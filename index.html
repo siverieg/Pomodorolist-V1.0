@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Focus</title>
-<meta name="description" content="A minimal, distraction-free Pomodoro focus timer with named sessions, streaks and statistics. All data stays in your browser.">
+<title>Pomodorolist</title>
+<meta name="description" content="A minimal, distraction-free Pomodoro focus timer with named sessions, streaks, statistics and cloud sync across devices.">
 <style>
 /* ==========================================================================
    THEME TOKENS
@@ -21,19 +21,20 @@
   --accent-soft: rgba(47, 143, 131, .12);
   --heat0: #ecedea;
   --danger: #b94a3f;
+  --warn: #c07a2c;
   --radius: 16px;
   color-scheme: light;
 }
 :root[data-theme="dark"] {
   --bg: #121414; --surface: #1a1d1d; --text: #e7e9e8; --muted: #8e9693;
   --line: #2a2f2e; --accent: #4fb3a5; --accent-soft: rgba(79, 179, 165, .16);
-  --heat0: #232827; --danger: #e07a6f; color-scheme: dark;
+  --heat0: #232827; --danger: #e07a6f; --warn: #e0a15a; color-scheme: dark;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #121414; --surface: #1a1d1d; --text: #e7e9e8; --muted: #8e9693;
     --line: #2a2f2e; --accent: #4fb3a5; --accent-soft: rgba(79, 179, 165, .16);
-    --heat0: #232827; --danger: #e07a6f; color-scheme: dark;
+    --heat0: #232827; --danger: #e07a6f; --warn: #e0a15a; color-scheme: dark;
   }
 }
 
@@ -67,6 +68,14 @@ h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacin
 .tabs button { border: 0; background: none; padding: 6px 14px; border-radius: 999px; color: var(--muted); cursor: pointer; }
 .tabs button.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
 
+/* Sync status indicator */
+.sync { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); margin-left: 6px; white-space: nowrap; }
+.sync i { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); display: inline-block; }
+.sync.syncing i { background: var(--muted); animation: pulse .8s ease-in-out infinite alternate; }
+.sync.offline i { background: var(--warn); }
+.sync.error i { background: var(--danger); }
+@keyframes pulse { to { opacity: .25; } }
+
 main { max-width: 1040px; margin: 0 auto; padding: 20px 16px 56px; }
 .tab { display: none; }
 .tab.active { display: block; }
@@ -78,7 +87,7 @@ main { max-width: 1040px; margin: 0 auto; padding: 20px 16px 56px; }
 
 /* Buttons */
 .btn {
-  border-radius: 999px; border: 1px solid var(--line); background: var(--surface);
+  white-space: nowrap; border-radius: 999px; border: 1px solid var(--line); background: var(--surface);
   padding: 9px 18px; cursor: pointer; transition: border-color .15s, background .15s;
 }
 .btn:hover { border-color: var(--muted); }
@@ -91,19 +100,47 @@ main { max-width: 1040px; margin: 0 auto; padding: 20px 16px 56px; }
 .linkbtn:hover { color: var(--text); }
 .iconbtn {
   width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface);
-  display: inline-grid; place-items: center; cursor: pointer; color: var(--muted);
+  display: inline-grid; place-items: center; cursor: pointer; color: var(--muted); flex: none;
 }
 .iconbtn:hover { color: var(--text); }
 .iconbtn svg { width: 18px; height: 18px; }
 
 /* Form fields */
 .field { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
-input[type="text"], input[type="number"], select {
+input[type="text"], input[type="number"], input[type="password"], select {
   width: 100%; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px;
 }
 input:focus, select:focus { outline: 3px solid var(--accent-soft); border-color: var(--accent); }
 input[type="color"] { width: 42px; height: 40px; padding: 2px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); cursor: pointer; flex: none; }
 input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); }
+
+/* ==========================================================================
+   LOGIN / SIGN-UP SCREEN
+   ========================================================================== */
+.boot, .auth { min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; padding: 24px 16px; }
+.boot { color: var(--muted); }
+.auth-card { width: min(400px, 100%); padding: 28px 24px 22px; }
+.auth-brand { font-size: 22px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+.auth-brand i { width: 12px; height: 12px; border-radius: 50%; background: var(--accent); display: inline-block; }
+.auth-card .lead { color: var(--muted); font-size: 14px; margin: 6px 0 20px; }
+.auth-card .seg { display: flex; width: 100%; margin-bottom: 18px; }
+.auth-card .seg button { flex: 1; }
+.auth-form label.field { margin-top: 12px; }
+.hint { font-size: 12px; color: var(--muted); margin-top: 5px; }
+.pw { position: relative; }
+.pw input { padding-right: 68px; }
+.pw button {
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  border: 0; background: none; color: var(--muted); font-size: 13px; cursor: pointer; padding: 4px 8px;
+}
+.pw button:hover { color: var(--text); }
+.auth-error { color: var(--danger); font-size: 14px; min-height: 21px; margin: 14px 0 10px; }
+.auth-form .btn.primary { width: 100%; }
+.auth-foot { text-align: center; margin-top: 14px; }
+.auth-warn {
+  margin-top: 16px; font-size: 13px; line-height: 1.45; padding: 10px 12px; border-radius: 10px;
+  background: var(--accent-soft); color: var(--text);
+}
 
 /* ==========================================================================
    TIMER
@@ -183,7 +220,7 @@ input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent);
 .scroll-x { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .scroll-x .chart { min-width: 640px; }
 .tip { min-height: 22px; font-size: 13px; color: var(--muted); margin-top: 8px; }
-.legend { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted); margin-top: 8px; }
+.legend { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted); margin-top: 8px; flex-wrap: wrap; }
 .legend i { width: 11px; height: 11px; border-radius: 2px; display: inline-block; }
 .toplist { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
 .toplist li { display: grid; grid-template-columns: auto minmax(0, 1fr) 90px auto; gap: 10px; align-items: center; font-size: 14px; }
@@ -203,11 +240,12 @@ input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent);
    ========================================================================== */
 .setting { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 0; border-top: 1px solid var(--line); }
 .setting:first-of-type { border-top: 0; padding-top: 4px; }
-.setting .desc { font-size: 12px; color: var(--muted); }
+.desc { font-size: 12px; color: var(--muted); }
 .setting input[type="number"], .setting select { width: 140px; flex: none; }
 .btn-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.acct-name { font-weight: 600; word-break: break-all; }
 
-/* Preset dialog */
+/* Dialogs */
 dialog {
   border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--text);
   padding: 20px; width: min(520px, calc(100vw - 32px)); max-height: calc(100vh - 40px);
@@ -231,16 +269,63 @@ dialog::backdrop { background: rgba(0, 0, 0, .35); }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 @media (max-width: 520px) {
-  .brand span { display: none; }
+  .brand { display: none; }
   .tabs button { padding: 6px 11px; }
 }
-@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
 </head>
 <body>
 
+<!-- ================================ BOOT (while Firebase loads) ================================ -->
+<div class="boot" id="bootView">Loading…</div>
+
+<!-- ================================ LOGIN / SIGN UP ================================ -->
+<section class="auth hidden" id="authView">
+  <div class="card auth-card">
+    <div class="auth-brand"><i></i>Pomodorolist</div>
+    <p class="lead">Log in to keep your focus sessions, streaks and stats in sync on every device.</p>
+    <div class="seg" id="authSeg" role="tablist">
+      <button type="button" data-mode="login" class="active">Log in</button>
+      <button type="button" data-mode="signup">Sign up</button>
+    </div>
+    <form class="auth-form" id="authForm" novalidate>
+      <label class="field" for="authUser" style="margin-top:0">Username</label>
+      <input type="text" id="authUser" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="20" required>
+      <div class="hint">3–20 characters: letters, numbers or _ (not case-sensitive)</div>
+
+      <label class="field" for="authPass">Password</label>
+      <div class="pw">
+        <input type="password" id="authPass" autocomplete="current-password" minlength="6" required>
+        <button type="button" data-toggle="authPass">Show</button>
+      </div>
+
+      <div id="confirmWrap" class="hidden">
+        <label class="field" for="authPass2">Confirm password</label>
+        <div class="pw">
+          <input type="password" id="authPass2" autocomplete="new-password" minlength="6">
+          <button type="button" data-toggle="authPass2">Show</button>
+        </div>
+      </div>
+
+      <div class="auth-error" id="authError" role="alert" aria-live="polite"></div>
+      <button type="submit" class="btn primary" id="authSubmit">Log in</button>
+    </form>
+    <div class="auth-foot"><button class="linkbtn" id="guestBtn" type="button">Use on this device only (no sync)</button></div>
+    <div class="auth-warn hidden" id="configWarn">
+      <b>Firebase isn’t set up yet.</b> Paste your <code>firebaseConfig</code> into the
+      “FIREBASE CONFIG” section near the top of the script in <code>index.html</code>.
+    </div>
+  </div>
+</section>
+
+<!-- ================================ APP ================================ -->
+<div id="appView" class="hidden">
 <header class="top">
-  <div class="brand"><i></i><span>Focus</span></div>
+  <div class="row" style="gap:4px">
+    <div class="brand"><i></i><span>Pomodorolist</span></div>
+    <span class="sync" id="syncStatus" title="Cloud sync status"><i></i><b>Synced</b></span>
+  </div>
   <nav class="tabs" id="tabs">
     <button data-tab="timer">Timer</button>
     <button data-tab="stats">Stats</button>
@@ -374,8 +459,18 @@ dialog::backdrop { background: rgba(0, 0, 0, .35); }
 
       <div class="stack">
         <div class="card">
+          <h2>Account</h2>
+          <div class="row between">
+            <div style="min-width:0">
+              <div class="acct-name" id="acctName"></div>
+              <div class="desc" id="acctDesc"></div>
+            </div>
+            <button class="btn" id="logoutBtn">Log out</button>
+          </div>
+        </div>
+        <div class="card">
           <h2>Backup</h2>
-          <p class="muted" style="margin:0 0 14px;font-size:14px">Everything is stored only in this browser. Export a JSON backup now and then, or to move to another device.</p>
+          <p class="muted" style="margin:0 0 14px;font-size:14px">Download a JSON copy of your data, or import a backup. Imports are merged into your account without creating duplicates.</p>
           <div class="btn-row">
             <button class="btn" id="exportBtn">Export JSON</button>
             <button class="btn" id="importBtn">Import JSON</button>
@@ -391,6 +486,7 @@ dialog::backdrop { background: rgba(0, 0, 0, .35); }
     </div>
   </section>
 </main>
+</div>
 
 <!-- Preset manager -->
 <dialog id="presetDlg">
@@ -413,11 +509,47 @@ dialog::backdrop { background: rgba(0, 0, 0, .35); }
   </form>
 </dialog>
 
+<!-- Migration prompt (shown once per account when pre-account data exists on this device) -->
+<dialog id="migrateDlg">
+  <h2>Existing progress found</h2>
+  <p style="margin:0 0 6px;font-weight:600">Upload your existing progress to this account?</p>
+  <p class="muted" style="margin:0 0 18px;font-size:14px" id="migrateText"></p>
+  <div class="btn-row" style="justify-content:flex-end">
+    <button class="btn" id="migrateNo">Not now</button>
+    <button class="btn primary" id="migrateYes" style="min-width:0;padding:9px 22px">Upload</button>
+  </div>
+</dialog>
+
 <div class="toast" id="toast" role="status"></div>
 <noscript><p style="text-align:center">This app needs JavaScript.</p></noscript>
 
 <script>
 'use strict';
+
+/* ##########################################################################
+   ###                     FIREBASE CONFIG — EDIT HERE                    ###
+   ###                                                                    ###
+   ###  Replace the placeholder values below with the firebaseConfig     ###
+   ###  object from: Firebase console → Project settings → Your apps.    ###
+   ###  (These values are safe to publish; your Firestore security       ###
+   ###  rules are what protect the data.)                                 ###
+   ########################################################################## */
+const firebaseConfig = {
+  apiKey: "AIzaSyDZyIYK_zJDcEWGdi9MKuIwVsgBenTAyLE",
+  authDomain: "pomodorolist-bbaa6.firebaseapp.com",
+  projectId: "pomodorolist-bbaa6",
+  storageBucket: "pomodorolist-bbaa6.firebasestorage.app",
+  messagingSenderId: "500992124941",
+  appId: "1:500992124941:web:6cf757455d74382ecb0d44",
+};
+/* ########################  END OF FIREBASE CONFIG  ######################## */
+
+// Firebase JS SDK version loaded from the official CDN (www.gstatic.com) as ES modules.
+const FIREBASE_VERSION = '10.12.2';
+// Usernames are turned into this fake e-mail for Firebase Email/Password auth. Users never see it.
+const USERNAME_DOMAIN = 'pomodorolist.app';
+// Developer testing only: open index.html?emulator=1 to use the local Firebase emulators.
+const USE_EMULATOR = /[?&]emulator=1\b/.test(location.search);
 
 /* ==========================================================================
    SMALL UTILITIES
@@ -428,9 +560,14 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;'
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 const pad = n => String(n).padStart(2, '0');
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+// Deep copy that also strips `undefined` values (Firestore rejects them).
+const clean = o => JSON.parse(JSON.stringify(o));
+const readJSON = (key, fallback) => { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch (e) { return fallback; } };
+const writeLS = (key, val) => { try { localStorage.setItem(key, typeof val === 'string' ? val : JSON.stringify(val)); } catch (e) { console.warn(e); } };
 
 // Dates: always use the user's LOCAL calendar. new Date(y, m, d + n) is DST-safe.
 const dayKey     = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const monthKey   = t => { const d = new Date(t); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}`; };
 const startOfDay = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
 const addDays    = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
 const fmtShort   = d => d.toLocaleDateString([], { day: 'numeric', month: 'short' });
@@ -452,25 +589,33 @@ function fmtClock(ms) {
 }
 
 let toastTimer;
-function toast(msg) {
+function toast(msg, ms = 2600) {
   const el = $('#toast');
   el.textContent = msg;
   el.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+  toastTimer = setTimeout(() => el.classList.remove('show'), ms);
 }
 
 /* ==========================================================================
-   STATE + PERSISTENCE (localStorage)
+   STATE
+   S holds everything the UI shows. For a signed-in user it is a mirror of
+   Firestore (profile doc + monthly session docs), cached in localStorage so
+   the app opens instantly and works offline.
    ========================================================================== */
-const STORE_KEY = 'focus-app-v1';
+const LEGACY_KEY  = 'focus-app-v1';            // pre-accounts data (also used by "device only" mode)
+const HANDLED_KEY = 'focus-app-v1-handled';    // uids already asked about migrating LEGACY_KEY
+const LAST_USER   = 'pomodorolist-last-user';  // { uid, username } for offline start
+const GUEST_FLAG  = 'pomodorolist-guest';      // "use on this device only" chosen
+const THEME_KEY   = 'pomodorolist-theme';      // theme for the login screen
+const cacheKey = id => 'pomodorolist-cache:' + id;
 
 // Calm palette used to auto-colour session names (user can override per name).
 const NAME_PALETTE = ['#2f8f83', '#5b7fd6', '#d08a3c', '#b45f8c', '#6a9a4a', '#8a6fd1', '#c8584e', '#3f9fbf', '#a08a3a', '#5f6f7a'];
 
 function defaultState() {
   return {
-    version: 1,
+    version: 2,
     settings: { goalMin: 60, weekStart: 1, sound: true, notify: true, theme: 'auto', autoStart: false },
     presets: [
       { id: 'p-classic', name: 'Classic 25/5',    focus: 25, short: 5,  long: 15, rounds: 4 },
@@ -481,39 +626,453 @@ function defaultState() {
     sessions: [],   // { id, name, start, end, duration(ms of focus), planned(ms), preset }
     recent: [],     // { name, presetId, ts }  most recent first
     pinned: [],     // { name, presetId }
-    // Live timer state is persisted so a reload (or closed tab) keeps going.
+    // Device-only fields (never uploaded):
     timer: { phase: 'focus', round: 1, status: 'idle', endAt: 0, remaining: 0, planned: 0, focusStartedAt: 0, name: '' },
     ui: { tab: 'timer', statsView: 'week' },
+    pendingSessions: [],  // logged while the sync service could not load at all; uploaded next time
+    profileDirty: false,  // profile edited in that same situation
   };
 }
 
 /** Merge stored data over defaults so new fields added later get sane values. */
 function hydrate(obj) {
   const def = defaultState();
+  obj = obj && typeof obj === 'object' ? obj : {};
   const out = { ...def, ...obj };
   for (const k of ['settings', 'timer', 'ui']) out[k] = { ...def[k], ...(obj[k] || {}) };
   if (!Array.isArray(out.presets) || !out.presets.length) out.presets = def.presets;
-  for (const k of ['sessions', 'recent', 'pinned']) if (!Array.isArray(out[k])) out[k] = [];
-  if (!out.names || typeof out.names !== 'object') out.names = {};
+  for (const k of ['sessions', 'recent', 'pinned', 'pendingSessions']) if (!Array.isArray(out[k])) out[k] = [];
+  if (!out.names || typeof out.names !== 'object' || Array.isArray(out.names)) out.names = {};
   return out;
 }
 
-function load() {
+let S = defaultState();
+let USER = null;          // { uid, username } or { guest: true }
+let localOnly = false;    // true when the Firebase SDK could not load (offline start)
+
+/** Save to this device (localStorage) and, if signed in, schedule a cloud upload. */
+function save() {
+  saveLocal();
+  scheduleProfilePush();
+}
+function saveLocal() {
+  if (!USER) return;
+  writeLS(USER.guest ? LEGACY_KEY : cacheKey(USER.uid), S);
+  writeLS(THEME_KEY, S.settings.theme);
+}
+
+/* ==========================================================================
+   FIREBASE: loading, auth, Firestore sync
+   Data layout:
+     users/{uid}                 profile: username, settings, presets, names,
+                                 recent, pinned, streak summary
+     users/{uid}/months/{YYYY-MM}  { sessions: [ ...that month's sessions ] }
+   Monthly documents keep a full year of sessions to ~12 small reads.
+   ========================================================================== */
+const FB = {};                // Firebase functions + app/auth/db instances
+let fbLoadError = '';
+let unsubs = [];              // Firestore listeners to detach on logout
+let profileLoaded = false;    // first profile snapshot applied (until then, never upload)
+let sessionsLoaded = false;
+let firstLoadDone = false;
+let lastProfileJSON = '';     // what the cloud already has, to skip redundant writes
+let monthOf = {};             // session id -> month doc id (needed to delete a session)
+let monthDocIds = [];
+let pendingWrites = 0;
+let syncError = false;
+let pushTimer;
+let localEditPending = false; // edited here but not uploaded yet: don't let a cloud snapshot overwrite it
+
+const firebaseConfigured = () => !/PASTE_/.test(firebaseConfig.apiKey + firebaseConfig.projectId);
+const cloudReady = () => !!(FB.db && USER && !USER.guest && !localOnly);
+const userRef    = () => FB.doc(FB.db, 'users', USER.uid);
+const monthRef   = m => FB.doc(FB.db, 'users', USER.uid, 'months', m);
+const usernameOf = user => (user.email || '').split('@')[0];
+
+async function loadFirebase() {
+  const base = `https://www.gstatic.com/firebasejs/${FIREBASE_VERSION}/`;
+  const [appM, authM, fsM] = await Promise.all([
+    import(base + 'firebase-app.js'),
+    import(base + 'firebase-auth.js'),
+    import(base + 'firebase-firestore.js'),
+  ]);
+  Object.assign(FB, appM, authM, fsM);
+  FB.app = FB.initializeApp(firebaseConfig);
+  FB.auth = FB.getAuth(FB.app);
+  if (USE_EMULATOR) FB.connectAuthEmulator(FB.auth, 'http://127.0.0.1:9099', { disableWarnings: true });
+  // "Stay logged in": keep the session in this browser until the user logs out.
+  await FB.setPersistence(FB.auth, FB.browserLocalPersistence).catch(() => {});
   try {
-    const raw = localStorage.getItem(STORE_KEY);
-    return raw ? hydrate(JSON.parse(raw)) : defaultState();
+    // Offline persistence: Firestore keeps a local copy in IndexedDB and queues
+    // writes made offline, syncing them automatically when back online.
+    FB.db = FB.initializeFirestore(FB.app, {
+      localCache: FB.persistentLocalCache({ tabManager: FB.persistentMultipleTabManager() }),
+    });
   } catch (e) {
-    console.warn('Could not read saved data', e);
-    return defaultState();
+    console.warn('Offline persistence unavailable, using memory cache', e);
+    FB.db = FB.getFirestore(FB.app);
+  }
+  if (USE_EMULATOR) FB.connectFirestoreEmulator(FB.db, '127.0.0.1', 8080);
+}
+
+/** Profile fields that live in users/{uid}. Names become an array (safe Firestore keys). */
+function profileFromState() {
+  const idx = buildIndex();
+  const { cur, longest } = computeStreaks(idx);
+  return clean({
+    username: USER.username,
+    settings: S.settings,
+    presets: S.presets,
+    activePresetId: S.activePresetId,
+    names: Object.entries(S.names).map(([name, v]) => ({ name, color: v.color || '', tag: v.tag || '' })),
+    recent: S.recent,
+    pinned: S.pinned,
+    // Stored for reference only; the app always recalculates streaks from the session log.
+    streak: { current: cur, longest, goalMin: S.settings.goalMin, today: dayKey(new Date()) },
+  });
+}
+
+function scheduleProfilePush() {
+  if (!USER || USER.guest) return;
+  localEditPending = true;
+  clearTimeout(pushTimer);
+  pushTimer = setTimeout(pushProfile, 700);
+}
+
+/** Upload the profile if it changed. Never before the cloud copy has been read (would overwrite it). */
+function pushProfile(force) {
+  if (!USER || USER.guest) return;
+  localEditPending = false;
+  if (localOnly) { S.profileDirty = true; saveLocal(); return; }
+  if (!cloudReady() || (!profileLoaded && !force)) return;
+  const p = profileFromState();
+  const json = JSON.stringify(p);
+  if (!force && json === lastProfileJSON) return;
+  lastProfileJSON = json;
+  trackWrite(FB.setDoc(userRef(), { ...p, updatedAt: FB.serverTimestamp() }, { merge: true }));
+}
+
+/** Append sessions to their monthly docs. arrayUnion never duplicates an identical entry. */
+function cloudAddSessions(list) {
+  if (!list.length) return;
+  const byMonth = {};
+  for (const s of list) (byMonth[monthKey(s.start)] ||= []).push(clean(s));
+  const batch = FB.writeBatch(FB.db);
+  for (const [m, arr] of Object.entries(byMonth)) {
+    batch.set(monthRef(m), { month: m, sessions: FB.arrayUnion(...arr), updatedAt: FB.serverTimestamp() }, { merge: true });
+  }
+  trackWrite(batch.commit());
+}
+function cloudRemoveSession(s) {
+  const m = monthOf[s.id] || monthKey(s.start);
+  trackWrite(FB.updateDoc(monthRef(m), { sessions: FB.arrayRemove(s), updatedAt: FB.serverTimestamp() }));
+}
+
+/** Count in-flight writes for the sync indicator. Offline writes stay pending until reconnect. */
+function trackWrite(promise) {
+  pendingWrites++;
+  renderSync();
+  promise.then(() => { syncError = false; }, onSyncError).finally(() => { pendingWrites--; renderSync(); });
+}
+function onSyncError(err) {
+  console.error('Sync error', err);
+  syncError = true;
+  renderSync();
+  if (err && err.code === 'permission-denied') toast('Cloud sync was refused — check the Firestore security rules', 5000);
+  else toast('Sync problem: ' + (err && err.message ? err.message : err), 4000);
+}
+
+function renderSync() {
+  const el = $('#syncStatus');
+  if (!el) return;
+  let cls = '', txt = 'Synced', title = 'All changes saved to the cloud';
+  if (USER && USER.guest) { cls = 'offline'; txt = 'This device'; title = 'Not signed in — data stays on this device'; }
+  else if (localOnly || !navigator.onLine) { cls = 'offline'; txt = 'Offline'; title = 'Changes are saved on this device and will sync when you are back online'; }
+  else if (syncError) { cls = 'error'; txt = 'Sync error'; title = 'Could not sync — see the message, or check your Firebase setup'; }
+  else if (pendingWrites > 0 || !profileLoaded) { cls = 'syncing'; txt = 'Syncing'; title = 'Saving to the cloud…'; }
+  el.className = 'sync ' + cls;
+  el.querySelector('b').textContent = txt;
+  el.title = title;
+}
+window.addEventListener('online', () => { syncError = false; renderSync(); });
+window.addEventListener('offline', renderSync);
+
+/** Apply the cloud profile to local state. */
+function applyProfile(d) {
+  const def = defaultState();
+  S.settings = { ...def.settings, ...(d.settings || {}) };
+  if (Array.isArray(d.presets) && d.presets.length) S.presets = d.presets;
+  S.activePresetId = S.presets.some(p => p.id === d.activePresetId) ? d.activePresetId : S.presets[0].id;
+  S.names = {};
+  for (const n of d.names || []) if (n && n.name) S.names[n.name] = { color: n.color || hashColor(n.name), tag: n.tag || '' };
+  S.recent = Array.isArray(d.recent) ? d.recent : [];
+  S.pinned = Array.isArray(d.pinned) ? d.pinned : [];
+  S.timer.round = Math.min(S.timer.round, activePreset().rounds);
+  lastProfileJSON = JSON.stringify(profileFromState());
+  saveLocal();
+  applyTheme();
+  syncNameInputs();
+  renderAll();
+  if (S.ui.tab === 'settings') renderSettings();
+}
+
+/** Live listeners: any change on another device shows up here within a second or two. */
+function attachListeners() {
+  unsubs.push(FB.onSnapshot(userRef(), { includeMetadataChanges: true }, snap => {
+    if (!snap.exists()) {
+      if (snap.metadata.fromCache) return;       // not sure yet — wait for the server's answer
+      if (!profileLoaded) { profileLoaded = true; pushProfile(true); afterFirstLoad(); }  // brand-new account
+      return;
+    }
+    if (profileLoaded && (snap.metadata.hasPendingWrites || localEditPending)) { renderSync(); return; }  // our own edit is newer
+    applyProfile(snap.data());
+    profileLoaded = true;
+    renderSync();
+    afterFirstLoad();
+  }, onSyncError));
+
+  unsubs.push(FB.onSnapshot(FB.collection(FB.db, 'users', USER.uid, 'months'), qs => {
+    const list = [];
+    monthOf = {};
+    monthDocIds = [];
+    qs.forEach(docSnap => {
+      monthDocIds.push(docSnap.id);
+      for (const s of docSnap.data().sessions || []) {
+        if (monthOf[s.id]) continue;  // ignore accidental duplicates
+        monthOf[s.id] = docSnap.id;
+        list.push(s);
+      }
+    });
+    list.sort((a, b) => a.start - b.start);
+    S.sessions = list;
+    sessionsLoaded = true;
+    saveLocal();
+    renderToday();
+    if (S.ui.tab === 'stats') renderStats();
+    scheduleProfilePush();  // keeps the stored streak summary current
+    afterFirstLoad();
+  }, onSyncError));
+}
+
+/** Runs once per login, after both the profile and sessions have loaded. */
+function afterFirstLoad() {
+  if (firstLoadDone || !profileLoaded || !sessionsLoaded) return;
+  firstLoadDone = true;
+  maybeOfferMigration();
+}
+
+/* ==========================================================================
+   SESSION START / LOGIN / LOGOUT
+   ========================================================================== */
+function showView(id) {
+  for (const v of ['bootView', 'authView', 'appView']) $('#' + v).classList.toggle('hidden', v !== id);
+}
+
+/** Enter the app for a signed-in user (cloud = Firebase available) or guest. */
+function startSession(user, cloud) {
+  if (USER && !USER.guest && user.uid && USER.uid === user.uid) return;
+  USER = user;
+  if (!user.guest) writeLS(LAST_USER, user);
+  S = hydrate(readJSON(user.guest ? LEGACY_KEY : cacheKey(user.uid), null));
+  applyTheme();
+  initInputs();
+  showView('appView');
+  renderAll();
+  showTab(S.ui.tab || 'timer');
+  renderAccount();
+  renderSync();
+  tick();  // finishes any phase that ended while the page was closed
+
+  if (cloud) {
+    // Upload anything recorded during an earlier start when Firebase could not load.
+    if (S.profileDirty) {
+      trackWrite(FB.setDoc(userRef(), { ...profileFromState(), updatedAt: FB.serverTimestamp() }, { merge: true }));
+      S.profileDirty = false;
+    }
+    if (S.pendingSessions.length) { cloudAddSessions(S.pendingSessions); S.pendingSessions = []; }
+    saveLocal();
+    attachListeners();
+    trackWrite(FB.waitForPendingWrites(FB.db));  // shows "Syncing" until earlier offline writes land
   }
 }
 
-function save() {
-  try { localStorage.setItem(STORE_KEY, JSON.stringify(S)); }
-  catch (e) { console.warn('Could not save', e); toast('Could not save — storage may be full or blocked'); }
+let authMode = 'login';
+function showAuth() {
+  showView('authView');
+  setAuthMode(authMode);
+  $('#configWarn').classList.toggle('hidden', firebaseConfigured());
+  if (fbLoadError) authErr(fbLoadError);
+}
+function setAuthMode(mode) {
+  authMode = mode;
+  $$('#authSeg button').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  $('#confirmWrap').classList.toggle('hidden', mode !== 'signup');
+  $('#authSubmit').textContent = mode === 'signup' ? 'Create account' : 'Log in';
+  $('#authPass').autocomplete = mode === 'signup' ? 'new-password' : 'current-password';
+  authErr('');
+}
+function authErr(msg) { $('#authError').textContent = msg; }
+
+/** Friendly messages for Firebase Auth error codes. */
+function friendlyAuthError(err) {
+  const code = (err && err.code) || '';
+  const map = {
+    'auth/email-already-in-use': 'That username is already taken — please choose another.',
+    'auth/invalid-credential': authMode === 'login' ? 'Wrong username or password. New here? Choose “Sign up”.' : 'Could not sign up. Please try again.',
+    'auth/invalid-login-credentials': 'Wrong username or password. New here? Choose “Sign up”.',
+    'auth/wrong-password': 'Wrong password — please try again.',
+    'auth/user-not-found': 'No account with that username. Choose “Sign up” to create one.',
+    'auth/invalid-email': 'That username can’t be used. Use letters, numbers and _ only.',
+    'auth/weak-password': 'Password must be at least 6 characters.',
+    'auth/missing-password': 'Please enter your password.',
+    'auth/network-request-failed': 'No internet connection. Check your connection and try again.',
+    'auth/too-many-requests': 'Too many attempts. Please wait a minute and try again.',
+    'auth/user-disabled': 'This account has been disabled.',
+    'auth/operation-not-allowed': 'Sign-in is not enabled yet. In Firebase, turn on Authentication → Email/Password.',
+    'auth/unauthorized-domain': 'This website is not authorised yet. Add it in Firebase → Authentication → Settings → Authorized domains.',
+    'auth/invalid-api-key': 'The Firebase config in index.html looks wrong — please paste it again.',
+    'auth/api-key-not-valid.-please-pass-a-valid-api-key.': 'The Firebase config in index.html looks wrong — please paste it again.',
+  };
+  return map[code] || 'Something went wrong' + (code ? ` (${code.replace('auth/', '')})` : '') + '. Please try again.';
 }
 
-let S = load();
+async function onAuthSubmit(e) {
+  e.preventDefault();
+  const username = $('#authUser').value.trim().toLowerCase();
+  const pass = $('#authPass').value;
+  if (!/^[a-z0-9_]{3,20}$/.test(username)) return authErr('Username must be 3–20 characters: letters, numbers or underscores.');
+  if (pass.length < 6) return authErr('Password must be at least 6 characters.');
+  if (authMode === 'signup' && pass !== $('#authPass2').value) return authErr('Passwords don’t match.');
+  if (!firebaseConfigured()) return authErr('Firebase isn’t set up yet — see the note below.');
+  if (!navigator.onLine) return authErr('No internet connection. Connect and try again.');
+  if (!FB.auth) return authErr(fbLoadError || 'Still loading — try again in a moment.');
+
+  const email = `${username}@${USERNAME_DOMAIN}`;
+  const btn = $('#authSubmit');
+  btn.disabled = true;
+  btn.textContent = authMode === 'signup' ? 'Creating account…' : 'Logging in…';
+  authErr('');
+  try {
+    if (authMode === 'signup') await FB.createUserWithEmailAndPassword(FB.auth, email, pass);
+    else await FB.signInWithEmailAndPassword(FB.auth, email, pass);
+    $('#authPass').value = $('#authPass2').value = '';
+    // onAuthStateChanged takes it from here.
+  } catch (err) {
+    console.warn(err);
+    authErr(friendlyAuthError(err));
+  } finally {
+    btn.disabled = false;
+    btn.textContent = authMode === 'signup' ? 'Create account' : 'Log in';
+  }
+}
+
+async function logout() {
+  if (!USER) return;
+  if (USER.guest) {
+    localStorage.removeItem(GUEST_FLAG);
+    location.reload();
+    return;
+  }
+  if (localOnly) { toast('Connect to the internet to log out'); return; }
+  if (pendingWrites > 0 && !confirm('Some changes have not reached the cloud yet (you may be offline). If you log out now they will be lost. Log out anyway?')) return;
+  unsubs.forEach(u => u());
+  unsubs = [];
+  try { await FB.signOut(FB.auth); } catch (e) { /* ignore */ }
+  // Remove this account's data from the device (useful on shared computers).
+  localStorage.removeItem(cacheKey(USER.uid));
+  localStorage.removeItem(LAST_USER);
+  // Also clear Firestore's offline copy. Best effort: never let this block logging out.
+  const cleanup = (async () => { await FB.terminate(FB.db); await FB.clearIndexedDbPersistence(FB.db); })().catch(() => {});
+  await Promise.race([cleanup, new Promise(r => setTimeout(r, 2000))]);
+  location.reload();
+}
+
+function renderAccount() {
+  if (!USER) return;
+  if (USER.guest) {
+    $('#acctName').textContent = 'Not signed in';
+    $('#acctDesc').textContent = 'Data stays on this device only';
+    $('#logoutBtn').textContent = 'Log in / Sign up';
+  } else {
+    $('#acctName').textContent = '@' + USER.username;
+    $('#acctDesc').textContent = localOnly ? 'Offline — will sync when the app is opened online' : 'Progress syncs across all your devices';
+    $('#logoutBtn').textContent = 'Log out';
+  }
+}
+
+/* ==========================================================================
+   MIGRATION + MERGING (old device data, JSON import)
+   ========================================================================== */
+function legacyData() {
+  const d = readJSON(LEGACY_KEY, null);
+  if (!d || !Array.isArray(d.sessions)) return null;
+  return (d.sessions.length || (d.pinned || []).length || (d.recent || []).length) ? d : null;
+}
+
+function maybeOfferMigration() {
+  const legacy = legacyData();
+  const handled = readJSON(HANDLED_KEY, []);
+  if (!legacy || handled.includes(USER.uid)) return;
+  const mins = legacy.sessions.reduce((a, s) => a + (+s.duration || 0), 0) / 60000;
+  $('#migrateText').textContent =
+    `This device has ${legacy.sessions.length} session${legacy.sessions.length === 1 ? '' : 's'} (${fmtMin(mins)} of focus) ` +
+    `saved before you had an account. Uploading merges them into @${USER.username} — nothing is duplicated.`;
+  const dlg = $('#migrateDlg');
+  const done = yes => {
+    dlg.close();
+    writeLS(HANDLED_KEY, [...handled, USER.uid]);
+    if (yes) toast(`Uploaded ${mergeData(legacy)} session(s) to your account`);
+  };
+  $('#migrateYes').onclick = () => done(true);
+  $('#migrateNo').onclick = () => done(false);
+  dlg.addEventListener('cancel', () => done(false), { once: true });
+  dlg.showModal();
+}
+
+/**
+ * Merge another data set (old device data or an imported backup) into the current state.
+ * Sessions are de-duplicated by id and by identical start+end times.
+ * Returns the number of sessions added.
+ */
+function mergeData(obj) {
+  const src = hydrate(obj);
+  const hadSessions = S.sessions.length > 0;
+  const ids = new Set(S.sessions.map(s => s.id));
+  const spans = new Set(S.sessions.map(s => s.start + '|' + s.end));
+  const add = [];
+  for (const s of src.sessions) {
+    if (!s || !Number.isFinite(+s.start) || !Number.isFinite(+s.end)) continue;
+    const id = String(s.id || uid());
+    const span = +s.start + '|' + +s.end;
+    if (ids.has(id) || spans.has(span)) continue;
+    ids.add(id); spans.add(span);
+    add.push({
+      id, name: String(s.name || 'Untitled'), start: +s.start, end: +s.end,
+      duration: Math.round(+s.duration || (+s.end - +s.start)), planned: Math.round(+s.planned || +s.duration || 0),
+      preset: String(s.preset || ''),
+    });
+  }
+  S.sessions.push(...add);
+  S.sessions.sort((a, b) => a.start - b.start);
+  if (cloudReady()) cloudAddSessions(add);
+  else if (USER && !USER.guest) S.pendingSessions.push(...add);
+
+  for (const p of src.presets) {
+    if (!p || S.presets.some(x => x.id === p.id || x.name === p.name)) continue;
+    const n = (v, lo, hi, d) => clamp(Math.round(+v) || d, lo, hi);
+    S.presets.push({ id: String(p.id || uid()), name: String(p.name || 'Preset'), focus: n(p.focus, 1, 240, 25), short: n(p.short, 1, 120, 5), long: n(p.long, 1, 180, 15), rounds: n(p.rounds, 1, 12, 4) });
+  }
+  for (const [name, v] of Object.entries(src.names)) if (!S.names[name] && v) S.names[name] = { color: v.color || hashColor(name), tag: v.tag || '' };
+  for (const p of src.pinned) if (p && !isPinned(p.name, p.presetId)) S.pinned.push({ name: p.name, presetId: p.presetId });
+  const seen = new Set();
+  S.recent = [...S.recent, ...src.recent].filter(r => r && r.name).sort((a, b) => (b.ts || 0) - (a.ts || 0))
+    .filter(r => { const k = r.name + '|' + r.presetId; if (seen.has(k)) return false; seen.add(k); return true; }).slice(0, 8);
+  if (!hadSessions) S.settings = { ...S.settings, ...src.settings };  // empty account: adopt the old settings
+  applyTheme();
+  save();
+  renderAll();
+  return add.length;
+}
 
 /* ==========================================================================
    NAMES (colour + tag per session name)
@@ -576,6 +1135,7 @@ function notify(title, body) {
    Accuracy: we store an absolute end timestamp (endAt) while running and
    compute remaining = endAt - now on every tick. Background-tab throttling
    of setInterval therefore never causes drift, and a reload resumes cleanly.
+   The running timer is per device (it is not synced).
    ========================================================================== */
 const activePreset = () => S.presets.find(p => p.id === S.activePresetId) || S.presets[0];
 
@@ -615,7 +1175,7 @@ function pauseTimer() {
   const t = S.timer;
   t.remaining = Math.max(0, t.endAt - Date.now());
   t.status = 'paused';
-  save();
+  saveLocal();
   renderTimer();
 }
 
@@ -668,11 +1228,12 @@ function finishPhase(reason) {
   renderAll();
 }
 
+/** Record a completed focus block locally and in the cloud. */
 function logSession(focusedMs, end) {
   const t = S.timer;
   const name = currentName();
   ensureName(name);
-  S.sessions.push({
+  const s = {
     id: uid(),
     name,
     start: t.focusStartedAt || end - focusedMs,
@@ -680,7 +1241,10 @@ function logSession(focusedMs, end) {
     duration: Math.round(focusedMs),
     planned: t.planned,
     preset: activePreset().name,
-  });
+  };
+  S.sessions.push(s);
+  if (cloudReady()) cloudAddSessions([s]);
+  else if (USER && !USER.guest) S.pendingSessions.push(s);
   toast(`Logged ${fmtMin(focusedMs / 60000)} · ${name}`);
 }
 
@@ -710,7 +1274,7 @@ function loadChip(name, pid) {
 }
 
 /* ==========================================================================
-   AGGREGATION + STREAKS
+   AGGREGATION + STREAKS (always derived from the synced session log)
    ========================================================================== */
 /**
  * Split a session across local calendar days (handles sessions crossing midnight).
@@ -780,7 +1344,7 @@ function renderClock() {
   $('#ringProg').style.strokeDashoffset = RING_C * (1 - clamp(progress, 0, 1));
   const t = S.timer;
   const label = t.phase === 'focus' ? 'Focus' : t.phase === 'short' ? 'Break' : 'Long break';
-  document.title = t.status === 'idle' ? 'Focus' : `${fmtClock(rem)} · ${label}${t.status === 'paused' ? ' (paused)' : ''}`;
+  document.title = t.status === 'idle' ? 'Pomodorolist' : `${fmtClock(rem)} · ${label}${t.status === 'paused' ? ' (paused)' : ''}`;
 }
 
 function renderTimer() {
@@ -1124,10 +1688,9 @@ function renderStats() {
 /* ==========================================================================
    RENDER: SETTINGS
    ========================================================================== */
-function applyTheme() {
-  const th = S.settings.theme;
-  if (th === 'auto') document.documentElement.removeAttribute('data-theme');
-  else document.documentElement.setAttribute('data-theme', th);
+function applyTheme(theme = S.settings.theme) {
+  if (theme === 'light' || theme === 'dark') document.documentElement.setAttribute('data-theme', theme);
+  else document.documentElement.removeAttribute('data-theme');
 }
 function renderSettings() {
   const st = S.settings;
@@ -1143,6 +1706,7 @@ function renderSettings() {
     : perm === 'denied' ? 'Blocked in browser settings'
     : perm === 'unsupported' ? 'Not supported in this browser'
     : 'You will be asked when you first start a timer';
+  renderAccount();
 }
 
 /* ==========================================================================
@@ -1173,9 +1737,10 @@ function showTab(tab) {
   $$('.tab').forEach(s => s.classList.toggle('active', s.id === 'tab-' + tab));
   if (tab === 'stats') renderStats();
   if (tab === 'settings') renderSettings();
-  save();
+  saveLocal();
 }
 function renderAll() {
+  if (!USER) return;
   renderSessionInputs();
   renderTimer();
   renderChips();
@@ -1186,14 +1751,32 @@ function renderAll() {
 /* ==========================================================================
    EVENTS
    ========================================================================== */
+// Login screen
+$('#authSeg').addEventListener('click', e => { const b = e.target.closest('button'); if (b) setAuthMode(b.dataset.mode); });
+$('#authForm').addEventListener('submit', onAuthSubmit);
+$$('[data-toggle]').forEach(btn => btn.addEventListener('click', () => {
+  const input = $('#' + btn.dataset.toggle);
+  const show = input.type === 'password';
+  input.type = show ? 'text' : 'password';
+  btn.textContent = show ? 'Hide' : 'Show';
+}));
+$('#guestBtn').addEventListener('click', () => {
+  writeLS(GUEST_FLAG, '1');
+  startSession({ guest: true }, false);
+});
+$('#logoutBtn').addEventListener('click', logout);
+
 // Name / colour / tag
-function onNameChange() {
+function syncNameInputs() {
   const name = $('#nameInput').value.trim();
-  S.timer.name = name;
   $('#nameColor').value = colorFor(name || 'Untitled');
   $('#nameTag').value = tagFor(name);
+}
+function onNameChange() {
+  S.timer.name = $('#nameInput').value.trim();
+  syncNameInputs();
   renderTimer();
-  save();
+  saveLocal();
 }
 $('#nameInput').addEventListener('input', onNameChange);
 $('#nameColor').addEventListener('input', e => {
@@ -1212,8 +1795,7 @@ $('#nameTag').addEventListener('change', e => {
 
 // Timer controls
 $('#mainBtn').addEventListener('click', () => {
-  const st = S.timer.status;
-  if (st === 'running') pauseTimer(); else startTimer();
+  if (S.timer.status === 'running') pauseTimer(); else startTimer();
 });
 $('#skipBtn').addEventListener('click', () => finishPhase('skip'));
 $('#resetBtn').addEventListener('click', () => finishPhase('reset'));
@@ -1233,7 +1815,7 @@ $('#presetSelect').addEventListener('change', e => {
 
 // Space bar = start / pause (ignored while typing)
 document.addEventListener('keydown', e => {
-  if (e.code !== 'Space' || e.target.closest('input, select, textarea, button, dialog') || S.ui.tab !== 'timer') return;
+  if (!USER || e.code !== 'Space' || e.target.closest('input, select, textarea, button, dialog') || S.ui.tab !== 'timer') return;
   e.preventDefault();
   $('#mainBtn').click();
 });
@@ -1265,7 +1847,7 @@ $('#statsSeg').addEventListener('click', e => {
   if (!b) return;
   S.ui.statsView = b.dataset.view;
   statsOffset = 0;
-  save();
+  saveLocal();
   renderStats();
 });
 $('#prevBtn').addEventListener('click', () => { statsOffset--; renderStats(); });
@@ -1282,12 +1864,17 @@ $('#statsBody').addEventListener('mouseover', showTip);
 $('#statsBody').addEventListener('click', e => {
   showTip(e);
   const del = e.target.closest('[data-del]');
-  if (del && confirm('Delete this session from your log?')) {
-    S.sessions = S.sessions.filter(s => s.id !== del.dataset.del);
-    save();
-    renderStats();
-    renderToday();
-  }
+  if (!del) return;
+  const s = S.sessions.find(x => x.id === del.dataset.del);
+  if (!s || !confirm('Delete this session from your log?')) return;
+  const pending = S.pendingSessions.some(x => x.id === s.id);
+  if (localOnly && !pending) { toast('Connect to the internet to delete synced sessions'); return; }
+  S.sessions = S.sessions.filter(x => x.id !== s.id);
+  S.pendingSessions = S.pendingSessions.filter(x => x.id !== s.id);
+  if (cloudReady()) cloudRemoveSession(s);
+  save();
+  renderStats();
+  renderToday();
 });
 
 // Settings
@@ -1309,10 +1896,11 @@ $('#setNotify').addEventListener('change', e => {
 
 // Export / import / wipe
 $('#exportBtn').addEventListener('click', () => {
-  const blob = new Blob([JSON.stringify(S, null, 2)], { type: 'application/json' });
+  const { timer, ui, pendingSessions, profileDirty, ...data } = S;
+  const blob = new Blob([JSON.stringify({ ...data, exportedAt: new Date().toISOString() }, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `focus-backup-${dayKey(new Date())}.json`;
+  a.download = `pomodorolist-backup-${dayKey(new Date())}.json`;
   document.body.appendChild(a);
   a.click();
   a.remove();
@@ -1326,28 +1914,32 @@ $('#importFile').addEventListener('change', async e => {
   if (!file) return;
   try {
     const data = JSON.parse(await file.text());
-    if (!data || !Array.isArray(data.sessions) || !Array.isArray(data.presets)) throw new Error('Not a Focus backup file');
-    if (!confirm(`Replace current data with this backup (${data.sessions.length} sessions)?`)) return;
-    S = hydrate(data);
-    save();
-    applyTheme();
-    initInputs();
-    renderAll();
-    renderSettings();
-    toast('Backup imported');
+    if (!data || !Array.isArray(data.sessions)) throw new Error('This is not a Pomodorolist backup file');
+    if (!confirm(`Merge this backup (${data.sessions.length} sessions) into your data? Duplicates are skipped.`)) return;
+    const added = mergeData(data);
+    toast(`Imported ${added} new session(s)`);
   } catch (err) {
     alert('Could not import: ' + err.message);
   }
 });
 $('#wipeBtn').addEventListener('click', () => {
-  if (!confirm('Erase ALL sessions, presets and settings? This cannot be undone.')) return;
+  if (localOnly) { toast('Connect to the internet to erase cloud data'); return; }
+  const where = USER.guest ? 'on this device' : 'in your account on ALL devices';
+  if (!confirm(`Erase ALL sessions, presets and settings ${where}? This cannot be undone.`)) return;
   S = defaultState();
-  save();
+  if (cloudReady()) {
+    const batch = FB.writeBatch(FB.db);
+    for (const m of monthDocIds) batch.delete(monthRef(m));
+    const p = profileFromState();
+    lastProfileJSON = JSON.stringify(p);
+    batch.set(userRef(), { ...p, updatedAt: FB.serverTimestamp() });
+    trackWrite(batch.commit());
+  }
+  saveLocal();
   applyTheme();
   initInputs();
   renderAll();
   renderSettings();
-  showTab('settings');
   toast('All data erased');
 });
 
@@ -1398,6 +1990,7 @@ $('#presetForm').addEventListener('submit', e => {
    ========================================================================== */
 let lastDay = dayKey(new Date());
 function tick() {
+  if (!USER) return;
   const t = S.timer;
   if (t.status === 'running' && Date.now() >= t.endAt) { finishPhase('complete'); return; }
   renderClock();
@@ -1413,19 +2006,12 @@ setInterval(tick, 250);
 // Catch up immediately when the tab becomes visible again or the device wakes.
 document.addEventListener('visibilitychange', tick);
 window.addEventListener('focus', tick);
+
 // Redraw charts at the new width after rotation / resize.
 let resizeTimer;
 window.addEventListener('resize', () => {
   clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(() => { if (S.ui.tab === 'stats') renderStats(); }, 150);
-});
-// Keep tabs in sync if the app is open in two windows.
-window.addEventListener('storage', e => {
-  if (e.key !== STORE_KEY) return;
-  S = load();
-  applyTheme();
-  initInputs();
-  renderAll();
+  resizeTimer = setTimeout(() => { if (USER && S.ui.tab === 'stats') renderStats(); }, 150);
 });
 
 /* ==========================================================================
@@ -1435,15 +2021,48 @@ function initInputs() {
   $('#ringProg').style.strokeDasharray = RING_C;
   const name = S.timer.name || (S.recent[0] && S.recent[0].name) || '';
   $('#nameInput').value = name;
-  $('#nameColor').value = colorFor(name || 'Untitled');
-  $('#nameTag').value = tagFor(name);
+  syncNameInputs();
 }
 
-applyTheme();
-initInputs();
-renderAll();
-showTab(S.ui.tab || 'timer');
-tick(); // finishes any phase that ended while the page was closed
+async function boot() {
+  applyTheme(readJSON(THEME_KEY, 'auto'));
+  const guest = localStorage.getItem(GUEST_FLAG) === '1';
+
+  if (!firebaseConfigured()) {
+    if (guest) startSession({ guest: true }, false); else showAuth();
+    return;
+  }
+  try {
+    await loadFirebase();
+  } catch (err) {
+    // Firebase could not load (usually: opened while offline). Fall back to this device's cache.
+    console.warn('Firebase failed to load', err);
+    fbLoadError = 'Could not reach the sync service. Check your internet connection and reload.';
+    const last = readJSON(LAST_USER, null);
+    if (guest) startSession({ guest: true }, false);
+    else if (last && last.uid) {
+      localOnly = true;
+      startSession(last, false);
+      toast(navigator.onLine
+        ? 'Could not start cloud sync (' + (err.code || err.message || 'unknown error') + '). Working offline for now.'
+        : 'Offline — your changes will sync next time you open the app online', 5000);
+    } else showAuth();
+    return;
+  }
+  FB.onAuthStateChanged(FB.auth, user => {
+    if (user) {
+      localStorage.removeItem(GUEST_FLAG);
+      startSession({ uid: user.uid, username: usernameOf(user) }, true);
+    } else if (USER && !USER.guest) {
+      location.reload();  // signed out (e.g. in another tab)
+    } else if (guest) {
+      if (!USER) startSession({ guest: true }, false);
+    } else {
+      showAuth();
+    }
+  });
+}
+boot();
 </script>
 </body>
 </html>
