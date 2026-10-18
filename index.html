@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pomodorolist</title>
+<link rel="icon" id="favicon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%2216%22%20r%3D%229%22%20fill%3D%22%232f8f83%22%2F%3E%3C%2Fsvg%3E">
 <meta name="description" content="A minimal, distraction-free Pomodoro focus timer with named sessions, streaks, statistics and cloud sync across devices.">
 <style>
 /* ==========================================================================
@@ -92,7 +93,7 @@ main { max-width: 1040px; margin: 0 auto; padding: 20px 16px 56px; }
 }
 .btn:hover { border-color: var(--muted); }
 .btn:disabled { opacity: .4; cursor: default; }
-.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; padding: 12px 30px; min-width: 132px; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent, #fff); font-weight: 600; padding: 12px 30px; min-width: 132px; }
 .btn.primary:hover { filter: brightness(1.06); }
 .btn.small { padding: 5px 12px; font-size: 13px; }
 .btn.danger { color: var(--danger); }
@@ -160,7 +161,7 @@ input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent);
 .ring .prog { fill: none; stroke: var(--accent); stroke-width: 7; stroke-linecap: round; transition: stroke-dashoffset .35s linear; }
 .ring.break .prog { stroke: var(--muted); }
 .ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.time { font-size: clamp(52px, 15vw, 74px); font-weight: 300; font-variant-numeric: tabular-nums; letter-spacing: -.02em; line-height: 1; }
+.time { font-family: var(--timer-font, inherit); font-size: clamp(52px, 15vw, 74px); font-weight: 300; font-variant-numeric: tabular-nums; letter-spacing: -.02em; line-height: 1; }
 .ring-sub { color: var(--muted); font-size: 13px; margin-top: 10px; max-width: 70%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .controls { display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; }
 
@@ -260,19 +261,147 @@ dialog::backdrop { background: rgba(0, 0, 0, .35); }
 .pform .full { grid-column: 1 / -1; }
 @media (max-width: 480px) { .pform { grid-template-columns: 1fr 1fr; } }
 
+/* ==========================================================================
+   PROGRESSION + SHOP
+   ========================================================================== */
+.lvchip {
+  display: inline-flex; align-items: center; gap: 6px; margin-left: 8px; padding: 2px 10px 2px 3px;
+  border: 1px solid var(--line); background: var(--surface); border-radius: 999px; cursor: pointer;
+  font-size: 12px; color: var(--muted); white-space: nowrap;
+}
+.lvchip:hover { border-color: var(--muted); }
+.lvchip svg { flex: none; }
+.lvchip .uname { color: var(--text); font-weight: 600; max-width: 120px; overflow: hidden; text-overflow: ellipsis; }
+.lvchip .lvn { font-variant-numeric: tabular-nums; }
+.coin { color: #c9a227; flex: none; }
+.coins { display: inline-flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
+.big.coins .coin { width: 22px; height: 22px; }
+
+.prog-hero { display: flex; gap: 20px; align-items: center; }
+.prog-hero .tiername { color: var(--tier); font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
+.xpbar { height: 8px; background: var(--heat0); border-radius: 999px; overflow: hidden; margin: 10px 0 6px; }
+.xpbar i { display: block; height: 100%; background: var(--accent); border-radius: 999px; transition: width .5s; }
+.tiles4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+@media (min-width: 640px) { .tiles4 { grid-template-columns: repeat(4, 1fr); } }
+.tiles4 .tile .v { font-size: 20px; }
+.tiergrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 10px; }
+.tier { text-align: center; padding: 12px 4px 10px; border: 1px solid var(--line); border-radius: 12px; font-size: 13px; }
+.tier svg { display: block; margin: 0 auto 6px; }
+.tier .tn { font-weight: 600; }
+.tier .lbl svg { display: inline; margin: 0; vertical-align: -2px; }
+.tier.locked svg:first-child { opacity: .35; }
+.tier.locked .tn { color: var(--muted); font-weight: 400; }
+.tier.current { border-color: var(--accent); background: var(--accent-soft); }
+.achlist { display: grid; }
+.ach { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 11px 0; border-top: 1px solid var(--line); }
+.ach:first-child { border-top: 0; }
+.ach .ic { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--line); color: var(--muted); }
+.ach.done .ic { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+.ach .an { font-weight: 600; font-size: 14px; }
+.ach:not(.done) .an { color: var(--muted); font-weight: 500; }
+.ach .ad { font-size: 12px; color: var(--muted); }
+.ach .ap { height: 4px; background: var(--heat0); border-radius: 9px; margin: 6px 0 2px; overflow: hidden; max-width: 220px; }
+.ach .ap i { display: block; height: 100%; background: var(--muted); border-radius: 9px; }
+.ach .ac { font-size: 12px; color: var(--muted); white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; }
+
+.shop-head { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
+.shop-head .lbl { flex: 1; min-width: 220px; }
+.catrow { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 12px; scrollbar-width: none; }
+.catrow::-webkit-scrollbar { display: none; }
+.catrow button { white-space: nowrap; border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 12px; color: var(--muted); cursor: pointer; font-size: 13px; }
+.catrow button.active { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+.amb-vol { margin-bottom: 12px; padding: 14px 18px; }
+.shopgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+.item { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+.item.equipped { border-color: var(--accent); }
+.item.locked .pv { opacity: .5; }
+.item .pv { height: 78px; border-radius: 10px; background: var(--bg); display: grid; place-items: center; overflow: hidden; position: relative; }
+.item .pv .tag { position: absolute; top: 6px; right: 6px; font-size: 10px; padding: 1px 7px; border-radius: 999px; background: var(--surface); color: var(--muted); border: 1px solid var(--line); }
+.item.equipped .pv .tag { color: var(--accent); border-color: var(--accent); }
+.item .nm { font-weight: 600; font-size: 14px; }
+.item .ds { font-size: 12px; color: var(--muted); flex: 1; }
+.item .act { display: flex; gap: 6px; align-items: center; margin-top: 2px; }
+.item .act .btn { flex: 1; padding: 6px 10px; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
+.btn.buy { color: var(--accent); border-color: var(--accent); font-weight: 600; }
+.btn.buy:disabled { color: var(--muted); border-color: var(--line); font-weight: 400; }
+.iconbtn.sm { width: 32px; height: 32px; }
+.fontpv { font-size: 30px; font-weight: 300; font-variant-numeric: tabular-nums; color: var(--text); }
+.namepv { font-weight: 600; font-size: 15px; }
+.pvicon { color: var(--muted); }
+.thprev { position: absolute; inset: 0; background: var(--pbg); display: grid; place-items: center; }
+.thprev.stars { background: radial-gradient(1px 1px at 20% 30%, #fff, transparent), radial-gradient(1px 1px at 70% 20%, #fff, transparent), radial-gradient(1px 1px at 80% 70%, #cfd6ff, transparent), radial-gradient(1px 1px at 35% 80%, #fff, transparent), var(--pbg); }
+.thprev .sf { width: 70%; height: 58%; background: var(--psf); border-radius: 8px; border: 1px solid rgba(128,128,128,.22); display: flex; flex-direction: column; justify-content: center; gap: 5px; padding: 0 10px; }
+.thprev i { width: 12px; height: 12px; border-radius: 50%; background: var(--pac); }
+.thprev b { display: block; height: 4px; border-radius: 4px; background: var(--ptx); opacity: .7; width: 80%; }
+.thprev b.s { width: 50%; opacity: .35; }
+input[type="range"] { accent-color: var(--accent); width: 160px; }
+
+/* Timer ring styles */
+.ring .ringdots { display: none; }
+.ring .ringdots circle { fill: var(--line); transition: fill .3s; }
+.ring .ringdots circle.on { fill: var(--accent); }
+.ring.break .ringdots circle.on { fill: var(--muted); }
+.ring.rs-dots .track, .ring.rs-dots .prog { display: none; }
+.ring.rs-dots .ringdots { display: inline; }
+.ring.rs-thin .track, .ring.rs-thin .prog { stroke-width: 2.5; }
+.ring.rs-grad .prog { stroke: url(#ringGrad); }
+.ring.rs-glow .prog { filter: drop-shadow(0 0 5px var(--accent)); }
+.ring.rs-none svg { visibility: hidden; }
+.ring.rs-none .time { font-size: clamp(68px, 21vw, 108px); }
+.ripple {
+  position: absolute; left: 50%; top: 50%; width: 92%; aspect-ratio: 1; border: 2px solid var(--accent); border-radius: 50%;
+  transform: translate(-50%, -50%) scale(.6); opacity: 0; animation: ripple 1.5s ease-out forwards; pointer-events: none;
+}
+@keyframes ripple { 0% { transform: translate(-50%, -50%) scale(.6); opacity: .6; } 100% { transform: translate(-50%, -50%) scale(1.35); opacity: 0; } }
+#fxCanvas { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 70; }
+#starCanvas { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+#appView { position: relative; z-index: 1; }
+
+/* Zen mode: only the timer while a focus block runs */
+.zen #tab-timer .grid-2 { grid-template-columns: 1fr; max-width: 560px; margin: 0 auto; }
+.zen #tab-timer .grid-2 > .stack:nth-child(2), .zen #tab-timer .stack > .card:not(.timer-card) { display: none; }
+.zen .top { opacity: .3; transition: opacity .3s; }
+.zen .top:hover, .zen .top:focus-within { opacity: 1; }
+
+/* Level-up moment */
+.lvdlg { text-align: center; width: min(340px, calc(100vw - 32px)); padding: 26px 24px 22px; }
+.lvdlg[open] { animation: dlgIn .35s ease-out; }
+.lv-badge { position: relative; display: grid; place-items: center; height: 124px; margin-bottom: 6px; }
+.lv-badge svg { animation: pop .7s cubic-bezier(.2, .9, .3, 1.25) both; }
+.lv-badge svg.draw * { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 1.1s .2s ease-out forwards; }
+.tierup .lv-badge::before, .tierup .lv-badge::after {
+  content: ""; position: absolute; left: 50%; top: 50%; width: 112px; height: 112px; margin: -56px 0 0 -56px;
+  border-radius: 50%; border: 1.5px solid var(--tier); opacity: 0; animation: burst 1.7s .35s ease-out;
+}
+.tierup .lv-badge::after { animation-delay: .7s; }
+.tierup .lv-badge svg { filter: drop-shadow(0 0 12px var(--tier)); }
+.lv-kicker { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--tier, var(--accent)); font-weight: 600; }
+.lv-title { font-size: 30px; font-weight: 300; margin: 2px 0 4px; }
+.lv-sub { color: var(--muted); font-size: 14px; margin-bottom: 18px; }
+@keyframes pop { from { transform: scale(.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes burst { 0% { transform: scale(.6); opacity: .7; } 100% { transform: scale(1.9); opacity: 0; } }
+@keyframes dlgIn { from { transform: translateY(8px); opacity: 0; } }
+
 /* Toast */
 .toast {
   position: fixed; left: 50%; bottom: max(24px, env(safe-area-inset-bottom)); transform: translateX(-50%) translateY(20px);
-  background: var(--text); color: var(--bg); padding: 10px 18px; border-radius: 999px; font-size: 14px;
+  background: var(--text); color: var(--bg); padding: 10px 18px; border-radius: 14px; font-size: 14px; text-align: center;
   opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; z-index: 50; max-width: calc(100vw - 32px);
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 @media (max-width: 520px) {
   .brand { display: none; }
-  .tabs button { padding: 6px 11px; }
+  .tabs button { padding: 6px 9px; font-size: 14px; }
+  .lvchip .uname { display: none; }
+  .lvchip { margin-left: 4px; padding-right: 8px; }
 }
-@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+@media (max-width: 400px) { .sync b { display: none; } }
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+  .lv-badge svg.draw * { stroke-dashoffset: 0; }
+}
 </style>
 </head>
 <body>
@@ -325,10 +454,12 @@ dialog::backdrop { background: rgba(0, 0, 0, .35); }
   <div class="row" style="gap:4px">
     <div class="brand"><i></i><span>Pomodorolist</span></div>
     <span class="sync" id="syncStatus" title="Cloud sync status"><i></i><b>Synced</b></span>
+    <button class="lvchip hidden" id="lvChip" aria-label="Your level and progress"></button>
   </div>
   <nav class="tabs" id="tabs">
     <button data-tab="timer">Timer</button>
     <button data-tab="stats">Stats</button>
+    <button data-tab="profile" id="profileTabBtn" class="hidden">Profile</button>
     <button data-tab="settings">Settings</button>
   </nav>
 </header>
@@ -344,6 +475,8 @@ dialog::backdrop { background: rgba(0, 0, 0, .35); }
           <div class="dots" id="roundDots"></div>
           <div class="ring" id="ring">
             <svg viewBox="0 0 260 260" aria-hidden="true">
+              <defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--accent)"/><stop offset="1" style="stop-color:var(--accent);stop-opacity:.25"/></linearGradient></defs>
+              <g class="ringdots" id="ringDots"></g>
               <circle class="track" cx="130" cy="130" r="120"></circle>
               <circle class="prog" id="ringProg" cx="130" cy="130" r="120"></circle>
             </svg>
@@ -426,6 +559,18 @@ dialog::backdrop { background: rgba(0, 0, 0, .35); }
     <div id="statsBody"></div>
   </section>
 
+  <!-- ================================ PROFILE TAB (progress + shop) ================================ -->
+  <section class="tab" id="tab-profile">
+    <div class="stats-head">
+      <div class="seg" id="profileSeg">
+        <button data-view="progress">Progress</button>
+        <button data-view="shop">Shop</button>
+      </div>
+    </div>
+    <div id="progressView"></div>
+    <div id="shopView" class="hidden"></div>
+  </section>
+
   <!-- ================================ SETTINGS TAB ================================ -->
   <section class="tab" id="tab-settings">
     <div class="grid-2">
@@ -454,6 +599,14 @@ dialog::backdrop { background: rgba(0, 0, 0, .35); }
         <div class="setting">
           <div><div>Auto-start next phase</div><div class="desc">Begin breaks and focus blocks automatically</div></div>
           <input type="checkbox" id="setAuto">
+        </div>
+        <div class="setting">
+          <div><div>Ambient volume</div><div class="desc">For ambient sounds from the shop</div></div>
+          <input type="range" id="setAmbVol" min="0" max="1" step="0.05">
+        </div>
+        <div class="setting">
+          <div><div>Progression</div><div class="desc">XP, levels, coins, achievements and the shop. Turn off for a plain timer (equipped items stay on).</div></div>
+          <input type="checkbox" id="setGame">
         </div>
       </div>
 
@@ -520,6 +673,17 @@ dialog::backdrop { background: rgba(0, 0, 0, .35); }
   </div>
 </dialog>
 
+<!-- Level-up moment -->
+<dialog id="levelDlg" class="lvdlg">
+  <div class="lv-badge" id="lvBadge"></div>
+  <div class="lv-kicker" id="lvKicker">Level up</div>
+  <div class="lv-title" id="lvTitle"></div>
+  <div class="lv-sub" id="lvSub"></div>
+  <button class="btn primary" id="lvClose">Continue</button>
+</dialog>
+
+<canvas id="starCanvas" class="hidden" aria-hidden="true"></canvas>
+<canvas id="fxCanvas" class="hidden" aria-hidden="true"></canvas>
 <div class="toast" id="toast" role="status"></div>
 <noscript><p style="text-align:center">This app needs JavaScript.</p></noscript>
 
@@ -588,13 +752,22 @@ function fmtClock(ms) {
   return `${pad(Math.floor(s / 60))}:${pad(s % 60)}`;
 }
 
-let toastTimer;
+// Toasts queue up so a burst (XP, achievement, level) reads one at a time.
+const toastQueue = [];
+let toastBusy = false;
 function toast(msg, ms = 2600) {
-  const el = $('#toast');
-  el.textContent = msg;
+  if (toastQueue.some(t => t.msg === msg)) return;
+  toastQueue.push({ msg, ms });
+  if (toastQueue.length > 5) toastQueue.shift();
+  if (!toastBusy) nextToast();
+}
+function nextToast() {
+  const el = $('#toast'), t = toastQueue.shift();
+  if (!t) { toastBusy = false; return; }
+  toastBusy = true;
+  el.textContent = t.msg;
   el.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), ms);
+  setTimeout(() => { el.classList.remove('show'); setTimeout(nextToast, 260); }, t.ms);
 }
 
 /* ==========================================================================
@@ -616,7 +789,7 @@ const NAME_PALETTE = ['#2f8f83', '#5b7fd6', '#d08a3c', '#b45f8c', '#6a9a4a', '#8
 function defaultState() {
   return {
     version: 2,
-    settings: { goalMin: 60, weekStart: 1, sound: true, notify: true, theme: 'auto', autoStart: false },
+    settings: { goalMin: 60, weekStart: 1, sound: true, notify: true, theme: 'auto', autoStart: false, gamification: true, ambientVolume: 0.5 },
     presets: [
       { id: 'p-classic', name: 'Classic 25/5',    focus: 25, short: 5,  long: 15, rounds: 4 },
       { id: 'p-deep',    name: 'Deep Work 50/10', focus: 50, short: 10, long: 20, rounds: 3 },
@@ -626,9 +799,10 @@ function defaultState() {
     sessions: [],   // { id, name, start, end, duration(ms of focus), planned(ms), preset }
     recent: [],     // { name, presetId, ts }  most recent first
     pinned: [],     // { name, presetId }
+    game: normalizeGame(null),  // purchases, equipped items, claimed rewards, used streak freezes
     // Device-only fields (never uploaded):
     timer: { phase: 'focus', round: 1, status: 'idle', endAt: 0, remaining: 0, planned: 0, focusStartedAt: 0, name: '' },
-    ui: { tab: 'timer', statsView: 'week' },
+    ui: { tab: 'timer', statsView: 'week', profileView: 'progress', shopCat: 'sound' },
     pendingSessions: [],  // logged while the sync service could not load at all; uploaded next time
     profileDirty: false,  // profile edited in that same situation
   };
@@ -643,6 +817,7 @@ function hydrate(obj) {
   if (!Array.isArray(out.presets) || !out.presets.length) out.presets = def.presets;
   for (const k of ['sessions', 'recent', 'pinned', 'pendingSessions']) if (!Array.isArray(out[k])) out[k] = [];
   if (!out.names || typeof out.names !== 'object' || Array.isArray(out.names)) out.names = {};
+  out.game = normalizeGame(obj.game);
   return out;
 }
 
@@ -656,6 +831,7 @@ function save() {
   scheduleProfilePush();
 }
 function saveLocal() {
+  G = null;  // derived progression numbers must be recomputed
   if (!USER) return;
   writeLS(USER.guest ? LEGACY_KEY : cacheKey(USER.uid), S);
   writeLS(THEME_KEY, S.settings.theme);
@@ -727,6 +903,7 @@ function profileFromState() {
     names: Object.entries(S.names).map(([name, v]) => ({ name, color: v.color || '', tag: v.tag || '' })),
     recent: S.recent,
     pinned: S.pinned,
+    game: S.game,
     // Stored for reference only; the app always recalculates streaks from the session log.
     streak: { current: cur, longest, goalMin: S.settings.goalMin, today: dayKey(new Date()) },
   });
@@ -807,10 +984,11 @@ function applyProfile(d) {
   for (const n of d.names || []) if (n && n.name) S.names[n.name] = { color: n.color || hashColor(n.name), tag: n.tag || '' };
   S.recent = Array.isArray(d.recent) ? d.recent : [];
   S.pinned = Array.isArray(d.pinned) ? d.pinned : [];
+  S.game = normalizeGame(d.game);
   S.timer.round = Math.min(S.timer.round, activePreset().rounds);
   lastProfileJSON = JSON.stringify(profileFromState());
   saveLocal();
-  applyTheme();
+  applyCosmetics();
   syncNameInputs();
   renderAll();
   if (S.ui.tab === 'settings') renderSettings();
@@ -850,6 +1028,7 @@ function attachListeners() {
     renderToday();
     if (S.ui.tab === 'stats') renderStats();
     scheduleProfilePush();  // keeps the stored streak summary current
+    if (firstLoadDone) reconcileRewards('quiet');
     afterFirstLoad();
   }, onSyncError));
 }
@@ -858,6 +1037,7 @@ function attachListeners() {
 function afterFirstLoad() {
   if (firstLoadDone || !profileLoaded || !sessionsLoaded) return;
   firstLoadDone = true;
+  reconcileRewards('initial');  // first load of this version also awards XP/coins for all past sessions
   maybeOfferMigration();
 }
 
@@ -874,14 +1054,15 @@ function startSession(user, cloud) {
   USER = user;
   if (!user.guest) writeLS(LAST_USER, user);
   S = hydrate(readJSON(user.guest ? LEGACY_KEY : cacheKey(user.uid), null));
-  applyTheme();
   initInputs();
+  applyCosmetics();
   showView('appView');
   renderAll();
   showTab(S.ui.tab || 'timer');
   renderAccount();
   renderSync();
   tick();  // finishes any phase that ended while the page was closed
+  if (!cloud) reconcileRewards('initial');
 
   if (cloud) {
     // Upload anything recorded during an earlier start when Firebase could not load.
@@ -1068,8 +1249,17 @@ function mergeData(obj) {
   S.recent = [...S.recent, ...src.recent].filter(r => r && r.name).sort((a, b) => (b.ts || 0) - (a.ts || 0))
     .filter(r => { const k = r.name + '|' + r.presetId; if (seen.has(k)) return false; seen.add(k); return true; }).slice(0, 8);
   if (!hadSessions) S.settings = { ...S.settings, ...src.settings };  // empty account: adopt the old settings
-  applyTheme();
+  // Progression: keep every purchase and the earliest claim of each reward; take equipped items only where unset.
+  const sg = src.game, g = S.game;
+  for (const [k, v] of Object.entries(sg.purchases)) if (!g.purchases[k]) g.purchases[k] = v;
+  for (const kind of ['goalDays', 'milestones', 'achievements']) {
+    for (const [k, v] of Object.entries(sg.claims[kind])) if (!g.claims[kind][k] || v < g.claims[kind][k]) g.claims[kind][k] = v;
+  }
+  for (const [k, v] of Object.entries(sg.freezesUsed)) if (!g.freezesUsed[k]) g.freezesUsed[k] = v;
+  for (const [k, v] of Object.entries(sg.equipped)) if (!(k in g.equipped)) g.equipped[k] = v;
   save();
+  applyCosmetics();
+  reconcileRewards('quiet');
   renderAll();
   return add.length;
 }
@@ -1102,22 +1292,6 @@ function ensureAudio() {
     audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
     if (audioCtx.state === 'suspended') audioCtx.resume();
   } catch (e) { /* audio unsupported */ }
-}
-/** Soft three-note chime built with oscillators — no audio files needed. */
-function chime() {
-  if (!S.settings.sound || !audioCtx) return;
-  const now = audioCtx.currentTime;
-  [[523.25, 0], [659.25, 0.18], [783.99, 0.36]].forEach(([freq, t]) => {
-    const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
-    osc.type = 'sine';
-    osc.frequency.value = freq;
-    gain.gain.setValueAtTime(0, now + t);
-    gain.gain.linearRampToValueAtTime(0.16, now + t + 0.03);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + t + 1.8);
-    osc.connect(gain).connect(audioCtx.destination);
-    osc.start(now + t);
-    osc.stop(now + t + 1.9);
-  });
 }
 function askNotifyPermission() {
   if (S.settings.notify && 'Notification' in window && Notification.permission === 'default') {
@@ -1163,6 +1337,7 @@ function startTimer() {
       t.name = currentName();
       ensureName(t.name);
       pushRecent(t.name, S.activePresetId);
+      if (extraOn('x_startcue')) playStartCue();
     }
   }
   t.endAt = now + t.remaining;
@@ -1204,7 +1379,7 @@ function finishPhase(reason) {
     const focused = t.planned - rem;
     // For natural completion use endAt, so the log is exact even if the tab was asleep.
     const end = reason === 'complete' ? t.endAt : Date.now();
-    if (focused >= 0.8 * t.planned) logSession(focused, end);
+    if (focused >= 0.8 * t.planned) { logSession(focused, end); playEffect(equippedId('effect')); }
     else if (reason !== 'complete' && focused > 0) toast('Not logged — under 80% of the focus time');
   }
 
@@ -1219,7 +1394,7 @@ function finishPhase(reason) {
   t.endAt = 0;
 
   if (reason === 'complete') {
-    chime();
+    playEndSound();
     if (wasFocus) notify('Focus complete', `Nice work on “${t.name || 'Untitled'}”. Time for a break.`);
     else notify('Break over', 'Ready for the next focus block?');
     if (S.settings.autoStart) { startTimer(); return; }
@@ -1242,10 +1417,18 @@ function logSession(focusedMs, end) {
     planned: t.planned,
     preset: activePreset().name,
   };
+  const levelBefore = rewardsReady() ? game().lv.level : 0;
   S.sessions.push(s);
   if (cloudReady()) cloudAddSessions([s]);
   else if (USER && !USER.guest) S.pendingSessions.push(s);
-  toast(`Logged ${fmtMin(focusedMs / 60000)} · ${name}`);
+  G = null;
+  const news = reconcileRewards('collect');
+  if (!S.settings.gamification) { toast(`Logged ${fmtMin(focusedMs / 60000)} · ${name}`); return; }
+  const goalDays = news.filter(n => n.type === 'goal').length;
+  toast(`+${xpForSession(s)} XP · +${COINS_PER_SESSION + GOAL_BONUS * goalDays} coins${goalDays ? ' · daily goal reached' : ''}`);
+  announce(news, 'loud');
+  const levelAfter = game().lv.level;
+  if (levelBefore && levelAfter > levelBefore) setTimeout(() => showLevelUp(levelBefore, levelAfter), 700);
 }
 
 /* ==========================================================================
@@ -1307,22 +1490,25 @@ function buildIndex() {
 }
 /**
  * Current streak: consecutive goal-met days ending today — or ending yesterday
- * if today's goal isn't met yet (today is still in progress).
+ * if today's goal isn't met yet (today is still in progress). Frozen days bridge gaps.
  */
 function computeStreaks(idx) {
   const goal = S.settings.goalMin;
+  const frozen = (S.game && S.game.freezesUsed) || {};
   const met = d => ((idx[dayKey(d)] || {}).total || 0) >= goal;
+  // A day protected by a Streak Freeze keeps the streak alive but doesn't add to it.
+  const kept = d => met(d) || !!frozen[dayKey(d)];
   const today = startOfDay(new Date());
 
   let cur = 0, d = met(today) ? today : addDays(today, -1);
-  while (met(d)) { cur++; d = addDays(d, -1); }
+  while (kept(d)) { if (met(d)) cur++; d = addDays(d, -1); }
 
   let longest = 0, run = 0;
   const keys = Object.keys(idx).sort();
   if (keys.length) {
     const [y, m, dd] = keys[0].split('-').map(Number);
     for (let x = new Date(y, m - 1, dd); x <= today; x = addDays(x, 1)) {
-      run = met(x) ? run + 1 : 0;
+      run = met(x) ? run + 1 : kept(x) ? run : 0;
       longest = Math.max(longest, run);
     }
   }
@@ -1342,6 +1528,9 @@ function renderClock() {
   const progress = planned ? 1 - rem / planned : 0;
   $('#timeText').textContent = fmtClock(rem);
   $('#ringProg').style.strokeDashoffset = RING_C * (1 - clamp(progress, 0, 1));
+  const dots = Math.round(clamp(progress, 0, 1) * 60);
+  if (dots !== lastDots) { lastDots = dots; $$('#ringDots circle').forEach((c, i) => c.classList.toggle('on', i < dots)); }
+  updateFavicon(clamp(progress, 0, 1));
   const t = S.timer;
   const label = t.phase === 'focus' ? 'Focus' : t.phase === 'short' ? 'Break' : 'Long break';
   document.title = t.status === 'idle' ? 'Pomodorolist' : `${fmtClock(rem)} · ${label}${t.status === 'paused' ? ' (paused)' : ''}`;
@@ -1364,6 +1553,8 @@ function renderTimer() {
   $('#mainBtn').textContent = t.status === 'running' ? 'Pause' : t.status === 'paused' ? 'Resume' : (isBreak ? 'Start break' : 'Start');
   $('#muteBtn').innerHTML = S.settings.sound ? ICON_SOUND : ICON_MUTE;
   $('#muteBtn').title = S.settings.sound ? 'Sound on — click to mute' : 'Muted — click for sound';
+  document.body.classList.toggle('zen', extraOn('x_zen') && t.status === 'running' && t.phase === 'focus');
+  updateAmbient();
   renderClock();
 }
 
@@ -1688,10 +1879,6 @@ function renderStats() {
 /* ==========================================================================
    RENDER: SETTINGS
    ========================================================================== */
-function applyTheme(theme = S.settings.theme) {
-  if (theme === 'light' || theme === 'dark') document.documentElement.setAttribute('data-theme', theme);
-  else document.documentElement.removeAttribute('data-theme');
-}
 function renderSettings() {
   const st = S.settings;
   $('#setGoal').value = st.goalMin;
@@ -1700,6 +1887,8 @@ function renderSettings() {
   $('#setSound').checked = st.sound;
   $('#setNotify').checked = st.notify;
   $('#setAuto').checked = st.autoStart;
+  $('#setGame').checked = st.gamification;
+  $('#setAmbVol').value = st.ambientVolume;
   const perm = 'Notification' in window ? Notification.permission : 'unsupported';
   $('#notifStatus').textContent =
     perm === 'granted' ? 'Allowed — shown when the tab is in the background'
@@ -1729,6 +1918,981 @@ function fillPresetForm(p) {
 }
 
 /* ==========================================================================
+   PROGRESSION — XP, LEVELS, TIERS, COINS, ACHIEVEMENTS
+   Everything here is DERIVED from the synced session log plus a small `game`
+   record in the profile: purchases, equipped items, claimed bonuses and used
+   streak freezes. Every device computes the same numbers, so they can't drift.
+   The `game` record is made of maps keyed by id or date, which Firestore merges
+   key by key — two devices writing at once (even offline) never erase each other.
+   ========================================================================== */
+const COINS_PER_SESSION = 5;
+const GOAL_BONUS = 10;
+const GOAL_BONUS_MIN = 25;   // a day only earns the goal bonus with at least 25 min, whatever the goal setting
+const STREAK_BONUS = { 3: 15, 7: 40, 30: 200, 100: 750 };
+const MAX_FREEZES = 2;
+const REDUCED = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+const fmtNum = n => Math.round(n).toLocaleString();
+
+function normalizeGame(g) {
+  g = g && typeof g === 'object' ? g : {};
+  const map = v => (v && typeof v === 'object' && !Array.isArray(v) ? { ...v } : {});
+  const c = map(g.claims);
+  return {
+    purchases: map(g.purchases),     // purchaseId -> { item, price, at }
+    equipped: map(g.equipped),       // category -> itemId, or extraId -> true/false
+    claims: {                        // one-time rewards, value = time claimed
+      goalDays: map(c.goalDays),     // 'YYYY-MM-DD' -> ts
+      milestones: map(c.milestones), // '3' | '7' | '30' | '100' -> ts
+      achievements: map(c.achievements),
+    },
+    freezesUsed: map(g.freezesUsed), // 'YYYY-MM-DD' -> ts (day protected by a Streak Freeze)
+  };
+}
+
+/** 1 XP per full minute of focus; +10% for sessions of 45 minutes or longer. */
+function xpForSession(s) {
+  const min = Math.floor((+s.duration || 0) / 60000);
+  return Math.round(min * (min >= 45 ? 1.1 : 1));
+}
+/** XP needed to go from level L to L+1. Gradually harder; Legend (level 100) ≈ 5,000 focus hours. */
+const xpToNext = L => Math.round(40 * Math.pow(L, 1.1));
+function levelInfo(xp) {
+  let level = 1, into = xp;
+  while (into >= xpToNext(level)) { into -= xpToNext(level); level++; }
+  return { level, into, need: xpToNext(level) };
+}
+
+/* ---------- Tiers + badges (simple geometric line icons, one colour each) ---------- */
+const sunRays = Array.from({ length: 8 }, (_, i) => {
+  const a = i * Math.PI / 4, c = Math.cos(a), s = Math.sin(a);
+  return `<path d="M${(12 + 6.3 * c).toFixed(2)} ${(12 + 6.3 * s).toFixed(2)}L${(12 + 8.8 * c).toFixed(2)} ${(12 + 8.8 * s).toFixed(2)}"/>`;
+}).join('');
+const TIERS = [
+  { id: 'novice',      name: 'Novice',      min: 1,   color: '#8c9a97', icon: '<circle cx="12" cy="12" r="7"/>' },
+  { id: 'apprentice',  name: 'Apprentice',  min: 5,   color: '#6a9a4a', icon: '<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.2"/>' },
+  { id: 'scholar',     name: 'Scholar',     min: 10,  color: '#3f8fbf', icon: '<path d="M12 4.2 19.6 17.8H4.4Z"/><path d="M8.6 13.6h6.8"/>' },
+  { id: 'focused',     name: 'Focused',     min: 20,  color: '#2f8f83', icon: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.4"/><circle cx="12" cy="12" r="1"/>' },
+  { id: 'disciplined', name: 'Disciplined', min: 30,  color: '#8a6fd1', icon: '<path d="M12 3.6 20.4 12 12 20.4 3.6 12Z"/><path d="M12 8.2 15.8 12 12 15.8 8.2 12Z"/>' },
+  { id: 'expert',      name: 'Expert',      min: 45,  color: '#c07a2c', icon: '<path d="M12 3.5 19.4 7.75v8.5L12 20.5 4.6 16.25v-8.5Z"/><circle cx="12" cy="12" r="3"/>' },
+  { id: 'master',      name: 'Master',      min: 60,  color: '#c8584e', icon: '<path d="M12 3.8 14.4 9l5.6.6-4.2 3.8 1.2 5.6L12 16.2 7 19l1.2-5.6L4 9.6 9.6 9Z"/>' },
+  { id: 'grandmaster', name: 'Grandmaster', min: 80,  color: '#b45f8c', icon: '<path d="M12 3.4 19.6 16.6H4.4Z"/><path d="M12 20.6 4.4 7.4h15.2Z"/>' },
+  { id: 'legend',      name: 'Legend',      min: 100, color: '#c9a227', icon: '<circle cx="12" cy="12" r="4"/>' + sunRays },
+];
+const tierFor = level => TIERS.filter(t => level >= t.min).pop();
+
+// Profile flair: frames drawn around the badge.
+const FRAMES = {
+  frame_none: '',
+  frame_ring: '<circle cx="12" cy="12" r="11.2" stroke-width="1" opacity=".6"/>',
+  frame_double: '<circle cx="12" cy="12" r="11.3" stroke-width="1" opacity=".55"/><circle cx="12" cy="12" r="9.9" stroke-width=".7" opacity=".35"/>',
+  frame_hex: '<path d="M12 .7 21.8 6.35v11.3L12 23.3 2.2 17.65V6.35Z" stroke-width="1" opacity=".6"/>',
+  frame_orbit: '<circle cx="12" cy="12" r="11.2" stroke-width="1" stroke-dasharray="1.2 2.2" opacity=".7"/><circle cx="12" cy=".8" r="1.1" stroke="none" fill="currentColor"/>',
+};
+function badgeSVG(tier, { size = 24, frame = 'frame_none', locked = false, draw = false } = {}) {
+  const col = locked ? 'var(--muted)' : tier.color;
+  let body = (FRAMES[frame] || '') + tier.icon;
+  if (draw) body = body.replace(/<(path|circle)/g, '<$1 pathLength="1"');
+  return `<svg viewBox="-1 -1 26 26" width="${size}" height="${size}" fill="none" stroke="${col}" style="color:${col}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"${draw ? ' class="draw"' : ''}>${body}</svg>`;
+}
+const iconSVG = (paths, size = 18) =>
+  `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
+const COIN_SVG = '<svg class="coin" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="8" cy="8" r="6.2"/><circle cx="8" cy="8" r="3"/></svg>';
+const LOCK_SVG = '<svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3.5" y="7" width="9" height="6.5" rx="1.5"/><path d="M5.5 7V5.5a2.5 2.5 0 0 1 5 0V7"/></svg>';
+const PLAY_SVG = '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l10-6.5Z"/></svg>';
+
+/* ---------- Achievements ---------- */
+const ICONS = {
+  first: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.5"/>',
+  sessions: '<path d="M6 7.5h12M6 12h12M6 16.5h12"/>',
+  clock: '<circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/>',
+  flame: '<path d="M12 3.8c2.6 3 5.2 5.3 5.2 9.2a5.2 5.2 0 0 1-10.4 0c0-2 .9-3.6 2.1-4.6.3 1.6 1.2 2.6 2.1 2.9-.6-2.6-.1-5.2 1-7.5Z"/>',
+  hourglass: '<path d="M7 4h10M7 20h10M8 4c0 5 8 5 8 8s-8 3-8 8M16 4c0 5-8 5-8 8s8 3 8 8"/>',
+  sunrise: '<path d="M4 17.5h16M7 17.5a5 5 0 0 1 10 0M12 7v2.2M5.6 10.6 7 12M18.4 10.6 17 12"/>',
+  moon: '<path d="M17 15.6A7 7 0 0 1 8.4 5a7 7 0 1 0 8.6 10.6Z"/>',
+  names: '<circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><circle cx="12" cy="16" r="3"/>',
+  target: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r=".8"/>',
+  calendar: '<rect x="4.5" y="6" width="15" height="13" rx="2"/><path d="M4.5 10h15M9 4v3M15 4v3"/>',
+  mountain: '<path d="M3.5 18.5 9.5 8l3.5 6 2.5-3.5 5 8Z"/>',
+  wave: '<path d="M3.5 12c2.2-3 4.3-3 6.5 0s4.3 3 6.5 0c1.3-1.8 2.7-2 4-1.5"/>',
+  sliders: '<path d="M6 5v14M12 5v14M18 5v14"/><circle cx="6" cy="9" r="1.8"/><circle cx="12" cy="15" r="1.8"/><circle cx="18" cy="11" r="1.8"/>',
+  gem: '<path d="M7 5h10l3 4-8 10L4 9Z"/><path d="M4 9h16"/>',
+  ret: '<path d="M9 7 5 11l4 4"/><path d="M5 11h9.5a4.5 4.5 0 0 1 0 9H11"/>',
+  // shop categories / extras
+  sound: '<path d="M4 10v4h3l4 3.5v-11L7 10Z"/><path d="M15 9.5a3.5 3.5 0 0 1 0 5M17.5 7a7 7 0 0 1 0 10"/>',
+  ambient: '<path d="M4.5 14a7.5 7.5 0 0 1 15 0"/><rect x="3.5" y="13.5" width="4" height="6" rx="1.5"/><rect x="16.5" y="13.5" width="4" height="6" rx="1.5"/>',
+  effect: '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/>',
+  freeze: '<path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9M9.5 4.5 12 7l2.5-2.5M9.5 19.5 12 17l2.5 2.5"/>',
+  x_startcue: '<circle cx="12" cy="12" r="8"/><path d="M10.5 9v6l4.5-3Z"/>',
+  x_favicon: '<rect x="3.5" y="5" width="17" height="14" rx="2"/><path d="M3.5 9h17"/><circle cx="12" cy="14" r="2.6"/>',
+  x_zen: '<circle cx="12" cy="12" r="8"/><path d="M8.5 13.5c1 1.2 2.2 1.8 3.5 1.8s2.5-.6 3.5-1.8"/>',
+};
+const ACHIEVEMENTS = [
+  { id: 'first',     name: 'First focus',      desc: 'Complete your first session',            icon: 'first',     coins: 10,  goal: 1,    val: s => s.sessions },
+  { id: 's10',       name: 'Getting going',    desc: 'Complete 10 sessions',                   icon: 'sessions',  coins: 20,  goal: 10,   val: s => s.sessions },
+  { id: 's100',      name: 'Centurion',        desc: 'Complete 100 sessions',                  icon: 'sessions',  coins: 100, goal: 100,  val: s => s.sessions },
+  { id: 's500',      name: 'Unstoppable',      desc: 'Complete 500 sessions',                  icon: 'sessions',  coins: 300, goal: 500,  val: s => s.sessions },
+  { id: 'h10',       name: 'Ten hours',        desc: '10 hours of total focus',                icon: 'clock',     coins: 30,  goal: 10,   val: s => s.hours },
+  { id: 'h100',      name: 'A hundred hours',  desc: '100 hours of total focus',               icon: 'clock',     coins: 150, goal: 100,  val: s => s.hours },
+  { id: 'h1000',     name: 'A thousand hours', desc: '1,000 hours of total focus',             icon: 'clock',     coins: 800, goal: 1000, val: s => s.hours },
+  { id: 'st7',       name: 'One week',         desc: 'Reach a 7-day streak',                   icon: 'flame',     coins: 30,  goal: 7,    val: s => s.streak },
+  { id: 'st30',      name: 'One month',        desc: 'Reach a 30-day streak',                  icon: 'flame',     coins: 120, goal: 30,   val: s => s.streak },
+  { id: 'st100',     name: 'Hundred days',     desc: 'Reach a 100-day streak',                 icon: 'flame',     coins: 400, goal: 100,  val: s => s.streak },
+  { id: 'long2h',    name: 'Deep dive',        desc: 'One session of 2 hours or more',         icon: 'hourglass', coins: 50,  goal: 120,  val: s => s.maxMin, unit: 'min' },
+  { id: 'early',     name: 'Early bird',       desc: 'Focus before 7 AM',                      icon: 'sunrise',   coins: 20,  goal: 1,    val: s => s.early },
+  { id: 'night',     name: 'Night owl',        desc: 'Focus after 10 PM',                      icon: 'moon',      coins: 20,  goal: 1,    val: s => s.night },
+  { id: 'names5',    name: 'Polymath',         desc: 'Use 5 different session names',          icon: 'names',     coins: 20,  goal: 5,    val: s => s.names },
+  { id: 'goals10',   name: 'Consistent',       desc: 'Reach your daily goal on 10 days',       icon: 'target',    coins: 40,  goal: 10,   val: s => s.goalDays },
+  { id: 'marathon',  name: 'Marathon',         desc: '4 hours of focus in a single day',       icon: 'mountain',  coins: 60,  goal: 240,  val: s => s.maxDay, unit: 'min' },
+  { id: 'deep10',    name: 'Deep worker',      desc: '10 sessions of 50 minutes or more',      icon: 'wave',      coins: 60,  goal: 10,   val: s => s.deep },
+  { id: 'weekend',   name: 'Weekend warrior',  desc: 'Focus on a Saturday and the Sunday after', icon: 'calendar', coins: 20, goal: 1,    val: s => s.weekend },
+  { id: 'presets3',  name: 'Experimenter',     desc: 'Use 3 different timer presets',          icon: 'sliders',   coins: 15,  goal: 3,    val: s => s.presets },
+  { id: 'comeback',  name: 'Comeback',         desc: 'Return after a break of a week or more', icon: 'ret',       coins: 20,  goal: 1,    val: s => s.comeback },
+  { id: 'collector', name: 'Collector',        desc: 'Own 5 items from the shop',              icon: 'gem',       coins: 40,  goal: 5,    val: s => s.owned },
+];
+const ACH_BY_ID = Object.fromEntries(ACHIEVEMENTS.map(a => [a.id, a]));
+
+/* ---------- Shop catalogue (cosmetic only). price 0 = free default. lvl = minimum level. ---------- */
+const SHOP_CATS = [
+  ['sound', 'Sounds'], ['ambient', 'Ambient'], ['theme', 'Themes'], ['ring', 'Timer ring'], ['font', 'Timer font'],
+  ['effect', 'Effects'], ['frame', 'Badge frame'], ['color', 'Name colour'], ['extra', 'Extras'], ['freeze', 'Streak freeze'],
+];
+const ITEMS = [
+  { id: 'snd_chime',   cat: 'sound', name: 'Chime',         desc: 'The original three-note chime', price: 0 },
+  { id: 'snd_bell',    cat: 'sound', name: 'Soft bell',     desc: 'A single warm bell',             price: 60 },
+  { id: 'snd_wood',    cat: 'sound', name: 'Wooden block',  desc: 'Two gentle knocks',              price: 60 },
+  { id: 'snd_rain',    cat: 'sound', name: 'Rain drop',     desc: 'Three soft drips',               price: 80 },
+  { id: 'snd_digital', cat: 'sound', name: 'Digital chime', desc: 'A quiet, clean beep',            price: 80 },
+  { id: 'snd_piano',   cat: 'sound', name: 'Piano note',    desc: 'A soft two-note phrase',         price: 120 },
+  { id: 'snd_bowl',    cat: 'sound', name: 'Singing bowl',  desc: 'Long, resonant and calm',        price: 180, lvl: 5 },
+
+  { id: 'amb_none',  cat: 'ambient', name: 'Silence',      desc: 'No background sound',          price: 0 },
+  { id: 'amb_brown', cat: 'ambient', name: 'Brown noise',  desc: 'A deep, steady rumble',        price: 100 },
+  { id: 'amb_rain',  cat: 'ambient', name: 'Rain',         desc: 'Steady rainfall',              price: 150 },
+  { id: 'amb_ocean', cat: 'ambient', name: 'Ocean',        desc: 'Slow waves rolling in',        price: 220, lvl: 4 },
+  { id: 'amb_cafe',  cat: 'ambient', name: 'Café murmur',  desc: 'Distant chatter and cups',     price: 280, lvl: 6 },
+  { id: 'amb_fire',  cat: 'ambient', name: 'Fireplace',    desc: 'A low fire with soft crackles', price: 320, lvl: 8 },
+
+  { id: 'th_default',   cat: 'theme', name: 'Default',   desc: 'Calm teal · light, dark or system', price: 0 },
+  { id: 'th_paper',     cat: 'theme', name: 'Paper',     desc: 'Warm cream, easy on the eyes',      price: 150 },
+  { id: 'th_mono',      cat: 'theme', name: 'Mono',      desc: 'Pure black and white',              price: 150 },
+  { id: 'th_forest',    cat: 'theme', name: 'Forest',    desc: 'Soft greens',                       price: 250 },
+  { id: 'th_ocean',     cat: 'theme', name: 'Ocean',     desc: 'Cool blues',                        price: 250 },
+  { id: 'th_nord',      cat: 'theme', name: 'Nord',      desc: 'Arctic, muted and crisp',           price: 300, lvl: 4 },
+  { id: 'th_sakura',    cat: 'theme', name: 'Sakura',    desc: 'Gentle blossom pink',               price: 300, lvl: 4 },
+  { id: 'th_sunset',    cat: 'theme', name: 'Sunset',    desc: 'Warm coral',                        price: 350, lvl: 6 },
+  { id: 'th_midnight',  cat: 'theme', name: 'Midnight',  desc: 'Deep indigo · always dark',         price: 400, lvl: 8 },
+  { id: 'th_starfield', cat: 'theme', name: 'Starfield', desc: 'A slowly drifting night sky · always dark', price: 1200, lvl: 15 },
+
+  { id: 'ring_classic', cat: 'ring', name: 'Classic',     desc: 'The original ring',          price: 0 },
+  { id: 'ring_thin',    cat: 'ring', name: 'Thin line',   desc: 'A fine, light ring',         price: 50 },
+  { id: 'ring_number',  cat: 'ring', name: 'Number only', desc: 'Just the digits, larger',    price: 80 },
+  { id: 'ring_dots',    cat: 'ring', name: 'Dotted',      desc: 'Sixty soft dots', price: 120 },
+  { id: 'ring_grad',    cat: 'ring', name: 'Gradient',    desc: 'Fades along its length',     price: 160 },
+  { id: 'ring_glow',    cat: 'ring', name: 'Glowing',     desc: 'A soft halo',                price: 220, lvl: 5 },
+
+  { id: 'font_system',  cat: 'font', name: 'System',         desc: 'Your device’s own font', price: 0 },
+  { id: 'font_inter',   cat: 'font', name: 'Inter',          desc: 'Clean and neutral',      price: 80 },
+  { id: 'font_grotesk', cat: 'font', name: 'Space Grotesk',  desc: 'Quirky geometric',       price: 120 },
+  { id: 'font_mono',    cat: 'font', name: 'JetBrains Mono', desc: 'Even monospaced digits', price: 120 },
+  { id: 'font_serif',   cat: 'font', name: 'Fraunces',       desc: 'A soft, elegant serif',  price: 200, lvl: 5 },
+
+  { id: 'fx_none',      cat: 'effect', name: 'None',            desc: 'Quiet completion',               price: 0 },
+  { id: 'fx_ripple',    cat: 'effect', name: 'Ripple',          desc: 'Rings spread out from the timer', price: 100 },
+  { id: 'fx_confetti',  cat: 'effect', name: 'Gentle confetti', desc: 'A light, short fall',            price: 200 },
+  { id: 'fx_fireworks', cat: 'effect', name: 'Fireworks',       desc: 'Three small bursts',             price: 500, lvl: 12 },
+
+  { id: 'frame_none',   cat: 'frame', name: 'No frame',   desc: 'Just the badge',          price: 0 },
+  { id: 'frame_ring',   cat: 'frame', name: 'Ring',       desc: 'A thin circle',           price: 60 },
+  { id: 'frame_double', cat: 'frame', name: 'Double ring', desc: 'Two fine circles',       price: 120 },
+  { id: 'frame_hex',    cat: 'frame', name: 'Hexagon',    desc: 'A crisp hex outline',     price: 220, lvl: 8 },
+  { id: 'frame_orbit',  cat: 'frame', name: 'Orbit',      desc: 'Dotted orbit with a moon', price: 450, lvl: 20 },
+
+  { id: 'col_default', cat: 'color', name: 'Default', desc: 'Your theme’s text colour', price: 0 },
+  { id: 'col_teal',    cat: 'color', name: 'Teal',    desc: 'Calm and focused',  price: 50 },
+  { id: 'col_sky',     cat: 'color', name: 'Sky',     desc: 'Clear blue',        price: 50 },
+  { id: 'col_coral',   cat: 'color', name: 'Coral',   desc: 'Warm and friendly', price: 50 },
+  { id: 'col_violet',  cat: 'color', name: 'Violet',  desc: 'Quietly bold',      price: 80 },
+  { id: 'col_rose',    cat: 'color', name: 'Rose',    desc: 'Soft pink',         price: 80 },
+  { id: 'col_gold',    cat: 'color', name: 'Gold',    desc: 'For the dedicated', price: 300, lvl: 20 },
+
+  { id: 'x_startcue', cat: 'extra', name: 'Start cue',     desc: 'A soft tone when a focus block begins',           price: 80 },
+  { id: 'x_favicon',  cat: 'extra', name: 'Live tab icon', desc: 'The browser tab icon shows the timer’s progress', price: 120 },
+  { id: 'x_zen',      cat: 'extra', name: 'Zen mode',      desc: 'Hides everything but the timer while you focus',  price: 150 },
+
+  { id: 'freeze', cat: 'freeze', name: 'Streak Freeze', desc: 'Protects your streak for one missed day. Used automatically; hold up to 2', price: 250 },
+];
+const ITEM_BY_ID = Object.fromEntries(ITEMS.map(i => [i.id, i]));
+const DEFAULTS = { sound: 'snd_chime', ambient: 'amb_none', theme: 'th_default', ring: 'ring_classic', font: 'font_system', effect: 'fx_none', frame: 'frame_none', color: 'col_default' };
+const NAME_COLORS = { col_teal: '#2f9e8f', col_sky: '#4a90c2', col_coral: '#e07a5f', col_violet: '#8a6fd1', col_rose: '#c95c84', col_gold: '#c9a227' };
+
+/* ---------- Derived game state (cached; cleared whenever state is saved) ---------- */
+let G = null;
+const game = () => G || (G = computeGame());
+
+/** Coins earned up to time t: 5 per session, plus goal / streak / achievement bonuses claimed by then. */
+function earnedAt(t) {
+  let c = 0;
+  for (const s of S.sessions) if (s.end <= t) c += COINS_PER_SESSION;
+  const cl = S.game.claims;
+  for (const ts of Object.values(cl.goalDays)) if (ts <= t) c += GOAL_BONUS;
+  for (const [m, ts] of Object.entries(cl.milestones)) if (ts <= t) c += STREAK_BONUS[m] || 0;
+  for (const [id, ts] of Object.entries(cl.achievements)) if (ts <= t && ACH_BY_ID[id]) c += ACH_BY_ID[id].coins;
+  return c;
+}
+
+/**
+ * Replays every purchase in time order. A purchase only counts if the coins
+ * earned by then cover it — so even if two devices spend the same coins while
+ * offline, the later purchase is refunded and the balance never goes negative.
+ */
+function computeGame() {
+  const idx = buildIndex();
+  const streak = computeStreaks(idx);
+  let xp = 0, focusMs = 0;
+  for (const s of S.sessions) { xp += xpForSession(s); focusMs += +s.duration || 0; }
+  const lv = levelInfo(xp);
+  const usedTimes = Object.values(S.game.freezesUsed).map(Number);
+  const buys = Object.entries(S.game.purchases)
+    .map(([pid, p]) => ({ pid, ...(p || {}) }))
+    .filter(p => p.item)
+    .sort((a, b) => (a.at - b.at) || (a.pid < b.pid ? -1 : 1));
+  let spent = 0;
+  const owned = new Set(), freezeBuys = [], invalid = [];
+  for (const p of buys) {
+    const item = ITEM_BY_ID[p.item], price = Math.max(0, Math.round(+p.price || 0));
+    const isFreeze = item && item.cat === 'freeze';
+    const heldThen = freezeBuys.length - usedTimes.filter(t => t <= p.at).length;
+    const ok = item && (isFreeze ? heldThen < MAX_FREEZES : !owned.has(p.item)) && earnedAt(p.at) - spent >= price;
+    if (!ok) { invalid.push(p.pid); continue; }
+    spent += price;
+    if (isFreeze) freezeBuys.push(p.at); else owned.add(p.item);
+  }
+  const earned = earnedAt(Infinity);
+  return {
+    idx, streak, xp, lv, tier: tierFor(lv.level), focusMs, earned, spent,
+    balance: Math.max(0, earned - spent), owned, invalid, freezeBuys,
+    ownedCount: [...owned].filter(id => ITEM_BY_ID[id].price > 0).length,
+    freezesHeld: Math.max(0, freezeBuys.length - usedTimes.length),
+  };
+}
+
+function computeStats(idx, streak, ownedCount) {
+  const names = new Set(), presets = new Set();
+  let maxMin = 0, early = 0, night = 0, deep = 0, focusMs = 0;
+  for (const s of S.sessions) {
+    const min = (+s.duration || 0) / 60000;
+    focusMs += +s.duration || 0;
+    names.add(s.name);
+    if (s.preset) presets.add(s.preset);
+    maxMin = Math.max(maxMin, min);
+    if (min >= 50) deep++;
+    const h = new Date(s.start).getHours();
+    if (h >= 4 && h < 7) early++;
+    if (h >= 22 || h < 4) night++;
+  }
+  const days = Object.keys(idx).sort();
+  let weekend = 0, comeback = 0, maxDay = 0;
+  for (let i = 0; i < days.length; i++) {
+    const [y, m, d] = days[i].split('-').map(Number), dt = new Date(y, m - 1, d);
+    if (dt.getDay() === 6 && idx[dayKey(addDays(dt, 1))]) weekend = 1;
+    if (i && (Date.UTC(y, m - 1, d) - Date.parse(days[i - 1] + 'T00:00:00Z')) / 864e5 >= 8) comeback = 1;
+    maxDay = Math.max(maxDay, idx[days[i]].total);
+  }
+  return {
+    sessions: S.sessions.length, hours: focusMs / 3.6e6, streak: streak.longest, maxMin, early, night,
+    names: names.size, goalDays: Object.keys(S.game.claims.goalDays).length, weekend, maxDay, deep,
+    presets: presets.size, owned: ownedCount, comeback,
+  };
+}
+
+const isOwned = id => { const it = ITEM_BY_ID[id]; return !!it && (it.price === 0 || game().owned.has(id)); };
+/** The item in use for a category; falls back to the free default if it isn't owned (e.g. refunded). */
+function equippedId(cat) {
+  const id = S.game.equipped[cat];
+  return id && ITEM_BY_ID[id] && ITEM_BY_ID[id].cat === cat && isOwned(id) ? id : DEFAULTS[cat];
+}
+const extraOn = id => isOwned(id) && S.game.equipped[id] === true;
+// Rewards are only claimed once the cloud copy has loaded (otherwise we'd claim against partial data).
+const rewardsReady = () => !!USER && (USER.guest || localOnly || firstLoadDone);
+
+/* ---------- Claiming one-time rewards ---------- */
+let knownInvalid = null;
+/**
+ * Claim any rewards the session log now qualifies for, and use Streak Freezes if needed.
+ * mode: 'initial' (first load: one summary toast), 'quiet' (no reward toasts),
+ *       'loud' (toast each reward), 'collect' (return them; the caller announces).
+ */
+function reconcileRewards(mode = 'quiet') {
+  if (!rewardsReady()) return [];
+  const now = Date.now(), cl = S.game.claims, news = [];
+  G = null;
+  const g0 = game();
+  const froze = useStreakFreezes(g0, now);
+  if (froze) news.push({ type: 'freeze', n: froze });
+  const goalMin = Math.max(S.settings.goalMin, GOAL_BONUS_MIN);
+  for (const [k, d] of Object.entries(g0.idx)) {
+    if (d.total >= goalMin && !cl.goalDays[k]) { cl.goalDays[k] = now; news.push({ type: 'goal', key: k }); }
+  }
+  const streak = computeStreaks(g0.idx);
+  for (const m of Object.keys(STREAK_BONUS)) {
+    if (streak.longest >= +m && !cl.milestones[m]) { cl.milestones[m] = now; news.push({ type: 'streak', m: +m }); }
+  }
+  const stats = computeStats(g0.idx, streak, g0.ownedCount);
+  for (const a of ACHIEVEMENTS) {
+    if (!cl.achievements[a.id] && a.val(stats) >= a.goal) { cl.achievements[a.id] = now; news.push({ type: 'ach', a }); }
+  }
+  G = null;
+  if (news.length) save();
+  // A purchase made on another device that the coins couldn't cover gets refunded.
+  const inv = game().invalid;
+  if (knownInvalid && inv.some(p => !knownInvalid.has(p))) toast('A purchase made on another device couldn’t be covered and was refunded', 4000);
+  knownInvalid = new Set(inv);
+  if (mode !== 'collect') announce(news, mode);
+  if (news.length) renderToday();  // a used Streak Freeze changes the streak shown
+  renderHeaderChip();
+  if (S.ui.tab === 'profile') renderProfile();
+  return news;
+}
+
+function announce(news, mode) {
+  if (!news.length || !S.settings.gamification) return;
+  if (mode === 'initial') {
+    const key = 'pomodorolist-intro:' + (USER.guest ? 'guest' : USER.uid);
+    if (!localStorage.getItem(key) && S.sessions.length) {
+      const g = game();
+      toast(`Progression unlocked · Level ${g.lv.level} ${g.tier.name} · ${fmtNum(g.balance)} coins from your history`, 5000);
+    }
+    writeLS(key, '1');
+  }
+  for (const n of news) {
+    if (n.type === 'freeze') toast(`Streak Freeze used for ${n.n === 1 ? 'a missed day' : n.n + ' missed days'} — your streak is safe`, 4000);
+    else if (mode !== 'loud') continue;
+    else if (n.type === 'streak') toast(`${n.m}-day streak · +${STREAK_BONUS[n.m]} coins`);
+    else if (n.type === 'ach') toast(`Achievement · ${n.a.name} · +${n.a.coins} coins`);
+  }
+}
+
+/**
+ * Streak Freeze: if the days just before today were missed (at most 2) and a
+ * streak existed before them, use one held freeze per missed day. Only freezes
+ * bought before today count, so one can't be bought afterwards to repair a gap.
+ */
+function useStreakFreezes(g, now) {
+  const idx = g.idx, used = S.game.freezesUsed, goal = S.settings.goalMin;
+  const first = Object.keys(idx).sort()[0];
+  if (!first) return 0;
+  const kept = d => ((idx[dayKey(d)] || {}).total || 0) >= goal || !!used[dayKey(d)];
+  const today = startOfDay(new Date());
+  const gap = [];
+  let d = addDays(today, -1);
+  while (!kept(d) && dayKey(d) > first && gap.length <= MAX_FREEZES) { gap.push(dayKey(d)); d = addDays(d, -1); }
+  if (!gap.length || gap.length > MAX_FREEZES || !kept(d)) return 0;
+  const available = g.freezeBuys.filter(at => at < today.getTime()).length - Object.keys(used).length;
+  if (available < gap.length) return 0;
+  for (const k of gap) used[k] = now;
+  return gap.length;
+}
+
+/* ---------- Buying and equipping ---------- */
+function buyItem(id) {
+  const it = ITEM_BY_ID[id];
+  if (!it) return;
+  if (!rewardsReady()) { toast('Still syncing — try again in a moment'); return; }
+  const g = game();
+  if (it.lvl && g.lv.level < it.lvl) { toast(`Unlocks at level ${it.lvl}`); return; }
+  if (it.cat === 'freeze' ? g.freezesHeld >= MAX_FREEZES : isOwned(id)) return;
+  if (g.balance < it.price) { toast(`You need ${it.price - g.balance} more coins`); return; }
+  if (!confirm(`Buy “${it.name}” for ${it.price} coins?`)) return;
+  S.game.purchases['b' + uid()] = { item: id, price: it.price, at: Date.now() };
+  if (it.cat === 'extra') S.game.equipped[id] = true;
+  else if (it.cat !== 'freeze') S.game.equipped[it.cat] = id;
+  G = null;
+  save();
+  applyCosmetics();
+  toast(it.cat === 'freeze' ? 'Streak Freeze added' : `${it.name} is yours`);
+  announce(reconcileRewards('collect'), 'loud');
+  renderProfile();
+}
+function equipItem(id) {
+  const it = ITEM_BY_ID[id];
+  if (!it || !isOwned(id)) return;
+  S.game.equipped[it.cat] = id;
+  save();
+  applyCosmetics();
+  renderProfile();
+}
+function toggleExtra(id) {
+  if (!isOwned(id)) return;
+  S.game.equipped[id] = !extraOn(id);
+  save();
+  applyCosmetics();
+  renderTimer();
+  renderProfile();
+}
+
+/* ==========================================================================
+   AUDIO — end sounds, start cue and ambient sound, all generated with Web Audio
+   ========================================================================== */
+const getCtx = () => { ensureAudio(); return audioCtx; };
+function envelope(g, t, peak, attack, decay) {
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.linearRampToValueAtTime(peak, t + attack);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + attack + decay);
+}
+function tone(ctx, out, { f, t = 0, type = 'sine', peak = 0.15, a = 0.01, d = 1.2, f2 = 0, fd = 0.08 }) {
+  const now = ctx.currentTime + t, o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = type;
+  o.frequency.setValueAtTime(f, now);
+  if (f2) o.frequency.exponentialRampToValueAtTime(f2, now + fd);
+  envelope(g, now, peak, a, d);
+  o.connect(g).connect(out);
+  o.start(now);
+  o.stop(now + a + d + 0.05);
+}
+function noiseHit(ctx, out, { t = 0, freq = 1000, q = 5, peak = 0.3, d = 0.08, type = 'bandpass' }) {
+  const now = ctx.currentTime + t, s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+  s.buffer = noiseBuffer('white');
+  f.type = type; f.frequency.value = freq; f.Q.value = q;
+  envelope(g, now, peak, 0.002, d);
+  s.connect(f).connect(g).connect(out);
+  s.start(now, Math.random() * 2);
+  s.stop(now + d + 0.05);
+}
+const END_SOUNDS = {
+  snd_chime: (c, o) => [[523.25, 0], [659.25, 0.18], [783.99, 0.36]].forEach(([f, t]) => tone(c, o, { f, t, peak: 0.16, a: 0.03, d: 1.8 })),
+  snd_bell: (c, o) => [[1, 0.16], [2.76, 0.07], [5.4, 0.035], [8.93, 0.015]].forEach(([m, p]) => tone(c, o, { f: 660 * m, peak: p, a: 0.005, d: 2.8 / Math.sqrt(m) })),
+  snd_wood: (c, o) => [0, 0.17].forEach(t => { noiseHit(c, o, { t, freq: 950, q: 7, peak: 0.5, d: 0.07 }); tone(c, o, { f: 420, t, peak: 0.12, a: 0.002, d: 0.09 }); }),
+  snd_bowl: (c, o) => [[196, 0.12], [197.6, 0.1], [528, 0.05], [530.5, 0.04]].forEach(([f, p]) => tone(c, o, { f, peak: p, a: 0.06, d: 5.5 })),
+  snd_digital: (c, o) => {
+    const lp = c.createBiquadFilter();
+    lp.type = 'lowpass'; lp.frequency.value = 2400; lp.connect(o);
+    [[988, 0], [1319, 0.14], [988, 0.42], [1319, 0.56]].forEach(([f, t]) => tone(c, lp, { f, t, type: 'square', peak: 0.035, a: 0.005, d: 0.11 }));
+  },
+  snd_piano: (c, o) => [[523.25, 0, 0.17], [659.25, 0.32, 0.13]].forEach(([f, t, p]) =>
+    [[1, 1, 1.9], [2, 0.4, 1.2], [3, 0.2, 0.8], [4, 0.08, 0.5]].forEach(([m, k, d]) => tone(c, o, { f: f * m, t, peak: p * k, a: 0.004, d }))),
+  snd_rain: (c, o) => [0, 0.2, 0.47].forEach((t, i) => tone(c, o, { f: 1700 - i * 150, f2: 520, fd: 0.07, t, peak: 0.16, a: 0.003, d: 0.16 })),
+};
+/** Play the equipped end sound (or a specific one for previews, which ignore mute). */
+function playEndSound(id = equippedId('sound'), force = false) {
+  if (!force && !S.settings.sound) return;
+  const c = getCtx();
+  if (c) (END_SOUNDS[id] || END_SOUNDS.snd_chime)(c, c.destination);
+}
+function playStartCue() {
+  const c = getCtx();
+  if (!c || !S.settings.sound) return;
+  tone(c, c.destination, { f: 392, peak: 0.05, a: 0.08, d: 0.9 });
+  tone(c, c.destination, { f: 587.33, t: 0.12, peak: 0.035, a: 0.08, d: 0.9 });
+}
+function playTierChord() {
+  const c = getCtx();
+  if (!c || !S.settings.sound) return;
+  [[392, 0], [493.88, 0.12], [587.33, 0.24], [783.99, 0.36]].forEach(([f, t]) => tone(c, c.destination, { f, t, peak: 0.07, a: 0.02, d: 1.6 }));
+}
+
+// Ambient sound: looped noise buffers shaped with filters and slow LFOs.
+const NOISE = {};
+function noiseBuffer(kind) {
+  if (NOISE[kind]) return NOISE[kind];
+  const c = audioCtx, len = c.sampleRate * 4, b = c.createBuffer(1, len, c.sampleRate), d = b.getChannelData(0);
+  let last = 0, b0 = 0, b1 = 0, b2 = 0;
+  for (let i = 0; i < len; i++) {
+    const w = Math.random() * 2 - 1;
+    if (kind === 'brown') { last = (last + 0.02 * w) / 1.02; d[i] = last * 3.5; }
+    else if (kind === 'pink') { b0 = 0.99765 * b0 + w * 0.099046; b1 = 0.963 * b1 + w * 0.2965164; b2 = 0.57 * b2 + w * 1.0526913; d[i] = (b0 + b1 + b2 + w * 0.1848) * 0.11; }
+    else d[i] = w;
+  }
+  return (NOISE[kind] = b);
+}
+function loopNoise(kind) { const s = audioCtx.createBufferSource(); s.buffer = noiseBuffer(kind); s.loop = true; s.start(0, Math.random() * 3); return s; }
+function filt(type, freq, q = 0.7) { const f = audioCtx.createBiquadFilter(); f.type = type; f.frequency.value = freq; f.Q.value = q; return f; }
+function gainNode(v) { const g = audioCtx.createGain(); g.gain.value = v; return g; }
+function lfo(freq, depth, param) { const o = audioCtx.createOscillator(), g = gainNode(depth); o.frequency.value = freq; o.connect(g).connect(param); o.start(); return o; }
+const AMBIENTS = {
+  amb_rain(out) {
+    const n = loopNoise('pink'), g = gainNode(0.55);
+    n.connect(filt('highpass', 500)).connect(filt('lowpass', 6500)).connect(g).connect(out);
+    const n2 = loopNoise('white');
+    n2.connect(filt('bandpass', 3200, 0.8)).connect(gainNode(0.05)).connect(out);
+    return [n, n2, lfo(0.17, 0.08, g.gain)];
+  },
+  amb_brown(out) {
+    const n = loopNoise('brown');
+    n.connect(filt('lowpass', 900)).connect(gainNode(0.9)).connect(out);
+    return [n];
+  },
+  amb_cafe(out) {
+    const n = loopNoise('pink'), g = gainNode(0.35);
+    n.connect(filt('bandpass', 650, 0.9)).connect(g).connect(out);
+    const n2 = loopNoise('brown');
+    n2.connect(filt('lowpass', 300)).connect(gainNode(0.35)).connect(out);
+    let timer;
+    const clink = () => {
+      tone(audioCtx, out, { f: 2200 + Math.random() * 1400, peak: 0.02 + Math.random() * 0.03, a: 0.002, d: 0.35 });
+      timer = setTimeout(clink, 3000 + Math.random() * 7000);
+    };
+    timer = setTimeout(clink, 2500);
+    return [n, n2, lfo(0.9, 0.12, g.gain), lfo(0.31, 0.1, g.gain), { stop: () => clearTimeout(timer) }];
+  },
+  amb_ocean(out) {
+    const n = loopNoise('brown'), lp = filt('lowpass', 700), g = gainNode(0.5);
+    n.connect(lp).connect(g).connect(out);
+    const n2 = loopNoise('pink'), g2 = gainNode(0.05);
+    n2.connect(filt('highpass', 2000)).connect(g2).connect(out);
+    return [n, n2, lfo(0.085, 450, lp.frequency), lfo(0.085, 0.3, g.gain), lfo(0.085, 0.04, g2.gain)];
+  },
+  amb_fire(out) {
+    const n = loopNoise('brown');
+    n.connect(filt('lowpass', 450)).connect(gainNode(0.7)).connect(out);
+    let timer;
+    const crackle = () => {
+      noiseHit(audioCtx, out, { freq: 1800 + Math.random() * 3000, q: 1.5, peak: 0.04 + Math.random() * 0.16, d: 0.012 + Math.random() * 0.03, type: 'highpass' });
+      timer = setTimeout(crackle, 40 + Math.random() * (Math.random() < 0.2 ? 600 : 180));
+    };
+    crackle();
+    return [n, { stop: () => clearTimeout(timer) }];
+  },
+};
+let amb = null, ambPreviewTimer = null;
+const ambVol = () => Math.pow(S.settings.ambientVolume ?? 0.5, 1.5) * 0.6;
+function startAmbient(id) {
+  const master = gainNode(0);
+  master.connect(audioCtx.destination);
+  const parts = AMBIENTS[id](master);
+  master.gain.setTargetAtTime(ambVol(), audioCtx.currentTime, 0.6);
+  return { id, master, parts };
+}
+function stopAmbient() {
+  if (!amb) return;
+  const a = amb;
+  amb = null;
+  a.master.gain.setTargetAtTime(0, audioCtx.currentTime, 0.2);
+  setTimeout(() => { a.parts.forEach(p => { try { p.stop(); } catch (e) { /* already stopped */ } }); a.master.disconnect(); }, 900);
+}
+/** Ambient plays only while a focus block is running (and sound isn't muted). */
+function updateAmbient() {
+  if (ambPreviewTimer) return;
+  let want = 'amb_none';
+  if (USER && audioCtx && S.settings.sound && S.timer.status === 'running' && S.timer.phase === 'focus') want = equippedId('ambient');
+  if (!AMBIENTS[want]) { stopAmbient(); return; }
+  if (amb && amb.id === want) { amb.master.gain.setTargetAtTime(ambVol(), audioCtx.currentTime, 0.2); return; }
+  stopAmbient();
+  amb = startAmbient(want);
+}
+function previewAmbient(id) {
+  if (!getCtx()) return;
+  clearTimeout(ambPreviewTimer);
+  stopAmbient();
+  amb = startAmbient(id);
+  ambPreviewTimer = setTimeout(() => { ambPreviewTimer = null; stopAmbient(); updateAmbient(); }, 6000);
+}
+function setAmbientVolume(v) {
+  S.settings.ambientVolume = clamp(+v || 0, 0, 1);
+  if (amb) amb.master.gain.setTargetAtTime(ambVol(), audioCtx.currentTime, 0.1);
+  save();
+}
+// After a reload, audio can only start after the next tap or click.
+document.addEventListener('pointerdown', () => { if (USER && !audioCtx) { ensureAudio(); updateAmbient(); } });
+
+/* ==========================================================================
+   VISUAL COSMETICS — themes, ring styles, fonts, effects, live tab icon
+   ========================================================================== */
+const SKIN_VARS = ['bg', 'surface', 'text', 'muted', 'line', 'accent', 'accent-soft', 'heat0', 'on-accent'];
+const SKINS = {
+  th_paper: {
+    light: { bg: '#f4efe4', surface: '#fbf8f1', text: '#2b2620', muted: '#7a7064', line: '#e6ddcc', accent: '#a8692f', heat0: '#ebe3d3' },
+    dark:  { bg: '#1c1a16', surface: '#24211c', text: '#ece4d6', muted: '#a09584', line: '#363128', accent: '#d09a5e', heat0: '#2e2a23', 'on-accent': '#1c1a16' },
+  },
+  th_mono: {
+    light: { bg: '#ffffff', surface: '#ffffff', text: '#000000', muted: '#5c5c5c', line: '#d6d6d6', accent: '#000000', heat0: '#ededed', 'accent-soft': 'rgba(0,0,0,.07)', 'on-accent': '#ffffff' },
+    dark:  { bg: '#000000', surface: '#0b0b0b', text: '#ffffff', muted: '#a3a3a3', line: '#2b2b2b', accent: '#ffffff', heat0: '#1c1c1c', 'accent-soft': 'rgba(255,255,255,.1)', 'on-accent': '#000000' },
+  },
+  th_forest: {
+    light: { bg: '#f2f4ef', surface: '#fbfcf9', text: '#1f2a20', muted: '#66735f', line: '#dfe5d8', accent: '#4a7c4e', heat0: '#e6ebe0' },
+    dark:  { bg: '#111612', surface: '#18201a', text: '#e3eae0', muted: '#8a9a88', line: '#26302a', accent: '#7fb27f', heat0: '#1f2822', 'on-accent': '#111612' },
+  },
+  th_ocean: {
+    light: { bg: '#f0f5f8', surface: '#fafcfd', text: '#14232e', muted: '#5f7380', line: '#dbe6ec', accent: '#2a7ab0', heat0: '#e3edf2' },
+    dark:  { bg: '#0d1820', surface: '#13212b', text: '#dde9f0', muted: '#87a0b0', line: '#21323e', accent: '#5cb0e0', heat0: '#1a2a35', 'on-accent': '#0d1820' },
+  },
+  th_sunset: {
+    light: { bg: '#fbf3ee', surface: '#fffaf7', text: '#2e1f1a', muted: '#86695e', line: '#f0dfd5', accent: '#cf5f3a', heat0: '#f3e5dc' },
+    dark:  { bg: '#1a1214', surface: '#22181a', text: '#f2e2dc', muted: '#a88a84', line: '#33262a', accent: '#f08a5d', heat0: '#2c2024', 'on-accent': '#1a1214' },
+  },
+  th_sakura: {
+    light: { bg: '#fbf4f6', surface: '#fffafb', text: '#2e1e24', muted: '#8a6c76', line: '#f0dde3', accent: '#c25480', heat0: '#f3e4e9' },
+    dark:  { bg: '#1a1316', surface: '#22191d', text: '#f1e2e7', muted: '#a68892', line: '#34262c', accent: '#e88aab', heat0: '#2c2025', 'on-accent': '#1a1316' },
+  },
+  th_nord: {
+    light: { bg: '#eceff4', surface: '#f8f9fb', text: '#2e3440', muted: '#5e6a82', line: '#d8dee9', accent: '#5e81ac', heat0: '#e1e5ec' },
+    dark:  { bg: '#2e3440', surface: '#3b4252', text: '#eceff4', muted: '#a3adbf', line: '#4c566a', accent: '#88c0d0', heat0: '#434c5e', 'on-accent': '#2e3440' },
+  },
+  th_midnight: {
+    force: 'dark',
+    dark: { bg: '#0b0d17', surface: '#12152a', text: '#e4e6f2', muted: '#8b90b0', line: '#232846', accent: '#8c9aff', heat0: '#1a1e38', 'on-accent': '#0b0d17' },
+  },
+  th_starfield: {
+    force: 'dark',
+    dark: { bg: '#05060d', surface: 'rgba(16,18,32,.88)', text: '#e8eaf6', muted: '#9095b5', line: '#252a45', accent: '#a5b4ff', heat0: '#1a1d33', 'on-accent': '#0b0d17' },
+  },
+};
+// The free default theme, used for its shop preview while another theme is equipped.
+const DEFAULT_SKIN = {
+  light: { bg: '#f6f6f3', surface: '#ffffff', text: '#1f2322', accent: '#2f8f83' },
+  dark:  { bg: '#121414', surface: '#1a1d1d', text: '#e7e9e8', accent: '#4fb3a5' },
+};
+const softOf = hex => { const n = parseInt(hex.slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},.14)`; };
+const systemDark = () => matchMedia('(prefers-color-scheme: dark)').matches;
+
+/** Light/dark/system setting + the equipped theme. Shop themes set CSS variables inline. */
+function applyTheme(themeArg) {
+  const root = document.documentElement;
+  const theme = themeArg || (USER ? S.settings.theme : 'auto');
+  const skinId = USER ? equippedId('theme') : 'th_default';
+  const skin = SKINS[skinId];
+  for (const v of SKIN_VARS) root.style.removeProperty('--' + v);
+  if (skin) {
+    const dark = skin.force ? skin.force === 'dark' : theme === 'dark' || (theme !== 'light' && systemDark());
+    const vars = dark ? (skin.dark || skin.light) : (skin.light || skin.dark);
+    root.setAttribute('data-theme', dark ? 'dark' : 'light');
+    for (const [k, v] of Object.entries(vars)) root.style.setProperty('--' + k, v);
+    if (!vars['accent-soft']) root.style.setProperty('--accent-soft', softOf(vars.accent));
+  } else if (theme === 'light' || theme === 'dark') root.setAttribute('data-theme', theme);
+  else root.removeAttribute('data-theme');
+  setStarfield(skinId === 'th_starfield');
+  favKey = '';
+}
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (USER) applyTheme(); });
+
+const RING_CLASSES = { ring_thin: 'rs-thin', ring_dots: 'rs-dots', ring_grad: 'rs-grad', ring_glow: 'rs-glow', ring_number: 'rs-none' };
+let lastDots = -1;
+function applyRingStyle() {
+  const ring = $('#ring');
+  ring.classList.remove(...Object.values(RING_CLASSES));
+  const cls = RING_CLASSES[equippedId('ring')];
+  if (cls) ring.classList.add(cls);
+  lastDots = -1;
+}
+
+const FONTS = {
+  font_inter:   { family: 'Inter', q: 'Inter:wght@200;300' },
+  font_grotesk: { family: 'Space Grotesk', q: 'Space+Grotesk:wght@300' },
+  font_mono:    { family: 'JetBrains Mono', q: 'JetBrains+Mono:wght@200;300' },
+  font_serif:   { family: 'Fraunces', q: 'Fraunces:opsz,wght@9..144,300' },
+};
+/** Google Fonts are only requested when equipped (or a tiny digits-only subset for shop previews). */
+function loadFont(id, previewOnly) {
+  const f = FONTS[id], key = 'gf-' + (previewOnly ? 'pv-' : '') + id;
+  if (!f || document.getElementById(key)) return;
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.id = key;
+  link.href = `https://fonts.googleapis.com/css2?family=${f.q}${previewOnly ? '&text=' + encodeURIComponent('0123456789:') : ''}&display=swap`;
+  document.head.appendChild(link);
+}
+function applyFont() {
+  const id = equippedId('font'), f = FONTS[id], root = document.documentElement;
+  if (f) { loadFont(id); root.style.setProperty('--timer-font', `"${f.family}", system-ui, sans-serif`); }
+  else root.style.removeProperty('--timer-font');
+}
+
+// Starfield theme: a slow, subtle drifting star canvas behind the app.
+let starRAF = null, stars = [];
+function sizeStars() {
+  const cv = $('#starCanvas'), d = devicePixelRatio || 1;
+  cv.width = innerWidth * d; cv.height = innerHeight * d;
+  cv.getContext('2d').setTransform(d, 0, 0, d, 0, 0);
+  stars = Array.from({ length: Math.round(innerWidth * innerHeight / 7000) }, () =>
+    ({ x: Math.random() * innerWidth, y: Math.random() * innerHeight, z: 0.2 + Math.random() * 0.8, p: Math.random() * 6.28 }));
+}
+function setStarfield(on) {
+  const cv = $('#starCanvas');
+  if (!on) { cancelAnimationFrame(starRAF); starRAF = null; cv.classList.add('hidden'); return; }
+  cv.classList.remove('hidden');
+  if (starRAF) return;
+  sizeStars();
+  const x = cv.getContext('2d'), still = REDUCED();
+  let last = 0;
+  const draw = t => {
+    if (!still) starRAF = requestAnimationFrame(draw);
+    if (!still && t - last < 40) return;   // ~25 fps is plenty for a slow drift
+    last = t;
+    x.clearRect(0, 0, innerWidth, innerHeight);
+    x.fillStyle = '#dfe4ff';
+    for (const s of stars) {
+      if (!still) {
+        s.y += s.z * 0.12; s.x += s.z * 0.03;
+        if (s.y > innerHeight) { s.y = 0; s.x = Math.random() * innerWidth; }
+        if (s.x > innerWidth) s.x = 0;
+      }
+      x.globalAlpha = (0.25 + 0.55 * s.z) * (0.8 + 0.2 * Math.sin(t / 1200 + s.p));
+      x.fillRect(s.x, s.y, s.z * 1.3, s.z * 1.3);
+    }
+  };
+  starRAF = requestAnimationFrame(draw);
+}
+window.addEventListener('resize', () => { if (starRAF) sizeStars(); });
+
+// Session-complete effects.
+let fxParts = [], fxRunning = false;
+function playEffect(id, anchor) {
+  if (!id || id === 'fx_none' || REDUCED()) return;
+  if (id === 'fx_ripple') {
+    const host = anchor || $('#ring');
+    for (let i = 0; i < 3; i++) {
+      const r = document.createElement('div');
+      r.className = 'ripple';
+      r.style.animationDelay = i * 0.28 + 's';
+      host.appendChild(r);
+      setTimeout(() => r.remove(), 2400);
+    }
+    return;
+  }
+  const cs = getComputedStyle(document.documentElement);
+  const cols = [cs.getPropertyValue('--accent').trim(), game().tier.color, cs.getPropertyValue('--muted').trim()];
+  const pick = () => cols[Math.floor(Math.random() * cols.length)];
+  const W = innerWidth, H = innerHeight;
+  if (id === 'fx_confetti') {
+    for (let i = 0; i < 70; i++) fxParts.push({ kind: 'c', x: Math.random() * W, y: -10 - Math.random() * H * 0.3, vx: (Math.random() - 0.5) * 0.8, vy: 1.2 + Math.random() * 1.6, g: 0.015, r: Math.random() * 6.28, vr: (Math.random() - 0.5) * 0.15, s: 4 + Math.random() * 4, life: 220, col: pick() });
+    startFx();
+  }
+  if (id === 'fx_fireworks') {
+    [0, 380, 760].forEach(delay => setTimeout(() => {
+      const cx = W * (0.25 + Math.random() * 0.5), cy = H * (0.2 + Math.random() * 0.25), col = pick();
+      for (let i = 0; i < 46; i++) {
+        const a = Math.random() * 6.28, sp = 1.2 + Math.random() * 2.8;
+        fxParts.push({ kind: 'f', x: cx, y: cy, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, g: 0.035, drag: 0.985, s: 1.8, life: 70 + Math.random() * 40, col: Math.random() < 0.7 ? col : pick() });
+      }
+      startFx();
+    }, delay));
+  }
+}
+function startFx() {
+  if (fxRunning) return;
+  fxRunning = true;
+  const cv = $('#fxCanvas'), d = devicePixelRatio || 1, x = cv.getContext('2d');
+  cv.width = innerWidth * d; cv.height = innerHeight * d;
+  x.setTransform(d, 0, 0, d, 0, 0);
+  cv.classList.remove('hidden');
+  const step = () => {
+    x.clearRect(0, 0, innerWidth, innerHeight);
+    fxParts = fxParts.filter(p => p.life-- > 0 && p.y < innerHeight + 20);
+    for (const p of fxParts) {
+      if (p.drag) { p.vx *= p.drag; p.vy *= p.drag; }
+      p.vy += p.g; p.x += p.vx; p.y += p.vy;
+      x.globalAlpha = Math.min(1, p.life / 40);
+      x.fillStyle = p.col;
+      if (p.kind === 'c') { p.r += p.vr; x.save(); x.translate(p.x, p.y); x.rotate(p.r); x.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); x.restore(); }
+      else { x.beginPath(); x.arc(p.x, p.y, p.s, 0, 6.28); x.fill(); }
+    }
+    if (fxParts.length) requestAnimationFrame(step);
+    else { fxRunning = false; x.clearRect(0, 0, innerWidth, innerHeight); cv.classList.add('hidden'); }
+  };
+  requestAnimationFrame(step);
+}
+
+// Live tab icon: the favicon becomes a tiny progress ring while the timer runs.
+const FAV_DEFAULT = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><circle cx="16" cy="16" r="9" fill="#2f8f83"/></svg>');
+let favKey = '';
+function updateFavicon(progress) {
+  const on = !!USER && S.timer.status !== 'idle' && extraOn('x_favicon');
+  const key = on ? `${S.timer.phase}${S.timer.status}${Math.round(progress * 48)}` : 'idle';
+  if (key === favKey) return;
+  favKey = key;
+  let href = FAV_DEFAULT;
+  if (on) {
+    const c = document.createElement('canvas'), x = c.getContext('2d');
+    const ac = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#2f8f83';
+    c.width = c.height = 64;
+    x.lineWidth = 9; x.lineCap = 'round';
+    x.strokeStyle = 'rgba(128,128,128,.35)';
+    x.beginPath(); x.arc(32, 32, 24, 0, Math.PI * 2); x.stroke();
+    x.strokeStyle = S.timer.phase === 'focus' ? ac : '#8c9a97';
+    x.beginPath(); x.arc(32, 32, 24, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * Math.max(0.01, progress)); x.stroke();
+    if (S.timer.status === 'paused') { x.fillStyle = ac; x.fillRect(24, 22, 5, 20); x.fillRect(35, 22, 5, 20); }
+    href = c.toDataURL();
+  }
+  $('#favicon').href = href;
+}
+
+/** Re-apply everything that depends on equipped items. */
+function applyCosmetics() {
+  if (!USER) return;
+  G = null;
+  applyTheme();
+  applyRingStyle();
+  applyFont();
+  updateAmbient();
+  renderHeaderChip();
+}
+
+/* ==========================================================================
+   RENDER — header chip, Progress page, Shop, level-up moment
+   ========================================================================== */
+function renderHeaderChip() {
+  if (!USER) return;
+  const on = S.settings.gamification;
+  $('#lvChip').classList.toggle('hidden', !on);
+  $('#profileTabBtn').classList.toggle('hidden', !on);
+  if (!on) { if (S.ui.tab === 'profile') showTab('timer'); return; }
+  const g = game(), col = NAME_COLORS[equippedId('color')];
+  $('#lvChip').innerHTML = badgeSVG(g.tier, { size: 22, frame: equippedId('frame') }) +
+    `<span class="uname"${col ? ` style="color:${col}"` : ''}>${esc(USER.guest ? 'You' : '@' + USER.username)}</span><span class="lvn">Lv ${g.lv.level}</span>`;
+  $('#lvChip').title = `${g.tier.name} · Level ${g.lv.level} · ${fmtNum(g.lv.need - g.lv.into)} XP to level ${g.lv.level + 1}`;
+}
+
+function renderProfile() {
+  const view = S.ui.profileView === 'shop' ? 'shop' : 'progress';
+  $$('#profileSeg button').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+  $('#progressView').classList.toggle('hidden', view !== 'progress');
+  $('#shopView').classList.toggle('hidden', view !== 'shop');
+  if (view === 'progress') renderProgress(); else renderShop();
+}
+
+function renderProgress() {
+  const g = game(), lv = g.lv, frame = equippedId('frame');
+  const next = TIERS.find(t => t.min > lv.level);
+  const stats = computeStats(g.idx, g.streak, g.ownedCount);
+  const claimed = S.game.claims.achievements;
+  const done = ACHIEVEMENTS.filter(a => claimed[a.id]).length;
+  const tile = (v, s) => `<div class="tile"><div class="v">${v}</div><div class="s">${s}</div></div>`;
+  const tiers = TIERS.map((t, i) => {
+    const locked = lv.level < t.min, cur = g.tier.id === t.id;
+    const range = TIERS[i + 1] ? `Lv ${t.min}–${TIERS[i + 1].min - 1}` : `Lv ${t.min}+`;
+    return `<div class="tier${locked ? ' locked' : ''}${cur ? ' current' : ''}" title="${esc(t.name)}">
+      ${badgeSVG(t, { size: 40, locked, frame: cur ? frame : 'frame_none' })}
+      <div class="tn">${t.name}</div><div class="lbl">${locked ? LOCK_SVG + ' Level ' + t.min : range}</div></div>`;
+  }).join('');
+  const achs = ACHIEVEMENTS.map(a => {
+    const got = claimed[a.id], v = Math.min(a.val(stats), a.goal);
+    const prog = !got && a.goal > 1
+      ? `<div class="ap"><i style="width:${(v / a.goal * 100).toFixed(1)}%"></i></div><div class="lbl">${fmtNum(Math.floor(v))} / ${fmtNum(a.goal)}${a.unit ? ' ' + a.unit : ''}</div>` : '';
+    return `<div class="ach${got ? ' done' : ''}"><div class="ic">${iconSVG(ICONS[a.icon])}</div>
+      <div><div class="an">${esc(a.name)}</div><div class="ad">${esc(a.desc)}${got ? ' · ' + new Date(got).toLocaleDateString([], { day: 'numeric', month: 'short', year: 'numeric' }) : ''}</div>${prog}</div>
+      <div class="ac">${got ? '✓' : ''} ${COIN_SVG} ${a.coins}</div></div>`;
+  }).join('');
+  $('#progressView').innerHTML = `
+    <div class="grid-2">
+      <div class="stack">
+        <div class="card prog-hero" style="--tier:${g.tier.color}">
+          <div class="bigbadge">${badgeSVG(g.tier, { size: 76, frame })}</div>
+          <div style="flex:1;min-width:0">
+            <div class="tiername">${g.tier.name}</div>
+            <div class="big">Level ${lv.level}</div>
+            <div class="xpbar"><i style="width:${(lv.into / lv.need * 100).toFixed(1)}%"></i></div>
+            <div class="lbl">${fmtNum(lv.into)} / ${fmtNum(lv.need)} XP · ${fmtNum(lv.need - lv.into)} to level ${lv.level + 1}</div>
+            ${next ? `<div class="lbl">${next.name} at level ${next.min}</div>` : ''}
+          </div>
+        </div>
+        <div class="tiles4">
+          ${tile(`<span class="coins">${COIN_SVG}${fmtNum(g.balance)}</span>`, 'Coins')}
+          ${tile((g.focusMs / 3.6e6).toFixed(1) + 'h', 'Lifetime focus')}
+          ${tile(fmtNum(g.xp), 'Total XP')}
+          ${tile(`${g.freezesHeld}/${MAX_FREEZES}`, 'Streak freezes')}
+        </div>
+        <div class="card"><h2>Badges</h2><div class="tiergrid">${tiers}</div></div>
+      </div>
+      <div class="card">
+        <div class="row between" style="margin-bottom:6px"><h2 style="margin:0">Achievements</h2><span class="lbl">${done} / ${ACHIEVEMENTS.length}</span></div>
+        <div class="achlist">${achs}</div>
+      </div>
+    </div>`;
+}
+
+function ringPreview(id) {
+  if (id === 'ring_number') return '<span class="fontpv" style="font-size:26px">25:00</span>';
+  const p = 0.65, C = 2 * Math.PI * 22;
+  let svg = '<svg viewBox="0 0 60 60" width="60" height="60" style="transform:rotate(-90deg)">';
+  if (id === 'ring_dots') {
+    return svg + Array.from({ length: 24 }, (_, i) => {
+      const a = i / 24 * Math.PI * 2;
+      return `<circle cx="${(30 + 22 * Math.cos(a)).toFixed(1)}" cy="${(30 + 22 * Math.sin(a)).toFixed(1)}" r="1.8" style="fill:${i < 24 * p ? 'var(--accent)' : 'var(--line)'}"/>`;
+    }).join('') + '</svg>';
+  }
+  const w = id === 'ring_thin' ? 1.5 : 4;
+  if (id === 'ring_grad') svg += '<defs><linearGradient id="pvGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--accent)"/><stop offset="1" style="stop-color:var(--accent);stop-opacity:.25"/></linearGradient></defs>';
+  const stroke = id === 'ring_grad' ? 'url(#pvGrad)' : 'var(--accent)';
+  const glow = id === 'ring_glow' ? ';filter:drop-shadow(0 0 3px var(--accent))' : '';
+  return svg + `<circle cx="30" cy="30" r="22" fill="none" style="stroke:var(--line)" stroke-width="${w}"/>` +
+    `<circle cx="30" cy="30" r="22" fill="none" style="stroke:${stroke}${glow}" stroke-width="${w}" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C * (1 - p)).toFixed(1)}"/></svg>`;
+}
+function previewFor(it, g) {
+  if (it.cat === 'theme') {
+    const sk = SKINS[it.id], dark = document.documentElement.getAttribute('data-theme') === 'dark' ||
+      (!document.documentElement.getAttribute('data-theme') && systemDark());
+    const base = sk || DEFAULT_SKIN;
+    const v = base.force || dark ? (base.dark || base.light) : base.light;
+    const st = `--pbg:${v.bg};--psf:${v.surface};--pac:${v.accent};--ptx:${v.text}`;
+    return `<div class="thprev${it.id === 'th_starfield' ? ' stars' : ''}" style="${st}"><div class="sf"><i></i><b></b><b class="s"></b></div></div>`;
+  }
+  if (it.cat === 'ring') return ringPreview(it.id);
+  if (it.cat === 'font') { const f = FONTS[it.id]; return `<span class="fontpv"${f ? ` style="font-family:'${f.family}',system-ui"` : ''}>25:00</span>`; }
+  if (it.cat === 'frame') return badgeSVG(g.tier, { size: 48, frame: it.id });
+  if (it.cat === 'color') { const c = NAME_COLORS[it.id]; return `<span class="namepv"${c ? ` style="color:${c}"` : ''}>${esc(USER.guest ? 'You' : '@' + USER.username)}</span>`; }
+  return `<span class="pvicon">${iconSVG(ICONS[it.id] || ICONS[it.cat], 28)}</span>`;
+}
+function itemCard(it, g) {
+  const owned = isOwned(it.id), isExtra = it.cat === 'extra', isFreeze = it.cat === 'freeze';
+  const equipped = isExtra ? extraOn(it.id) : !isFreeze && equippedId(it.cat) === it.id;
+  const locked = !owned && it.lvl && g.lv.level < it.lvl;
+  const buy = `<button class="btn buy" data-buy="${it.id}"${g.balance < it.price ? ' disabled title="Not enough coins yet"' : ''}>${COIN_SVG} ${fmtNum(it.price)}</button>`;
+  let btn;
+  if (isFreeze) btn = locked ? '' : g.freezesHeld >= MAX_FREEZES ? '<button class="btn" disabled>Holding the maximum</button>' : buy;
+  else if (equipped) btn = isExtra ? `<button class="btn" data-toggle-extra="${it.id}">Turn off</button>` : '<button class="btn" disabled>Equipped</button>';
+  else if (owned) btn = isExtra ? `<button class="btn" data-toggle-extra="${it.id}">Turn on</button>` : `<button class="btn" data-equip="${it.id}">Equip</button>`;
+  else if (locked) btn = `<button class="btn" disabled>${LOCK_SVG} Level ${it.lvl}</button>`;
+  else btn = buy;
+  const canPreview = ['sound', 'ambient', 'effect'].includes(it.cat) && !['amb_none', 'fx_none'].includes(it.id);
+  const play = canPreview ? `<button class="iconbtn sm" data-preview="${it.id}" title="Preview" aria-label="Preview ${esc(it.name)}">${PLAY_SVG}</button>` : '';
+  const state = equipped ? 'Equipped' : owned && it.price ? 'Owned' : '';
+  return `<div class="item${equipped ? ' equipped' : ''}${locked ? ' locked' : ''}">
+    <div class="pv">${previewFor(it, g)}${state ? `<span class="tag">${state}</span>` : ''}</div>
+    <div class="nm">${esc(it.name)}</div>
+    <div class="ds">${esc(it.desc)}${isFreeze ? ` · You hold ${g.freezesHeld}/${MAX_FREEZES}` : ''}</div>
+    <div class="act">${play}${btn}</div></div>`;
+}
+function renderShop() {
+  const g = game(), cat = SHOP_CATS.some(([id]) => id === S.ui.shopCat) ? S.ui.shopCat : 'sound';
+  const items = ITEMS.filter(i => i.cat === cat);
+  if (cat === 'font') items.forEach(i => loadFont(i.id, true));
+  $('#shopView').innerHTML = `
+    <div class="shop-head">
+      <div class="big coins">${COIN_SVG}${fmtNum(g.balance)}</div>
+      <div class="lbl">5 coins per session · +10 on daily-goal days · bonuses for streaks and achievements. Everything here is cosmetic.</div>
+    </div>
+    <div class="catrow" id="shopCats">${SHOP_CATS.map(([id, n]) => `<button data-cat="${id}" class="${id === cat ? 'active' : ''}">${n}</button>`).join('')}</div>
+    ${cat === 'ambient' ? `<div class="card amb-vol"><label class="row between"><span>Ambient volume</span><input type="range" id="shopAmbVol" min="0" max="1" step="0.05" value="${S.settings.ambientVolume}"></label><div class="lbl">Plays only while a focus block is running. The mute button silences it too.</div></div>` : ''}
+    <div class="shopgrid">${items.map(it => itemCard(it, g)).join('')}</div>`;
+}
+function previewItem(id) {
+  const it = ITEM_BY_ID[id];
+  if (!it) return;
+  if (it.cat === 'sound') playEndSound(id, true);
+  else if (it.cat === 'ambient') previewAmbient(id);
+  else if (it.cat === 'effect') {
+    if (REDUCED()) { toast('Effects are off because your device prefers reduced motion'); return; }
+    const host = document.querySelector(`[data-preview="${id}"]`).closest('.item').querySelector('.pv');
+    playEffect(id, host);
+  }
+}
+
+/** Level-up moment. A new tier gets a bigger badge, expanding rings and a soft chord. */
+function showLevelUp(from, to) {
+  if (!S.settings.gamification) return;
+  const t = tierFor(to), tierUp = tierFor(from).id !== t.id, dlg = $('#levelDlg');
+  dlg.classList.toggle('tierup', tierUp);
+  dlg.style.setProperty('--tier', t.color);
+  $('#lvBadge').innerHTML = badgeSVG(t, { size: tierUp ? 104 : 84, frame: equippedId('frame'), draw: true });
+  $('#lvKicker').textContent = tierUp ? 'New tier' : 'Level up';
+  $('#lvTitle').textContent = tierUp ? t.name : `Level ${to}`;
+  const next = TIERS.find(x => x.min > to);
+  $('#lvSub').textContent = tierUp ? `You reached level ${to}. Your new badge is in your profile.`
+    : `${t.name} · ${next ? `${next.name} at level ${next.min}` : 'the highest tier'}`;
+  if (!dlg.open) dlg.showModal();
+  if (tierUp) playTierChord();
+}
+
+/* ==========================================================================
    MASTER RENDER + TABS
    ========================================================================== */
 function showTab(tab) {
@@ -1737,6 +2901,7 @@ function showTab(tab) {
   $$('.tab').forEach(s => s.classList.toggle('active', s.id === 'tab-' + tab));
   if (tab === 'stats') renderStats();
   if (tab === 'settings') renderSettings();
+  if (tab === 'profile') renderProfile();
   saveLocal();
 }
 function renderAll() {
@@ -1745,7 +2910,9 @@ function renderAll() {
   renderTimer();
   renderChips();
   renderToday();
+  renderHeaderChip();
   if (S.ui.tab === 'stats') renderStats();
+  if (S.ui.tab === 'profile') renderProfile();
 }
 
 /* ==========================================================================
@@ -1801,7 +2968,7 @@ $('#skipBtn').addEventListener('click', () => finishPhase('skip'));
 $('#resetBtn').addEventListener('click', () => finishPhase('reset'));
 $('#muteBtn').addEventListener('click', () => {
   S.settings.sound = !S.settings.sound;
-  if (S.settings.sound) { ensureAudio(); chime(); }
+  if (S.settings.sound) { ensureAudio(); playEndSound(); }
   save();
   renderTimer();
   toast(S.settings.sound ? 'Sound on' : 'Muted');
@@ -1882,11 +3049,36 @@ $('#setGoal').addEventListener('change', e => {
   S.settings.goalMin = clamp(Math.round(+e.target.value) || 60, 5, 1440);
   e.target.value = S.settings.goalMin;
   save(); renderToday();
+  reconcileRewards('quiet');
 });
 $('#setWeek').addEventListener('change', e => { S.settings.weekStart = +e.target.value; save(); });
 $('#setTheme').addEventListener('change', e => { S.settings.theme = e.target.value; applyTheme(); save(); });
 $('#setSound').addEventListener('change', e => { S.settings.sound = e.target.checked; save(); renderTimer(); });
 $('#setAuto').addEventListener('change', e => { S.settings.autoStart = e.target.checked; save(); });
+$('#setAmbVol').addEventListener('input', e => setAmbientVolume(e.target.value));
+$('#setGame').addEventListener('change', e => {
+  S.settings.gamification = e.target.checked;
+  save();
+  renderAll();
+});
+
+// Progress + shop
+$('#lvChip').addEventListener('click', () => { S.ui.profileView = 'progress'; showTab('profile'); });
+$('#tab-profile').addEventListener('click', e => {
+  const seg = e.target.closest('#profileSeg button');
+  if (seg) { S.ui.profileView = seg.dataset.view; saveLocal(); renderProfile(); return; }
+  const cat = e.target.closest('[data-cat]');
+  if (cat) { S.ui.shopCat = cat.dataset.cat; saveLocal(); renderShop(); return; }
+  const b = e.target.closest('[data-buy],[data-equip],[data-toggle-extra],[data-preview]');
+  if (!b) return;
+  if (b.dataset.buy) buyItem(b.dataset.buy);
+  else if (b.dataset.equip) equipItem(b.dataset.equip);
+  else if (b.dataset.toggleExtra) toggleExtra(b.dataset.toggleExtra);
+  else previewItem(b.dataset.preview);
+});
+$('#tab-profile').addEventListener('input', e => { if (e.target.id === 'shopAmbVol') setAmbientVolume(e.target.value); });
+$('#lvClose').addEventListener('click', () => $('#levelDlg').close());
+$('#levelDlg').addEventListener('click', e => { if (e.target.id === 'levelDlg') $('#levelDlg').close(); });
 $('#setNotify').addEventListener('change', e => {
   S.settings.notify = e.target.checked;
   save();
@@ -1936,8 +3128,8 @@ $('#wipeBtn').addEventListener('click', () => {
     trackWrite(batch.commit());
   }
   saveLocal();
-  applyTheme();
   initInputs();
+  applyCosmetics();
   renderAll();
   renderSettings();
   toast('All data erased');
@@ -1999,6 +3191,7 @@ function tick() {
   if (k !== lastDay) {
     lastDay = k;
     renderToday();
+    reconcileRewards('quiet');  // new day: goal bonus bookkeeping and Streak Freezes
     if (S.ui.tab === 'stats') renderStats();
   }
 }
@@ -2019,6 +3212,11 @@ window.addEventListener('resize', () => {
    ========================================================================== */
 function initInputs() {
   $('#ringProg').style.strokeDasharray = RING_C;
+  $('#ringDots').innerHTML = Array.from({ length: 60 }, (_, i) => {
+    const a = i / 60 * Math.PI * 2;
+    return `<circle cx="${(130 + 120 * Math.cos(a)).toFixed(1)}" cy="${(130 + 120 * Math.sin(a)).toFixed(1)}" r="3"/>`;
+  }).join('');
+  lastDots = -1;
   const name = S.timer.name || (S.recent[0] && S.recent[0].name) || '';
   $('#nameInput').value = name;
   syncNameInputs();
