@@ -1,0 +1,1449 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Focus</title>
+<meta name="description" content="A minimal, distraction-free Pomodoro focus timer with named sessions, streaks and statistics. All data stays in your browser.">
+<style>
+/* ==========================================================================
+   THEME TOKENS
+   One accent colour (calm teal). Light by default, dark via system setting
+   or an explicit data-theme attribute set from Settings.
+   ========================================================================== */
+:root {
+  --bg: #f6f6f3;
+  --surface: #ffffff;
+  --text: #1f2322;
+  --muted: #6c7471;
+  --line: #e5e5df;
+  --accent: #2f8f83;
+  --accent-soft: rgba(47, 143, 131, .12);
+  --heat0: #ecedea;
+  --danger: #b94a3f;
+  --radius: 16px;
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --bg: #121414; --surface: #1a1d1d; --text: #e7e9e8; --muted: #8e9693;
+  --line: #2a2f2e; --accent: #4fb3a5; --accent-soft: rgba(79, 179, 165, .16);
+  --heat0: #232827; --danger: #e07a6f; color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121414; --surface: #1a1d1d; --text: #e7e9e8; --muted: #8e9693;
+    --line: #2a2f2e; --accent: #4fb3a5; --accent-soft: rgba(79, 179, 165, .16);
+    --heat0: #232827; --danger: #e07a6f; color-scheme: dark;
+  }
+}
+
+/* ==========================================================================
+   BASE
+   ========================================================================== */
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+button, input, select { font: inherit; color: inherit; }
+h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 0 0 12px; }
+.muted { color: var(--muted); }
+.row { display: flex; align-items: center; gap: 10px; }
+.between { justify-content: space-between; }
+.hidden { display: none !important; }
+
+/* Header + tabs */
+.top {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 12px 16px; padding-top: max(12px, env(safe-area-inset-top));
+  background: var(--bg); border-bottom: 1px solid var(--line);
+}
+.brand { font-weight: 600; display: flex; align-items: center; gap: 8px; letter-spacing: .01em; }
+.brand i { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); display: inline-block; }
+.tabs { display: flex; gap: 2px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px; }
+.tabs button { border: 0; background: none; padding: 6px 14px; border-radius: 999px; color: var(--muted); cursor: pointer; }
+.tabs button.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+
+main { max-width: 1040px; margin: 0 auto; padding: 20px 16px 56px; }
+.tab { display: none; }
+.tab.active { display: block; }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; }
+.stack { display: grid; gap: 16px; align-content: start; }
+.grid-2 { display: grid; gap: 16px; grid-template-columns: 1fr; }
+@media (min-width: 860px) { .grid-2 { grid-template-columns: 1.1fr 1fr; align-items: start; } }
+
+/* Buttons */
+.btn {
+  border-radius: 999px; border: 1px solid var(--line); background: var(--surface);
+  padding: 9px 18px; cursor: pointer; transition: border-color .15s, background .15s;
+}
+.btn:hover { border-color: var(--muted); }
+.btn:disabled { opacity: .4; cursor: default; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; padding: 12px 30px; min-width: 132px; }
+.btn.primary:hover { filter: brightness(1.06); }
+.btn.small { padding: 5px 12px; font-size: 13px; }
+.btn.danger { color: var(--danger); }
+.linkbtn { border: 0; background: none; color: var(--muted); cursor: pointer; font-size: 13px; padding: 4px 6px; }
+.linkbtn:hover { color: var(--text); }
+.iconbtn {
+  width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface);
+  display: inline-grid; place-items: center; cursor: pointer; color: var(--muted);
+}
+.iconbtn:hover { color: var(--text); }
+.iconbtn svg { width: 18px; height: 18px; }
+
+/* Form fields */
+.field { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+input[type="text"], input[type="number"], select {
+  width: 100%; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px;
+}
+input:focus, select:focus { outline: 3px solid var(--accent-soft); border-color: var(--accent); }
+input[type="color"] { width: 42px; height: 40px; padding: 2px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); cursor: pointer; flex: none; }
+input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); }
+
+/* ==========================================================================
+   TIMER
+   ========================================================================== */
+.timer-card { text-align: center; padding: 26px 18px 24px; position: relative; }
+.timer-card .corner { position: absolute; top: 14px; right: 14px; }
+.phase-label { font-weight: 600; color: var(--accent); letter-spacing: .02em; }
+.phase-label.break { color: var(--muted); }
+.dots { display: flex; justify-content: center; gap: 6px; margin-top: 8px; }
+.dots span { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--line); }
+.dots span.done { background: var(--accent); border-color: var(--accent); }
+.dots span.current { border-color: var(--accent); }
+
+.ring { position: relative; width: min(74vw, 310px); aspect-ratio: 1; margin: 18px auto 22px; }
+.ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring .track { fill: none; stroke: var(--line); stroke-width: 7; }
+.ring .prog { fill: none; stroke: var(--accent); stroke-width: 7; stroke-linecap: round; transition: stroke-dashoffset .35s linear; }
+.ring.break .prog { stroke: var(--muted); }
+.ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.time { font-size: clamp(52px, 15vw, 74px); font-weight: 300; font-variant-numeric: tabular-nums; letter-spacing: -.02em; line-height: 1; }
+.ring-sub { color: var(--muted); font-size: 13px; margin-top: 10px; max-width: 70%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.controls { display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+/* Session name row */
+.name-row { display: flex; gap: 8px; }
+.name-row input[type="text"] { flex: 1; min-width: 0; }
+.sub-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+.preset-row { display: flex; gap: 8px; }
+
+/* Chips */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 8px; max-width: 100%;
+  border: 1px solid var(--line); background: var(--bg); border-radius: 999px;
+  padding: 5px 4px 5px 12px; cursor: pointer; font-size: 14px;
+}
+.chip:hover { border-color: var(--muted); }
+.chip .nm { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 190px; }
+.chip .meta { color: var(--muted); font-size: 12px; }
+.chip .pin { border: 0; background: none; color: var(--muted); cursor: pointer; padding: 2px 6px; font-size: 15px; line-height: 1; }
+.chip.pinned { border-color: var(--accent); }
+.chip.pinned .pin { color: var(--accent); }
+.dot { width: 9px; height: 9px; border-radius: 50%; flex: none; display: inline-block; }
+.empty { color: var(--muted); font-size: 14px; }
+
+/* Streak */
+.streak-nums { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.big { font-size: 30px; font-weight: 300; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.big small { font-size: 14px; color: var(--muted); margin-left: 4px; }
+.lbl { font-size: 12px; color: var(--muted); }
+.progress { height: 8px; background: var(--heat0); border-radius: 999px; overflow: hidden; margin-top: 8px; }
+.progress i { display: block; height: 100%; background: var(--accent); border-radius: 999px; transition: width .4s; }
+
+/* ==========================================================================
+   STATS
+   ========================================================================== */
+.seg { display: inline-flex; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px; }
+.seg button { border: 0; background: none; padding: 6px 14px; border-radius: 999px; color: var(--muted); cursor: pointer; }
+.seg button.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.stats-head { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.range-nav { display: flex; align-items: center; gap: 8px; }
+.range-nav .lbl2 { min-width: 150px; text-align: center; font-weight: 600; }
+.tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+.tile { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; }
+.tile .v { font-size: 24px; font-weight: 300; font-variant-numeric: tabular-nums; line-height: 1.2; }
+.tile .s { font-size: 12px; color: var(--muted); }
+@media (max-width: 480px) { .tile .v { font-size: 19px; } .tile { padding: 12px 10px; } }
+.chart-card + .chart-card { margin-top: 16px; }
+.chart { width: 100%; height: auto; display: block; }
+.chart .axis { fill: var(--muted); font-size: 11px; }
+.chart .axis-b { fill: var(--text); font-size: 11px; }
+.chart .grid { stroke: var(--line); stroke-width: 1; }
+.chart .goal { stroke: var(--accent); stroke-dasharray: 4 4; stroke-width: 1.2; opacity: .8; }
+.chart .now { stroke: var(--danger); stroke-width: 1.5; }
+.chart [data-tip] { cursor: pointer; }
+.chart [data-tip]:hover { opacity: .8; }
+.scroll-x { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.scroll-x .chart { min-width: 640px; }
+.tip { min-height: 22px; font-size: 13px; color: var(--muted); margin-top: 8px; }
+.legend { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted); margin-top: 8px; }
+.legend i { width: 11px; height: 11px; border-radius: 2px; display: inline-block; }
+.toplist { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.toplist li { display: grid; grid-template-columns: auto minmax(0, 1fr) 90px auto; gap: 10px; align-items: center; font-size: 14px; }
+.toplist .nm { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.toplist .tag { color: var(--muted); font-size: 12px; margin-left: 6px; }
+.toplist .bar { height: 6px; background: var(--heat0); border-radius: 999px; overflow: hidden; }
+.toplist .bar i { display: block; height: 100%; border-radius: 999px; }
+.toplist .v { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 13px; text-align: right; }
+.sesslist { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 6px; }
+.sesslist li { display: flex; align-items: center; gap: 10px; font-size: 14px; padding: 6px 0; border-top: 1px solid var(--line); }
+.sesslist .t { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 13px; min-width: 104px; }
+.sesslist .nm { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sesslist .d { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 13px; }
+
+/* ==========================================================================
+   SETTINGS
+   ========================================================================== */
+.setting { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 0; border-top: 1px solid var(--line); }
+.setting:first-of-type { border-top: 0; padding-top: 4px; }
+.setting .desc { font-size: 12px; color: var(--muted); }
+.setting input[type="number"], .setting select { width: 140px; flex: none; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* Preset dialog */
+dialog {
+  border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--text);
+  padding: 20px; width: min(520px, calc(100vw - 32px)); max-height: calc(100vh - 40px);
+}
+dialog::backdrop { background: rgba(0, 0, 0, .35); }
+.preset-list { list-style: none; margin: 0 0 18px; padding: 0; }
+.preset-list li { display: flex; align-items: center; gap: 8px; padding: 10px 0; border-top: 1px solid var(--line); }
+.preset-list li:first-child { border-top: 0; }
+.preset-list .nm { flex: 1; min-width: 0; }
+.preset-list .meta { color: var(--muted); font-size: 12px; display: block; }
+.pform { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.pform .full { grid-column: 1 / -1; }
+@media (max-width: 480px) { .pform { grid-template-columns: 1fr 1fr; } }
+
+/* Toast */
+.toast {
+  position: fixed; left: 50%; bottom: max(24px, env(safe-area-inset-bottom)); transform: translateX(-50%) translateY(20px);
+  background: var(--text); color: var(--bg); padding: 10px 18px; border-radius: 999px; font-size: 14px;
+  opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; z-index: 50; max-width: calc(100vw - 32px);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+@media (max-width: 520px) {
+  .brand span { display: none; }
+  .tabs button { padding: 6px 11px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand"><i></i><span>Focus</span></div>
+  <nav class="tabs" id="tabs">
+    <button data-tab="timer">Timer</button>
+    <button data-tab="stats">Stats</button>
+    <button data-tab="settings">Settings</button>
+  </nav>
+</header>
+
+<main>
+  <!-- ================================ TIMER TAB ================================ -->
+  <section class="tab" id="tab-timer">
+    <div class="grid-2">
+      <div class="stack">
+        <div class="card timer-card">
+          <button class="iconbtn corner" id="muteBtn" title="Toggle sound" aria-label="Toggle sound"></button>
+          <div class="phase-label" id="phaseLabel">Focus</div>
+          <div class="dots" id="roundDots"></div>
+          <div class="ring" id="ring">
+            <svg viewBox="0 0 260 260" aria-hidden="true">
+              <circle class="track" cx="130" cy="130" r="120"></circle>
+              <circle class="prog" id="ringProg" cx="130" cy="130" r="120"></circle>
+            </svg>
+            <div class="ring-center">
+              <div class="time" id="timeText">25:00</div>
+              <div class="ring-sub" id="ringSub"></div>
+            </div>
+          </div>
+          <div class="controls">
+            <button class="btn" id="resetBtn" title="Reset (double-reset returns to round 1)">Reset</button>
+            <button class="btn primary" id="mainBtn">Start</button>
+            <button class="btn" id="skipBtn">Skip</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Session</h2>
+          <label class="field" for="nameInput">What are you working on?</label>
+          <div class="name-row">
+            <input type="text" id="nameInput" list="nameList" placeholder="e.g. Physics – Rotational Motion" maxlength="80" autocomplete="off">
+            <input type="color" id="nameColor" title="Colour for this name">
+          </div>
+          <datalist id="nameList"></datalist>
+          <div class="sub-row">
+            <div>
+              <label class="field" for="nameTag">Tag (optional)</label>
+              <input type="text" id="nameTag" placeholder="e.g. JEE, Study" maxlength="30">
+            </div>
+            <div>
+              <label class="field" for="presetSelect">Preset</label>
+              <div class="preset-row">
+                <select id="presetSelect"></select>
+                <button class="iconbtn" id="managePresets" title="Manage presets" aria-label="Manage presets">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="card">
+          <div class="row between"><h2 style="margin:0">Today</h2><span class="lbl" id="todayDate"></span></div>
+          <div class="streak-nums" style="margin-top:12px">
+            <div><div class="big" id="curStreak">0<small>days</small></div><div class="lbl">Current streak</div></div>
+            <div><div class="big" id="bestStreak">0<small>days</small></div><div class="lbl">Longest streak</div></div>
+          </div>
+          <div class="row between"><span id="todayText">0m of 1h</span><span class="lbl" id="todayPct">0%</span></div>
+          <div class="progress"><i id="todayBar" style="width:0%"></i></div>
+        </div>
+
+        <div class="card">
+          <div class="row between" style="margin-bottom:12px">
+            <h2 style="margin:0">Recently used</h2>
+            <button class="linkbtn" id="clearRecent">Clear</button>
+          </div>
+          <div class="chips" id="chips"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================ STATS TAB ================================ -->
+  <section class="tab" id="tab-stats">
+    <div class="stats-head">
+      <div class="seg" id="statsSeg">
+        <button data-view="day">Day</button>
+        <button data-view="week">Week</button>
+        <button data-view="month">Month</button>
+        <button data-view="year">Year</button>
+      </div>
+      <div class="range-nav">
+        <button class="iconbtn" id="prevBtn" aria-label="Previous">‹</button>
+        <span class="lbl2" id="rangeLabel"></span>
+        <button class="iconbtn" id="nextBtn" aria-label="Next">›</button>
+      </div>
+    </div>
+    <div class="tiles" id="tiles"></div>
+    <div id="statsBody"></div>
+  </section>
+
+  <!-- ================================ SETTINGS TAB ================================ -->
+  <section class="tab" id="tab-settings">
+    <div class="grid-2">
+      <div class="card">
+        <h2>Preferences</h2>
+        <div class="setting">
+          <div><div>Daily goal</div><div class="desc">Minutes of focus for a day to count toward your streak</div></div>
+          <input type="number" id="setGoal" min="5" max="1440" step="5">
+        </div>
+        <div class="setting">
+          <div><div>Week starts on</div></div>
+          <select id="setWeek"><option value="1">Monday</option><option value="0">Sunday</option></select>
+        </div>
+        <div class="setting">
+          <div><div>Theme</div></div>
+          <select id="setTheme"><option value="auto">System</option><option value="light">Light</option><option value="dark">Dark</option></select>
+        </div>
+        <div class="setting">
+          <div><div>Sound</div><div class="desc">Gentle chime when a session ends</div></div>
+          <input type="checkbox" id="setSound">
+        </div>
+        <div class="setting">
+          <div><div>Notifications</div><div class="desc" id="notifStatus"></div></div>
+          <input type="checkbox" id="setNotify">
+        </div>
+        <div class="setting">
+          <div><div>Auto-start next phase</div><div class="desc">Begin breaks and focus blocks automatically</div></div>
+          <input type="checkbox" id="setAuto">
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="card">
+          <h2>Backup</h2>
+          <p class="muted" style="margin:0 0 14px;font-size:14px">Everything is stored only in this browser. Export a JSON backup now and then, or to move to another device.</p>
+          <div class="btn-row">
+            <button class="btn" id="exportBtn">Export JSON</button>
+            <button class="btn" id="importBtn">Import JSON</button>
+            <input type="file" id="importFile" accept="application/json,.json" class="hidden">
+          </div>
+        </div>
+        <div class="card">
+          <h2>Danger zone</h2>
+          <button class="btn danger" id="wipeBtn">Erase all data</button>
+        </div>
+        <p class="muted" style="font-size:12px;text-align:center;margin:0">Shortcut: <b>Space</b> starts / pauses the timer.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Preset manager -->
+<dialog id="presetDlg">
+  <div class="row between" style="margin-bottom:12px">
+    <h2 style="margin:0">Timer presets</h2>
+    <button class="linkbtn" id="closeDlg">Close</button>
+  </div>
+  <ul class="preset-list" id="presetList"></ul>
+  <form id="presetForm" class="pform" autocomplete="off">
+    <input type="hidden" id="pfId">
+    <div class="full"><label class="field" for="pfName" id="pfTitle">New preset</label><input type="text" id="pfName" placeholder="Preset name" required maxlength="40"></div>
+    <div><label class="field" for="pfFocus">Focus (min)</label><input type="number" id="pfFocus" min="1" max="240" required></div>
+    <div><label class="field" for="pfShort">Short break</label><input type="number" id="pfShort" min="1" max="120" required></div>
+    <div><label class="field" for="pfLong">Long break</label><input type="number" id="pfLong" min="1" max="180" required></div>
+    <div><label class="field" for="pfRounds">Rounds</label><input type="number" id="pfRounds" min="1" max="12" required></div>
+    <div class="full btn-row" style="justify-content:flex-end">
+      <button type="button" class="btn" id="pfNew">Clear</button>
+      <button type="submit" class="btn primary" style="min-width:0;padding:9px 22px">Save preset</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status"></div>
+<noscript><p style="text-align:center">This app needs JavaScript.</p></noscript>
+
+<script>
+'use strict';
+
+/* ==========================================================================
+   SMALL UTILITIES
+   ========================================================================== */
+const $  = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const pad = n => String(n).padStart(2, '0');
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+
+// Dates: always use the user's LOCAL calendar. new Date(y, m, d + n) is DST-safe.
+const dayKey     = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const startOfDay = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+const addDays    = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+const fmtShort   = d => d.toLocaleDateString([], { day: 'numeric', month: 'short' });
+const fmtTime    = t => new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+const WEEKDAYS   = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const MONTHS     = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/** Minutes -> "45m", "2h", "1h 25m" */
+function fmtMin(m) {
+  m = Math.round(m);
+  if (m < 60) return m + 'm';
+  const h = Math.floor(m / 60), r = m % 60;
+  return r ? `${h}h ${r}m` : `${h}h`;
+}
+/** Milliseconds -> "MM:SS" countdown (minutes may exceed 59) */
+function fmtClock(ms) {
+  const s = Math.max(0, Math.ceil(ms / 1000));
+  return `${pad(Math.floor(s / 60))}:${pad(s % 60)}`;
+}
+
+let toastTimer;
+function toast(msg) {
+  const el = $('#toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+/* ==========================================================================
+   STATE + PERSISTENCE (localStorage)
+   ========================================================================== */
+const STORE_KEY = 'focus-app-v1';
+
+// Calm palette used to auto-colour session names (user can override per name).
+const NAME_PALETTE = ['#2f8f83', '#5b7fd6', '#d08a3c', '#b45f8c', '#6a9a4a', '#8a6fd1', '#c8584e', '#3f9fbf', '#a08a3a', '#5f6f7a'];
+
+function defaultState() {
+  return {
+    version: 1,
+    settings: { goalMin: 60, weekStart: 1, sound: true, notify: true, theme: 'auto', autoStart: false },
+    presets: [
+      { id: 'p-classic', name: 'Classic 25/5',    focus: 25, short: 5,  long: 15, rounds: 4 },
+      { id: 'p-deep',    name: 'Deep Work 50/10', focus: 50, short: 10, long: 20, rounds: 3 },
+    ],
+    activePresetId: 'p-classic',
+    names: {},      // name -> { color, tag }
+    sessions: [],   // { id, name, start, end, duration(ms of focus), planned(ms), preset }
+    recent: [],     // { name, presetId, ts }  most recent first
+    pinned: [],     // { name, presetId }
+    // Live timer state is persisted so a reload (or closed tab) keeps going.
+    timer: { phase: 'focus', round: 1, status: 'idle', endAt: 0, remaining: 0, planned: 0, focusStartedAt: 0, name: '' },
+    ui: { tab: 'timer', statsView: 'week' },
+  };
+}
+
+/** Merge stored data over defaults so new fields added later get sane values. */
+function hydrate(obj) {
+  const def = defaultState();
+  const out = { ...def, ...obj };
+  for (const k of ['settings', 'timer', 'ui']) out[k] = { ...def[k], ...(obj[k] || {}) };
+  if (!Array.isArray(out.presets) || !out.presets.length) out.presets = def.presets;
+  for (const k of ['sessions', 'recent', 'pinned']) if (!Array.isArray(out[k])) out[k] = [];
+  if (!out.names || typeof out.names !== 'object') out.names = {};
+  return out;
+}
+
+function load() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    return raw ? hydrate(JSON.parse(raw)) : defaultState();
+  } catch (e) {
+    console.warn('Could not read saved data', e);
+    return defaultState();
+  }
+}
+
+function save() {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(S)); }
+  catch (e) { console.warn('Could not save', e); toast('Could not save — storage may be full or blocked'); }
+}
+
+let S = load();
+
+/* ==========================================================================
+   NAMES (colour + tag per session name)
+   ========================================================================== */
+function hashColor(name) {
+  let h = 0;
+  for (const c of name) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  return NAME_PALETTE[h % NAME_PALETTE.length];
+}
+const colorFor = name => (S.names[name] && S.names[name].color) || hashColor(name || 'Untitled');
+const tagFor   = name => (S.names[name] && S.names[name].tag) || '';
+/** New names get the first palette colour not already in use (hash as fallback). */
+function ensureName(name) {
+  if (S.names[name]) return;
+  const used = new Set(Object.values(S.names).map(n => n.color));
+  S.names[name] = { color: NAME_PALETTE.find(c => !used.has(c)) || hashColor(name), tag: '' };
+}
+const currentName = () => ($('#nameInput').value.trim() || S.timer.name || 'Untitled');
+
+/* ==========================================================================
+   SOUND + NOTIFICATIONS
+   ========================================================================== */
+let audioCtx = null;
+/** Must be created/resumed from a user gesture (Start click) on most browsers. */
+function ensureAudio() {
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  } catch (e) { /* audio unsupported */ }
+}
+/** Soft three-note chime built with oscillators — no audio files needed. */
+function chime() {
+  if (!S.settings.sound || !audioCtx) return;
+  const now = audioCtx.currentTime;
+  [[523.25, 0], [659.25, 0.18], [783.99, 0.36]].forEach(([freq, t]) => {
+    const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0, now + t);
+    gain.gain.linearRampToValueAtTime(0.16, now + t + 0.03);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + t + 1.8);
+    osc.connect(gain).connect(audioCtx.destination);
+    osc.start(now + t);
+    osc.stop(now + t + 1.9);
+  });
+}
+function askNotifyPermission() {
+  if (S.settings.notify && 'Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission().then(renderSettings);
+  }
+}
+function notify(title, body) {
+  if (!S.settings.notify || !('Notification' in window) || Notification.permission !== 'granted') return;
+  if (!document.hidden && document.hasFocus()) return; // user is looking; the chime is enough
+  try { new Notification(title, { body, silent: true, tag: 'focus-timer' }); } catch (e) { /* some mobile browsers need a service worker */ }
+}
+
+/* ==========================================================================
+   TIMER ENGINE
+   Accuracy: we store an absolute end timestamp (endAt) while running and
+   compute remaining = endAt - now on every tick. Background-tab throttling
+   of setInterval therefore never causes drift, and a reload resumes cleanly.
+   ========================================================================== */
+const activePreset = () => S.presets.find(p => p.id === S.activePresetId) || S.presets[0];
+
+function phaseMs(phase) {
+  const p = activePreset();
+  return (phase === 'focus' ? p.focus : phase === 'short' ? p.short : p.long) * 60000;
+}
+function remainingMs() {
+  const t = S.timer;
+  if (t.status === 'running') return Math.max(0, t.endAt - Date.now());
+  if (t.status === 'paused')  return t.remaining;
+  return phaseMs(t.phase);
+}
+const plannedMs = () => (S.timer.status === 'idle' ? phaseMs(S.timer.phase) : S.timer.planned);
+
+function startTimer() {
+  ensureAudio();
+  askNotifyPermission();
+  const t = S.timer, now = Date.now();
+  if (t.status === 'idle') {
+    t.planned = phaseMs(t.phase);
+    t.remaining = t.planned;
+    if (t.phase === 'focus') {
+      t.focusStartedAt = now;
+      t.name = currentName();
+      ensureName(t.name);
+      pushRecent(t.name, S.activePresetId);
+    }
+  }
+  t.endAt = now + t.remaining;
+  t.status = 'running';
+  save();
+  renderAll();
+}
+
+function pauseTimer() {
+  const t = S.timer;
+  t.remaining = Math.max(0, t.endAt - Date.now());
+  t.status = 'paused';
+  save();
+  renderTimer();
+}
+
+/** Move to the next phase in the Pomodoro cycle. */
+function advancePhase() {
+  const t = S.timer, p = activePreset();
+  if (t.phase === 'focus') {
+    t.phase = t.round >= p.rounds ? 'long' : 'short';
+  } else {
+    t.round = t.phase === 'long' ? 1 : t.round + 1;
+    t.phase = 'focus';
+  }
+}
+
+/**
+ * End the current phase.
+ * reason: 'complete' (timer ran out), 'skip', or 'reset'.
+ * A focus block is logged only if >= 80% of its planned time was actually focused.
+ */
+function finishPhase(reason) {
+  const t = S.timer;
+  const wasFocus = t.phase === 'focus';
+
+  if (wasFocus && t.status !== 'idle') {
+    const rem = reason === 'complete' ? 0 : remainingMs();
+    const focused = t.planned - rem;
+    // For natural completion use endAt, so the log is exact even if the tab was asleep.
+    const end = reason === 'complete' ? t.endAt : Date.now();
+    if (focused >= 0.8 * t.planned) logSession(focused, end);
+    else if (reason !== 'complete' && focused > 0) toast('Not logged — under 80% of the focus time');
+  }
+
+  if (reason === 'reset') {
+    // First reset: restart this phase. Reset again while idle: back to round 1.
+    if (t.status === 'idle') { t.phase = 'focus'; t.round = 1; }
+  } else {
+    advancePhase();
+  }
+  t.status = 'idle';
+  t.remaining = 0;
+  t.endAt = 0;
+
+  if (reason === 'complete') {
+    chime();
+    if (wasFocus) notify('Focus complete', `Nice work on “${t.name || 'Untitled'}”. Time for a break.`);
+    else notify('Break over', 'Ready for the next focus block?');
+    if (S.settings.autoStart) { startTimer(); return; }
+  }
+  save();
+  renderAll();
+}
+
+function logSession(focusedMs, end) {
+  const t = S.timer;
+  const name = currentName();
+  ensureName(name);
+  S.sessions.push({
+    id: uid(),
+    name,
+    start: t.focusStartedAt || end - focusedMs,
+    end,
+    duration: Math.round(focusedMs),
+    planned: t.planned,
+    preset: activePreset().name,
+  });
+  toast(`Logged ${fmtMin(focusedMs / 60000)} · ${name}`);
+}
+
+/* ==========================================================================
+   RECENT + PINNED CHIPS
+   ========================================================================== */
+function pushRecent(name, presetId) {
+  S.recent = S.recent.filter(r => !(r.name === name && r.presetId === presetId));
+  S.recent.unshift({ name, presetId, ts: Date.now() });
+  S.recent = S.recent.slice(0, 8);
+}
+const isPinned = (name, pid) => S.pinned.some(p => p.name === name && p.presetId === pid);
+function togglePin(name, pid) {
+  if (isPinned(name, pid)) S.pinned = S.pinned.filter(p => !(p.name === name && p.presetId === pid));
+  else S.pinned.push({ name, presetId: pid });
+  save();
+  renderChips();
+}
+/** Tap a chip: load the name and preset. A running block keeps its length; the preset applies from the next phase. */
+function loadChip(name, pid) {
+  $('#nameInput').value = name;
+  onNameChange();
+  if (S.presets.some(p => p.id === pid)) S.activePresetId = pid;
+  if (S.timer.status !== 'idle') toast('Name updated · preset applies from the next phase');
+  save();
+  renderAll();
+}
+
+/* ==========================================================================
+   AGGREGATION + STREAKS
+   ========================================================================== */
+/**
+ * Split a session across local calendar days (handles sessions crossing midnight).
+ * Pauses are spread proportionally, so the per-day minutes always sum to duration.
+ */
+function splitSession(s, cb) {
+  const span = s.end - s.start;
+  const ratio = span > 0 ? s.duration / span : 1;
+  if (span <= 0) { cb(dayKey(new Date(s.end)), s.duration / 60000); return; }
+  let t = s.start;
+  while (t < s.end) {
+    const d = new Date(t);
+    const next = addDays(startOfDay(d), 1).getTime();
+    const segEnd = Math.min(next, s.end);
+    cb(dayKey(d), (segEnd - t) * ratio / 60000);
+    t = segEnd;
+  }
+}
+/** dayKey -> { total: minutes, byName: { name: minutes } } */
+function buildIndex() {
+  const idx = {};
+  for (const s of S.sessions) {
+    splitSession(s, (k, m) => {
+      const d = idx[k] || (idx[k] = { total: 0, byName: {} });
+      d.total += m;
+      d.byName[s.name] = (d.byName[s.name] || 0) + m;
+    });
+  }
+  return idx;
+}
+/**
+ * Current streak: consecutive goal-met days ending today — or ending yesterday
+ * if today's goal isn't met yet (today is still in progress).
+ */
+function computeStreaks(idx) {
+  const goal = S.settings.goalMin;
+  const met = d => ((idx[dayKey(d)] || {}).total || 0) >= goal;
+  const today = startOfDay(new Date());
+
+  let cur = 0, d = met(today) ? today : addDays(today, -1);
+  while (met(d)) { cur++; d = addDays(d, -1); }
+
+  let longest = 0, run = 0;
+  const keys = Object.keys(idx).sort();
+  if (keys.length) {
+    const [y, m, dd] = keys[0].split('-').map(Number);
+    for (let x = new Date(y, m - 1, dd); x <= today; x = addDays(x, 1)) {
+      run = met(x) ? run + 1 : 0;
+      longest = Math.max(longest, run);
+    }
+  }
+  return { cur, longest: Math.max(longest, cur) };
+}
+
+/* ==========================================================================
+   RENDER: TIMER TAB
+   ========================================================================== */
+const RING_C = 2 * Math.PI * 120;
+const ICON_SOUND = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/></svg>';
+const ICON_MUTE  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="m22 9-6 6"/><path d="m16 9 6 6"/></svg>';
+
+/** Fast path, called several times a second. */
+function renderClock() {
+  const rem = remainingMs(), planned = plannedMs();
+  const progress = planned ? 1 - rem / planned : 0;
+  $('#timeText').textContent = fmtClock(rem);
+  $('#ringProg').style.strokeDashoffset = RING_C * (1 - clamp(progress, 0, 1));
+  const t = S.timer;
+  const label = t.phase === 'focus' ? 'Focus' : t.phase === 'short' ? 'Break' : 'Long break';
+  document.title = t.status === 'idle' ? 'Focus' : `${fmtClock(rem)} · ${label}${t.status === 'paused' ? ' (paused)' : ''}`;
+}
+
+function renderTimer() {
+  const t = S.timer, p = activePreset();
+  const isBreak = t.phase !== 'focus';
+  const label = t.phase === 'focus' ? 'Focus' : t.phase === 'short' ? 'Short break' : 'Long break';
+  $('#phaseLabel').textContent = label + (t.status === 'paused' ? ' · paused' : '');
+  $('#phaseLabel').classList.toggle('break', isBreak);
+  $('#ring').classList.toggle('break', isBreak);
+
+  // Round dots: filled = focus rounds completed in this cycle
+  const done = t.phase === 'focus' ? t.round - 1 : t.phase === 'long' ? p.rounds : t.round;
+  $('#roundDots').innerHTML = Array.from({ length: p.rounds }, (_, i) =>
+    `<span class="${i < done ? 'done' : (i === t.round - 1 && t.phase === 'focus' ? 'current' : '')}"></span>`).join('');
+
+  $('#ringSub').textContent = t.phase === 'focus' ? (currentName() === 'Untitled' ? p.name : currentName()) : p.name;
+  $('#mainBtn').textContent = t.status === 'running' ? 'Pause' : t.status === 'paused' ? 'Resume' : (isBreak ? 'Start break' : 'Start');
+  $('#muteBtn').innerHTML = S.settings.sound ? ICON_SOUND : ICON_MUTE;
+  $('#muteBtn').title = S.settings.sound ? 'Sound on — click to mute' : 'Muted — click for sound';
+  renderClock();
+}
+
+function renderSessionInputs() {
+  $('#presetSelect').innerHTML = S.presets.map(p =>
+    `<option value="${esc(p.id)}"${p.id === activePreset().id ? ' selected' : ''}>${esc(p.name)}</option>`).join('');
+  $('#nameList').innerHTML = Object.keys(S.names).sort().map(n => `<option value="${esc(n)}">`).join('');
+}
+
+function renderChips() {
+  const seen = new Set();
+  const items = [];
+  for (const p of S.pinned) { items.push({ ...p, pinned: true }); seen.add(p.name + '|' + p.presetId); }
+  for (const r of S.recent) {
+    if (seen.has(r.name + '|' + r.presetId)) continue;
+    items.push({ ...r, pinned: false });
+  }
+  const presetLabel = pid => {
+    const p = S.presets.find(x => x.id === pid);
+    return p ? `${p.focus}/${p.short}` : '—';
+  };
+  $('#chips').innerHTML = items.length ? items.map(it => `
+    <div class="chip${it.pinned ? ' pinned' : ''}" role="button" tabindex="0" data-name="${esc(it.name)}" data-pid="${esc(it.presetId)}">
+      <span class="dot" style="background:${esc(colorFor(it.name))}"></span>
+      <span class="nm">${esc(it.name)}</span>
+      <span class="meta">${presetLabel(it.presetId)}</span>
+      <button class="pin" title="${it.pinned ? 'Unpin' : 'Pin as favourite'}" aria-label="Pin">${it.pinned ? '★' : '☆'}</button>
+    </div>`).join('')
+    : '<div class="empty">Start a session and it will appear here for one-tap reuse.</div>';
+}
+
+function renderToday() {
+  const idx = buildIndex();
+  const today = new Date();
+  const mins = (idx[dayKey(today)] || {}).total || 0;
+  const goal = S.settings.goalMin;
+  const { cur, longest } = computeStreaks(idx);
+  $('#todayDate').textContent = today.toLocaleDateString([], { weekday: 'long', day: 'numeric', month: 'short' });
+  $('#curStreak').innerHTML  = `${cur}<small>${cur === 1 ? 'day' : 'days'}</small>`;
+  $('#bestStreak').innerHTML = `${longest}<small>${longest === 1 ? 'day' : 'days'}</small>`;
+  $('#todayText').textContent = `${fmtMin(mins)} of ${fmtMin(goal)}${mins >= goal ? ' · goal met ✓' : ''}`;
+  const pct = Math.min(100, Math.round(mins / goal * 100));
+  $('#todayPct').textContent = pct + '%';
+  $('#todayBar').style.width = pct + '%';
+}
+
+/* ==========================================================================
+   RENDER: STATS TAB (hand-drawn SVG charts, no dependencies)
+   ========================================================================== */
+let statsOffset = 0; // 0 = current period, -1 = previous, ...
+
+/** Returns { start, end (exclusive), label } for the chosen view and offset. */
+function getRange(view, off) {
+  const today = startOfDay(new Date());
+  if (view === 'day') {
+    const s = addDays(today, off);
+    return { start: s, end: addDays(s, 1), label: off === 0 ? 'Today' : off === -1 ? 'Yesterday' : s.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }) };
+  }
+  if (view === 'week') {
+    const diff = (today.getDay() - S.settings.weekStart + 7) % 7;
+    const s = addDays(today, -diff + 7 * off), e = addDays(s, 7);
+    return { start: s, end: e, label: `${fmtShort(s)} – ${fmtShort(addDays(e, -1))}` };
+  }
+  if (view === 'month') {
+    const s = new Date(today.getFullYear(), today.getMonth() + off, 1);
+    return { start: s, end: new Date(s.getFullYear(), s.getMonth() + 1, 1), label: s.toLocaleDateString([], { month: 'long', year: 'numeric' }) };
+  }
+  const y = today.getFullYear() + off;
+  return { start: new Date(y, 0, 1), end: new Date(y + 1, 0, 1), label: String(y) };
+}
+function daysIn(r) {
+  const out = [];
+  for (let d = r.start; d < r.end; d = addDays(d, 1)) out.push(d);
+  return out;
+}
+/** Round an axis maximum (minutes) up to a friendly value. */
+function niceMax(m) {
+  for (const c of [30, 60, 90, 120, 180, 240, 360, 480, 600, 720, 960, 1200, 1440]) if (m <= c) return c;
+  const h = Math.ceil(m / 60), mag = 10 ** Math.floor(Math.log10(h));
+  return [1, 2, 2.5, 5, 10].find(f => f * mag >= h) * mag * 60;
+}
+/** Order segments by the period's top names; everything else becomes "Other". */
+function segsFor(byName, topNames) {
+  const segs = [];
+  let other = 0;
+  for (const [n, m] of Object.entries(byName || {})) if (!topNames.includes(n)) other += m;
+  for (const n of topNames) if (byName && byName[n]) segs.push({ name: n, min: byName[n], color: colorFor(n) });
+  if (other > 0.5) segs.push({ name: 'Other', min: other, color: 'var(--muted)' });
+  return segs;
+}
+
+/** Draw charts at the card's real pixel width so axis text stays readable on phones. */
+const chartWidth = () => clamp(($('#statsBody').clientWidth || 720) - 38, 300, 980);
+
+/** Generic stacked bar chart. cols: [{ label, sub, total, segs, tip }] */
+function barChart(cols, { goal = 0, height = 240 } = {}) {
+  const W = chartWidth(), H = height, L = 42, R = 8, T = 12, B = cols.some(c => c.sub) ? 38 : 26;
+  const plotH = H - T - B;
+  const yMax = niceMax(Math.max(goal, 30, ...cols.map(c => c.total)));
+  const cw = (W - L - R) / cols.length, bw = Math.min(cw * 0.64, 46);
+  const yOf = v => T + plotH * (1 - v / yMax);
+  let svg = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img">`;
+
+  const ticks = (yMax / 4) % 15 === 0 ? 4 : 3; // keep gridlines on round minute values
+  for (let i = 0; i <= ticks; i++) {
+    const v = yMax * i / ticks, y = yOf(v);
+    svg += `<line class="grid" x1="${L}" x2="${W - R}" y1="${y}" y2="${y}"/>`;
+    svg += `<text class="axis" x="${L - 6}" y="${y + 4}" text-anchor="end">${i === 0 ? '0' : fmtMin(v)}</text>`;
+  }
+  if (goal && goal <= yMax) svg += `<line class="goal" x1="${L}" x2="${W - R}" y1="${yOf(goal)}" y2="${yOf(goal)}"/>`;
+
+  cols.forEach((c, i) => {
+    const x = L + cw * i + (cw - bw) / 2;
+    let y = H - B;
+    for (const seg of c.segs) {
+      const h = seg.min / yMax * plotH;
+      y -= h;
+      svg += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(h, 0).toFixed(1)}" rx="2" style="fill:${seg.color}" data-tip="${esc(`${c.tip} · ${seg.name}: ${fmtMin(seg.min)} (total ${fmtMin(c.total)})`)}"/>`;
+    }
+    if (!c.segs.length) svg += `<rect x="${x.toFixed(1)}" y="${T}" width="${bw.toFixed(1)}" height="${plotH}" fill="transparent" data-tip="${esc(c.tip + ' · no focus')}"/>`;
+    const cx = (x + bw / 2).toFixed(1);
+    if (c.label && (cw >= 16 || i % 5 === 0 || c.label === '1')) svg += `<text class="axis-b" x="${cx}" y="${H - B + 15}" text-anchor="middle">${esc(c.label)}</text>`;
+    if (c.sub)   svg += `<text class="axis" x="${cx}" y="${H - B + 29}" text-anchor="middle">${esc(c.sub)}</text>`;
+  });
+  return svg + '</svg>';
+}
+
+/** Day view: 24-hour timeline of focus blocks coloured by session name. */
+function dayTimeline(day, sessions) {
+  const W = chartWidth(), H = 92, PX = 12, T = 10, BH = 44;
+  const t0 = day.getTime(), t1 = addDays(day, 1).getTime();
+  const xOf = t => PX + (t - t0) / (t1 - t0) * (W - 2 * PX);
+  let svg = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img">`;
+  svg += `<rect x="${PX}" y="${T}" width="${W - 2 * PX}" height="${BH}" rx="6" style="fill:var(--heat0)"/>`;
+  const step = W < 500 ? 6 : 3; // fewer hour labels on narrow screens
+  for (let h = 0; h <= 24; h += step) {
+    const x = xOf(new Date(day.getFullYear(), day.getMonth(), day.getDate(), h).getTime());
+    svg += `<line class="grid" x1="${x}" x2="${x}" y1="${T + BH}" y2="${T + BH + 6}"/>`;
+    svg += `<text class="axis" x="${x}" y="${T + BH + 20}" text-anchor="${h === 0 ? 'start' : h === 24 ? 'end' : 'middle'}">${pad(h % 24)}:00</text>`;
+  }
+  for (const s of sessions) {
+    const a = Math.max(s.start, t0), b = Math.min(s.end, t1);
+    const x = xOf(a), w = Math.max(2, xOf(b) - x);
+    svg += `<rect x="${x.toFixed(1)}" y="${T}" width="${w.toFixed(1)}" height="${BH}" rx="3" style="fill:${colorFor(s.name)}" data-tip="${esc(`${fmtTime(s.start)}–${fmtTime(s.end)} · ${s.name} · ${fmtMin(s.duration / 60000)}`)}"/>`;
+  }
+  const now = Date.now();
+  if (now >= t0 && now < t1) {
+    const x = xOf(now);
+    svg += `<line class="now" x1="${x}" x2="${x}" y1="${T - 4}" y2="${T + BH + 4}"/>`;
+  }
+  return svg + '</svg>';
+}
+
+/** Heat level 0–4 relative to the daily goal. */
+function heatLevel(min) {
+  const g = S.settings.goalMin;
+  if (min <= 0) return 0;
+  if (min < g * 0.25) return 1;
+  if (min < g * 0.5) return 2;
+  if (min < g) return 3;
+  return 4;
+}
+const HEAT_OPACITY = [0, 0.22, 0.42, 0.68, 1];
+const heatLegend = () => `<div class="legend">Less ${HEAT_OPACITY.map((o, i) =>
+  `<i style="background:${i ? 'var(--accent)' : 'var(--heat0)'};opacity:${i ? o : 1}"></i>`).join('')} More <span style="margin-left:8px">(relative to your ${fmtMin(S.settings.goalMin)} goal)</span></div>`;
+
+/** Month view: calendar heatmap. */
+function monthHeat(r, idx) {
+  const ws = S.settings.weekStart, days = daysIn(r);
+  const lead = (r.start.getDay() - ws + 7) % 7;
+  const rows = Math.ceil((lead + days.length) / 7);
+  const C = 44, G = 6, T = 22, W = 7 * (C + G) - G, H = T + rows * (C + G) - G;
+  const todayK = dayKey(new Date());
+  let svg = `<svg class="chart" viewBox="0 0 ${W} ${H}" style="max-width:420px;margin:0 auto" role="img">`;
+  for (let c = 0; c < 7; c++) svg += `<text class="axis" x="${c * (C + G) + C / 2}" y="12" text-anchor="middle">${WEEKDAYS[(ws + c) % 7]}</text>`;
+  days.forEach((d, i) => {
+    const pos = lead + i, x = (pos % 7) * (C + G), y = T + Math.floor(pos / 7) * (C + G);
+    const min = (idx[dayKey(d)] || {}).total || 0, lv = heatLevel(min);
+    const tip = `${d.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' })} · ${fmtMin(min)}`;
+    svg += `<g data-tip="${esc(tip)}"><rect x="${x}" y="${y}" width="${C}" height="${C}" rx="8" style="fill:var(--heat0)"/>`;
+    if (lv) svg += `<rect x="${x}" y="${y}" width="${C}" height="${C}" rx="8" style="fill:var(--accent);opacity:${HEAT_OPACITY[lv]}"/>`;
+    if (dayKey(d) === todayK) svg += `<rect x="${x + 1}" y="${y + 1}" width="${C - 2}" height="${C - 2}" rx="7" fill="none" style="stroke:var(--text);stroke-width:1.5"/>`;
+    svg += `<text x="${x + C / 2}" y="${y + C / 2 + 4}" text-anchor="middle" style="font-size:12px;fill:${lv >= 3 ? '#fff' : 'var(--text)'}">${d.getDate()}</text></g>`;
+  });
+  return svg + '</svg>';
+}
+
+/** Year view: GitHub-style contribution grid (columns = weeks). */
+function yearHeat(r, idx) {
+  const ws = S.settings.weekStart, days = daysIn(r);
+  const lead = (r.start.getDay() - ws + 7) % 7;
+  const cols = Math.ceil((lead + days.length) / 7);
+  const C = 11, G = 3, L = 30, T = 18, W = L + cols * (C + G), H = T + 7 * (C + G);
+  let svg = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img">`;
+  for (let row = 1; row < 7; row += 2) svg += `<text class="axis" x="0" y="${T + row * (C + G) + C - 1}">${WEEKDAYS[(ws + row) % 7]}</text>`;
+  for (let m = 0; m < 12; m++) {
+    const first = new Date(r.start.getFullYear(), m, 1);
+    const i = Math.round((first - r.start) / 864e5);
+    svg += `<text class="axis" x="${L + Math.floor((lead + i) / 7) * (C + G)}" y="11">${MONTHS[m]}</text>`;
+  }
+  const today = startOfDay(new Date());
+  days.forEach((d, i) => {
+    const pos = lead + i, x = L + Math.floor(pos / 7) * (C + G), y = T + (pos % 7) * (C + G);
+    const min = (idx[dayKey(d)] || {}).total || 0, lv = heatLevel(min);
+    const tip = `${d.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })} · ${fmtMin(min)}`;
+    const future = d > today ? ';opacity:.45' : '';
+    svg += lv
+      ? `<rect x="${x}" y="${y}" width="${C}" height="${C}" rx="2" style="fill:var(--accent);opacity:${HEAT_OPACITY[lv]}" data-tip="${esc(tip)}"/>`
+      : `<rect x="${x}" y="${y}" width="${C}" height="${C}" rx="2" style="fill:var(--heat0)${future}" data-tip="${esc(tip)}"/>`;
+  });
+  return svg + '</svg>';
+}
+
+function topList(top, total) {
+  if (!top.length) return '<div class="empty">No focus sessions in this period yet.</div>';
+  const max = top[0][1];
+  return `<ol class="toplist">${top.slice(0, 6).map(([n, m]) => `
+    <li><span class="dot" style="background:${esc(colorFor(n))}"></span>
+      <span class="nm">${esc(n)}${tagFor(n) ? `<span class="tag">${esc(tagFor(n))}</span>` : ''}</span>
+      <span class="bar"><i style="width:${(m / max * 100).toFixed(1)}%;background:${esc(colorFor(n))}"></i></span>
+      <span class="v">${fmtMin(m)} · ${Math.round(m / total * 100)}%</span></li>`).join('')}</ol>`;
+}
+
+function renderStats() {
+  const view = S.ui.statsView;
+  const r = getRange(view, statsOffset);
+  const idx = buildIndex();
+  const days = daysIn(r);
+  const today = startOfDay(new Date());
+
+  $$('#statsSeg button').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+  $('#rangeLabel').textContent = r.label;
+  $('#nextBtn').disabled = statsOffset >= 0;
+
+  // ---- Summary numbers for the period ----
+  let total = 0, best = null;
+  const byName = {};
+  for (const d of days) {
+    const e = idx[dayKey(d)];
+    if (!e) continue;
+    total += e.total;
+    if (!best || e.total > best.min) best = { d, min: e.total };
+    for (const n in e.byName) byName[n] = (byName[n] || 0) + e.byName[n];
+  }
+  const top = Object.entries(byName).sort((a, b) => b[1] - a[1]);
+  const topNames = top.slice(0, 7).map(([n]) => n);
+  const elapsedDays = days.filter(d => d <= today).length;
+  const tile = (v, s) => `<div class="tile"><div class="v">${v}</div><div class="s">${s}</div></div>`;
+
+  const t0 = r.start.getTime(), t1 = r.end.getTime();
+  const daySessions = view === 'day'
+    ? S.sessions.filter(s => s.end > t0 && s.start < t1).sort((a, b) => a.start - b.start) : [];
+
+  if (view === 'day') {
+    $('#tiles').innerHTML =
+      tile(fmtMin(total), 'Total focus') +
+      tile(daySessions.length, daySessions.length === 1 ? 'Session' : 'Sessions') +
+      tile(Math.min(999, Math.round(total / S.settings.goalMin * 100)) + '%', `of ${fmtMin(S.settings.goalMin)} goal`);
+  } else {
+    $('#tiles').innerHTML =
+      tile(fmtMin(total), 'Total focus') +
+      tile(fmtMin(elapsedDays ? total / elapsedDays : 0), 'Daily average') +
+      tile(best ? fmtMin(best.min) : '—', best ? 'Best · ' + fmtShort(best.d) : 'Best day');
+  }
+
+  // ---- Charts per view ----
+  let html = '';
+  const card = (title, body) => `<div class="card chart-card"><h2>${title}</h2>${body}</div>`;
+
+  if (view === 'day') {
+    const list = daySessions.length
+      ? `<ul class="sesslist">${daySessions.slice().reverse().map(s => `
+          <li><span class="t">${fmtTime(s.start)}–${fmtTime(s.end)}</span>
+            <span class="dot" style="background:${esc(colorFor(s.name))}"></span>
+            <span class="nm" title="${esc(s.preset || '')}">${esc(s.name)}</span>
+            <span class="d">${fmtMin(s.duration / 60000)}</span>
+            <button class="linkbtn" data-del="${esc(s.id)}" title="Delete this session" aria-label="Delete">✕</button></li>`).join('')}</ul>`
+      : '<div class="empty" style="margin-top:12px">No focus blocks on this day.</div>';
+    html += card('Timeline', dayTimeline(r.start, daySessions) + '<div class="tip" data-tipbox></div>' + list);
+  }
+
+  if (view === 'week') {
+    const cols = days.map(d => {
+      const e = idx[dayKey(d)] || {};
+      return { label: WEEKDAYS[d.getDay()], sub: String(d.getDate()), total: e.total || 0,
+               segs: segsFor(e.byName, topNames), tip: d.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' }) };
+    });
+    html += card('Focus per day', barChart(cols, { goal: S.settings.goalMin }) + '<div class="tip" data-tipbox></div>');
+  }
+
+  if (view === 'month') {
+    html += card('Calendar', monthHeat(r, idx) + heatLegend() + '<div class="tip" data-tipbox></div>');
+    const cols = days.map(d => {
+      const e = idx[dayKey(d)] || {}, n = d.getDate();
+      return { label: (n === 1 || n % 5 === 0) ? String(n) : '', total: e.total || 0,
+               segs: segsFor(e.byName, topNames), tip: fmtShort(d) };
+    });
+    html += card('Daily minutes', barChart(cols, { goal: S.settings.goalMin, height: 220 }) + '<div class="tip" data-tipbox></div>');
+  }
+
+  if (view === 'year') {
+    html += card('Contributions', `<div class="scroll-x">${yearHeat(r, idx)}</div>` + heatLegend() + '<div class="tip" data-tipbox></div>');
+    const cols = MONTHS.map((mName, m) => {
+      const mb = {};
+      let mt = 0;
+      for (const d of days) {
+        if (d.getMonth() !== m) continue;
+        const e = idx[dayKey(d)];
+        if (!e) continue;
+        mt += e.total;
+        for (const n in e.byName) mb[n] = (mb[n] || 0) + e.byName[n];
+      }
+      return { label: mName, total: mt, segs: segsFor(mb, topNames), tip: `${mName} ${r.start.getFullYear()}` };
+    });
+    html += card('Monthly totals', barChart(cols, { height: 220 }) + '<div class="tip" data-tipbox></div>');
+  }
+
+  html += card('Top sessions', topList(top, total));
+  $('#statsBody').innerHTML = html;
+}
+
+/* ==========================================================================
+   RENDER: SETTINGS
+   ========================================================================== */
+function applyTheme() {
+  const th = S.settings.theme;
+  if (th === 'auto') document.documentElement.removeAttribute('data-theme');
+  else document.documentElement.setAttribute('data-theme', th);
+}
+function renderSettings() {
+  const st = S.settings;
+  $('#setGoal').value = st.goalMin;
+  $('#setWeek').value = String(st.weekStart);
+  $('#setTheme').value = st.theme;
+  $('#setSound').checked = st.sound;
+  $('#setNotify').checked = st.notify;
+  $('#setAuto').checked = st.autoStart;
+  const perm = 'Notification' in window ? Notification.permission : 'unsupported';
+  $('#notifStatus').textContent =
+    perm === 'granted' ? 'Allowed — shown when the tab is in the background'
+    : perm === 'denied' ? 'Blocked in browser settings'
+    : perm === 'unsupported' ? 'Not supported in this browser'
+    : 'You will be asked when you first start a timer';
+}
+
+/* ==========================================================================
+   PRESET MANAGER
+   ========================================================================== */
+function renderPresetList() {
+  $('#presetList').innerHTML = S.presets.map(p => `
+    <li><span class="nm">${esc(p.name)}<span class="meta">Focus ${p.focus} · Break ${p.short} · Long ${p.long} · ${p.rounds} rounds</span></span>
+      <button class="btn small" data-edit="${esc(p.id)}">Edit</button>
+      <button class="btn small danger" data-delp="${esc(p.id)}"${S.presets.length < 2 ? ' disabled' : ''}>Delete</button></li>`).join('');
+}
+function fillPresetForm(p) {
+  $('#pfId').value = p ? p.id : '';
+  $('#pfTitle').textContent = p ? 'Edit preset' : 'New preset';
+  $('#pfName').value = p ? p.name : '';
+  $('#pfFocus').value = p ? p.focus : 25;
+  $('#pfShort').value = p ? p.short : 5;
+  $('#pfLong').value = p ? p.long : 15;
+  $('#pfRounds').value = p ? p.rounds : 4;
+}
+
+/* ==========================================================================
+   MASTER RENDER + TABS
+   ========================================================================== */
+function showTab(tab) {
+  S.ui.tab = tab;
+  $$('#tabs button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  $$('.tab').forEach(s => s.classList.toggle('active', s.id === 'tab-' + tab));
+  if (tab === 'stats') renderStats();
+  if (tab === 'settings') renderSettings();
+  save();
+}
+function renderAll() {
+  renderSessionInputs();
+  renderTimer();
+  renderChips();
+  renderToday();
+  if (S.ui.tab === 'stats') renderStats();
+}
+
+/* ==========================================================================
+   EVENTS
+   ========================================================================== */
+// Name / colour / tag
+function onNameChange() {
+  const name = $('#nameInput').value.trim();
+  S.timer.name = name;
+  $('#nameColor').value = colorFor(name || 'Untitled');
+  $('#nameTag').value = tagFor(name);
+  renderTimer();
+  save();
+}
+$('#nameInput').addEventListener('input', onNameChange);
+$('#nameColor').addEventListener('input', e => {
+  const name = currentName();
+  ensureName(name);
+  S.names[name].color = e.target.value;
+  save();
+  renderChips();
+});
+$('#nameTag').addEventListener('change', e => {
+  const name = currentName();
+  ensureName(name);
+  S.names[name].tag = e.target.value.trim();
+  save();
+});
+
+// Timer controls
+$('#mainBtn').addEventListener('click', () => {
+  const st = S.timer.status;
+  if (st === 'running') pauseTimer(); else startTimer();
+});
+$('#skipBtn').addEventListener('click', () => finishPhase('skip'));
+$('#resetBtn').addEventListener('click', () => finishPhase('reset'));
+$('#muteBtn').addEventListener('click', () => {
+  S.settings.sound = !S.settings.sound;
+  if (S.settings.sound) { ensureAudio(); chime(); }
+  save();
+  renderTimer();
+  toast(S.settings.sound ? 'Sound on' : 'Muted');
+});
+$('#presetSelect').addEventListener('change', e => {
+  S.activePresetId = e.target.value;
+  if (S.timer.status !== 'idle') toast('Preset applies from the next phase');
+  save();
+  renderTimer();
+});
+
+// Space bar = start / pause (ignored while typing)
+document.addEventListener('keydown', e => {
+  if (e.code !== 'Space' || e.target.closest('input, select, textarea, button, dialog') || S.ui.tab !== 'timer') return;
+  e.preventDefault();
+  $('#mainBtn').click();
+});
+
+// Chips: tap to load, star to pin
+$('#chips').addEventListener('click', e => {
+  const chip = e.target.closest('.chip');
+  if (!chip) return;
+  if (e.target.closest('.pin')) { togglePin(chip.dataset.name, chip.dataset.pid); return; }
+  loadChip(chip.dataset.name, chip.dataset.pid);
+});
+$('#chips').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.classList.contains('chip')) loadChip(e.target.dataset.name, e.target.dataset.pid);
+});
+$('#clearRecent').addEventListener('click', () => {
+  if (!S.recent.length) return;
+  if (!confirm('Clear recently used? Pinned favourites stay.')) return;
+  S.recent = [];
+  save();
+  renderChips();
+});
+
+// Tabs
+$('#tabs').addEventListener('click', e => { const b = e.target.closest('button'); if (b) showTab(b.dataset.tab); });
+
+// Stats navigation
+$('#statsSeg').addEventListener('click', e => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  S.ui.statsView = b.dataset.view;
+  statsOffset = 0;
+  save();
+  renderStats();
+});
+$('#prevBtn').addEventListener('click', () => { statsOffset--; renderStats(); });
+$('#nextBtn').addEventListener('click', () => { if (statsOffset < 0) { statsOffset++; renderStats(); } });
+
+// Chart tooltips (tap on mobile, hover on desktop) + delete session
+function showTip(e) {
+  const el = e.target.closest('[data-tip]');
+  if (!el) return;
+  const box = el.closest('.chart-card') && el.closest('.chart-card').querySelector('[data-tipbox]');
+  if (box) box.textContent = el.dataset.tip;
+}
+$('#statsBody').addEventListener('mouseover', showTip);
+$('#statsBody').addEventListener('click', e => {
+  showTip(e);
+  const del = e.target.closest('[data-del]');
+  if (del && confirm('Delete this session from your log?')) {
+    S.sessions = S.sessions.filter(s => s.id !== del.dataset.del);
+    save();
+    renderStats();
+    renderToday();
+  }
+});
+
+// Settings
+$('#setGoal').addEventListener('change', e => {
+  S.settings.goalMin = clamp(Math.round(+e.target.value) || 60, 5, 1440);
+  e.target.value = S.settings.goalMin;
+  save(); renderToday();
+});
+$('#setWeek').addEventListener('change', e => { S.settings.weekStart = +e.target.value; save(); });
+$('#setTheme').addEventListener('change', e => { S.settings.theme = e.target.value; applyTheme(); save(); });
+$('#setSound').addEventListener('change', e => { S.settings.sound = e.target.checked; save(); renderTimer(); });
+$('#setAuto').addEventListener('change', e => { S.settings.autoStart = e.target.checked; save(); });
+$('#setNotify').addEventListener('change', e => {
+  S.settings.notify = e.target.checked;
+  save();
+  if (e.target.checked) askNotifyPermission();
+  renderSettings();
+});
+
+// Export / import / wipe
+$('#exportBtn').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(S, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `focus-backup-${dayKey(new Date())}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  toast('Backup downloaded');
+});
+$('#importBtn').addEventListener('click', () => $('#importFile').click());
+$('#importFile').addEventListener('change', async e => {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+  try {
+    const data = JSON.parse(await file.text());
+    if (!data || !Array.isArray(data.sessions) || !Array.isArray(data.presets)) throw new Error('Not a Focus backup file');
+    if (!confirm(`Replace current data with this backup (${data.sessions.length} sessions)?`)) return;
+    S = hydrate(data);
+    save();
+    applyTheme();
+    initInputs();
+    renderAll();
+    renderSettings();
+    toast('Backup imported');
+  } catch (err) {
+    alert('Could not import: ' + err.message);
+  }
+});
+$('#wipeBtn').addEventListener('click', () => {
+  if (!confirm('Erase ALL sessions, presets and settings? This cannot be undone.')) return;
+  S = defaultState();
+  save();
+  applyTheme();
+  initInputs();
+  renderAll();
+  renderSettings();
+  showTab('settings');
+  toast('All data erased');
+});
+
+// Preset dialog
+$('#managePresets').addEventListener('click', () => {
+  renderPresetList();
+  fillPresetForm(null);
+  $('#presetDlg').showModal();
+});
+$('#closeDlg').addEventListener('click', () => $('#presetDlg').close());
+$('#pfNew').addEventListener('click', () => fillPresetForm(null));
+$('#presetList').addEventListener('click', e => {
+  const ed = e.target.closest('[data-edit]'), dl = e.target.closest('[data-delp]');
+  if (ed) fillPresetForm(S.presets.find(p => p.id === ed.dataset.edit));
+  if (dl && S.presets.length > 1) {
+    const p = S.presets.find(x => x.id === dl.dataset.delp);
+    if (!confirm(`Delete preset “${p.name}”? Logged sessions are kept.`)) return;
+    S.presets = S.presets.filter(x => x.id !== p.id);
+    S.pinned = S.pinned.filter(x => x.presetId !== p.id);
+    S.recent = S.recent.filter(x => x.presetId !== p.id);
+    if (S.activePresetId === p.id) S.activePresetId = S.presets[0].id;
+    save();
+    renderPresetList();
+    renderAll();
+  }
+});
+$('#presetForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const n = (id, lo, hi) => clamp(Math.round(+$(id).value) || lo, lo, hi);
+  const data = {
+    name: $('#pfName').value.trim() || 'Untitled preset',
+    focus: n('#pfFocus', 1, 240), short: n('#pfShort', 1, 120), long: n('#pfLong', 1, 180), rounds: n('#pfRounds', 1, 12),
+  };
+  const id = $('#pfId').value;
+  if (id) Object.assign(S.presets.find(p => p.id === id), data);
+  else { const p = { id: uid(), ...data }; S.presets.push(p); S.activePresetId = p.id; }
+  // Keep the round counter valid if rounds were reduced
+  S.timer.round = Math.min(S.timer.round, activePreset().rounds);
+  save();
+  renderPresetList();
+  fillPresetForm(null);
+  renderAll();
+  toast(id ? 'Preset updated' : 'Preset added');
+});
+
+/* ==========================================================================
+   TICK LOOP + MIDNIGHT HANDLING
+   ========================================================================== */
+let lastDay = dayKey(new Date());
+function tick() {
+  const t = S.timer;
+  if (t.status === 'running' && Date.now() >= t.endAt) { finishPhase('complete'); return; }
+  renderClock();
+  // Local midnight passed: refresh today's progress, streak and stats.
+  const k = dayKey(new Date());
+  if (k !== lastDay) {
+    lastDay = k;
+    renderToday();
+    if (S.ui.tab === 'stats') renderStats();
+  }
+}
+setInterval(tick, 250);
+// Catch up immediately when the tab becomes visible again or the device wakes.
+document.addEventListener('visibilitychange', tick);
+window.addEventListener('focus', tick);
+// Redraw charts at the new width after rotation / resize.
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => { if (S.ui.tab === 'stats') renderStats(); }, 150);
+});
+// Keep tabs in sync if the app is open in two windows.
+window.addEventListener('storage', e => {
+  if (e.key !== STORE_KEY) return;
+  S = load();
+  applyTheme();
+  initInputs();
+  renderAll();
+});
+
+/* ==========================================================================
+   INIT
+   ========================================================================== */
+function initInputs() {
+  $('#ringProg').style.strokeDasharray = RING_C;
+  const name = S.timer.name || (S.recent[0] && S.recent[0].name) || '';
+  $('#nameInput').value = name;
+  $('#nameColor').value = colorFor(name || 'Untitled');
+  $('#nameTag').value = tagFor(name);
+}
+
+applyTheme();
+initInputs();
+renderAll();
+showTab(S.ui.tab || 'timer');
+tick(); // finishes any phase that ended while the page was closed
+</script>
+</body>
+</html>
