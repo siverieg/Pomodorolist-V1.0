@@ -158,7 +158,7 @@ input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent);
 .ring { position: relative; width: min(74vw, 310px); aspect-ratio: 1; margin: 18px auto 22px; }
 .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
 .ring .track { fill: none; stroke: var(--line); stroke-width: 7; }
-.ring .prog { fill: none; stroke: var(--accent); stroke-width: 7; stroke-linecap: round; transition: stroke-dashoffset .35s linear; }
+.ring .prog { fill: none; stroke: var(--accent); stroke-width: 7; stroke-linecap: round; }
 .ring.break .prog { stroke: var(--muted); }
 .ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .time { font-family: var(--timer-font, inherit); font-size: clamp(52px, 15vw, 74px); font-weight: 300; font-variant-numeric: tabular-nums; letter-spacing: -.02em; line-height: 1; }
@@ -193,7 +193,7 @@ input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent);
 .big small { font-size: 14px; color: var(--muted); margin-left: 4px; }
 .lbl { font-size: 12px; color: var(--muted); }
 .progress { height: 8px; background: var(--heat0); border-radius: 999px; overflow: hidden; margin-top: 8px; }
-.progress i { display: block; height: 100%; background: var(--accent); border-radius: 999px; transition: width .4s; }
+.progress i { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
 
 /* ==========================================================================
    STATS
@@ -251,7 +251,6 @@ dialog {
   border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--text);
   padding: 20px; width: min(520px, calc(100vw - 32px)); max-height: calc(100vh - 40px);
 }
-dialog::backdrop { background: rgba(0, 0, 0, .35); }
 .preset-list { list-style: none; margin: 0 0 18px; padding: 0; }
 .preset-list li { display: flex; align-items: center; gap: 8px; padding: 10px 0; border-top: 1px solid var(--line); }
 .preset-list li:first-child { border-top: 0; }
@@ -365,15 +364,7 @@ input[type="range"] { accent-color: var(--accent); width: 160px; }
 
 /* Level-up moment */
 .lvdlg { text-align: center; width: min(340px, calc(100vw - 32px)); padding: 26px 24px 22px; }
-.lvdlg[open] { animation: dlgIn .35s ease-out; }
 .lv-badge { position: relative; display: grid; place-items: center; height: 124px; margin-bottom: 6px; }
-.lv-badge svg { animation: pop .7s cubic-bezier(.2, .9, .3, 1.25) both; }
-.lv-badge svg.draw * { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 1.1s .2s ease-out forwards; }
-.tierup .lv-badge::before, .tierup .lv-badge::after {
-  content: ""; position: absolute; left: 50%; top: 50%; width: 112px; height: 112px; margin: -56px 0 0 -56px;
-  border-radius: 50%; border: 1.5px solid var(--tier); opacity: 0; animation: burst 1.7s .35s ease-out;
-}
-.tierup .lv-badge::after { animation-delay: .7s; }
 .tierup .lv-badge svg { filter: drop-shadow(0 0 12px var(--tier)); }
 .lv-kicker { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--tier, var(--accent)); font-weight: 600; }
 .lv-title { font-size: 30px; font-weight: 300; margin: 2px 0 4px; }
@@ -456,13 +447,303 @@ input[type="range"] { accent-color: var(--accent); width: 160px; }
 .sesslist .kudos .kudo { width: 28px; height: 26px; font-size: 13px; }
 @media (max-width: 520px) { .sesslist li { flex-wrap: wrap; } .sesslist .kudos { width: 100%; justify-content: flex-end; } }
 
-/* Toast */
-.toast {
-  position: fixed; left: 50%; bottom: max(24px, env(safe-area-inset-bottom)); transform: translateX(-50%) translateY(20px);
-  background: var(--text); color: var(--bg); padding: 10px 18px; border-radius: 14px; font-size: 14px; text-align: center;
-  opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; z-index: 50; max-width: calc(100vw - 32px);
+/* ==========================================================================
+   MOTION — animations and micro-interactions
+   <html data-motion>: "full" | "reduced" (simple fades only) | "off".
+   Everything animates transform and opacity where possible.
+   ========================================================================== */
+:root {
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --spring: cubic-bezier(.34, 1.5, .64, 1);
+  --spring-soft: cubic-bezier(.3, 1.25, .5, 1);
+  --lift: 0 8px 18px -10px rgba(0, 0, 0, .3);
+  --shine: rgba(255, 255, 255, .5);
 }
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+:root[data-theme="dark"] { --lift: 0 10px 22px -10px rgba(0, 0, 0, .75); --shine: rgba(255, 255, 255, .13); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --lift: 0 10px 22px -10px rgba(0, 0, 0, .75); --shine: rgba(255, 255, 255, .13); } }
+
+/* Off: nothing moves. Reduced: colour/opacity fades only. */
+:root[data-motion="off"] *, :root[data-motion="off"] *::before, :root[data-motion="off"] *::after { animation: none !important; transition: none !important; }
+:root[data-motion="reduced"] *, :root[data-motion="reduced"] *::before, :root[data-motion="reduced"] *::after {
+  transition-property: opacity, color, background-color, border-color, stroke-dashoffset, fill !important;
+}
+@keyframes fadeIn { from { opacity: 0; } }
+@keyframes fadeOut { to { opacity: 0; } }
+@keyframes drawIn { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+
+/* ---------- Buttons: press, hover lift, ripple ---------- */
+.btn { position: relative; transition: transform .22s var(--spring), box-shadow .22s var(--ease), border-color .15s, background-color .15s, color .15s; }
+.iconbtn, .chip, .kudo, .catrow button, .tabs button, .seg button, .linkbtn { transition: transform .2s var(--spring), border-color .15s, background-color .15s, color .2s; }
+.chip, .kudo { position: relative; }
+:root:not([data-motion="off"]) :is(.btn, .iconbtn, .chip, .kudo, .catrow button, .tabs button, .seg button):not(:disabled):active { transform: scale(.96); transition-duration: .08s; }
+@media (hover: hover) {
+  :root[data-motion="full"] :is(.btn, .iconbtn):not(:disabled):hover { transform: translateY(-1px); box-shadow: var(--lift); }
+  :root[data-motion="full"] :is(.btn, .iconbtn):not(:disabled):active { transform: scale(.96); box-shadow: none; }
+}
+.rip { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none; }
+.rip-dot { position: absolute; border-radius: 50%; background: currentColor; opacity: .22; transform: scale(0); animation: rip .6s var(--ease) forwards; }
+@keyframes rip { to { transform: scale(1); opacity: 0; } }
+
+/* Start / pause: icons morph, soft glow while running */
+#mainBtn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.pp { position: relative; width: 15px; height: 15px; flex: none; }
+.pp svg { position: absolute; inset: 0; width: 15px; height: 15px; fill: currentColor; transition: transform .4s var(--spring), opacity .2s var(--ease); }
+.pp .i-pause, #mainBtn.running .pp .i-play { opacity: 0; transform: scale(.3) rotate(-90deg); }
+#mainBtn.running .pp .i-pause { opacity: 1; transform: none; }
+#mainBtn::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: 0 0 20px 3px var(--accent); opacity: 0; pointer-events: none; }
+:root[data-motion="full"] #mainBtn.running::after { animation: glow 2.8s ease-in-out infinite; }
+@keyframes glow { 50% { opacity: .5; } }
+
+/* ---------- Segmented toggles: sliding pill ---------- */
+.seg { position: relative; }
+.seg > button { position: relative; z-index: 1; }
+.seg.has-ind > button.active { background: transparent; }
+.seg-ind {
+  position: absolute; left: 0; top: 3px; bottom: 3px; width: 0; border-radius: 999px; background: var(--accent);
+  z-index: 0; pointer-events: none; transition: transform .42s var(--spring-soft), width .42s var(--spring-soft), opacity .2s;
+}
+
+/* ---------- Switches and sliders ---------- */
+input[type="checkbox"] {
+  appearance: none; -webkit-appearance: none; width: 42px; height: 24px; margin: 0; flex: none; cursor: pointer;
+  border-radius: 999px; background: var(--line); position: relative; transition: background-color .25s var(--ease);
+}
+input[type="checkbox"]::before {
+  content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%;
+  background: var(--surface); box-shadow: 0 1px 3px rgba(0, 0, 0, .3); transition: transform .38s var(--spring);
+}
+input[type="checkbox"]:checked { background: var(--accent); }
+input[type="checkbox"]:checked::before { transform: translateX(18px); }
+input[type="checkbox"]:active::before { transform: scale(.88); }
+input[type="checkbox"]:checked:active::before { transform: translateX(18px) scale(.88); }
+input[type="checkbox"]:focus-visible { outline: 3px solid var(--accent-soft); outline-offset: 2px; }
+input[type="range"] { -webkit-appearance: none; appearance: none; height: 24px; background: transparent; cursor: pointer; }
+input[type="range"]::-webkit-slider-runnable-track { height: 4px; border-radius: 4px; background: var(--line); }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; margin-top: -7px; border-radius: 50%; background: var(--accent); box-shadow: 0 1px 4px rgba(0, 0, 0, .3); transition: transform .3s var(--spring); }
+input[type="range"]:active::-webkit-slider-thumb { transform: scale(1.3); }
+input[type="range"]::-moz-range-track { height: 4px; border-radius: 4px; background: var(--line); }
+input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border: 0; border-radius: 50%; background: var(--accent); transition: transform .3s var(--spring); }
+input[type="range"]:active::-moz-range-thumb { transform: scale(1.3); }
+
+/* ---------- Pages, lists, charts ---------- */
+:root[data-motion="full"] .tab.active, :root[data-motion="full"] .view-in { animation: pageIn .3s var(--ease) both; }
+:root[data-motion="reduced"] .tab.active, :root[data-motion="reduced"] .view-in { animation: fadeIn .25s both; }
+@keyframes pageIn { from { opacity: 0; transform: translateY(8px); } }
+:root[data-motion="full"] .stagger > *, :root[data-motion="full"] .row-new { animation: itemIn .34s var(--ease) both; animation-delay: calc(var(--i, 0) * 30ms); }
+:root[data-motion="reduced"] .stagger > * { animation: fadeIn .3s both; }
+@keyframes itemIn { from { opacity: 0; transform: translateY(10px); } }
+.chart.bars rect { transform-box: view-box; }
+:root[data-motion="full"] .chart.anim.bars rect { animation: barUp .6s var(--ease) both; animation-delay: calc(var(--i, 0) * 26ms); }
+@keyframes barUp { from { transform: scaleY(0); } }
+:root[data-motion="full"] .chart.anim.timeline rect[data-tip] { transform-box: fill-box; transform-origin: left center; animation: barX .6s var(--ease) both; }
+@keyframes barX { from { transform: scaleX(0); } }
+:root[data-motion="full"] .chart.anim.heat > :not(text) { transform-box: fill-box; transform-origin: center; animation: heatIn .42s var(--ease) both; animation-delay: calc(var(--i, 0) * 16ms); }
+@keyframes heatIn { from { opacity: 0; transform: scale(.3); } }
+:root[data-motion="full"] .chart.anim .goal { animation: fadeIn .5s .35s both; }
+:root[data-motion="reduced"] .chart.anim > :is(rect, g) { animation: fadeIn .4s both; }
+
+/* Leaderboard medals: a slow, subtle shine */
+.lb :is(.top1, .top2, .top3) .rk { position: relative; overflow: hidden; }
+.lb :is(.top1, .top2, .top3) .rk::after { content: ""; position: absolute; inset: 0; background: linear-gradient(115deg, transparent 35%, var(--shine) 50%, transparent 65%); transform: translateX(-120%); }
+:root[data-motion="full"] .lb :is(.top1, .top2, .top3) .rk::after { animation: medal 5s ease-in-out infinite; }
+:root[data-motion="full"] .lb .top2 .rk::after { animation-delay: .5s; }
+:root[data-motion="full"] .lb .top3 .rk::after { animation-delay: 1s; }
+@keyframes medal { 0%, 62% { transform: translateX(-120%); } 82%, 100% { transform: translateX(120%); } }
+
+/* Loading skeletons */
+.skel { position: relative; overflow: hidden; display: block; background: var(--heat0); border-radius: 8px; }
+.skel::after { content: ""; position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, var(--shine), transparent); }
+:root:not([data-motion="off"]) .skel::after { animation: skel 1.3s ease-in-out infinite; }
+@keyframes skel { to { transform: translateX(100%); } }
+.skel-row { display: flex; align-items: center; gap: 12px; padding: 11px 0; }
+.skel.circ { width: 30px; height: 30px; border-radius: 50%; flex: none; }
+.skel.line { height: 10px; flex: 1; }
+.skel.short { flex: 0 0 14%; margin-left: auto; }
+.skel.block { height: 150px; border-radius: 12px; }
+.boot-in { display: flex; align-items: center; gap: 10px; }
+.boot-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+:root:not([data-motion="off"]) .boot-dot { animation: glow 1.2s ease-in-out infinite; opacity: .4; }
+
+/* ---------- Dialogs: scale up from 95%, blurred backdrop ---------- */
+dialog::backdrop { background: rgba(10, 12, 12, .32); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+:root[data-motion="full"] dialog[open] { animation: dlgIn .36s var(--spring-soft) both; }
+:root[data-motion="reduced"] dialog[open] { animation: fadeIn .2s both; }
+:root:not([data-motion="off"]) dialog[open]::backdrop { animation: fadeIn .3s both; }
+:root:not([data-motion="off"]) dialog.closing { animation: dlgOut .17s var(--ease) both; }
+:root:not([data-motion="off"]) dialog.closing::backdrop { animation: fadeOut .17s both; }
+@keyframes dlgIn { from { opacity: 0; transform: scale(.95); } }
+@keyframes dlgOut { to { opacity: 0; transform: scale(.97); } }
+:root[data-motion="reduced"] dialog.closing { animation: fadeOut .17s both; }
+
+/* ---------- Feedback: shake, check marks, floating rewards ---------- */
+.shake { animation: shake .42s var(--ease); }
+@keyframes shake { 15% { transform: translateX(-7px); } 35% { transform: translateX(6px); } 55% { transform: translateX(-4px); } 75% { transform: translateX(2px); } }
+.ok-check { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.ok-check path { stroke-dasharray: 1; stroke-dashoffset: 0; }
+:root:not([data-motion="off"]) .ok-check path { animation: drawIn .45s .12s var(--ease) both; }
+.floater { position: absolute; left: 50%; z-index: 3; pointer-events: none; font-weight: 600; font-size: 15px; color: var(--accent); white-space: nowrap; opacity: 0; transform: translate(-50%, 0); }
+.floater.coin { color: #c9a227; }
+:root[data-motion="full"] .floater { animation: floatUp 1.5s var(--ease) both; }
+:root[data-motion="reduced"] .floater { animation: floatFade 1.5s both; }
+@keyframes floatUp { 0% { opacity: 0; transform: translate(-50%, 12px) scale(.85); } 18% { opacity: 1; transform: translate(-50%, 0) scale(1); } 100% { opacity: 0; transform: translate(-50%, -48px); } }
+@keyframes floatFade { 20%, 70% { opacity: 1; } }
+.float-emoji { position: fixed; left: 50%; bottom: 140px; z-index: 85; font-size: 46px; pointer-events: none; opacity: 0; }
+:root[data-motion="full"] .float-emoji { animation: emojiPop 1.9s var(--ease) both; }
+:root[data-motion="reduced"] .float-emoji { animation: floatFade 1.6s both; transform: translateX(-50%); }
+@keyframes emojiPop {
+  0% { opacity: 0; transform: translateX(-50%) scale(.2); }
+  18% { opacity: 1; transform: translateX(-50%) scale(1.2); }
+  30% { transform: translateX(-50%) scale(1); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-130px) scale(.9); }
+}
+
+/* Toasts: slide in, stack, slide out */
+.toasts {
+  position: fixed; left: 50%; bottom: max(22px, env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 80;
+  display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; width: max-content; max-width: calc(100vw - 32px);
+}
+.toast-item {
+  display: flex; align-items: center; gap: 8px; background: var(--text); color: var(--bg); padding: 10px 16px; border-radius: 14px;
+  font-size: 14px; text-align: center; box-shadow: 0 10px 26px -12px rgba(0, 0, 0, .45);
+  opacity: 0; transform: translateY(16px) scale(.97); transition: transform .38s var(--spring-soft), opacity .22s var(--ease);
+}
+.toast-item.in { opacity: 1; transform: none; }
+.toast-item.out { opacity: 0; transform: translateY(10px) scale(.97); }
+:root[data-motion="reduced"] .toast-item { transform: none !important; }
+
+/* Achievement card: slides in from the top with a shine */
+.achcard {
+  position: fixed; top: max(14px, env(safe-area-inset-top)); left: 50%; z-index: 90; display: flex; align-items: center; gap: 12px;
+  min-width: 260px; max-width: calc(100vw - 32px); padding: 12px 16px; background: var(--surface); color: var(--text);
+  border: 1px solid var(--accent); border-radius: 16px; box-shadow: 0 16px 36px -16px rgba(0, 0, 0, .45); overflow: hidden;
+  opacity: 0; transform: translate(-50%, -150%); transition: transform .5s var(--spring-soft), opacity .3s var(--ease); pointer-events: none;
+}
+.achcard.show { opacity: 1; transform: translate(-50%, 0); }
+:root[data-motion="reduced"] .achcard { transform: translate(-50%, 0); }
+.achcard::after { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 30%, var(--shine) 50%, transparent 70%); transform: translateX(-100%); }
+:root[data-motion="full"] .achcard.show::after { animation: sweep 1.1s .35s var(--ease) both; }
+@keyframes sweep { to { transform: translateX(100%); } }
+.ac-ic { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; flex: none; color: var(--accent); background: var(--accent-soft); border: 1px solid var(--accent); }
+.ac-k { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+.ac-n { font-weight: 600; }
+.ac-c { margin-left: auto; padding-left: 8px; display: inline-flex; align-items: center; gap: 4px; font-size: 13px; color: var(--muted); white-space: nowrap; }
+
+/* ---------- Timer ---------- */
+.timer-card { overflow: hidden; isolation: isolate; }
+.timer-card::before {   /* very low-key drifting colour behind the timer */
+  content: ""; position: absolute; inset: -40%; z-index: -1; pointer-events: none; opacity: .55;
+  background: radial-gradient(30% 30% at 30% 35%, var(--accent-soft), transparent 70%), radial-gradient(28% 28% at 72% 68%, var(--accent-soft), transparent 70%);
+}
+:root[data-motion="full"] .timer-card::before { animation: drift 26s ease-in-out infinite alternate; }
+@keyframes drift { to { transform: translate(6%, -5%) rotate(25deg); } }
+.ring .prog { transition: stroke-dashoffset .6s var(--ease); }
+.ring.ring-live .prog { transition: none; }
+.ring.celebrate .prog { stroke-dashoffset: 0 !important; transition: stroke-dashoffset .25s var(--ease); }
+.ring-glow {   /* slow breathing during breaks */
+  position: absolute; inset: 1%; border-radius: 50%; pointer-events: none; opacity: 0;
+  background: radial-gradient(circle, transparent 60%, var(--accent-soft) 68%, transparent 76%);
+}
+.ring.breathing .ring-glow { opacity: .7; }
+:root[data-motion="full"] .ring.breathing .ring-glow { animation: breathe 8s ease-in-out infinite; }
+@keyframes breathe { 0%, 100% { transform: scale(.94); opacity: .35; } 50% { transform: scale(1.07); opacity: 1; } }
+:root[data-motion="full"] .ring.final { animation: finalPulse 1s ease-in-out infinite; }
+@keyframes finalPulse { 50% { transform: scale(1.018); } }
+.ring-burst { position: absolute; inset: 2.6%; border-radius: 50%; border: 7px solid var(--accent); opacity: 0; pointer-events: none; }
+:root[data-motion="full"] .ring.celebrate .ring-burst { animation: burstRing .85s .2s var(--ease) both; }
+@keyframes burstRing { 0% { opacity: .9; transform: scale(1); } 100% { opacity: 0; transform: scale(1.28); } }
+.time .dg { display: inline-block; position: relative; overflow: hidden; height: 1.08em; line-height: 1.08em; vertical-align: top; }
+.time .dc { display: block; }
+.time .dc.in { animation: digIn .32s var(--ease) both; }
+.time .dc.out { position: absolute; left: 0; top: 0; animation: digOut .32s var(--ease) both; }
+@keyframes digIn { from { transform: translateY(60%); opacity: 0; } }
+@keyframes digOut { to { transform: translateY(-60%); opacity: 0; } }
+:root[data-motion="full"] .time.bounce { animation: bounceIn .6s var(--spring) both; }
+@keyframes bounceIn { 0% { transform: scale(.7); opacity: .2; } 60% { transform: scale(1.07); opacity: 1; } 100% { transform: scale(1); } }
+
+/* Focus mode: everything but the timer steps back while a focus block runs */
+.top, .greet, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .stack > .card:not(.timer-card) { transition: opacity .6s var(--ease); }
+body.focus-dim :is(.top, .greet, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .stack > .card:not(.timer-card)) { opacity: .26; }
+body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .stack > .card:not(.timer-card)):is(:hover, :focus-within) { opacity: 1; }
+
+/* Tomato mascot */
+.mascot { position: absolute; top: 10px; left: 12px; width: 40px; height: 40px; overflow: visible; }
+.mascot .m-body { transform-box: fill-box; transform-origin: 50% 100%; }
+.mascot .e, .mascot .zz { opacity: 0; transition: opacity .25s; }
+.mascot[data-state="idle"] .e-open, .mascot[data-state="focus"] .e-focus, .mascot[data-state="sleep"] .e-sleep,
+.mascot[data-state="celebrate"] .e-happy, .mascot[data-state="sleep"] .zz { opacity: 1; }
+.mascot .e-open { transform-box: fill-box; transform-origin: center; }
+:root[data-motion="full"] .mascot[data-state="idle"] .m-body { animation: bob 3.4s ease-in-out infinite; }
+:root[data-motion="full"] .mascot[data-state="idle"] .e-open { animation: blink 5s infinite; }
+:root[data-motion="full"] .mascot[data-state="focus"] .m-body { animation: bob 1.8s ease-in-out infinite; }
+:root[data-motion="full"] .mascot[data-state="sleep"] .m-body { animation: sleepy 4s ease-in-out infinite; }
+:root[data-motion="full"] .mascot[data-state="sleep"] .zz { animation: zz 2.6s ease-out infinite; }
+:root[data-motion="full"] .mascot[data-state="celebrate"] .m-body { animation: hop .62s var(--spring) 3; }
+@keyframes bob { 50% { transform: translateY(-1.5px); } }
+@keyframes blink { 0%, 93%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.1); } }
+@keyframes sleepy { 50% { transform: scale(1.04, .96); } }
+@keyframes zz { 0% { opacity: 0; transform: translate(0, 2px); } 30% { opacity: 1; } 100% { opacity: 0; transform: translate(4px, -7px); } }
+@keyframes hop { 0%, 100% { transform: translateY(0) rotate(0); } 40% { transform: translateY(-7px) rotate(-8deg); } 70% { transform: translateY(0) rotate(5deg); } }
+
+/* Greeting */
+.greet { font-size: 14px; color: var(--muted); margin: -4px 0 14px 2px; min-height: 21px; transition: opacity .3s var(--ease); }
+.greet.swap { opacity: 0; }
+
+/* ---------- Rewards ---------- */
+.xpbar, .progress, .chal .bar { position: relative; overflow: hidden; }
+.xpbar i, .progress i, .chal .bar i { position: relative; overflow: hidden; width: 100% !important; transform: translateX(-100%); transition: transform .9s var(--ease); }
+.xpbar i::after, .progress i::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, var(--shine), transparent); transform: translateX(-100%); }
+:root[data-motion="full"] .xpbar i::after, :root[data-motion="full"] .progress i::after { animation: shimmer 3.2s 1s ease-in-out infinite; }
+@keyframes shimmer { 0%, 55% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+/* Level-up: spring pop + rotate, glow ring, particles; a tier-up is bigger */
+:root[data-motion="full"] .lv-badge svg { animation: popSpin .8s var(--spring) both; }
+:root[data-motion="full"] .lv-badge svg.draw * { stroke-dasharray: 1; stroke-dashoffset: 1; animation: drawIn 1.1s .2s ease-out forwards; }
+:root[data-motion="reduced"] .lv-badge svg { animation: fadeIn .3s both; }
+@keyframes popSpin { 0% { transform: scale(.35) rotate(-30deg); opacity: 0; } 65% { transform: scale(1.1) rotate(5deg); opacity: 1; } 100% { transform: none; } }
+.lv-badge::before, .lv-badge::after {
+  content: ""; position: absolute; left: 50%; top: 50%; width: 104px; height: 104px; margin: -52px 0 0 -52px;
+  border-radius: 50%; border: 1.5px solid var(--tier, var(--accent)); opacity: 0; pointer-events: none;
+}
+:root[data-motion="full"] .lvdlg[open] .lv-badge::before { animation: burst 1.5s .3s ease-out; }
+:root[data-motion="full"] .lvdlg.tierup[open] .lv-badge::after { animation: burst 1.7s .7s ease-out; }
+.lvdlg.tierup .lv-badge::before, .lvdlg.tierup .lv-badge::after { width: 124px; height: 124px; margin: -62px 0 0 -62px; border-width: 2px; }
+.lvp { position: absolute; left: 50%; top: 50%; width: 6px; height: 6px; margin: -3px; border-radius: 50%; background: var(--tier, var(--accent)); opacity: 0; pointer-events: none; }
+:root[data-motion="full"] .lvp { animation: lvp .95s var(--ease) both; animation-delay: var(--d, .25s); }
+@keyframes lvp { 0% { opacity: 1; transform: translate(0, 0) scale(1); } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(.3); } }
+
+/* Streak flame: flickers; flares and the number rolls up when the streak grows */
+#curStreak { display: flex; align-items: baseline; }
+.flame { display: inline-flex; align-self: center; margin-right: 4px; color: var(--muted); }
+.flame.lit { color: #e8793a; }
+:root[data-motion="full"] .flame.lit svg { transform-origin: 50% 90%; animation: flicker 2.6s ease-in-out infinite; }
+:root[data-motion="full"] .flame.lit.flare svg { animation: flare .75s var(--spring), flicker 2.6s .75s ease-in-out infinite; }
+@keyframes flicker { 0%, 100% { transform: scale(1) rotate(0); } 30% { transform: scale(1.06, .95) rotate(-3deg); } 60% { transform: scale(.97, 1.05) rotate(2deg); } }
+@keyframes flare { 40% { transform: scale(1.5) rotate(-6deg); } }
+.sn { display: inline-block; }
+:root[data-motion="full"] .sn.roll { animation: rollUp .55s var(--spring) both; }
+@keyframes rollUp { from { transform: translateY(80%); opacity: 0; } }
+
+/* Daily-goal ring around the header badge */
+.gring { position: relative; width: 28px; height: 28px; display: grid; place-items: center; flex: none; }
+.gring > svg:first-child { position: absolute; inset: 0; width: 28px; height: 28px; transform: rotate(-90deg); }
+.gring .gt { fill: none; stroke: var(--line); stroke-width: 2.6; }
+.gring .gp { fill: none; stroke: var(--accent); stroke-width: 2.6; stroke-linecap: round; transition: stroke-dashoffset 1s var(--ease); }
+.lvchip { padding-left: 2px; }
+
+/* Shop */
+.item { transition: transform .26s var(--spring), box-shadow .26s var(--ease), border-color .2s; }
+@media (hover: hover) { :root[data-motion="full"] .item:hover { transform: translateY(-3px); box-shadow: var(--lift); } }
+:root[data-motion="full"] .item.bought { animation: bought .6s var(--spring); }
+@keyframes bought { 40% { transform: scale(1.04); } }
+.item .pv .tag { display: inline-flex; align-items: center; gap: 3px; }
+.item .pv .tag .ok-check { width: 11px; height: 11px; stroke-width: 3; }
+.coin-fly { position: fixed; z-index: 95; pointer-events: none; color: #c9a227; }
+.coin-fly svg { width: 18px; height: 18px; }
+
+/* Theme switching: colours crossfade instead of snapping */
+.theme-fade, .theme-fade *, .theme-fade *::before, .theme-fade *::after {
+  transition: background-color .45s var(--ease), color .45s var(--ease), border-color .45s var(--ease), fill .45s, stroke .45s !important;
+}
 
 @media (max-width: 520px) {
   .brand { display: none; }
@@ -471,16 +752,13 @@ input[type="range"] { accent-color: var(--accent); width: 160px; }
   .lvchip { margin-left: 4px; padding-right: 8px; }
 }
 @media (max-width: 400px) { .sync b { display: none; } }
-@media (prefers-reduced-motion: reduce) {
-  * { transition: none !important; animation: none !important; }
-  .lv-badge svg.draw * { stroke-dashoffset: 0; }
-}
+/* prefers-reduced-motion is handled by the Animations setting (data-motion on <html>). */
 </style>
 </head>
 <body>
 
 <!-- ================================ BOOT (while Firebase loads) ================================ -->
-<div class="boot" id="bootView">Loading…</div>
+<div class="boot" id="bootView"><div class="boot-in"><span class="boot-dot"></span><span>Loading…</span></div></div>
 
 <!-- ================================ LOGIN / SIGN UP ================================ -->
 <section class="auth hidden" id="authView">
@@ -541,13 +819,31 @@ input[type="range"] { accent-color: var(--accent); width: 160px; }
 <main>
   <!-- ================================ TIMER TAB ================================ -->
   <section class="tab" id="tab-timer">
+    <div class="greet" id="greet" aria-live="polite"></div>
     <div class="grid-2">
       <div class="stack">
         <div class="card timer-card">
+          <svg class="mascot" id="mascot" data-state="idle" viewBox="0 0 40 40" aria-hidden="true">
+            <g class="m-body">
+              <ellipse cx="20" cy="24" rx="13.5" ry="12.5" fill="#e5654f"/>
+              <ellipse cx="14.5" cy="19" rx="3.4" ry="2" fill="#fff" opacity=".25" transform="rotate(-28 14.5 19)"/>
+              <path d="M20 12.6 16.2 10.4l1.2 3.1-3.6.9 3.8.9 2.4-.6 2.4.6 3.8-.9-3.6-.9 1.2-3.1Z" fill="#5c9b57"/>
+              <path d="M20 12.8V8.8" stroke="#4e8a4a" stroke-width="1.6" stroke-linecap="round"/>
+              <circle cx="13.2" cy="27.2" r="1.9" fill="#ff9d8c" opacity=".6"/><circle cx="26.8" cy="27.2" r="1.9" fill="#ff9d8c" opacity=".6"/>
+              <g class="e e-open" fill="#3a1d18"><circle cx="15.8" cy="24" r="1.55"/><circle cx="24.2" cy="24" r="1.55"/></g>
+              <g class="e e-focus" stroke="#3a1d18" stroke-width="1.5" stroke-linecap="round"><path d="M14.2 24.2h3.2M22.6 24.2h3.2M14 21.8l3.2.8M26 21.8l-3.2.8"/></g>
+              <g class="e e-sleep" stroke="#3a1d18" stroke-width="1.4" stroke-linecap="round" fill="none"><path d="M14.2 24q1.6 1.4 3.2 0M22.6 24q1.6 1.4 3.2 0"/></g>
+              <g class="e e-happy" stroke="#3a1d18" stroke-width="1.5" stroke-linecap="round" fill="none"><path d="M14.2 24.8q1.6-2.3 3.2 0M22.6 24.8q1.6-2.3 3.2 0"/></g>
+              <path d="M18.4 28.3q1.6 1.3 3.2 0" stroke="#3a1d18" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+            </g>
+            <text class="zz" x="31" y="11" font-size="8" font-weight="600" fill="currentColor" style="color:var(--muted)">z</text>
+          </svg>
           <button class="iconbtn corner" id="muteBtn" title="Toggle sound" aria-label="Toggle sound"></button>
           <div class="phase-label" id="phaseLabel">Focus</div>
           <div class="dots" id="roundDots"></div>
           <div class="ring" id="ring">
+            <div class="ring-glow"></div>
+            <div class="ring-burst"></div>
             <svg viewBox="0 0 260 260" aria-hidden="true">
               <defs><linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--accent)"/><stop offset="1" style="stop-color:var(--accent);stop-opacity:.25"/></linearGradient></defs>
               <g class="ringdots" id="ringDots"></g>
@@ -561,7 +857,7 @@ input[type="range"] { accent-color: var(--accent); width: 160px; }
           </div>
           <div class="controls">
             <button class="btn" id="resetBtn" title="Reset (double-reset returns to round 1)">Reset</button>
-            <button class="btn primary" id="mainBtn">Start</button>
+            <button class="btn primary" id="mainBtn"><span class="mb-lbl">Start</span></button>
             <button class="btn" id="skipBtn">Skip</button>
           </div>
         </div>
@@ -687,6 +983,10 @@ input[type="range"] { accent-color: var(--accent); width: 160px; }
           <input type="checkbox" id="setAuto">
         </div>
         <div class="setting">
+          <div><div>Animations</div><div class="desc">Full, reduced (simple fades) or off. Saved on this device.</div></div>
+          <select id="setMotion"><option value="full">Full</option><option value="reduced">Reduced</option><option value="off">Off</option></select>
+        </div>
+        <div class="setting">
           <div><div>Ambient volume</div><div class="desc">For ambient sounds from the shop</div></div>
           <input type="range" id="setAmbVol" min="0" max="1" step="0.05">
         </div>
@@ -790,7 +1090,8 @@ input[type="range"] { accent-color: var(--accent); width: 160px; }
 
 <canvas id="starCanvas" class="hidden" aria-hidden="true"></canvas>
 <canvas id="fxCanvas" class="hidden" aria-hidden="true"></canvas>
-<div class="toast" id="toast" role="status"></div>
+<div class="toasts" id="toast" role="status" aria-live="polite"></div>
+<div class="achcard" id="achCard" aria-live="polite"></div>
 <noscript><p style="text-align:center">This app needs JavaScript.</p></noscript>
 
 <script>
@@ -858,23 +1159,377 @@ function fmtClock(ms) {
   return `${pad(Math.floor(s / 60))}:${pad(s % 60)}`;
 }
 
-// Toasts queue up so a burst (XP, achievement, level) reads one at a time.
-const toastQueue = [];
-let toastBusy = false;
-function toast(msg, ms = 2600) {
-  if (toastQueue.some(t => t.msg === msg)) return;
-  toastQueue.push({ msg, ms });
-  if (toastQueue.length > 5) toastQueue.shift();
-  if (!toastBusy) nextToast();
+// Toasts stack (up to 3 at once) and slide in and out; ok = true adds a small drawn check mark.
+function toast(msg, ms = 2600, ok = false) {
+  const host = $('#toast');
+  if ([...host.children].some(c => c.dataset.msg === msg && !c.classList.contains('out'))) return;
+  const el = document.createElement('div');
+  el.className = 'toast-item';
+  el.dataset.msg = msg;
+  if (ok) el.innerHTML = CHECK_SVG;
+  el.appendChild(document.createTextNode(msg));
+  glideToasts(host, () => host.appendChild(el));
+  const live = [...host.children].filter(c => !c.classList.contains('out'));
+  if (live.length > 3) dismissToast(live[0]);
+  requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('in')));
+  setTimeout(() => dismissToast(el), ms);
 }
-function nextToast() {
-  const el = $('#toast'), t = toastQueue.shift();
-  if (!t) { toastBusy = false; return; }
-  toastBusy = true;
-  el.textContent = t.msg;
-  el.classList.add('show');
-  setTimeout(() => { el.classList.remove('show'); setTimeout(nextToast, 260); }, t.ms);
+function dismissToast(el) {
+  if (!el.isConnected || el.classList.contains('out')) return;
+  el.classList.add('out');
+  setTimeout(() => { if (el.parentNode) glideToasts(el.parentNode, () => el.remove()); }, 240);
 }
+/** Other toasts glide to their new places when one arrives or leaves. */
+function glideToasts(host, change) {
+  const kids = [...host.children], before = kids.map(c => c.getBoundingClientRect().top);
+  change();
+  if (motion() !== 'full') return;
+  kids.forEach((c, i) => {
+    if (!c.isConnected) return;
+    const dy = before[i] - c.getBoundingClientRect().top;
+    if (Math.abs(dy) > 1) c.animate([{ transform: `translateY(${dy}px)` }, { transform: 'none' }], { duration: 320, easing: 'cubic-bezier(.2,.8,.2,1)' });
+  });
+}
+
+/* ==========================================================================
+   MOTION — animations and micro-interactions
+   <html data-motion="full | reduced | off">. "reduced" keeps simple fades only.
+   The choice is a per-device preference kept in localStorage (no synced data).
+   Only transform and opacity are animated wherever possible.
+   ========================================================================== */
+const MOTION_KEY = 'pomodorolist-motion';
+const motion = () => document.documentElement.dataset.motion || 'full';
+function applyMotion() {
+  const pref = localStorage.getItem(MOTION_KEY);
+  document.documentElement.dataset.motion = pref || (matchMedia('(prefers-reduced-motion: reduce)').matches ? 'reduced' : 'full');
+}
+applyMotion();
+matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', applyMotion);
+
+/* ---------- Tap ripple on buttons ---------- */
+document.addEventListener('pointerdown', e => {
+  const b = e.target.closest('.btn, .chip, .kudo');
+  if (!b || b.disabled || motion() !== 'full') return;
+  let host = b.querySelector(':scope > .rip');
+  if (!host) { host = document.createElement('span'); host.className = 'rip'; b.appendChild(host); }
+  const r = b.getBoundingClientRect(), size = Math.max(r.width, r.height) * 2.2;
+  const dot = document.createElement('span');
+  dot.className = 'rip-dot';
+  dot.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX - r.left - size / 2}px;top:${e.clientY - r.top - size / 2}px`;
+  host.appendChild(dot);
+  setTimeout(() => dot.remove(), 650);
+}, { passive: true });
+
+/* ---------- Segmented toggles: a pill that slides to the selected option ---------- */
+const segPos = new Map();
+function syncSegs() {
+  document.querySelectorAll('.seg').forEach(seg => {
+    const act = seg.querySelector(':scope > button.active:not(.hidden)');
+    let ind = seg.querySelector(':scope > .seg-ind');
+    if (!act || !seg.offsetParent) { if (ind) ind.style.opacity = 0; return; }
+    if (!ind) {
+      ind = document.createElement('span');
+      ind.className = 'seg-ind';
+      seg.prepend(ind);
+      seg.classList.add('has-ind');
+      // A re-rendered toggle starts from where the previous one with the same id was, so it still slides.
+      const prev = seg.id && segPos.get(seg.id);
+      ind.style.transition = 'none';
+      ind.style.transform = `translateX(${prev ? prev.x : act.offsetLeft}px)`;
+      ind.style.width = (prev ? prev.w : act.offsetWidth) + 'px';
+      void ind.offsetWidth;
+      ind.style.transition = '';
+    }
+    const x = act.offsetLeft, w = act.offsetWidth;
+    ind.style.opacity = 1;
+    if (ind.dataset.x === String(x) && ind.dataset.w === String(w)) return;
+    ind.dataset.x = x; ind.dataset.w = w;
+    ind.style.transform = `translateX(${x}px)`;
+    ind.style.width = w + 'px';
+    if (seg.id) segPos.set(seg.id, { x, w });
+  });
+}
+let segQueued = false;
+new MutationObserver(muts => {
+  if (segQueued) return;
+  for (const m of muts) {
+    const t = m.target;
+    if (t.nodeType !== 1 || t.closest('#ring, #toast, #achCard, .floater, .gring')) continue;
+    segQueued = true;
+    requestAnimationFrame(() => { segQueued = false; syncSegs(); });
+    return;
+  }
+}).observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['class'] });
+window.addEventListener('resize', () => requestAnimationFrame(syncSegs));
+
+/* ---------- Dialogs: animate closing too (opening is pure CSS) ---------- */
+(() => {
+  const P = HTMLDialogElement.prototype, nativeClose = P.close, nativeShow = P.showModal, timers = new WeakMap();
+  P.close = function (v) {
+    if (!this.open || motion() === 'off') return nativeClose.call(this, v);
+    if (timers.has(this)) return;
+    this.classList.add('closing');
+    timers.set(this, setTimeout(() => { timers.delete(this); this.classList.remove('closing'); nativeClose.call(this, v); }, 170));
+  };
+  P.showModal = function () {
+    if (timers.has(this)) { clearTimeout(timers.get(this)); timers.delete(this); this.classList.remove('closing'); if (this.open) return; }
+    return nativeShow.call(this);
+  };
+})();
+
+/* ---------- Small helpers used across the app ---------- */
+const CHECK_SVG = '<svg class="ok-check" viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+function shake(el) {
+  if (!el || motion() !== 'full') return;
+  el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake');
+  setTimeout(() => el.classList.remove('shake'), 450);
+}
+function restartClass(el, cls, ms) {
+  if (!el) return;
+  el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls);
+  if (ms) setTimeout(() => el.classList.remove(cls), ms);
+}
+/** Lists stagger in and charts grow — only when a view is opened, never on background refreshes. */
+function animateIn(root) {
+  if (!root || motion() === 'off') return;
+  const lists = root.querySelectorAll('.sesslist, .plist, .lb:not(.pinned), .shopgrid, .achlist, .tiergrid, .toplist, .tiles, .tiles4, .stack.chal-list');
+  lists.forEach(l => {
+    const kids = [...l.children];
+    kids.forEach((c, i) => c.style.setProperty('--i', Math.min(i, 14)));
+    restartClass(l, 'stagger', 400 + Math.min(kids.length, 14) * 30);
+  });
+  root.querySelectorAll('svg.chart').forEach(c => restartClass(c, 'anim'));
+}
+function viewIn(el) { if (el && motion() !== 'off') restartClass(el, 'view-in', 400); }
+const skelRows = (n = 4) => Array.from({ length: n }, (_, i) =>
+  `<div class="skel-row"><span class="skel circ"></span><span class="skel line" style="max-width:${42 + (i * 17) % 30}%"></span><span class="skel line short"></span></div>`).join('');
+
+/** Numbers count up/down to their new value (keyed so the same number animates from its last shown value). */
+const shownCounts = {};
+function animateCounts(root) {
+  if (!root) return;
+  root.querySelectorAll('[data-count]').forEach(el => {
+    const key = el.dataset.count, to = +el.dataset.val, from = shownCounts[key] ?? 0;
+    shownCounts[key] = to;
+    if (from === to || motion() === 'off') { el.textContent = fmtNum(to); return; }
+    const t0 = performance.now(), dur = Math.min(1000, 380 + Math.abs(to - from) * 3);
+    el.textContent = fmtNum(from);
+    const step = t => {
+      const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+      el.textContent = fmtNum(from + (to - from) * e);
+      if (k < 1 && el.isConnected) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  });
+}
+/** Progress bars sweep from their last value (bars use transform, not width). */
+const shownFills = {};
+function animateFills(root) {
+  if (!root) return;
+  root.querySelectorAll('[data-fill]').forEach(el => {
+    const key = el.dataset.fillKey, to = clamp(+el.dataset.fill || 0, 0, 100);
+    let from = key in shownFills ? shownFills[key] : 0;
+    shownFills[key] = to;
+    if (to < from) from = 0;
+    const set = v => { el.style.transform = `translateX(${v - 100}%)`; };
+    if (motion() === 'off') { set(to); return; }
+    el.style.transition = 'none'; set(from); void el.offsetWidth; el.style.transition = ''; set(to);
+  });
+}
+/** Leaderboard rows glide to their new places (FLIP). */
+function flipCapture(sel) {
+  const m = new Map();
+  document.querySelectorAll(sel).forEach(el => m.set(el.dataset.uid, el.getBoundingClientRect().top));
+  return m;
+}
+function flipPlay(first, sel) {
+  if (motion() !== 'full' || !first || !first.size) return false;
+  document.querySelectorAll(sel).forEach((el, i) => {
+    const top0 = first.get(el.dataset.uid);
+    if (top0 === undefined) { el.style.setProperty('--i', Math.min(i, 10)); el.classList.add('row-new'); return; }
+    const dy = top0 - el.getBoundingClientRect().top;
+    if (Math.abs(dy) < 1) return;
+    el.style.transition = 'none';
+    el.style.transform = `translateY(${dy}px)`;
+    requestAnimationFrame(() => requestAnimationFrame(() => { el.style.transition = 'transform .5s var(--spring-soft)'; el.style.transform = ''; }));
+  });
+  return true;
+}
+
+/* ---------- Timer: digits, smooth ring, completion ---------- */
+/** Each digit slides to its new value. */
+function setTimeDigits(str) {
+  const el = $('#timeText');
+  el.setAttribute('aria-label', str);
+  if (motion() !== 'full') { if (el.textContent !== str || el.querySelector('.dg')) el.textContent = str; return; }
+  if (el.children.length !== str.length || !el.querySelector('.dg')) {
+    el.innerHTML = [...str].map(c => `<span class="dg" aria-hidden="true"><span class="dc">${c}</span></span>`).join('');
+    return;
+  }
+  [...str].forEach((c, i) => {
+    const slot = el.children[i], cur = slot.lastElementChild;
+    if (cur.textContent === c) return;
+    cur.classList.remove('in');
+    cur.classList.add('out');
+    const n = document.createElement('span');
+    n.className = 'dc in';
+    n.textContent = c;
+    slot.appendChild(n);
+    setTimeout(() => cur.remove(), 330);
+  });
+}
+let ringRAF = 0, lastFinal = null;
+/** Draws the ring from the exact remaining time (called every frame while running). */
+function paintRing() {
+  const rem = remainingMs(), planned = plannedMs(), p = planned ? clamp(1 - rem / planned, 0, 1) : 0;
+  $('#ringProg').style.strokeDashoffset = RING_C * (1 - p);
+  const dots = Math.round(p * 60);
+  if (dots !== lastDots) { lastDots = dots; $$('#ringDots circle').forEach((c, i) => c.classList.toggle('on', i < dots)); }
+  const fin = S.timer.status === 'running' && rem > 0 && rem <= 10000;
+  if (fin !== lastFinal) { lastFinal = fin; $('#ring').classList.toggle('final', fin); }
+  return p;
+}
+function ensureRingLoop() {
+  if (ringRAF || motion() === 'off') return;
+  const step = () => {
+    if (!USER || S.timer.status !== 'running' || S.ui.tab !== 'timer' || motion() === 'off') { ringRAF = 0; $('#ring').classList.remove('ring-live'); return; }
+    $('#ring').classList.add('ring-live');
+    paintRing();
+    ringRAF = requestAnimationFrame(step);
+  };
+  ringRAF = requestAnimationFrame(step);
+}
+function setMainBtn(label, running) {
+  const b = $('#mainBtn');
+  let l = b.querySelector('.mb-lbl');
+  if (!l) {
+    b.innerHTML = '<span class="pp" aria-hidden="true"><svg class="i-play" viewBox="0 0 24 24"><path d="M8 5.2v13.6L19 12Z"/></svg>' +
+      '<svg class="i-pause" viewBox="0 0 24 24"><rect x="6" y="5" width="4.2" height="14" rx="1.3"/><rect x="13.8" y="5" width="4.2" height="14" rx="1.3"/></svg></span><span class="mb-lbl"></span>';
+    l = b.querySelector('.mb-lbl');
+  }
+  if (l.textContent !== label) l.textContent = label;
+  b.classList.toggle('running', running);
+}
+/** Ring fills and bursts, digits bounce in, then the equipped completion effect plays. */
+function motionComplete(wasFocus) {
+  if (wasFocus) mascotCelebrate();
+  if (motion() !== 'full') return;
+  const ring = $('#ring');
+  restartClass(ring, 'celebrate');
+  setTimeout(() => { ring.classList.remove('celebrate'); restartClass($('#timeText'), 'bounce', 700); }, 620);
+}
+/** "+25 XP" and "+5 coins" float up from the timer. */
+function floatUp(items) {
+  if (motion() === 'off') return;
+  const host = $('#ring');
+  items.forEach(([text, cls], i) => {
+    const el = document.createElement('div');
+    el.className = 'floater ' + (cls || '');
+    el.textContent = text;
+    el.style.top = (60 + i * 9) + '%';
+    el.style.animationDelay = (0.7 + i * 0.2) + 's';
+    host.appendChild(el);
+    setTimeout(() => el.remove(), 2600 + i * 200);
+  });
+}
+function floatEmoji(emoji) {
+  if (motion() === 'off') return;
+  const el = document.createElement('div');
+  el.className = 'float-emoji';
+  el.textContent = emoji;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2000);
+}
+
+/* ---------- Tomato mascot: idle, focused, sleeping on breaks, celebrating ---------- */
+let mascotHold = 0;
+function setMascot() {
+  const m = $('#mascot');
+  if (!m || !USER) return;
+  const t = S.timer;
+  const st = Date.now() < mascotHold ? 'celebrate' : t.phase !== 'focus' ? 'sleep' : t.status === 'running' ? 'focus' : 'idle';
+  if (m.dataset.state !== st) m.dataset.state = st;
+}
+function mascotCelebrate() { mascotHold = Date.now() + 2600; setMascot(); setTimeout(setMascot, 2700); }
+
+/* ---------- Greeting that changes with the time of day ---------- */
+function greetingText() {
+  const h = new Date().getHours(), n = USER && !USER.guest ? USER.username : '';
+  if (h >= 5 && h < 12) return n ? `Good morning, ${n}` : 'Good morning';
+  if (h >= 12 && h < 17) return n ? `Good afternoon, ${n}` : 'Good afternoon';
+  if (h >= 17 && h < 21) return n ? `Good evening, ${n}` : 'Good evening';
+  return n ? `Late-night grind, ${n} 🌙` : 'Late-night grind 🌙';
+}
+function renderGreeting() {
+  const el = $('#greet');
+  if (!el || !USER) return;
+  const txt = greetingText();
+  if (el.dataset.t === txt) return;
+  const first = !el.dataset.t;
+  el.dataset.t = txt;
+  if (first || motion() === 'off') { el.textContent = txt; return; }
+  el.classList.add('swap');
+  setTimeout(() => { el.textContent = txt; el.classList.remove('swap'); }, 300);
+}
+
+/* ---------- Rewards: achievement card, level-up particles, coins ---------- */
+const achQueue = [];
+let achBusy = false;
+function showAchCard(a) { achQueue.push(a); if (!achBusy) nextAch(); }
+function nextAch() {
+  const a = achQueue.shift(), el = $('#achCard');
+  if (!a) { achBusy = false; return; }
+  achBusy = true;
+  el.innerHTML = `<div class="ac-ic">${iconSVG(ICONS[a.icon], 20)}</div><div><div class="ac-k">Achievement unlocked</div><div class="ac-n">${esc(a.name)}</div></div><div class="ac-c">${COIN_SVG} +${a.coins}</div>`;
+  restartClass(el, 'show');
+  setTimeout(() => { el.classList.remove('show'); setTimeout(nextAch, 450); }, 3300);
+}
+function burstParticles(host, n) {
+  if (motion() !== 'full') return;
+  for (let i = 0; i < n; i++) {
+    const p = document.createElement('i');
+    p.className = 'lvp';
+    const a = (i / n) * Math.PI * 2 + Math.random() * 0.4, r = 50 + Math.random() * 34;
+    p.style.setProperty('--dx', (Math.cos(a) * r).toFixed(1) + 'px');
+    p.style.setProperty('--dy', (Math.sin(a) * r).toFixed(1) + 'px');
+    p.style.setProperty('--d', (0.25 + Math.random() * 0.2).toFixed(2) + 's');
+    if (i % 3 === 0) p.style.background = 'var(--accent)';
+    host.appendChild(p);
+  }
+}
+function playCoin() {
+  const c = getCtx();
+  if (!c || !S.settings.sound) return;
+  tone(c, c.destination, { f: 1568, peak: 0.05, a: 0.003, d: 0.18 });
+  tone(c, c.destination, { f: 2093, t: 0.07, peak: 0.045, a: 0.003, d: 0.3 });
+}
+/** Coins drop from the balance into the item you just bought. */
+function coinDrop(target) {
+  playCoin();
+  const bal = $('#shopView .shop-head .coins');
+  if (motion() !== 'full' || !bal || !target) return;
+  const a = bal.getBoundingClientRect(), b = target.getBoundingClientRect();
+  const dx = b.left + b.width / 2 - (a.left + 12), dy = b.top + b.height / 2 - (a.top + a.height / 2);
+  for (let i = 0; i < 3; i++) {
+    const c = document.createElement('div');
+    c.className = 'coin-fly';
+    c.innerHTML = COIN_SVG;
+    c.style.left = a.left + 4 + 'px';
+    c.style.top = a.top + a.height / 2 - 8 + 'px';
+    document.body.appendChild(c);
+    c.animate([
+      { transform: 'translate(0,0) scale(1)', opacity: 1 },
+      { transform: `translate(${dx * 0.5}px, ${dy * 0.5 - 50}px) scale(1.25)`, opacity: 1, offset: 0.45 },
+      { transform: `translate(${dx}px, ${dy}px) scale(.5)`, opacity: 0 },
+    ], { duration: 700, delay: i * 90, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'both' }).onfinish = () => c.remove();
+  }
+  setTimeout(() => restartClass(target.closest('.item'), 'bought', 700), 600);
+}
+let justEquipped = null, justEquippedTimer;
+/** Marks an item as just equipped so its "Equipped" tag draws a check mark for a moment. */
+function markEquipped(id) { justEquipped = id; clearTimeout(justEquippedTimer); justEquippedTimer = setTimeout(() => { justEquipped = null; }, 1500); }
+let lastStreak = null, lastGoalPct = null;
+
 
 /* ==========================================================================
    STATE
@@ -1201,7 +1856,7 @@ function setAuthMode(mode) {
   $('#authPass').autocomplete = mode === 'signup' ? 'new-password' : 'current-password';
   authErr('');
 }
-function authErr(msg) { $('#authError').textContent = msg; }
+function authErr(msg) { $('#authError').textContent = msg; if (msg) shake($('#authForm')); }
 
 /** Friendly messages for Firebase Auth error codes. */
 function friendlyAuthError(err) {
@@ -1486,13 +2141,18 @@ function advancePhase() {
 function finishPhase(reason) {
   const t = S.timer;
   const wasFocus = t.phase === 'focus';
+  if (reason === 'complete') motionComplete(wasFocus);
 
   if (wasFocus && t.status !== 'idle') {
     const rem = reason === 'complete' ? 0 : remainingMs();
     const focused = t.planned - rem;
     // For natural completion use endAt, so the log is exact even if the tab was asleep.
     const end = reason === 'complete' ? t.endAt : Date.now();
-    if (focused >= 0.8 * t.planned) { logSession(focused, end); playEffect(equippedId('effect')); }
+    if (focused >= 0.8 * t.planned) {
+      logSession(focused, end);
+      const fx = equippedId('effect');
+      setTimeout(() => playEffect(fx), reason === 'complete' && motion() === 'full' ? 700 : 0);
+    }
     else if (reason !== 'complete' && focused > 0) toast('Not logged — under 80% of the focus time');
   }
 
@@ -1539,6 +2199,7 @@ function logSession(focusedMs, end) {
   if (!S.settings.gamification) { toast(`Logged ${fmtMin(focusedMs / 60000)} · ${name}`); socialAfterSession(); return; }
   const goalDays = news.filter(n => n.type === 'goal').length;
   toast(`+${xpForSession(s)} XP · +${COINS_PER_SESSION + GOAL_BONUS * goalDays} coins${goalDays ? ' · daily goal reached' : ''}`);
+  floatUp([[`+${xpForSession(s)} XP`], [`+${COINS_PER_SESSION + GOAL_BONUS * goalDays} coins`, 'coin']]);
   announce(news, 'loud');
   socialAfterSession();
   const levelAfter = game().lv.level;
@@ -1640,10 +2301,8 @@ const ICON_MUTE  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" s
 function renderClock() {
   const rem = remainingMs(), planned = plannedMs();
   const progress = planned ? 1 - rem / planned : 0;
-  $('#timeText').textContent = fmtClock(rem);
-  $('#ringProg').style.strokeDashoffset = RING_C * (1 - clamp(progress, 0, 1));
-  const dots = Math.round(clamp(progress, 0, 1) * 60);
-  if (dots !== lastDots) { lastDots = dots; $$('#ringDots circle').forEach((c, i) => c.classList.toggle('on', i < dots)); }
+  setTimeDigits(fmtClock(rem));
+  if (!ringRAF) paintRing();   // while running, a requestAnimationFrame loop draws the ring every frame
   updateFavicon(clamp(progress, 0, 1));
   const t = S.timer;
   const label = t.phase === 'focus' ? 'Focus' : t.phase === 'short' ? 'Break' : 'Long break';
@@ -1657,6 +2316,7 @@ function renderTimer() {
   $('#phaseLabel').textContent = label + (t.status === 'paused' ? ' · paused' : '');
   $('#phaseLabel').classList.toggle('break', isBreak);
   $('#ring').classList.toggle('break', isBreak);
+  $('#ring').classList.toggle('breathing', isBreak && t.status === 'running');
 
   // Round dots: filled = focus rounds completed in this cycle
   const done = t.phase === 'focus' ? t.round - 1 : t.phase === 'long' ? p.rounds : t.round;
@@ -1664,10 +2324,13 @@ function renderTimer() {
     `<span class="${i < done ? 'done' : (i === t.round - 1 && t.phase === 'focus' ? 'current' : '')}"></span>`).join('');
 
   $('#ringSub').textContent = t.phase === 'focus' ? (currentName() === 'Untitled' ? p.name : currentName()) : p.name;
-  $('#mainBtn').textContent = t.status === 'running' ? 'Pause' : t.status === 'paused' ? 'Resume' : (isBreak ? 'Start break' : 'Start');
+  setMainBtn(t.status === 'running' ? 'Pause' : t.status === 'paused' ? 'Resume' : (isBreak ? 'Start break' : 'Start'), t.status === 'running');
   $('#muteBtn').innerHTML = S.settings.sound ? ICON_SOUND : ICON_MUTE;
   $('#muteBtn').title = S.settings.sound ? 'Sound on — click to mute' : 'Muted — click for sound';
   document.body.classList.toggle('zen', extraOn('x_zen') && t.status === 'running' && t.phase === 'focus');
+  document.body.classList.toggle('focus-dim', t.status === 'running' && t.phase === 'focus' && S.ui.tab === 'timer');
+  setMascot();
+  if (t.status === 'running') ensureRingLoop();
   updateAmbient();
   publishPresence();
   renderClock();
@@ -1708,12 +2371,15 @@ function renderToday() {
   const goal = S.settings.goalMin;
   const { cur, longest } = computeStreaks(idx);
   $('#todayDate').textContent = today.toLocaleDateString([], { weekday: 'long', day: 'numeric', month: 'short' });
-  $('#curStreak').innerHTML  = `${cur}<small>${cur === 1 ? 'day' : 'days'}</small>`;
+  const grew = lastStreak !== null && cur > lastStreak;
+  lastStreak = cur;
+  $('#curStreak').innerHTML = `<span class="flame${cur ? ' lit' : ''}${grew ? ' flare' : ''}">${iconSVG(ICONS.flame, 22)}</span>` +
+    `<span class="sn${grew ? ' roll' : ''}">${cur}</span><small>${cur === 1 ? 'day' : 'days'}</small>`;
   $('#bestStreak').innerHTML = `${longest}<small>${longest === 1 ? 'day' : 'days'}</small>`;
   $('#todayText').textContent = `${fmtMin(mins)} of ${fmtMin(goal)}${mins >= goal ? ' · goal met ✓' : ''}`;
   const pct = Math.min(100, Math.round(mins / goal * 100));
   $('#todayPct').textContent = pct + '%';
-  $('#todayBar').style.width = pct + '%';
+  $('#todayBar').style.transform = `translateX(${pct - 100}%)`;
 }
 
 /* ==========================================================================
@@ -1771,7 +2437,7 @@ function barChart(cols, { goal = 0, height = 240, width = 0 } = {}) {
   const yMax = niceMax(Math.max(goal, 30, ...cols.map(c => c.total)));
   const cw = (W - L - R) / cols.length, bw = Math.min(cw * 0.64, 46);
   const yOf = v => T + plotH * (1 - v / yMax);
-  let svg = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img">`;
+  let svg = `<svg class="chart bars" viewBox="0 0 ${W} ${H}" role="img">`;
 
   const ticks = (yMax / 4) % 15 === 0 ? 4 : 3; // keep gridlines on round minute values
   for (let i = 0; i <= ticks; i++) {
@@ -1787,7 +2453,7 @@ function barChart(cols, { goal = 0, height = 240, width = 0 } = {}) {
     for (const seg of c.segs) {
       const h = seg.min / yMax * plotH;
       y -= h;
-      svg += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(h, 0).toFixed(1)}" rx="2" style="fill:${seg.color}" data-tip="${esc(`${c.tip} · ${seg.name}: ${fmtMin(seg.min)} (total ${fmtMin(c.total)})`)}"/>`;
+      svg += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(h, 0).toFixed(1)}" rx="2" style="fill:${seg.color};--i:${i};transform-origin:0 ${H - B}px" data-tip="${esc(`${c.tip} · ${seg.name}: ${fmtMin(seg.min)} (total ${fmtMin(c.total)})`)}"/>`;
     }
     if (!c.segs.length) svg += `<rect x="${x.toFixed(1)}" y="${T}" width="${bw.toFixed(1)}" height="${plotH}" fill="transparent" data-tip="${esc(c.tip + ' · no focus')}"/>`;
     const cx = (x + bw / 2).toFixed(1);
@@ -1802,7 +2468,7 @@ function dayTimeline(day, sessions) {
   const W = chartWidth(), H = 92, PX = 12, T = 10, BH = 44;
   const t0 = day.getTime(), t1 = addDays(day, 1).getTime();
   const xOf = t => PX + (t - t0) / (t1 - t0) * (W - 2 * PX);
-  let svg = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img">`;
+  let svg = `<svg class="chart timeline" viewBox="0 0 ${W} ${H}" role="img">`;
   svg += `<rect x="${PX}" y="${T}" width="${W - 2 * PX}" height="${BH}" rx="6" style="fill:var(--heat0)"/>`;
   const step = W < 500 ? 6 : 3; // fewer hour labels on narrow screens
   for (let h = 0; h <= 24; h += step) {
@@ -1843,13 +2509,13 @@ function monthHeat(r, idx) {
   const rows = Math.ceil((lead + days.length) / 7);
   const C = 44, G = 6, T = 22, W = 7 * (C + G) - G, H = T + rows * (C + G) - G;
   const todayK = dayKey(new Date());
-  let svg = `<svg class="chart" viewBox="0 0 ${W} ${H}" style="max-width:420px;margin:0 auto" role="img">`;
+  let svg = `<svg class="chart heat" viewBox="0 0 ${W} ${H}" style="max-width:420px;margin:0 auto" role="img">`;
   for (let c = 0; c < 7; c++) svg += `<text class="axis" x="${c * (C + G) + C / 2}" y="12" text-anchor="middle">${WEEKDAYS[(ws + c) % 7]}</text>`;
   days.forEach((d, i) => {
     const pos = lead + i, x = (pos % 7) * (C + G), y = T + Math.floor(pos / 7) * (C + G);
     const min = (idx[dayKey(d)] || {}).total || 0, lv = heatLevel(min);
     const tip = `${d.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' })} · ${fmtMin(min)}`;
-    svg += `<g data-tip="${esc(tip)}"><rect x="${x}" y="${y}" width="${C}" height="${C}" rx="8" style="fill:var(--heat0)"/>`;
+    svg += `<g data-tip="${esc(tip)}" style="--i:${(pos % 7) + Math.floor(pos / 7)}"><rect x="${x}" y="${y}" width="${C}" height="${C}" rx="8" style="fill:var(--heat0)"/>`;
     if (lv) svg += `<rect x="${x}" y="${y}" width="${C}" height="${C}" rx="8" style="fill:var(--accent);opacity:${HEAT_OPACITY[lv]}"/>`;
     if (dayKey(d) === todayK) svg += `<rect x="${x + 1}" y="${y + 1}" width="${C - 2}" height="${C - 2}" rx="7" fill="none" style="stroke:var(--text);stroke-width:1.5"/>`;
     svg += `<text x="${x + C / 2}" y="${y + C / 2 + 4}" text-anchor="middle" style="font-size:12px;fill:${lv >= 3 ? '#fff' : 'var(--text)'}">${d.getDate()}</text></g>`;
@@ -1863,7 +2529,7 @@ function yearHeat(r, idx) {
   const lead = (r.start.getDay() - ws + 7) % 7;
   const cols = Math.ceil((lead + days.length) / 7);
   const C = 11, G = 3, L = 30, T = 18, W = L + cols * (C + G), H = T + 7 * (C + G);
-  let svg = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img">`;
+  let svg = `<svg class="chart heat" viewBox="0 0 ${W} ${H}" role="img">`;
   for (let row = 1; row < 7; row += 2) svg += `<text class="axis" x="0" y="${T + row * (C + G) + C - 1}">${WEEKDAYS[(ws + row) % 7]}</text>`;
   for (let m = 0; m < 12; m++) {
     const first = new Date(r.start.getFullYear(), m, 1);
@@ -1877,8 +2543,8 @@ function yearHeat(r, idx) {
     const tip = `${d.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })} · ${fmtMin(min)}`;
     const future = d > today ? ';opacity:.45' : '';
     svg += lv
-      ? `<rect x="${x}" y="${y}" width="${C}" height="${C}" rx="2" style="fill:var(--accent);opacity:${HEAT_OPACITY[lv]}" data-tip="${esc(tip)}"/>`
-      : `<rect x="${x}" y="${y}" width="${C}" height="${C}" rx="2" style="fill:var(--heat0)${future}" data-tip="${esc(tip)}"/>`;
+      ? `<rect x="${x}" y="${y}" width="${C}" height="${C}" rx="2" style="fill:var(--accent);opacity:${HEAT_OPACITY[lv]};--i:${Math.floor(pos / 7)}" data-tip="${esc(tip)}"/>`
+      : `<rect x="${x}" y="${y}" width="${C}" height="${C}" rx="2" style="fill:var(--heat0)${future};--i:${Math.floor(pos / 7)}" data-tip="${esc(tip)}"/>`;
   });
   return svg + '</svg>';
 }
@@ -2003,6 +2669,7 @@ function renderSettings() {
   $('#setNotify').checked = st.notify;
   $('#setAuto').checked = st.autoStart;
   $('#setGame').checked = st.gamification;
+  $('#setMotion').value = motion();
   renderPrivacy();
   $('#setAmbVol').value = st.ambientVolume;
   const perm = 'Notification' in window ? Notification.permission : 'unsupported';
@@ -2046,7 +2713,7 @@ const GOAL_BONUS = 10;
 const GOAL_BONUS_MIN = 25;   // a day only earns the goal bonus with at least 25 min, whatever the goal setting
 const STREAK_BONUS = { 3: 15, 7: 40, 30: 200, 100: 750 };
 const MAX_FREEZES = 2;
-const REDUCED = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+const REDUCED = () => motion() !== 'full';
 const fmtNum = n => Math.round(n).toLocaleString();
 
 function normalizeGame(g) {
@@ -2395,7 +3062,7 @@ function announce(news, mode) {
     if (n.type === 'freeze') toast(`Streak Freeze used for ${n.n === 1 ? 'a missed day' : n.n + ' missed days'} — your streak is safe`, 4000);
     else if (mode !== 'loud') continue;
     else if (n.type === 'streak') toast(`${n.m}-day streak · +${STREAK_BONUS[n.m]} coins`);
-    else if (n.type === 'ach') toast(`Achievement · ${n.a.name} · +${n.a.coins} coins`);
+    else if (n.type === 'ach') showAchCard(n.a);
   }
 }
 
@@ -2431,19 +3098,22 @@ function buyItem(id) {
   if (g.balance < it.price) { toast(`You need ${it.price - g.balance} more coins`); return; }
   if (!confirm(`Buy “${it.name}” for ${it.price} coins?`)) return;
   S.game.purchases['b' + uid()] = { item: id, price: it.price, at: Date.now() };
+  if (it.cat !== 'freeze') markEquipped(id);
   if (it.cat === 'extra') S.game.equipped[id] = true;
   else if (it.cat !== 'freeze') S.game.equipped[it.cat] = id;
   G = null;
   save();
   applyCosmetics();
-  toast(it.cat === 'freeze' ? 'Streak Freeze added' : `${it.name} is yours`);
+  toast(it.cat === 'freeze' ? 'Streak Freeze added' : `${it.name} is yours`, 2600, true);
   announce(reconcileRewards('collect'), 'loud');
   renderProfile();
+  coinDrop(document.querySelector(`#shopView .item[data-id="${id}"] .pv`));
 }
 function equipItem(id) {
   const it = ITEM_BY_ID[id];
   if (!it || !isOwned(id)) return;
   S.game.equipped[it.cat] = id;
+  markEquipped(id);
   save();
   applyCosmetics();
   renderProfile();
@@ -2451,6 +3121,7 @@ function equipItem(id) {
 function toggleExtra(id) {
   if (!isOwned(id)) return;
   S.game.equipped[id] = !extraOn(id);
+  if (S.game.equipped[id]) markEquipped(id);
   save();
   applyCosmetics();
   renderTimer();
@@ -2672,8 +3343,16 @@ const softOf = hex => { const n = parseInt(hex.slice(1), 16); return `rgba(${n >
 const systemDark = () => matchMedia('(prefers-color-scheme: dark)').matches;
 
 /** Light/dark/system setting + the equipped theme. Shop themes set CSS variables inline. */
+let themeReady = false, themeFadeTimer;
 function applyTheme(themeArg) {
   const root = document.documentElement;
+  // Colours crossfade instead of snapping (skipped on the very first paint).
+  if (themeReady && motion() !== 'off') {
+    root.classList.add('theme-fade');
+    clearTimeout(themeFadeTimer);
+    themeFadeTimer = setTimeout(() => root.classList.remove('theme-fade'), 480);
+  }
+  themeReady = true;
   const theme = themeArg || (USER ? S.settings.theme : 'auto');
   const skinId = USER ? equippedId('theme') : 'th_default';
   const skin = SKINS[skinId];
@@ -2863,9 +3542,15 @@ function renderHeaderChip() {
   $('#profileTabBtn').classList.toggle('hidden', !on);
   if (!on) { if (S.ui.tab === 'profile') showTab('timer'); return; }
   const g = game(), col = NAME_COLORS[equippedId('color')];
-  $('#lvChip').innerHTML = badgeSVG(g.tier, { size: 22, frame: equippedId('frame') }) +
+  const goalPct = Math.min(100, Math.round(((g.idx[dayKey(new Date())] || {}).total || 0) / S.settings.goalMin * 100));
+  const fromPct = lastGoalPct ?? goalPct;
+  $('#lvChip').innerHTML = `<span class="gring" title="Today: ${goalPct}% of your daily goal"><svg viewBox="0 0 36 36" aria-hidden="true"><circle class="gt" cx="18" cy="18" r="16"/>` +
+    `<circle class="gp" cx="18" cy="18" r="16" pathLength="100" stroke-dasharray="100" style="stroke-dashoffset:${100 - fromPct}"/></svg>` +
+    badgeSVG(g.tier, { size: 20, frame: equippedId('frame') }) + '</span>' +
     `<span class="uname"${col ? ` style="color:${col}"` : ''}>${esc(USER.guest ? 'You' : '@' + USER.username)}</span><span class="lvn">Lv ${g.lv.level}</span>`;
   $('#lvChip').title = `${g.tier.name} · Level ${g.lv.level} · ${fmtNum(g.lv.need - g.lv.into)} XP to level ${g.lv.level + 1}`;
+  if (fromPct !== goalPct) { const gp = $('#lvChip .gp'); void gp.getBoundingClientRect(); requestAnimationFrame(() => { gp.style.strokeDashoffset = 100 - goalPct; }); }
+  lastGoalPct = goalPct;
 }
 
 function renderProfile() {
@@ -2906,15 +3591,15 @@ function renderProgress() {
           <div style="flex:1;min-width:0">
             <div class="tiername">${g.tier.name}</div>
             <div class="big">Level ${lv.level}</div>
-            <div class="xpbar"><i style="width:${(lv.into / lv.need * 100).toFixed(1)}%"></i></div>
+            <div class="xpbar"><i data-fill="${(lv.into / lv.need * 100).toFixed(1)}" data-fill-key="xp"></i></div>
             <div class="lbl">${fmtNum(lv.into)} / ${fmtNum(lv.need)} XP · ${fmtNum(lv.need - lv.into)} to level ${lv.level + 1}</div>
             ${next ? `<div class="lbl">${next.name} at level ${next.min}</div>` : ''}
           </div>
         </div>
         <div class="tiles4">
-          ${tile(`<span class="coins">${COIN_SVG}${fmtNum(g.balance)}</span>`, 'Coins')}
+          ${tile(`<span class="coins">${COIN_SVG}<span data-count="coins" data-val="${g.balance}">${fmtNum(g.balance)}</span></span>`, 'Coins')}
           ${tile((g.focusMs / 3.6e6).toFixed(1) + 'h', 'Lifetime focus')}
-          ${tile(fmtNum(g.xp), 'Total XP')}
+          ${tile(`<span data-count="xp" data-val="${g.xp}">${fmtNum(g.xp)}</span>`, 'Total XP')}
           ${tile(`${g.freezesHeld}/${MAX_FREEZES}`, 'Streak freezes')}
         </div>
         <div class="card"><h2>Badges</h2><div class="tiergrid">${tiers}</div></div>
@@ -2924,6 +3609,8 @@ function renderProgress() {
         <div class="achlist">${achs}</div>
       </div>
     </div>`;
+  animateCounts($('#progressView'));
+  animateFills($('#progressView'));
 }
 
 function ringPreview(id) {
@@ -2972,8 +3659,9 @@ function itemCard(it, g) {
   const canPreview = ['sound', 'ambient', 'effect'].includes(it.cat) && !['amb_none', 'fx_none'].includes(it.id);
   const play = canPreview ? `<button class="iconbtn sm" data-preview="${it.id}" title="Preview" aria-label="Preview ${esc(it.name)}">${PLAY_SVG}</button>` : '';
   const state = equipped ? 'Equipped' : owned && it.price ? 'Owned' : '';
-  return `<div class="item${equipped ? ' equipped' : ''}${locked ? ' locked' : ''}">
-    <div class="pv">${previewFor(it, g)}${state ? `<span class="tag">${state}</span>` : ''}</div>
+  const fresh = equipped && it.id === justEquipped;
+  return `<div class="item${equipped ? ' equipped' : ''}${locked ? ' locked' : ''}" data-id="${it.id}">
+    <div class="pv">${previewFor(it, g)}${state ? `<span class="tag">${fresh ? CHECK_SVG : ''}${state}</span>` : ''}</div>
     <div class="nm">${esc(it.name)}</div>
     <div class="ds">${esc(it.desc)}${isFreeze ? ` · You hold ${g.freezesHeld}/${MAX_FREEZES}` : ''}</div>
     <div class="act">${play}${btn}</div></div>`;
@@ -2984,12 +3672,13 @@ function renderShop() {
   if (cat === 'font') items.forEach(i => loadFont(i.id, true));
   $('#shopView').innerHTML = `
     <div class="shop-head">
-      <div class="big coins">${COIN_SVG}${fmtNum(g.balance)}</div>
+      <div class="big coins">${COIN_SVG}<span data-count="coins" data-val="${g.balance}">${fmtNum(g.balance)}</span></div>
       <div class="lbl">5 coins per session · +10 on daily-goal days · bonuses for streaks and achievements. Everything here is cosmetic.</div>
     </div>
     <div class="catrow" id="shopCats">${SHOP_CATS.map(([id, n]) => `<button data-cat="${id}" class="${id === cat ? 'active' : ''}">${n}</button>`).join('')}</div>
     ${cat === 'ambient' ? `<div class="card amb-vol"><label class="row between"><span>Ambient volume</span><input type="range" id="shopAmbVol" min="0" max="1" step="0.05" value="${S.settings.ambientVolume}"></label><div class="lbl">Plays only while a focus block is running. The mute button silences it too.</div></div>` : ''}
     <div class="shopgrid">${items.map(it => itemCard(it, g)).join('')}</div>`;
+  animateCounts($('#shopView'));
 }
 function previewItem(id) {
   const it = ITEM_BY_ID[id];
@@ -3010,6 +3699,7 @@ function showLevelUp(from, to) {
   dlg.classList.toggle('tierup', tierUp);
   dlg.style.setProperty('--tier', t.color);
   $('#lvBadge').innerHTML = badgeSVG(t, { size: tierUp ? 104 : 84, frame: equippedId('frame'), draw: true });
+  burstParticles($('#lvBadge'), tierUp ? 18 : 10);
   $('#lvKicker').textContent = tierUp ? 'New tier' : 'Level up';
   $('#lvTitle').textContent = tierUp ? t.name : `Level ${to}`;
   const next = TIERS.find(x => x.min > to);
@@ -3123,7 +3813,8 @@ function writePublic(col, data) {
   if (lastPub[col] === json) return null;
   lastPub[col] = json;
   const p = FB.setDoc(FB.doc(FB.db, col, USER.uid), { ...data, updatedAt: FB.serverTimestamp() });
-  trackWrite(p);
+  // A refused leaderboard update is retried automatically (see publishPublic), so it isn't shown as a sync error.
+  trackWrite(col === 'publicStats' ? p.catch(e => { if (e.code !== 'permission-denied') throw e; }) : p);
   return p;
 }
 function myPeriodStats() {
@@ -3230,12 +3921,12 @@ function onFriendshipsChanged() {
 }
 async function sendRequest(raw) {
   const name = String(raw || '').trim().replace(/^@/, '').toLowerCase();
-  if (!/^[a-z0-9_]{3,20}$/.test(name)) { toast('Enter a username: 3–20 letters, numbers or _'); return; }
+  if (!/^[a-z0-9_]{3,20}$/.test(name)) { toast('Enter a username: 3–20 letters, numbers or _'); shake($('#addFriendName')); return; }
   if (name === USER.username) { toast('That’s you!'); return; }
   if (friendsList().length >= MAX_FRIENDS) { toast(`You can have up to ${MAX_FRIENDS} friends`); return; }
   try {
     const reg = await FB.getDoc(FB.doc(FB.db, 'usernames', name));
-    if (!reg.exists()) { toast(`No one is called @${name}`); return; }
+    if (!reg.exists()) { toast(`No one is called @${name}`); shake($('#addFriendName')); return; }
     const to = reg.data().uid;
     if (SOC.blocked[to] !== undefined) { toast(`You’ve blocked @${name}. Unblock them in Settings first.`); return; }
     const ex = SOC.friendships.find(f => f.users.includes(to));
@@ -3246,7 +3937,7 @@ async function sendRequest(raw) {
     await FB.setDoc(FB.doc(FB.db, 'friendships', users.join('_')), {
       users, from: USER.uid, to, status: 'pending', fromName: USER.username, toName: name, createdAt: FB.serverTimestamp(),
     });
-    toast(`Friend request sent to @${name}`);
+    toast(`Friend request sent to @${name}`, 2600, true);
   } catch (e) {
     console.warn(e);
     toast(e.code === 'permission-denied' ? `Couldn’t send a request to @${name}` : 'No connection — try again when online');
@@ -3254,7 +3945,7 @@ async function sendRequest(raw) {
 }
 async function acceptRequest(id) {
   if (friendsList().length >= MAX_FRIENDS) { toast(`You can have up to ${MAX_FRIENDS} friends`); return; }
-  try { await FB.updateDoc(FB.doc(FB.db, 'friendships', id), { status: 'accepted', acceptedAt: FB.serverTimestamp() }); }
+  try { await FB.updateDoc(FB.doc(FB.db, 'friendships', id), { status: 'accepted', acceptedAt: FB.serverTimestamp() }); toast('You’re now friends', 2600, true); }
   catch (e) { toast('Couldn’t accept — try again'); }
 }
 async function removeFriendship(id, msg) {
@@ -3279,7 +3970,7 @@ async function shareInvite() {
   const url = inviteLink();
   try {
     if (navigator.share) await navigator.share({ title: 'Pomodorolist', text: `Focus with me on Pomodorolist — I’m @${USER.username}`, url });
-    else { await navigator.clipboard.writeText(url); toast('Invite link copied'); }
+    else { await navigator.clipboard.writeText(url); toast('Invite link copied', 2600, true); }
   } catch (e) { /* share cancelled */ }
 }
 /** ?invite=username opens a "Send request?" prompt once the user is signed in. */
@@ -3306,6 +3997,7 @@ function onInbox(qs) {
     if (SOC.inboxSeen.has(d.id)) continue;
     SOC.inboxSeen.add(d.id);
     if (shown++ < 3) {
+      if (shown === 1) floatEmoji(it.emoji);
       if (it.type === 'nudge') toast(`@${it.fromName}: Time to focus? 👀`, 4000);
       else toast(`@${it.fromName} sent ${it.emoji} for your ${String(it.target).startsWith('st_') ? 'streak' : 'session'}`, 3500);
     }
@@ -3320,7 +4012,7 @@ async function sendReaction(uid, type, emoji, target) {
   if (type === 'nudge') data.day = dayKey(new Date()); else data.target = target;
   SOC.sent.add(key);
   writeLS(lsKey('sent'), [...SOC.sent].slice(-300));
-  try { await FB.setDoc(FB.doc(FB.db, 'inbox', uid, 'items', id), data); toast(type === 'nudge' ? 'Nudge sent 👀' : `Sent ${emoji}`); }
+  try { await FB.setDoc(FB.doc(FB.db, 'inbox', uid, 'items', id), data); toast(type === 'nudge' ? 'Nudge sent 👀' : `Sent ${emoji}`, 2600, true); }
   catch (e) { toast(type === 'nudge' ? 'You’ve already nudged them today' : 'Kudos already sent'); }
   if (SOC.friend) renderFriends();
 }
@@ -3475,7 +4167,7 @@ async function startChallenge(preset) {
       preset, weekKey: wk, creator: USER.uid, members: [USER.uid], invited: friendsList().map(otherUid).slice(0, 100),
       names: { [USER.uid]: USER.username }, progress: { [USER.uid]: challengeProgress(preset, wk) }, createdAt: FB.serverTimestamp(),
     });
-    toast('Challenge started — your friends can join this week');
+    toast('Challenge started — your friends can join this week', 2600, true);
     loadChallenges(true);
   } catch (e) { toast('Couldn’t start the challenge — try again'); }
 }
@@ -3486,7 +4178,7 @@ async function joinChallenge(id) {
     await FB.updateDoc(FB.doc(FB.db, 'challenges', id), {
       members: FB.arrayUnion(USER.uid), ['names.' + USER.uid]: USER.username, ['progress.' + USER.uid]: challengeProgress(c.preset, c.weekKey),
     });
-    toast('Joined — good luck!');
+    toast('Joined — good luck!', 2600, true);
     loadChallenges(true);
   } catch (e) { toast('Couldn’t join — try again'); }
 }
@@ -3512,7 +4204,7 @@ function renderFriends(fromLoad) {
     return;
   }
   if (localOnly || !socialReady()) {
-    body.innerHTML = `<div class="card empty-card"><p class="muted">${localOnly ? 'Friends need an internet connection. Your timer and stats still work offline.' : 'Loading…'}</p></div>`;
+    body.innerHTML = `<div class="card empty-card"><p class="muted">${localOnly ? 'Friends need an internet connection. Your timer and stats still work offline.' : ''}</p>${localOnly ? '' : skelRows(3)}</div>`;
     return;
   }
   if (SOC.friend) { renderFriendProfile(fromLoad); return; }
@@ -3643,15 +4335,18 @@ async function renderBoard(fromLoad) {
   const key = `${scope}|${period}|${periodKey(period)}|${S.settings.weekStart}`, c = SOC.lb[key];
   if (!c || Date.now() - c.at > CACHE_MS) {
     if (!fromLoad || !c) {
-      $('#friendsBody').innerHTML = head + '<div class="card"><div class="empty">Loading…</div></div>';
+      if ($('#friendsBody .lb li[data-uid]')) SOC.flipFrom = flipCapture('#friendsBody .lb:not(.pinned) li[data-uid]');
+      $('#friendsBody').innerHTML = head + `<div class="card">${skelRows(5)}</div>`;
       loadLeaderboard(scope, period).then(() => { if (S.ui.tab === 'friends' && S.ui.friendsView === 'board') renderBoard(true); });
       return;
     }
   }
   const res = c || { rows: [] };
+  const rowSel = '#friendsBody .lb:not(.pinned) li[data-uid]';
+  const before = $('#friendsBody .lb li[data-uid]') ? flipCapture(rowSel) : SOC.flipFrom;
   const row = r => {
     const t = tierById(r.tier), col = NAME_COLORS[r.color], me = r.uid === USER.uid;
-    return `<li class="${me ? 'me' : ''}${r.rank <= 3 ? ' top' + r.rank : ''}"${!me && scope === 'friends' ? ` data-open="${r.uid}"` : ''}>
+    return `<li class="${me ? 'me' : ''}${r.rank <= 3 ? ' top' + r.rank : ''}" data-uid="${r.uid}"${!me && scope === 'friends' ? ` data-open="${r.uid}"` : ''}>
       <span class="rk">${r.rank}</span>${badgeSVG(t, { size: 26, frame: r.frame })}
       <span class="nm"${col ? ` style="color:${col}"` : ''}>@${esc(r.username)}${me ? ' <span class="lbl">(you)</span>' : ''}</span>
       <span class="v">${fmtMin(r.minutes)}</span></li>`;
@@ -3665,6 +4360,11 @@ async function renderBoard(fromLoad) {
       ${res.myRow ? `<ol class="lb pinned">${row(res.myRow)}</ol>` : ''}
       ${note}
     </div>`;
+  if (SOC.lbShown !== key) {   // animate when a board is first shown, not on background refreshes
+    SOC.lbShown = key;
+    if (!flipPlay(before, rowSel)) animateIn($('#friendsBody'));
+  }
+  SOC.flipFrom = null;
 }
 
 function renderChallenges(fromLoad) {
@@ -3677,7 +4377,7 @@ function renderChallenges(fromLoad) {
       const v = uid === USER.uid ? challengeProgress(c.preset, c.weekKey) : (c.progress[uid] || 0);
       const pct = Math.min(100, v / p.goal * 100);
       const val = p.unit === 'min' ? `${fmtMin(v)} / ${fmtMin(p.goal)}` : `${v} / ${p.goal}`;
-      return `<div class="cp${uid === USER.uid ? ' me' : ''}"><span class="nm">@${esc(c.names[uid] || '?')}</span><span class="bar"><i style="width:${pct.toFixed(1)}%"></i></span><span class="lbl">${val}</span></div>`;
+      return `<div class="cp${uid === USER.uid ? ' me' : ''}"><span class="nm">@${esc(c.names[uid] || '?')}</span><span class="bar"><i data-fill="${pct.toFixed(1)}" data-fill-key="c${c.id}${uid}"></i></span><span class="lbl">${val}</span></div>`;
     }).join('');
     return `<div class="card chal"><div class="row between"><b>${p.name}</b><span class="lbl">${done ? '✓ ' : ''}${COIN_SVG} +${p.coins}</span></div>
       <div class="lbl" style="margin-bottom:10px">Started by @${esc(c.names[c.creator] || '?')} · ${c.members.length} joined</div>${people}
@@ -3689,7 +4389,8 @@ function renderChallenges(fromLoad) {
     <div class="card"><h2>Start a challenge this week</h2>
       <p class="lbl" style="margin:-4px 0 10px">Runs Monday to Sunday (week of ${fmtShort(new Date(wk + 'T00:00'))}). All your friends are invited; finishing it earns bonus coins.</p>
       <div class="btn-row">${starters || '<span class="lbl">You’ve started every challenge this week.</span>'}</div></div>
-    <div class="stack" style="margin-top:16px">${cards || '<div class="card"><div class="empty">No challenges this week yet.</div></div>'}</div>`;
+    <div class="stack chal-list" style="margin-top:16px">${cards || (SOC.challenges ? '<div class="card"><div class="empty">No challenges this week yet.</div></div>' : `<div class="card">${skelRows(2)}</div>`)}</div>`;
+  animateFills($('#friendsBody'));
 }
 
 /* ---------- A friend's profile ---------- */
@@ -3697,7 +4398,7 @@ async function openFriend(uid) {
   SOC.friend = { uid, tab: 'activity' };
   renderFriends();
   await Promise.all([getPublic('publicProfiles', uid, 60000), getPublic('activity', uid, 60000), getPublic('presence', uid, 30000), getPublic('publicStats', uid, 60000)]);
-  if (SOC.friend && SOC.friend.uid === uid) renderFriends(true);
+  if (SOC.friend && SOC.friend.uid === uid) { renderFriends(true); viewIn($('#friendsBody')); animateIn($('#friendsBody')); }
 }
 function friendStreak(act) {
   if (!act || act.denied || !act.goalDays) return 0;
@@ -3714,7 +4415,7 @@ function renderFriendProfile() {
   const name = f ? otherName(f) : (cached('publicProfiles', uid) || {}).username || '';
   const prof = cached('publicProfiles', uid), act = cached('activity', uid), pres = cached('presence', uid);
   const back = '<button class="linkbtn back" id="friendBack">‹ Friends</button>';
-  if (prof === undefined) { $('#friendsBody').innerHTML = back + '<div class="card"><div class="empty">Loading…</div></div>'; return; }
+  if (prof === undefined) { $('#friendsBody').innerHTML = back + `<div class="card">${skelRows(1)}</div><div class="card" style="margin-top:16px"><span class="skel block"></span></div>`; return; }
   if (!prof || prof.denied) { $('#friendsBody').innerHTML = back + '<div class="card"><div class="empty">This profile isn’t available.</div></div>'; return; }
   const t = tierById(prof.tier), col = NAME_COLORS[prof.color], gameOn = S.settings.gamification;
   const isFriend = f && f.status === 'accepted';
@@ -3767,15 +4468,15 @@ function twelveWeeks(days) {
   const ws = S.settings.weekStart, today = startOfDay(new Date());
   const start = addDays(weekStartOf(today, ws), -77);
   const C = 14, G = 4, L = 30, T = 4, W = L + 12 * (C + G), H = T + 7 * (C + G);
-  let svg = `<svg class="chart" viewBox="0 0 ${W} ${H}" style="max-width:${Math.round(W * 1.15)}px" role="img">`;
+  let svg = `<svg class="chart heat" viewBox="0 0 ${W} ${H}" style="max-width:${Math.round(W * 1.15)}px" role="img">`;
   for (let row = 1; row < 7; row += 2) svg += `<text class="axis" x="0" y="${T + row * (C + G) + C - 2}">${WEEKDAYS[(ws + row) % 7]}</text>`;
   for (let i = 0; i < 84; i++) {
     const d = addDays(start, i);
     if (d > today) break;
     const m = days[dayKey(d)] || 0, lv = m <= 0 ? 0 : m < 30 ? 1 : m < 60 ? 2 : m < 120 ? 3 : 4;
     const x = L + Math.floor(i / 7) * (C + G), y = T + (i % 7) * (C + G);
-    svg += lv ? `<rect x="${x}" y="${y}" width="${C}" height="${C}" rx="3" style="fill:var(--accent);opacity:${HEAT_OPACITY[lv]}"><title>${fmtShort(d)} · ${fmtMin(m)}</title></rect>`
-      : `<rect x="${x}" y="${y}" width="${C}" height="${C}" rx="3" style="fill:var(--heat0)"><title>${fmtShort(d)} · 0m</title></rect>`;
+    svg += lv ? `<rect x="${x}" y="${y}" width="${C}" height="${C}" rx="3" style="fill:var(--accent);opacity:${HEAT_OPACITY[lv]};--i:${Math.floor(i / 7)}"><title>${fmtShort(d)} · ${fmtMin(m)}</title></rect>`
+      : `<rect x="${x}" y="${y}" width="${C}" height="${C}" rx="3" style="fill:var(--heat0);--i:${Math.floor(i / 7)}"><title>${fmtShort(d)} · 0m</title></rect>`;
   }
   return svg + '</svg>';
 }
@@ -3785,11 +4486,11 @@ function compareView(act, name) {
   const mine = [], theirs = [];
   for (let i = 0; i < 7; i++) { const k = dayKey(addDays(start, i)); mine.push((idx[k] || {}).total || 0); theirs.push(act.days[k] || 0); }
   const yMax = niceMax(Math.max(30, ...mine, ...theirs)), plot = H - T - B, cw = (W - L) / 7, bw = Math.min(cw * 0.3, 22);
-  let svg = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img">`;
+  let svg = `<svg class="chart bars" viewBox="0 0 ${W} ${H}" role="img">`;
   for (let i = 0; i <= 3; i++) { const y = T + plot * (1 - i / 3); svg += `<line class="grid" x1="${L}" x2="${W}" y1="${y}" y2="${y}"/><text class="axis" x="${L - 6}" y="${y + 4}" text-anchor="end">${i ? fmtMin(yMax * i / 3) : '0'}</text>`; }
   for (let i = 0; i < 7; i++) {
     const x = L + cw * i + cw / 2, d = addDays(start, i);
-    const bar = (v, dx, col, who) => { const h = v / yMax * plot; return `<rect x="${(x + dx).toFixed(1)}" y="${(T + plot - h).toFixed(1)}" width="${bw}" height="${Math.max(0, h).toFixed(1)}" rx="2" style="fill:${col}"><title>${who} · ${WEEKDAYS[d.getDay()]} · ${fmtMin(v)}</title></rect>`; };
+    const bar = (v, dx, col, who) => { const h = v / yMax * plot; return `<rect x="${(x + dx).toFixed(1)}" y="${(T + plot - h).toFixed(1)}" width="${bw}" height="${Math.max(0, h).toFixed(1)}" rx="2" style="fill:${col};--i:${i};transform-origin:0 ${T + plot}px"><title>${who} · ${WEEKDAYS[d.getDay()]} · ${fmtMin(v)}</title></rect>`; };
     svg += bar(mine[i], -bw - 1, 'var(--accent)', 'You') + bar(theirs[i], 1, 'var(--muted)', '@' + name);
     svg += `<text class="axis-b" x="${x}" y="${H - B + 16}" text-anchor="middle">${WEEKDAYS[d.getDay()]}</text>`;
   }
@@ -3823,8 +4524,11 @@ function showTab(tab) {
   if (tab === 'stats') renderStats();
   if (tab === 'settings') renderSettings();
   if (tab === 'profile') renderProfile();
-  if (tab === 'friends') { SOC.friend = null; renderFriends(); }
+  if (tab === 'friends') { SOC.friend = null; SOC.lbShown = null; renderFriends(); }
+  document.body.classList.toggle('focus-dim', tab === 'timer' && S.timer.status === 'running' && S.timer.phase === 'focus');
+  if (tab === 'timer') ensureRingLoop();
   saveLocal();
+  animateIn($('#tab-' + tab));
 }
 function renderAll() {
   if (!USER) return;
@@ -3833,6 +4537,7 @@ function renderAll() {
   renderChips();
   renderToday();
   renderHeaderChip();
+  renderGreeting();
   if (S.ui.tab === 'stats') renderStats();
   if (S.ui.tab === 'profile') renderProfile();
 }
@@ -3938,9 +4643,10 @@ $('#statsSeg').addEventListener('click', e => {
   statsOffset = 0;
   saveLocal();
   renderStats();
+  animateIn($('#tab-stats'));
 });
-$('#prevBtn').addEventListener('click', () => { statsOffset--; renderStats(); });
-$('#nextBtn').addEventListener('click', () => { if (statsOffset < 0) { statsOffset++; renderStats(); } });
+$('#prevBtn').addEventListener('click', () => { statsOffset--; renderStats(); animateIn($('#tab-stats')); });
+$('#nextBtn').addEventListener('click', () => { if (statsOffset < 0) { statsOffset++; renderStats(); animateIn($('#tab-stats')); } });
 
 // Chart tooltips (tap on mobile, hover on desktop) + delete session
 function showTip(e) {
@@ -3978,6 +4684,12 @@ $('#setTheme').addEventListener('change', e => { S.settings.theme = e.target.val
 $('#setSound').addEventListener('change', e => { S.settings.sound = e.target.checked; save(); renderTimer(); });
 $('#setAuto').addEventListener('change', e => { S.settings.autoStart = e.target.checked; save(); });
 $('#setAmbVol').addEventListener('input', e => setAmbientVolume(e.target.value));
+$('#setMotion').addEventListener('change', e => {
+  localStorage.setItem(MOTION_KEY, e.target.value);   // device preference, not synced
+  applyMotion();
+  renderTimer();
+  toast(`Animations: ${e.target.selectedOptions[0].textContent}`, 2000, true);
+});
 $('#setGame').addEventListener('change', e => {
   S.settings.gamification = e.target.checked;
   save();
@@ -3988,13 +4700,13 @@ $('#setGame').addEventListener('change', e => {
 $('#tab-friends').addEventListener('click', e => {
   const t = e.target;
   const seg = t.closest('#friendsSeg button');
-  if (seg) { S.ui.friendsView = seg.dataset.view; SOC.friend = null; saveLocal(); renderFriends(); return; }
+  if (seg) { S.ui.friendsView = seg.dataset.view; SOC.friend = null; SOC.lbShown = null; saveLocal(); renderFriends(); viewIn($('#friendsBody')); animateIn($('#friendsBody')); return; }
   if (t.closest('#guestLogin')) { logout(); return; }
   if (t.closest('#shareInvite')) { shareInvite(); return; }
   if (t.closest('#refreshFriends')) { loadFriendsPublic(true); return; }
   if (t.closest('#recapClose')) { writeLS(lsKey('recap'), SOC.recap ? SOC.recap.wk : ''); renderFriends(true); return; }
   if (t.closest('#recapShare')) { shareRecap(); return; }
-  if (t.closest('#friendBack')) { SOC.friend = null; renderFriends(); return; }
+  if (t.closest('#friendBack')) { SOC.friend = null; renderFriends(); viewIn($('#friendsBody')); animateIn($('#friendsBody')); return; }
   if (t.closest('#lbRefresh')) { SOC.lb = {}; renderFriends(); return; }
   if (t.closest('#goPrivacy')) { showTab('settings'); $('#privacyCard').scrollIntoView({ behavior: 'smooth' }); return; }
   if (t.closest('#nudgeBtn')) { sendReaction(SOC.friend.uid, 'nudge', '👀'); return; }
@@ -4003,7 +4715,7 @@ $('#tab-friends').addEventListener('click', e => {
   const d = b.dataset;
   if (d.scope) { S.ui.lbScope = d.scope; saveLocal(); renderFriends(); }
   else if (d.period) { S.ui.lbPeriod = d.period; saveLocal(); renderFriends(); }
-  else if (d.fptab) { SOC.friend.tab = d.fptab; renderFriends(true); }
+  else if (d.fptab) { SOC.friend.tab = d.fptab; renderFriends(true); animateIn($('#friendsBody')); }
   else if (d.accept) acceptRequest(d.accept);
   else if (d.decline) removeFriendship(d.decline, 'Request declined');
   else if (d.cancel) removeFriendship(d.cancel, 'Request cancelled');
@@ -4028,9 +4740,9 @@ $('#blockedList').addEventListener('click', e => { const b = e.target.closest('[
 $('#lvChip').addEventListener('click', () => { S.ui.profileView = 'progress'; showTab('profile'); });
 $('#tab-profile').addEventListener('click', e => {
   const seg = e.target.closest('#profileSeg button');
-  if (seg) { S.ui.profileView = seg.dataset.view; saveLocal(); renderProfile(); return; }
+  if (seg) { S.ui.profileView = seg.dataset.view; saveLocal(); renderProfile(); animateIn($('#tab-profile')); return; }
   const cat = e.target.closest('[data-cat]');
-  if (cat) { S.ui.shopCat = cat.dataset.cat; saveLocal(); renderShop(); return; }
+  if (cat) { S.ui.shopCat = cat.dataset.cat; saveLocal(); renderShop(); animateIn($('#shopView')); return; }
   const b = e.target.closest('[data-buy],[data-equip],[data-toggle-extra],[data-preview]');
   if (!b) return;
   if (b.dataset.buy) buyItem(b.dataset.buy);
@@ -4059,7 +4771,7 @@ $('#exportBtn').addEventListener('click', () => {
   a.click();
   a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-  toast('Backup downloaded');
+  toast('Backup downloaded', 2600, true);
 });
 $('#importBtn').addEventListener('click', () => $('#importFile').click());
 $('#importFile').addEventListener('change', async e => {
@@ -4071,7 +4783,7 @@ $('#importFile').addEventListener('change', async e => {
     if (!data || !Array.isArray(data.sessions)) throw new Error('This is not a Pomodorolist backup file');
     if (!confirm(`Merge this backup (${data.sessions.length} sessions) into your data? Duplicates are skipped.`)) return;
     const added = mergeData(data);
-    toast(`Imported ${added} new session(s)`);
+    toast(`Imported ${added} new session(s)`, 2600, true);
   } catch (err) {
     alert('Could not import: ' + err.message);
   }
@@ -4141,7 +4853,7 @@ $('#presetForm').addEventListener('submit', e => {
   renderPresetList();
   fillPresetForm(null);
   renderAll();
-  toast(id ? 'Preset updated' : 'Preset added');
+  toast(id ? 'Preset updated' : 'Preset added', 2600, true);
 });
 
 /* ==========================================================================
@@ -4150,6 +4862,7 @@ $('#presetForm').addEventListener('submit', e => {
 let lastDay = dayKey(new Date());
 function tick() {
   if (!USER) return;
+  renderGreeting();
   const t = S.timer;
   if (t.status === 'running' && Date.now() >= t.endAt) { finishPhase('complete'); return; }
   renderClock();
