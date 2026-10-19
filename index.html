@@ -65,9 +65,47 @@ h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacin
 }
 .brand { font-weight: 600; display: flex; align-items: center; gap: 8px; letter-spacing: .01em; }
 .brand i { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); display: inline-block; }
-.tabs { display: flex; gap: 2px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px; }
-.tabs button { border: 0; background: none; padding: 6px 14px; border-radius: 999px; color: var(--muted); cursor: pointer; }
+.tabs { position: relative; display: flex; gap: 2px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px; }
+.tabs button {
+  position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 7px; border: 0; background: none;
+  padding: 7px 13px; border-radius: 999px; color: var(--muted); cursor: pointer; font-size: 14px; white-space: nowrap;
+}
+.tabs button svg { width: 17px; height: 17px; flex: none; }
 .tabs button.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.tabs.has-ind > button.active { background: transparent; }
+.tabs > .seg-ind { background: var(--accent-soft); }
+.hdr-right { display: flex; align-items: center; gap: 8px; }
+.coinpill {
+  display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px 5px 8px; border: 1px solid var(--line); border-radius: 999px;
+  background: var(--surface); cursor: pointer; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--text);
+}
+.coinpill .coin { width: 16px; height: 16px; }
+.coinpill:hover, .lvchip:hover { border-color: var(--muted); }
+/* Tablets: compact top bar with the label under each icon */
+@media (min-width: 641px) and (max-width: 940px) {
+  .sync b { display: none; }
+  .tabs { border-radius: 18px; }
+  .tabs button { flex-direction: column; gap: 2px; padding: 5px 11px; font-size: 11px; border-radius: 14px; }
+  .tabs > .seg-ind { border-radius: 14px; }
+  .lvchip .uname { display: none; }
+}
+/* Phones: fixed bottom tab bar (icon + label), Profile/Settings behind the header badge */
+@media (max-width: 640px) {
+  .tabs {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; justify-content: space-around; gap: 0;
+    border: 0; border-top: 1px solid var(--line); border-radius: 0; padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+    background: var(--surface);
+  }
+  .tabs button { flex: 1 1 0; min-width: 0; flex-direction: column; gap: 3px; padding: 4px 2px; font-size: 10.5px; border-radius: 12px; }
+  .tabs button span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+  .tabs button svg { width: 22px; height: 22px; }
+  .tabs button[data-tab="profile"] { display: none; }
+  .tabs.has-ind > .seg-ind { background: transparent; top: 6px; bottom: auto; height: 30px; }
+  .tabs > .seg-ind::before { content: ""; position: absolute; left: 50%; top: 0; width: 56px; height: 30px; margin-left: -28px; border-radius: 999px; background: var(--accent-soft); }
+  main { padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
+  .toasts { bottom: calc(84px + env(safe-area-inset-bottom)); }
+  .float-emoji { bottom: calc(160px + env(safe-area-inset-bottom)); }
+}
 
 /* Sync status indicator */
 .sync { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); margin-left: 6px; white-space: nowrap; }
@@ -377,17 +415,34 @@ input[type="range"] { accent-color: var(--accent); width: 160px; }
 /* ==========================================================================
    FRIENDS + LEADERBOARDS
    ========================================================================== */
-.tabs button { position: relative; display: inline-flex; align-items: center; gap: 6px; }
-.tabs button svg { display: none; width: 18px; height: 18px; }
-.tbadge {
-  position: absolute; top: -3px; right: -3px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 999px;
-  background: var(--danger); color: #fff; font-size: 10px; font-weight: 700; line-height: 16px; text-align: center; font-style: normal;
+.tbadge { position: absolute; top: 4px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--danger); box-shadow: 0 0 0 2px var(--surface); }
+@media (max-width: 940px) { .tbadge { right: calc(50% - 16px); top: 3px; } }
+:root[data-motion="full"] .tbadge:not(.hidden) { animation: dotPop .4s var(--spring) both; }
+@keyframes dotPop { from { transform: scale(0); } }
+.prof-acct { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+.prof-acct .acct-name { font-size: 16px; }
+.btn.icon-l { display: inline-flex; align-items: center; gap: 7px; }
+.btn.icon-l svg { width: 16px; height: 16px; }
+.cta-card { text-align: center; padding: 22px 16px; margin-top: 12px; border: 1px dashed var(--line); border-radius: 14px; }
+.cta-card p { margin: 0 0 12px; color: var(--muted); }
+.earn-card { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; padding: 14px 18px; }
+
+/* First-time tour: a spotlight that glides between the tabs */
+.tour { position: fixed; inset: 0; z-index: 120; }
+.tour-spot {
+  position: fixed; left: 0; top: 0; border-radius: 16px; pointer-events: none; outline: 2px solid var(--accent); outline-offset: 2px;
+  box-shadow: 0 0 0 9999px rgba(8, 10, 10, .55);
+  transition: transform .45s var(--spring-soft), width .45s var(--spring-soft), height .45s var(--spring-soft);
 }
-@media (max-width: 600px) {
-  .tabs button span { display: none; }
-  .tabs button svg { display: block; }
-  .tabs button { padding: 7px 10px; }
+.tour-tip {
+  position: fixed; left: 0; top: 0; width: min(290px, calc(100vw - 32px)); padding: 16px 16px 12px; border-radius: 16px;
+  background: var(--surface); color: var(--text); border: 1px solid var(--line); box-shadow: 0 18px 40px -16px rgba(0, 0, 0, .5);
+  transition: transform .45s var(--spring-soft), opacity .25s var(--ease);
 }
+.tour-step { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+.tour-text { font-size: 15px; margin: 4px 0 12px; }
+.tour-btns { display: flex; justify-content: space-between; align-items: center; }
+.tour-btns .btn.primary { min-width: 0; padding: 8px 20px; }
 .seg .cnt:not(:empty) { margin-left: 6px; font-size: 11px; padding: 0 6px; border-radius: 999px; background: var(--danger); color: #fff; }
 .empty-card { text-align: center; padding: 32px 18px; }
 .empty-card h3 { margin: 8px 0 4px; font-weight: 600; }
@@ -745,13 +800,13 @@ body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .s
   transition: background-color .45s var(--ease), color .45s var(--ease), border-color .45s var(--ease), fill .45s, stroke .45s !important;
 }
 
-@media (max-width: 520px) {
-  .brand { display: none; }
-  .tabs button { padding: 6px 9px; font-size: 14px; }
+@media (min-width: 641px) and (max-width: 780px) { .brand span { display: none; } }
+@media (max-width: 640px) {
+  .sync b { display: none; }
   .lvchip .uname { display: none; }
-  .lvchip { margin-left: 4px; padding-right: 8px; }
+  .lvchip { margin-left: 0; padding-right: 8px; }
 }
-@media (max-width: 400px) { .sync b { display: none; } }
+@media (max-width: 359px) { .brand span { display: none; } }
 /* prefers-reduced-motion is handled by the Animations setting (data-motion on <html>). */
 </style>
 </head>
@@ -805,15 +860,20 @@ body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .s
   <div class="row" style="gap:4px">
     <div class="brand"><i></i><span>Pomodorolist</span></div>
     <span class="sync" id="syncStatus" title="Cloud sync status"><i></i><b>Synced</b></span>
-    <button class="lvchip hidden" id="lvChip" aria-label="Your level and progress"></button>
   </div>
-  <nav class="tabs" id="tabs">
-    <button data-tab="timer" aria-label="Timer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 1.5M9.5 2.5h5"/></svg><span>Timer</span></button>
-    <button data-tab="stats" aria-label="Stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20V11M12 20V5M19 20v-6"/></svg><span>Stats</span></button>
-    <button data-tab="friends" aria-label="Friends"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8.5" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><circle cx="17" cy="9.5" r="2.5"/><path d="M15.5 14.2A4.5 4.5 0 0 1 21 18.5"/></svg><span>Friends</span><i class="tbadge hidden" id="friendsBadge"></i></button>
-    <button data-tab="profile" id="profileTabBtn" class="hidden" aria-label="Profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5 19.4 7.75v8.5L12 20.5 4.6 16.25v-8.5Z"/><circle cx="12" cy="12" r="3"/></svg><span>Profile</span></button>
-    <button data-tab="settings" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg><span>Settings</span></button>
+  <nav class="tabs" id="tabs" aria-label="Main">
+    <button data-tab="timer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2h4"/><path d="M12 14l3-3"/><circle cx="12" cy="14" r="8"/></svg><span>Timer</span></button>
+    <button data-tab="stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg><span>Stats</span></button>
+    <button data-tab="board" id="boardTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg><span>Leaderboard</span></button>
+    <button data-tab="shop" id="shopTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><span>Shop</span></button>
+    <button data-tab="friends"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Friends</span><i class="tbadge hidden" id="friendsBadge" aria-label="New activity"></i></button>
+    <button data-tab="profile" id="profileTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.66V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.66"/></svg><span>Profile</span></button>
   </nav>
+  <div class="hdr-right">
+    <button class="coinpill hidden" id="coinPill" aria-label="Your coins — open the shop"></button>
+    <button class="lvchip hidden" id="lvChip" aria-label="Your level — open your profile"></button>
+    <button class="iconbtn hidden" id="avatarBtn" aria-label="Profile and settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.66V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.66"/></svg></button>
+  </div>
 </header>
 
 <main>
@@ -934,27 +994,31 @@ body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .s
     <div class="stats-head">
       <div class="seg" id="friendsSeg">
         <button data-view="friends">Friends<span class="cnt" id="reqCount"></span></button>
-        <button data-view="board">Leaderboard</button>
         <button data-view="challenges">Challenges</button>
       </div>
     </div>
     <div id="friendsBody"></div>
   </section>
 
-  <!-- ================================ PROFILE TAB (progress + shop) ================================ -->
+  <!-- ================================ LEADERBOARD TAB ================================ -->
+  <section class="tab" id="tab-board">
+    <div id="boardBody"></div>
+  </section>
+
+  <!-- ================================ SHOP TAB ================================ -->
+  <section class="tab" id="tab-shop">
+    <div id="shopView"></div>
+  </section>
+
+  <!-- ================================ PROFILE TAB (level, badges, achievements, settings link) ================================ -->
   <section class="tab" id="tab-profile">
-    <div class="stats-head">
-      <div class="seg" id="profileSeg">
-        <button data-view="progress">Progress</button>
-        <button data-view="shop">Shop</button>
-      </div>
-    </div>
+    <div id="profileHead"></div>
     <div id="progressView"></div>
-    <div id="shopView" class="hidden"></div>
   </section>
 
   <!-- ================================ SETTINGS TAB ================================ -->
   <section class="tab" id="tab-settings">
+    <button class="linkbtn back" id="settingsBack">‹ Profile</button>
     <div class="grid-2">
       <div class="card">
         <h2>Preferences</h2>
@@ -981,6 +1045,10 @@ body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .s
         <div class="setting">
           <div><div>Auto-start next phase</div><div class="desc">Begin breaks and focus blocks automatically</div></div>
           <input type="checkbox" id="setAuto">
+        </div>
+        <div class="setting">
+          <div><div>Welcome tour</div><div class="desc">A quick look at each section of the app</div></div>
+          <button class="btn small" id="replayTour">Replay tour</button>
         </div>
         <div class="setting">
           <div><div>Animations</div><div class="desc">Full, reduced (simple fades) or off. Saved on this device.</div></div>
@@ -1091,6 +1159,14 @@ body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .s
 <canvas id="starCanvas" class="hidden" aria-hidden="true"></canvas>
 <canvas id="fxCanvas" class="hidden" aria-hidden="true"></canvas>
 <div class="toasts" id="toast" role="status" aria-live="polite"></div>
+<div class="tour hidden" id="tour" role="dialog" aria-modal="true" aria-label="Welcome tour">
+  <div class="tour-spot"></div>
+  <div class="tour-tip">
+    <div class="tour-step" id="tourStep"></div>
+    <div class="tour-text" id="tourText"></div>
+    <div class="tour-btns"><button class="linkbtn" id="tourSkip">Skip</button><button class="btn primary" id="tourNext">Next</button></div>
+  </div>
+</div>
 <div class="achcard" id="achCard" aria-live="polite"></div>
 <noscript><p style="text-align:center">This app needs JavaScript.</p></noscript>
 
@@ -1223,10 +1299,10 @@ document.addEventListener('pointerdown', e => {
 /* ---------- Segmented toggles: a pill that slides to the selected option ---------- */
 const segPos = new Map();
 function syncSegs() {
-  document.querySelectorAll('.seg').forEach(seg => {
+  document.querySelectorAll('.seg, .tabs').forEach(seg => {
     const act = seg.querySelector(':scope > button.active:not(.hidden)');
     let ind = seg.querySelector(':scope > .seg-ind');
-    if (!act || !seg.offsetParent) { if (ind) ind.style.opacity = 0; return; }
+    if (!act || !seg.getClientRects().length || !act.offsetWidth) { if (ind) ind.style.opacity = 0; return; }
     if (!ind) {
       ind = document.createElement('span');
       ind.className = 'seg-ind';
@@ -1564,7 +1640,7 @@ function defaultState() {
     game: normalizeGame(null),  // purchases, equipped items, claimed rewards, used streak freezes
     // Device-only fields (never uploaded):
     timer: { phase: 'focus', round: 1, status: 'idle', endAt: 0, remaining: 0, planned: 0, focusStartedAt: 0, name: '' },
-    ui: { tab: 'timer', statsView: 'week', profileView: 'progress', shopCat: 'sound', friendsView: 'friends', lbScope: 'friends', lbPeriod: 'week' },
+    ui: { tab: 'timer', statsView: 'week', shopCat: 'sound', friendsView: 'friends', lbScope: 'friends', lbPeriod: 'week' },
     pendingSessions: [],  // logged while the sync service could not load at all; uploaded next time
     profileDirty: false,  // profile edited in that same situation
   };
@@ -1839,6 +1915,7 @@ function startSession(user, cloud) {
     attachListeners();
     trackWrite(FB.waitForPendingWrites(FB.db));  // shows "Syncing" until earlier offline writes land
   }
+  maybeStartTour(cloud);
 }
 
 let authMode = 'login';
@@ -3045,6 +3122,7 @@ function reconcileRewards(mode = 'quiet') {
   if (news.length) renderToday();  // a used Streak Freeze changes the streak shown
   renderHeaderChip();
   if (S.ui.tab === 'profile') renderProfile();
+  if (S.ui.tab === 'shop') renderShop();
   return news;
 }
 
@@ -3106,7 +3184,7 @@ function buyItem(id) {
   applyCosmetics();
   toast(it.cat === 'freeze' ? 'Streak Freeze added' : `${it.name} is yours`, 2600, true);
   announce(reconcileRewards('collect'), 'loud');
-  renderProfile();
+  renderShop();
   coinDrop(document.querySelector(`#shopView .item[data-id="${id}"] .pv`));
 }
 function equipItem(id) {
@@ -3116,7 +3194,7 @@ function equipItem(id) {
   markEquipped(id);
   save();
   applyCosmetics();
-  renderProfile();
+  renderShop();
 }
 function toggleExtra(id) {
   if (!isOwned(id)) return;
@@ -3125,7 +3203,7 @@ function toggleExtra(id) {
   save();
   applyCosmetics();
   renderTimer();
-  renderProfile();
+  renderShop();
 }
 
 /* ==========================================================================
@@ -3539,8 +3617,11 @@ function renderHeaderChip() {
   if (!USER) return;
   const on = S.settings.gamification;
   $('#lvChip').classList.toggle('hidden', !on);
-  $('#profileTabBtn').classList.toggle('hidden', !on);
-  if (!on) { if (S.ui.tab === 'profile') showTab('timer'); return; }
+  $('#coinPill').classList.toggle('hidden', !on);
+  $('#avatarBtn').classList.toggle('hidden', on);
+  $('#boardTabBtn').classList.toggle('hidden', !on);
+  $('#shopTabBtn').classList.toggle('hidden', !on);
+  if (!on) { if (S.ui.tab === 'board' || S.ui.tab === 'shop') showTab('timer'); return; }
   const g = game(), col = NAME_COLORS[equippedId('color')];
   const goalPct = Math.min(100, Math.round(((g.idx[dayKey(new Date())] || {}).total || 0) / S.settings.goalMin * 100));
   const fromPct = lastGoalPct ?? goalPct;
@@ -3551,14 +3632,25 @@ function renderHeaderChip() {
   $('#lvChip').title = `${g.tier.name} · Level ${g.lv.level} · ${fmtNum(g.lv.need - g.lv.into)} XP to level ${g.lv.level + 1}`;
   if (fromPct !== goalPct) { const gp = $('#lvChip .gp'); void gp.getBoundingClientRect(); requestAnimationFrame(() => { gp.style.strokeDashoffset = 100 - goalPct; }); }
   lastGoalPct = goalPct;
+  const pill = $('#coinPill');
+  if (!pill.firstChild) pill.innerHTML = `${COIN_SVG}<span data-count="hdrcoins" data-val="0">0</span>`;
+  pill.querySelector('[data-count]').dataset.val = g.balance;
+  animateCounts(pill);
 }
 
+const GEAR_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>';
+const USER_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.66V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.66"/></svg>';
 function renderProfile() {
-  const view = S.ui.profileView === 'shop' ? 'shop' : 'progress';
-  $$('#profileSeg button').forEach(b => b.classList.toggle('active', b.dataset.view === view));
-  $('#progressView').classList.toggle('hidden', view !== 'progress');
-  $('#shopView').classList.toggle('hidden', view !== 'shop');
-  if (view === 'progress') renderProgress(); else renderShop();
+  if (!USER) return;
+  const on = S.settings.gamification, g = game();
+  const badge = on ? badgeSVG(g.tier, { size: 44, frame: equippedId('frame') }) : `<span class="avatar big" style="width:44px;height:44px;font-size:18px">${USER.guest ? '?' : esc(USER.username[0].toUpperCase())}</span>`;
+  $('#profileHead').innerHTML = `<div class="card prof-acct">
+    <div class="row" style="gap:14px;min-width:0">${badge}<div style="min-width:0">
+      <div class="acct-name">${USER.guest ? 'Not signed in' : '@' + esc(USER.username)}</div>
+      <div class="desc">${USER.guest ? 'Data stays on this device only' : 'Progress syncs across your devices'}</div></div></div>
+    <button class="btn icon-l" id="openSettings">${GEAR_SVG}Settings</button></div>`;
+  if (on) renderProgress();
+  else $('#progressView').innerHTML = `<div class="card empty-card"><p class="muted">Levels, badges and achievements are hidden.</p><button class="btn" id="openSettings2">Turn them on in Settings</button></div>`;
 }
 
 function renderProgress() {
@@ -3675,6 +3767,7 @@ function renderShop() {
       <div class="big coins">${COIN_SVG}<span data-count="coins" data-val="${g.balance}">${fmtNum(g.balance)}</span></div>
       <div class="lbl">5 coins per session · +10 on daily-goal days · bonuses for streaks and achievements. Everything here is cosmetic.</div>
     </div>
+    ${g.balance < 50 ? `<div class="card earn-card"><span>${g.balance ? 'Almost there —' : 'No coins yet.'} Earn coins by finishing sessions.</span><button class="btn small primary" id="shopToTimer">Start a session</button></div>` : ''}
     <div class="catrow" id="shopCats">${SHOP_CATS.map(([id, n]) => `<button data-cat="${id}" class="${id === cat ? 'active' : ''}">${n}</button>`).join('')}</div>
     ${cat === 'ambient' ? `<div class="card amb-vol"><label class="row between"><span>Ambient volume</span><input type="range" id="shopAmbVol" min="0" max="1" step="0.05" value="${S.settings.ambientVolume}"></label><div class="lbl">Plays only while a focus block is running. The mute button silences it too.</div></div>` : ''}
     <div class="shopgrid">${items.map(it => itemCard(it, g)).join('')}</div>`;
@@ -3798,6 +3891,7 @@ async function initSocial() {
   publishPresence();
   loadChallenges();
   handleInvite();
+  if (S.ui.tab === 'board') renderBoardTab();
 }
 
 /* ---------- Publishing my public data (only what's shown to others) ---------- */
@@ -3902,8 +3996,7 @@ function publishPresence() {
 /* ---------- Friend requests ---------- */
 function onFriendshipsChanged() {
   const n = incoming().length;
-  $('#friendsBadge').textContent = n || '';
-  $('#friendsBadge').classList.toggle('hidden', !n);
+  updateFriendsDot();
   $('#reqCount').textContent = n || '';
   // +10 coins the first time a friendship with someone is accepted (capped per week in earnedAt).
   let gained = 0;
@@ -3996,6 +4089,7 @@ function onInbox(qs) {
     if (at < fresh) { FB.deleteDoc(d.ref).catch(() => {}); continue; }   // tidy up old items
     if (SOC.inboxSeen.has(d.id)) continue;
     SOC.inboxSeen.add(d.id);
+    if (S.ui.tab !== 'friends') { SOC.unread = true; updateFriendsDot(); }
     if (shown++ < 3) {
       if (shown === 1) floatEmoji(it.emoji);
       if (it.type === 'nudge') toast(`@${it.fromName}: Time to focus? 👀`, 4000);
@@ -4183,6 +4277,11 @@ async function joinChallenge(id) {
   } catch (e) { toast('Couldn’t join — try again'); }
 }
 
+function updateFriendsDot() {
+  const n = incoming().length;
+  $('#friendsBadge').classList.toggle('hidden', !(n || SOC.unread));
+  $('#reqCount').textContent = n || '';
+}
 /** Called after every completed session (cloud accounts). */
 function socialAfterSession() {
   if (!socialReady()) return;
@@ -4197,7 +4296,7 @@ function renderFriends(fromLoad) {
   const body = $('#friendsBody');
   const gameOn = S.settings.gamification;
   $('#friendsSeg').classList.toggle('hidden', !!SOC.friend || !USER || USER.guest);
-  $$('#friendsSeg [data-view=board], #friendsSeg [data-view=challenges]').forEach(b => b.classList.toggle('hidden', !gameOn));
+  $$('#friendsSeg [data-view=challenges]').forEach(b => b.classList.toggle('hidden', !gameOn));
   if (!USER || USER.guest) {
     body.innerHTML = `<div class="card empty-card"><div class="big-icon">${iconSVG(ICONS.names, 30)}</div><h3>Focus with friends</h3>
       <p class="muted">Log in to add friends, see leaderboards and join weekly challenges.</p><button class="btn primary" id="guestLogin">Log in to add friends</button></div>`;
@@ -4208,11 +4307,10 @@ function renderFriends(fromLoad) {
     return;
   }
   if (SOC.friend) { renderFriendProfile(fromLoad); return; }
-  let view = S.ui.friendsView || 'friends';
+  let view = S.ui.friendsView === 'challenges' ? 'challenges' : 'friends';
   if (!gameOn && view !== 'friends') view = S.ui.friendsView = 'friends';
   $$('#friendsSeg button').forEach(b => b.classList.toggle('active', b.dataset.view === view));
-  if (view === 'board') renderBoard(fromLoad);
-  else if (view === 'challenges') renderChallenges(fromLoad);
+  if (view === 'challenges') renderChallenges(fromLoad);
   else renderFriendsList(fromLoad);
 }
 
@@ -4335,15 +4433,15 @@ async function renderBoard(fromLoad) {
   const key = `${scope}|${period}|${periodKey(period)}|${S.settings.weekStart}`, c = SOC.lb[key];
   if (!c || Date.now() - c.at > CACHE_MS) {
     if (!fromLoad || !c) {
-      if ($('#friendsBody .lb li[data-uid]')) SOC.flipFrom = flipCapture('#friendsBody .lb:not(.pinned) li[data-uid]');
-      $('#friendsBody').innerHTML = head + `<div class="card">${skelRows(5)}</div>`;
-      loadLeaderboard(scope, period).then(() => { if (S.ui.tab === 'friends' && S.ui.friendsView === 'board') renderBoard(true); });
+      if ($('#boardBody .lb li[data-uid]')) SOC.flipFrom = flipCapture('#boardBody .lb:not(.pinned) li[data-uid]');
+      $('#boardBody').innerHTML = head + `<div class="card">${skelRows(5)}</div>`;
+      loadLeaderboard(scope, period).then(() => { if (S.ui.tab === 'board') renderBoard(true); });
       return;
     }
   }
   const res = c || { rows: [] };
-  const rowSel = '#friendsBody .lb:not(.pinned) li[data-uid]';
-  const before = $('#friendsBody .lb li[data-uid]') ? flipCapture(rowSel) : SOC.flipFrom;
+  const rowSel = '#boardBody .lb:not(.pinned) li[data-uid]';
+  const before = $('#boardBody .lb li[data-uid]') ? flipCapture(rowSel) : SOC.flipFrom;
   const row = r => {
     const t = tierById(r.tier), col = NAME_COLORS[r.color], me = r.uid === USER.uid;
     return `<li class="${me ? 'me' : ''}${r.rank <= 3 ? ' top' + r.rank : ''}" data-uid="${r.uid}"${!me && scope === 'friends' ? ` data-open="${r.uid}"` : ''}>
@@ -4353,18 +4451,32 @@ async function renderBoard(fromLoad) {
   };
   let note = '';
   if (scope === 'global' && !S.settings.globalBoard) note = `<div class="lb-note">You’re not on the global leaderboard. <button class="linkbtn" id="goPrivacy">Turn it on in Settings</button></div>`;
-  $('#friendsBody').innerHTML = head + `
+  $('#boardBody').innerHTML = head + `
     <div class="card">
       <div class="row between lb-meta"><span class="lbl">${resetText(period)}</span><span class="lbl">Updated ${Math.max(0, Math.round((Date.now() - (res.at || Date.now())) / 60000))} min ago <button class="linkbtn" id="lbRefresh" title="Refresh">↻</button></span></div>
       ${res.error ? `<div class="empty">${esc(res.error)}</div>` : res.rows.length ? `<ol class="lb">${res.rows.map(row).join('')}</ol>` : '<div class="empty">No one has focused yet in this period.</div>'}
       ${res.myRow ? `<ol class="lb pinned">${row(res.myRow)}</ol>` : ''}
       ${note}
+      ${scope === 'friends' && !friendsList().length && !res.error ? `<div class="cta-card"><p>Add friends to compete</p><button class="btn primary small" id="boardAddFriend">Add friend</button></div>` : ''}
     </div>`;
   if (SOC.lbShown !== key) {   // animate when a board is first shown, not on background refreshes
     SOC.lbShown = key;
-    if (!flipPlay(before, rowSel)) animateIn($('#friendsBody'));
+    if (!flipPlay(before, rowSel)) animateIn($('#boardBody'));
   }
   SOC.flipFrom = null;
+}
+
+/** Leaderboard tab: what to show before the board itself can load. */
+function renderBoardTab() {
+  const body = $('#boardBody');
+  if (!USER || USER.guest) {
+    body.innerHTML = `<div class="card empty-card"><div class="big-icon">${iconSVG(ICONS.target, 30)}</div><h3>Compete with friends</h3>
+      <p class="muted">Log in to see daily, weekly and all-time leaderboards for your friends and everyone else.</p><button class="btn primary" id="guestLogin">Log in</button></div>`;
+    return;
+  }
+  if (localOnly) { body.innerHTML = '<div class="card empty-card"><p class="muted">Leaderboards need an internet connection.</p></div>'; return; }
+  if (!socialReady()) { body.innerHTML = `<div class="card">${skelRows(5)}</div>`; return; }
+  renderBoard();
 }
 
 function renderChallenges(fromLoad) {
@@ -4517,19 +4629,91 @@ function renderPrivacy() {
 /* ==========================================================================
    MASTER RENDER + TABS
    ========================================================================== */
+const scrollMem = {};
 function showTab(tab) {
+  if ((tab === 'board' || tab === 'shop') && !S.settings.gamification) tab = 'timer';
+  if (!$('#tab-' + tab)) tab = 'timer';
+  if (S.ui.tab !== tab && $('#tab-' + S.ui.tab) && $('#tab-' + S.ui.tab).classList.contains('active')) scrollMem[S.ui.tab] = window.scrollY;
   S.ui.tab = tab;
-  $$('#tabs button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  const navTab = tab === 'settings' ? 'profile' : tab;   // Settings is part of Profile
+  $$('#tabs button').forEach(b => { b.classList.toggle('active', b.dataset.tab === navTab); b.setAttribute('aria-current', b.dataset.tab === navTab ? 'page' : 'false'); });
   $$('.tab').forEach(s => s.classList.toggle('active', s.id === 'tab-' + tab));
   if (tab === 'stats') renderStats();
   if (tab === 'settings') renderSettings();
   if (tab === 'profile') renderProfile();
-  if (tab === 'friends') { SOC.friend = null; SOC.lbShown = null; renderFriends(); }
+  if (tab === 'shop') renderShop();
+  if (tab === 'board') { SOC.lbShown = null; renderBoardTab(); }
+  if (tab === 'friends') { SOC.friend = null; SOC.unread = false; updateFriendsDot(); renderFriends(); }
+  const y = scrollMem[tab] || 0;   // restore once the tab has laid out (charts can grow it a moment later)
+  window.scrollTo({ top: y, behavior: 'instant' });
+  if (y) [60, 250].forEach(ms => setTimeout(() => { if (S.ui.tab === tab && Math.abs(window.scrollY - y) > 4) window.scrollTo({ top: y, behavior: 'instant' }); }, ms));
   document.body.classList.toggle('focus-dim', tab === 'timer' && S.timer.status === 'running' && S.timer.phase === 'focus');
   if (tab === 'timer') ensureRingLoop();
   saveLocal();
   animateIn($('#tab-' + tab));
 }
+/* ---------- First-time welcome tour (once per device) ---------- */
+const TOUR_KEY = 'pomodorolist-tour-done';
+const TOUR = { i: 0, steps: [] };
+const tourDone = () => { try { return localStorage.getItem(TOUR_KEY) === '1'; } catch { return true; } };
+const setTourDone = () => { try { localStorage.setItem(TOUR_KEY, '1'); } catch {} };
+function maybeStartTour(cloud, tries = 0) {
+  if (tourDone()) return;
+  // wait for a signed-in user's history so returning users on a new device aren't toured
+  if (cloud && !firstLoadDone && tries < 20) { setTimeout(() => maybeStartTour(cloud, tries + 1), 500); return; }
+  if (S.sessions.length >= 3) { setTourDone(); return; }
+  setTimeout(() => { if (!document.querySelector('dialog[open]') && $('#appView').offsetParent !== null) startTour(); else setTourDone(); }, 700);
+}
+function tourSteps() {
+  const on = S.settings.gamification;
+  const visible = sel => [...$$(sel)].find(el => el.getClientRects().length && el.offsetWidth);
+  const steps = [
+    { sel: '#tabs [data-tab="timer"]', text: 'Start a focus session here — pick a preset, name it, hit Start.' },
+    { sel: '#tabs [data-tab="stats"]', text: 'See your stats, streaks and focus history.' },
+    on && { sel: '#tabs [data-tab="board"]', text: 'Compete with friends on daily, weekly and all-time leaderboards.' },
+    on && { sel: '#tabs [data-tab="shop"]', text: 'Spend the coins you earn on themes, sounds and streak freezes.' },
+    { sel: '#tabs [data-tab="friends"]', text: on ? 'Add friends, send kudos and join challenges. Your profile and settings live behind your level badge.' : 'Add friends, send kudos and join challenges.' },
+    !on && { sel: '#tabs [data-tab="profile"], #avatarBtn', text: 'Your profile and settings are here.' },
+  ].filter(Boolean);
+  return steps.map(st => ({ ...st, el: () => visible(st.sel) })).filter(st => st.el());
+}
+function startTour() {
+  TOUR.steps = tourSteps();
+  if (!TOUR.steps.length) return;
+  TOUR.i = 0;
+  const t = $('#tour');
+  t.classList.remove('hidden');
+  t.querySelector('.tour-spot').style.transition = 'none';
+  t.querySelector('.tour-tip').style.transition = 'none';
+  placeTour();
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    t.querySelector('.tour-spot').style.transition = '';
+    t.querySelector('.tour-tip').style.transition = '';
+  }));
+  $('#tourNext').focus();
+}
+function placeTour() {
+  const st = TOUR.steps[TOUR.i], el = st && st.el();
+  if (!el) { endTour(); return; }
+  const r = el.getBoundingClientRect(), pad = 6, spot = $('#tour .tour-spot'), tip = $('#tour .tour-tip');
+  spot.style.width = r.width + pad * 2 + 'px';
+  spot.style.height = r.height + pad * 2 + 'px';
+  spot.style.transform = `translate(${r.left - pad}px, ${r.top - pad}px)`;
+  $('#tourStep').textContent = `${TOUR.i + 1} of ${TOUR.steps.length}`;
+  $('#tourText').textContent = st.text;
+  $('#tourNext').textContent = TOUR.i === TOUR.steps.length - 1 ? 'Got it' : 'Next';
+  const tw = tip.offsetWidth, th = tip.offsetHeight, vw = innerWidth, vh = innerHeight;
+  const x = Math.min(Math.max(16, r.left + r.width / 2 - tw / 2), vw - tw - 16);
+  const y = r.top + r.height / 2 < vh / 2 ? r.bottom + pad + 14 : r.top - pad - 14 - th;
+  tip.style.transform = `translate(${x}px, ${Math.max(12, y)}px)`;
+}
+function endTour() { setTourDone(); $('#tour').classList.add('hidden'); }
+$('#tourNext').addEventListener('click', () => { if (++TOUR.i >= TOUR.steps.length) endTour(); else placeTour(); });
+$('#tourSkip').addEventListener('click', endTour);
+$('#tour').addEventListener('keydown', e => { if (e.key === 'Escape') endTour(); });
+addEventListener('resize', () => { if (!$('#tour').classList.contains('hidden')) placeTour(); });
+$('#replayTour').addEventListener('click', () => { try { localStorage.removeItem(TOUR_KEY); } catch {} showTab('timer'); window.scrollTo(0, 0); setTimeout(startTour, 250); });
+
 function renderAll() {
   if (!USER) return;
   renderSessionInputs();
@@ -4540,6 +4724,7 @@ function renderAll() {
   renderGreeting();
   if (S.ui.tab === 'stats') renderStats();
   if (S.ui.tab === 'profile') renderProfile();
+  if (S.ui.tab === 'shop') renderShop();
 }
 
 /* ==========================================================================
@@ -4707,15 +4892,11 @@ $('#tab-friends').addEventListener('click', e => {
   if (t.closest('#recapClose')) { writeLS(lsKey('recap'), SOC.recap ? SOC.recap.wk : ''); renderFriends(true); return; }
   if (t.closest('#recapShare')) { shareRecap(); return; }
   if (t.closest('#friendBack')) { SOC.friend = null; renderFriends(); viewIn($('#friendsBody')); animateIn($('#friendsBody')); return; }
-  if (t.closest('#lbRefresh')) { SOC.lb = {}; renderFriends(); return; }
-  if (t.closest('#goPrivacy')) { showTab('settings'); $('#privacyCard').scrollIntoView({ behavior: 'smooth' }); return; }
   if (t.closest('#nudgeBtn')) { sendReaction(SOC.friend.uid, 'nudge', '👀'); return; }
-  const b = t.closest('[data-scope],[data-period],[data-fptab],[data-accept],[data-decline],[data-cancel],[data-remove],[data-block],[data-kudos],[data-start],[data-join],[data-open]');
+  const b = t.closest('[data-fptab],[data-accept],[data-decline],[data-cancel],[data-remove],[data-block],[data-kudos],[data-start],[data-join],[data-open]');
   if (!b) { showTip(e); return; }
   const d = b.dataset;
-  if (d.scope) { S.ui.lbScope = d.scope; saveLocal(); renderFriends(); }
-  else if (d.period) { S.ui.lbPeriod = d.period; saveLocal(); renderFriends(); }
-  else if (d.fptab) { SOC.friend.tab = d.fptab; renderFriends(true); animateIn($('#friendsBody')); }
+  if (d.fptab) { SOC.friend.tab = d.fptab; renderFriends(true); animateIn($('#friendsBody')); }
   else if (d.accept) acceptRequest(d.accept);
   else if (d.decline) removeFriendship(d.decline, 'Request declined');
   else if (d.cancel) removeFriendship(d.cancel, 'Request cancelled');
@@ -4736,11 +4917,28 @@ for (const [id, key] of [['#setShareAct', 'shareActivity'], ['#setShareNames', '
 $('#copyInvite').addEventListener('click', shareInvite);
 $('#blockedList').addEventListener('click', e => { const b = e.target.closest('[data-unblock]'); if (b) unblockUser(b.dataset.unblock); });
 
-// Progress + shop
-$('#lvChip').addEventListener('click', () => { S.ui.profileView = 'progress'; showTab('profile'); });
-$('#tab-profile').addEventListener('click', e => {
-  const seg = e.target.closest('#profileSeg button');
-  if (seg) { S.ui.profileView = seg.dataset.view; saveLocal(); renderProfile(); animateIn($('#tab-profile')); return; }
+// Header shortcuts: coins open the Shop, the level badge (or avatar) opens Profile
+$('#lvChip').addEventListener('click', () => showTab('profile'));
+$('#avatarBtn').addEventListener('click', () => showTab('profile'));
+$('#coinPill').addEventListener('click', () => showTab('shop'));
+$('#tab-profile').addEventListener('click', e => { if (e.target.closest('#openSettings, #openSettings2')) showTab('settings'); });
+$('#settingsBack').addEventListener('click', () => showTab('profile'));
+// Leaderboard tab
+$('#tab-board').addEventListener('click', e => {
+  const t = e.target;
+  if (t.closest('#guestLogin')) { logout(); return; }
+  if (t.closest('#lbRefresh')) { SOC.lb = {}; renderBoard(); return; }
+  if (t.closest('#goPrivacy')) { showTab('settings'); $('#privacyCard').scrollIntoView({ behavior: 'smooth' }); return; }
+  if (t.closest('#boardAddFriend')) { S.ui.friendsView = 'friends'; showTab('friends'); setTimeout(() => { const i = $('#addFriendName'); if (i) i.focus(); }, 350); return; }
+  const b = t.closest('[data-scope],[data-period],[data-open]');
+  if (!b) return;
+  if (b.dataset.scope) { S.ui.lbScope = b.dataset.scope; saveLocal(); renderBoard(); }
+  else if (b.dataset.period) { S.ui.lbPeriod = b.dataset.period; saveLocal(); renderBoard(); }
+  else { S.ui.friendsView = 'friends'; showTab('friends'); openFriend(b.dataset.open); }
+});
+// Shop tab
+$('#tab-shop').addEventListener('click', e => {
+  if (e.target.closest('#shopToTimer')) { showTab('timer'); return; }
   const cat = e.target.closest('[data-cat]');
   if (cat) { S.ui.shopCat = cat.dataset.cat; saveLocal(); renderShop(); animateIn($('#shopView')); return; }
   const b = e.target.closest('[data-buy],[data-equip],[data-toggle-extra],[data-preview]');
@@ -4750,7 +4948,7 @@ $('#tab-profile').addEventListener('click', e => {
   else if (b.dataset.toggleExtra) toggleExtra(b.dataset.toggleExtra);
   else previewItem(b.dataset.preview);
 });
-$('#tab-profile').addEventListener('input', e => { if (e.target.id === 'shopAmbVol') setAmbientVolume(e.target.value); });
+$('#tab-shop').addEventListener('input', e => { if (e.target.id === 'shopAmbVol') setAmbientVolume(e.target.value); });
 $('#lvClose').addEventListener('click', () => $('#levelDlg').close());
 $('#levelDlg').addEventListener('click', e => { if (e.target.id === 'levelDlg') $('#levelDlg').close(); });
 $('#setNotify').addEventListener('change', e => {
