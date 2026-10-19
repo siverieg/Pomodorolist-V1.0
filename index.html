@@ -82,13 +82,14 @@ h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacin
 .coinpill .coin { width: 16px; height: 16px; }
 .coinpill:hover, .lvchip:hover { border-color: var(--muted); }
 /* Tablets: compact top bar with the label under each icon */
-@media (min-width: 641px) and (max-width: 940px) {
+@media (min-width: 641px) and (max-width: 1160px) {
   .sync b { display: none; }
   .tabs { border-radius: 18px; }
   .tabs button { flex-direction: column; gap: 2px; padding: 5px 11px; font-size: 11px; border-radius: 14px; }
   .tabs > .seg-ind { border-radius: 14px; }
   .lvchip .uname { display: none; }
 }
+@media (min-width: 641px) and (max-width: 720px) { .tabs button { padding: 5px 7px; } .top { gap: 8px; padding-left: 12px; padding-right: 12px; } }
 /* Phones: fixed bottom tab bar (icon + label), Profile/Settings behind the header badge */
 @media (max-width: 640px) {
   .tabs {
@@ -416,7 +417,7 @@ input[type="range"] { accent-color: var(--accent); width: 160px; }
    FRIENDS + LEADERBOARDS
    ========================================================================== */
 .tbadge { position: absolute; top: 4px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--danger); box-shadow: 0 0 0 2px var(--surface); }
-@media (max-width: 940px) { .tbadge { right: calc(50% - 16px); top: 3px; } }
+@media (max-width: 1160px) { .tbadge { right: calc(50% - 16px); top: 3px; } }
 :root[data-motion="full"] .tbadge:not(.hidden) { animation: dotPop .4s var(--spring) both; }
 @keyframes dotPop { from { transform: scale(0); } }
 .prof-acct { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
@@ -808,6 +809,209 @@ body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .s
 }
 @media (max-width: 359px) { .brand span { display: none; } }
 /* prefers-reduced-motion is handled by the Animations setting (data-motion on <html>). */
+
+/* ==========================================================================
+   POMEO — the tomato buddy (tap = reaction, hold = pet)
+   ========================================================================== */
+.pomeo-host { position: absolute; top: 4px; left: 6px; z-index: 4; }
+.pomeo-btn { display: block; border: 0; background: none; padding: 2px; margin: 0; cursor: pointer; border-radius: 14px; touch-action: manipulation; -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; }
+.pomeo-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.pomeo-host .mascot, .pomeo-pic .mascot { position: static; display: block; width: 50px; height: 50px; }
+.mascot .m-cheek { transition: opacity .25s, transform .3s var(--spring); transform-box: fill-box; transform-origin: center; }
+.mascot .e-wink { opacity: 0; }
+.mascot[data-state="sleepy"] .e-sleep, .mascot[data-state="sleepy"] .zz,
+.mascot[data-state="happy"] .e-happy, .mascot[data-state="excited"] .e-happy { opacity: 1; }
+.mascot.r-wink .e { opacity: 0 !important; }
+.mascot.r-wink .e-wink { opacity: 1 !important; }
+.mascot.r-blush .m-cheek, .mascot.r-pet .m-cheek { opacity: 1; transform: scale(1.35); }
+.mascot.r-pet .e { opacity: 0 !important; }
+.mascot.r-pet .e-happy { opacity: 1 !important; }
+.mascot .spark { opacity: 0; }
+.mascot[data-state="excited"] .spark { opacity: 1; }
+:root[data-motion="full"] .mascot[data-state="happy"] .m-body { animation: bob 2.6s ease-in-out infinite; }
+:root[data-motion="full"] .mascot[data-state="sleepy"] .m-body { animation: sleepy 5s ease-in-out infinite; }
+:root[data-motion="full"] .mascot[data-state="sleepy"] .zz { animation: zz 3s ease-out infinite; }
+:root[data-motion="full"] .mascot[data-state="excited"] .m-body { animation: hop .7s var(--spring) 3, bob 2.2s 2.1s ease-in-out infinite; }
+:root[data-motion="full"] .mascot[data-state="excited"] .spark { animation: twinkle 1.4s ease-in-out infinite; }
+:root[data-motion="full"] .mascot.r-wiggle .m-body { animation: pWiggle .7s ease-in-out both; }
+:root[data-motion="full"] .mascot.r-jump .m-body { animation: pJump .75s var(--spring) both; }
+:root[data-motion="full"] .mascot.r-spin .m-body { transform-origin: 50% 60%; animation: pSpin .8s var(--spring-soft) both; }
+:root[data-motion="full"] .mascot.r-pet .m-body { animation: pSquish .55s ease-in-out 2 both; }
+@keyframes pWiggle { 20% { transform: rotate(-12deg); } 40% { transform: rotate(10deg); } 60% { transform: rotate(-7deg); } 80% { transform: rotate(4deg); } }
+@keyframes pJump { 35% { transform: translateY(-9px) scale(.96, 1.05); } 70% { transform: translateY(0) scale(1.08, .92); } }
+@keyframes pSpin { to { transform: rotate(360deg); } }
+@keyframes pSquish { 50% { transform: scale(1.12, .86); } }
+@keyframes twinkle { 50% { opacity: .2; transform: scale(.6); } }
+.p-heart { position: absolute; left: 22px; top: 6px; font-size: 13px; pointer-events: none; opacity: 0; }
+:root[data-motion="full"] .p-heart { animation: heartUp 1.3s var(--ease) forwards; }
+:root[data-motion="reduced"] .p-heart { animation: fadeInOut 1.3s forwards; }
+@keyframes heartUp { 0% { opacity: 0; transform: translate(0, 4px) scale(.6); } 25% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--hx), -34px) scale(1.1); } }
+@keyframes fadeInOut { 20%, 70% { opacity: 1; } }
+
+.pomeo-bubble {
+  position: absolute; left: 60px; top: 6px; width: max-content; max-width: min(260px, calc(100vw - 120px));
+  background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: 14px; padding: 8px 12px;
+  font-size: 13.5px; line-height: 1.4; box-shadow: 0 10px 24px -14px rgba(0, 0, 0, .4); transform-origin: 0 20px;
+}
+.pomeo-bubble::before { content: ""; position: absolute; left: -6px; top: 14px; width: 10px; height: 10px; background: inherit; border-left: 1px solid var(--line); border-bottom: 1px solid var(--line); transform: rotate(45deg); }
+.pomeo-bubble .pb-acts { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.pomeo-bubble .pb-acts .btn { padding: 5px 12px; font-size: 13px; min-width: 0; }
+.pomeo-bubble .pb-x { position: absolute; top: 2px; right: 4px; border: 0; background: none; color: var(--muted); cursor: pointer; font-size: 15px; line-height: 1; padding: 4px; }
+.pomeo-bubble.has-x { padding-right: 26px; }
+:root[data-motion="full"] .pomeo-bubble.show { animation: bubbleIn .4s var(--spring) both; }
+:root[data-motion="reduced"] .pomeo-bubble.show { animation: fadeIn .25s both; }
+@keyframes bubbleIn { from { opacity: 0; transform: scale(.7) translateX(-6px); } }
+
+/* Pomeo pop-up for reminders (on any tab) */
+.pomeo-pop {
+  position: fixed; right: 16px; bottom: calc(20px + env(safe-area-inset-bottom)); z-index: 90; display: flex; align-items: flex-end; gap: 6px;
+  max-width: min(380px, calc(100vw - 32px));
+}
+.pomeo-pop .pomeo-pic .mascot { width: 60px; height: 60px; }
+.pomeo-pop .pp-card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 14px 14px 12px; box-shadow: 0 18px 40px -16px rgba(0, 0, 0, .45); margin-bottom: 26px; position: relative; }
+.pomeo-pop .pp-card::after { content: ""; position: absolute; left: -6px; bottom: 16px; width: 12px; height: 12px; background: inherit; border-left: 1px solid var(--line); border-bottom: 1px solid var(--line); transform: rotate(45deg); }
+.pomeo-pop .pp-kicker { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+.pomeo-pop .pp-text { font-size: 15px; margin: 2px 0 10px; }
+.pomeo-pop .pp-acts { display: flex; gap: 6px; flex-wrap: wrap; }
+.pomeo-pop .pp-acts .btn { padding: 7px 12px; font-size: 13px; min-width: 0; }
+.pomeo-pop.no-pomeo .pomeo-pic { display: none; }
+.pomeo-pop.no-pomeo .pp-card { margin-bottom: 0; }
+.pomeo-pop.no-pomeo .pp-card::after { display: none; }
+:root[data-motion="full"] .pomeo-pop.show { animation: popUp .5s var(--spring) both; }
+:root[data-motion="reduced"] .pomeo-pop.show { animation: fadeIn .25s both; }
+@keyframes popUp { from { opacity: 0; transform: translateY(30px) scale(.9); } }
+@media (max-width: 640px) { .pomeo-pop { right: 12px; left: 12px; max-width: none; bottom: calc(84px + env(safe-area-inset-bottom)); } }
+
+/* Pomeo card on Profile */
+.pomeo-card { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+.pomeo-card .pomeo-pic { width: 84px; height: 84px; display: grid; place-items: center; border-radius: 18px; background: var(--accent-soft); flex: none; }
+.pomeo-card .pomeo-pic .mascot { width: 76px; height: 76px; }
+.pomeo-card .pc-main { flex: 1; min-width: 160px; }
+.pomeo-card .pc-name { font-weight: 600; font-size: 17px; }
+.item .pv .mascot { position: static; width: 64px; height: 64px; }
+
+/* Session note after a focus block, daily tip, today summary */
+.note-row { display: flex; gap: 6px; margin-top: 14px; align-items: center; }
+.note-row input { flex: 1; min-width: 0; }
+.note-row .btn { padding: 8px 14px; min-width: 0; }
+:root[data-motion="full"] .note-row:not(.hidden) { animation: pageIn .3s var(--ease) both; }
+.sesslist .note { display: block; font-size: 12px; color: var(--muted); font-style: italic; }
+.tip-card p { margin: 0; font-size: 14.5px; }
+.tip-card .tip-ic { margin-right: 6px; }
+.today-extra { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); display: grid; gap: 4px; font-size: 13.5px; color: var(--muted); }
+.today-extra b { color: var(--text); font-weight: 600; }
+.today-extra button { border: 0; background: none; padding: 0; color: var(--accent); cursor: pointer; text-align: left; font-size: 13.5px; }
+
+/* ==========================================================================
+   REMINDERS
+   ========================================================================== */
+.rem-head { margin-bottom: 14px; }
+.rem-head h1 { font-size: 20px; margin: 0; font-weight: 600; }
+.rem-sec { margin-bottom: 14px; }
+.rem-sec h2 { display: flex; justify-content: space-between; align-items: center; }
+.rem-list { list-style: none; margin: 0; padding: 0; }
+.rem { position: relative; border-top: 1px solid var(--line); overflow: hidden; touch-action: pan-y; }
+.rem:first-child { border-top: 0; }
+.rem-fg { position: relative; z-index: 1; display: flex; align-items: center; gap: 10px; padding: 10px 2px; background: var(--surface); transition: transform .3s var(--spring-soft); }
+.rem.dragging .rem-fg { transition: none; }
+.rem-bg { opacity: 0; position: absolute; inset: 0; display: flex; justify-content: space-between; align-items: center; padding: 0 16px; font-size: 13px; font-weight: 600; color: #fff; }
+.rem.dragging .rem-bg { opacity: 1; }
+.rem-bg .l { color: var(--accent); }
+.rem-bg .r { color: var(--danger); }
+.rem-check { width: 24px; height: 24px; border-radius: 50%; border: 1.6px solid var(--muted); background: none; flex: none; cursor: pointer; display: grid; place-items: center; padding: 0; color: var(--on-accent, #fff); }
+.rem-check svg { width: 14px; height: 14px; opacity: 0; }
+.rem.done .rem-check { background: var(--accent); border-color: var(--accent); }
+.rem.done .rem-check svg { opacity: 1; }
+.rem.done .rt { text-decoration: line-through; color: var(--muted); }
+.rem-main { flex: 1; min-width: 0; }
+.rem .rt { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rem .rs { font-size: 12.5px; color: var(--muted); }
+.rem .rs .miss { color: var(--warn); font-weight: 600; }
+.rem .rtime { font-variant-numeric: tabular-nums; font-weight: 600; font-size: 14px; min-width: 64px; }
+.rem-acts { display: flex; gap: 2px; }
+.rem-acts .iconbtn { width: 32px; height: 32px; }
+.rem-acts svg { width: 16px; height: 16px; }
+.rem-note { font-size: 12.5px; color: var(--muted); display: flex; gap: 8px; align-items: flex-start; }
+.rem-note svg { flex: none; width: 16px; height: 16px; margin-top: 2px; }
+.perm-card { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.perm-card p { margin: 0; flex: 1; min-width: 200px; }
+.rem-empty { text-align: center; padding: 26px 16px; }
+.rem-empty .pomeo-pic { display: inline-block; }
+.rem-empty .mascot { width: 64px; height: 64px; }
+.daychips { display: flex; gap: 4px; flex-wrap: wrap; }
+.daychips label { position: relative; }
+.daychips input { position: absolute; opacity: 0; pointer-events: none; }
+.daychips span { display: inline-grid; place-items: center; width: 38px; height: 34px; border-radius: 10px; border: 1px solid var(--line); cursor: pointer; font-size: 13px; }
+.daychips input:checked + span { background: var(--accent); border-color: var(--accent); color: var(--on-accent, #fff); font-weight: 600; }
+.daychips input:focus-visible + span { outline: 2px solid var(--accent); }
+.rform { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; }
+.rform .full { grid-column: 1 / -1; }
+.rform input, .rform select { width: 100%; }
+.cal-btns { display: grid; gap: 8px; margin: 14px 0 6px; }
+.cal-btns .btn { justify-content: center; display: flex; text-decoration: none; }
+@media (max-width: 640px) { .rem-acts .hide-sm { display: none; } }
+
+/* ==========================================================================
+   LIQUID GLASS (Settings → Appearance). <html data-glass="full | lite">
+   Frosted translucent surfaces over a soft colourful backdrop built from the
+   current theme's accent. Needs color-mix(); without backdrop-filter it falls
+   back to a solid, slightly translucent surface.
+   ========================================================================== */
+#glassBg { display: none; position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+#glassBg i { position: absolute; border-radius: 50%; width: 70vmax; height: 70vmax; }
+@supports (color: color-mix(in srgb, red 50%, blue)) {
+  :root { --gb-a: 42%; --glass-fill: 58%; --glass-blur: 22px; --glass-sat: 175%; --glass-edge: rgba(255, 255, 255, .55); --glass-hi: rgba(255, 255, 255, .7); --glass-glow: rgba(255, 255, 255, .25); --glass-shadow: 0 12px 32px -16px rgba(20, 30, 40, .28); --sheen-a: .22; --sx: 35%; }
+  :root[data-theme="dark"] { --gb-a: 30%; --glass-fill: 55%; --glass-edge: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .16); --glass-glow: rgba(255, 255, 255, .05); --glass-shadow: 0 14px 34px -14px rgba(0, 0, 0, .7); --sheen-a: .07; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --gb-a: 30%; --glass-fill: 55%; --glass-edge: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .16); --glass-glow: rgba(255, 255, 255, .05); --glass-shadow: 0 14px 34px -14px rgba(0, 0, 0, .7); --sheen-a: .07; } }
+  :root[data-glass="lite"] { --glass-blur: 9px; --glass-sat: 135%; --glass-fill: 72%; --sheen-a: 0; }
+
+  :root[data-glass] #glassBg { display: block; }
+  :root[data-glass] #glassBg .g1 { left: -25vmax; top: -30vmax; background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) var(--gb-a), transparent), transparent); }
+  :root[data-glass] #glassBg .g2 { right: -30vmax; top: -10vmax; background: radial-gradient(closest-side, color-mix(in srgb, color-mix(in srgb, var(--accent) 45%, #ff7aa8) var(--gb-a), transparent), transparent); }
+  :root[data-glass] #glassBg .g3 { left: 0; bottom: -40vmax; background: radial-gradient(closest-side, color-mix(in srgb, color-mix(in srgb, var(--accent) 40%, #ffc65c) var(--gb-a), transparent), transparent); }
+  :root[data-glass] #glassBg .g4 { right: -20vmax; bottom: -35vmax; background: radial-gradient(closest-side, color-mix(in srgb, color-mix(in srgb, var(--accent) 45%, #6a8cff) var(--gb-a), transparent), transparent); }
+  :root[data-glass="full"][data-motion="full"] #glassBg i { animation: drift 38s ease-in-out infinite alternate; }
+  :root[data-glass="full"][data-motion="full"] #glassBg .g2 { animation-duration: 46s; animation-delay: -12s; }
+  :root[data-glass="full"][data-motion="full"] #glassBg .g3 { animation-duration: 52s; animation-delay: -20s; }
+  :root[data-glass="full"][data-motion="full"] #glassBg .g4 { animation-duration: 42s; animation-delay: -6s; }
+  @keyframes drift { 50% { transform: translate(6vmax, 4vmax) scale(1.08); } 100% { transform: translate(-4vmax, 7vmax) scale(.95); } }
+
+  :root[data-glass] :is(.card, .tile, .item, dialog, .seg, .coinpill, .lvchip, .pomeo-bubble, .pomeo-pop .pp-card, .tour-tip), :root[data-glass] .top::before {
+    background-color: color-mix(in srgb, var(--surface) var(--glass-fill), transparent);
+    background-image: linear-gradient(115deg, transparent calc(var(--sx) - 22%), rgba(255, 255, 255, var(--sheen-a)) var(--sx), transparent calc(var(--sx) + 22%));
+    border-color: var(--glass-edge);
+    box-shadow: inset 0 1px 0 var(--glass-hi), inset 0 0 22px -6px var(--glass-glow), var(--glass-shadow);
+  }
+  :root[data-glass] :is(.card, .tile, dialog, .pomeo-pop .pp-card, .tour-tip), :root[data-glass] .top::before {
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)); backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat));
+  }
+  /* things that sit inside a glass card stay light-weight: a tint and an edge, no second blur */
+  :root[data-glass] .rem-fg { background: transparent; box-shadow: none; }
+  :root[data-glass] .item, :root[data-glass] .seg, :root[data-glass] .pomeo-bubble { box-shadow: inset 0 1px 0 var(--glass-hi), var(--glass-shadow); }
+  /* The header's glass lives on a pseudo-element: a backdrop-filter on the header itself would turn it into
+     the containing block of the fixed phone tab bar inside it, pulling the bar to the top. */
+  :root[data-glass] .top { background: transparent; border-bottom-color: var(--glass-edge); }
+  :root[data-glass] .top::before { content: ""; position: absolute; inset: 0; z-index: -1; box-shadow: inset 0 -1px 0 var(--glass-edge); }
+  :root[data-glass] .tabs { background-color: color-mix(in srgb, var(--surface) 45%, transparent); border-color: var(--glass-edge); box-shadow: inset 0 1px 0 var(--glass-hi); }
+  :root[data-glass] .item .pv { background: color-mix(in srgb, var(--bg) 55%, transparent); }
+  :root[data-glass] :is(.btn:not(.primary):not(.danger), .iconbtn, .chip, .catrow button) {
+    background-color: color-mix(in srgb, var(--surface) 42%, transparent); border-color: var(--glass-edge);
+    box-shadow: inset 0 1px 0 var(--glass-hi), 0 4px 12px -8px rgba(0, 0, 0, .25);
+  }
+  :root[data-glass] .btn.primary { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4), inset 0 -8px 16px -10px rgba(0, 0, 0, .25), 0 8px 20px -10px var(--accent); }
+  :root[data-glass] :is(input[type="text"], input[type="number"], input[type="date"], input[type="time"], input:not([type]), select) { background-color: color-mix(in srgb, var(--surface) 60%, transparent); }
+  :root[data-glass] .ring .track { opacity: .7; }
+  @media (max-width: 640px) {
+    :root[data-glass] .tabs { background-color: color-mix(in srgb, var(--surface) var(--glass-fill), transparent); -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)); backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)); box-shadow: inset 0 1px 0 var(--glass-hi), 0 -10px 30px -18px rgba(0, 0, 0, .3); }
+  }
+  /* no backdrop-filter (older browsers): a solid surface that is only slightly translucent */
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    :root[data-glass] :is(.card, .tile, .item, dialog, .seg, .tabs, .pomeo-bubble, .pomeo-pop .pp-card, .tour-tip), :root[data-glass] .top::before { background-color: color-mix(in srgb, var(--surface) 93%, transparent); }
+  }
+}
+
+.tabs .ls { display: none; }
+@media (max-width: 400px) { .tabs .lf { display: none; } .tabs .ls { display: inline; } .tabs button { font-size: 10px; } }
 </style>
 </head>
 <body>
@@ -863,8 +1067,9 @@ body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .s
   </div>
   <nav class="tabs" id="tabs" aria-label="Main">
     <button data-tab="timer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2h4"/><path d="M12 14l3-3"/><circle cx="12" cy="14" r="8"/></svg><span>Timer</span></button>
+    <button data-tab="reminders" id="remTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span>Reminders</span></button>
     <button data-tab="stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg><span>Stats</span></button>
-    <button data-tab="board" id="boardTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg><span>Leaderboard</span></button>
+    <button data-tab="board" id="boardTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg><span class="lf">Leaderboard</span><span class="ls">Ranks</span></button>
     <button data-tab="shop" id="shopTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><span>Shop</span></button>
     <button data-tab="friends"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Friends</span><i class="tbadge hidden" id="friendsBadge" aria-label="New activity"></i></button>
     <button data-tab="profile" id="profileTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.66V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.66"/></svg><span>Profile</span></button>
@@ -883,21 +1088,10 @@ body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .s
     <div class="grid-2">
       <div class="stack">
         <div class="card timer-card">
-          <svg class="mascot" id="mascot" data-state="idle" viewBox="0 0 40 40" aria-hidden="true">
-            <g class="m-body">
-              <ellipse cx="20" cy="24" rx="13.5" ry="12.5" fill="#e5654f"/>
-              <ellipse cx="14.5" cy="19" rx="3.4" ry="2" fill="#fff" opacity=".25" transform="rotate(-28 14.5 19)"/>
-              <path d="M20 12.6 16.2 10.4l1.2 3.1-3.6.9 3.8.9 2.4-.6 2.4.6 3.8-.9-3.6-.9 1.2-3.1Z" fill="#5c9b57"/>
-              <path d="M20 12.8V8.8" stroke="#4e8a4a" stroke-width="1.6" stroke-linecap="round"/>
-              <circle cx="13.2" cy="27.2" r="1.9" fill="#ff9d8c" opacity=".6"/><circle cx="26.8" cy="27.2" r="1.9" fill="#ff9d8c" opacity=".6"/>
-              <g class="e e-open" fill="#3a1d18"><circle cx="15.8" cy="24" r="1.55"/><circle cx="24.2" cy="24" r="1.55"/></g>
-              <g class="e e-focus" stroke="#3a1d18" stroke-width="1.5" stroke-linecap="round"><path d="M14.2 24.2h3.2M22.6 24.2h3.2M14 21.8l3.2.8M26 21.8l-3.2.8"/></g>
-              <g class="e e-sleep" stroke="#3a1d18" stroke-width="1.4" stroke-linecap="round" fill="none"><path d="M14.2 24q1.6 1.4 3.2 0M22.6 24q1.6 1.4 3.2 0"/></g>
-              <g class="e e-happy" stroke="#3a1d18" stroke-width="1.5" stroke-linecap="round" fill="none"><path d="M14.2 24.8q1.6-2.3 3.2 0M22.6 24.8q1.6-2.3 3.2 0"/></g>
-              <path d="M18.4 28.3q1.6 1.3 3.2 0" stroke="#3a1d18" stroke-width="1.3" stroke-linecap="round" fill="none"/>
-            </g>
-            <text class="zz" x="31" y="11" font-size="8" font-weight="600" fill="currentColor" style="color:var(--muted)">z</text>
-          </svg>
+          <div class="pomeo-host" id="pomeoHost">
+            <button class="pomeo-btn" id="pomeoBtn" aria-label="Pomeo, your tomato buddy. Tap to say hi, hold to pet."></button>
+            <div class="pomeo-bubble hidden" id="pomeoBubble" role="status" aria-live="polite"></div>
+          </div>
           <button class="iconbtn corner" id="muteBtn" title="Toggle sound" aria-label="Toggle sound"></button>
           <div class="phase-label" id="phaseLabel">Focus</div>
           <div class="dots" id="roundDots"></div>
@@ -919,6 +1113,11 @@ body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .s
             <button class="btn" id="resetBtn" title="Reset (double-reset returns to round 1)">Reset</button>
             <button class="btn primary" id="mainBtn"><span class="mb-lbl">Start</span></button>
             <button class="btn" id="skipBtn">Skip</button>
+          </div>
+          <div class="note-row hidden" id="noteRow">
+            <input type="text" id="noteInput" maxlength="120" placeholder="Add a note? e.g. finished ch. 5 problems" aria-label="Note for the session you just finished">
+            <button class="btn" id="noteSave">Save</button>
+            <button class="iconbtn" id="noteSkip" aria-label="Skip the note">×</button>
           </div>
         </div>
 
@@ -957,6 +1156,12 @@ body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .s
           </div>
           <div class="row between"><span id="todayText">0m of 1h</span><span class="lbl" id="todayPct">0%</span></div>
           <div class="progress"><i id="todayBar" style="width:0%"></i></div>
+          <div class="today-extra" id="todayExtra"></div>
+        </div>
+
+        <div class="card tip-card" id="tipCard">
+          <h2><span class="tip-ic">💡</span>Tip of the day</h2>
+          <p id="tipText"></p>
         </div>
 
         <div class="card">
@@ -968,6 +1173,18 @@ body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .s
         </div>
       </div>
     </div>
+  </section>
+
+  <!-- ================================ REMINDERS TAB ================================ -->
+  <section class="tab" id="tab-reminders">
+    <div class="row between rem-head">
+      <h1>Reminders</h1>
+      <button class="btn primary small" id="remAdd">+ Add reminder</button>
+    </div>
+    <div id="remPerm"></div>
+    <div id="remBody"></div>
+    <p class="rem-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+      <span>Web reminders only fire while Pomodorolist is open — a background tab is fine, a closed tab or a locked phone is not. Use the calendar button on a reminder to add it to your phone’s calendar, which can remind you even when the app is closed.</span></p>
   </section>
 
   <!-- ================================ STATS TAB ================================ -->
@@ -1031,10 +1248,6 @@ body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .s
           <select id="setWeek"><option value="1">Monday</option><option value="0">Sunday</option></select>
         </div>
         <div class="setting">
-          <div><div>Theme</div></div>
-          <select id="setTheme"><option value="auto">System</option><option value="light">Light</option><option value="dark">Dark</option></select>
-        </div>
-        <div class="setting">
           <div><div>Sound</div><div class="desc">Gentle chime when a session ends</div></div>
           <input type="checkbox" id="setSound">
         </div>
@@ -1051,12 +1264,12 @@ body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .s
           <button class="btn small" id="replayTour">Replay tour</button>
         </div>
         <div class="setting">
-          <div><div>Animations</div><div class="desc">Full, reduced (simple fades) or off. Saved on this device.</div></div>
-          <select id="setMotion"><option value="full">Full</option><option value="reduced">Reduced</option><option value="off">Off</option></select>
-        </div>
-        <div class="setting">
           <div><div>Ambient volume</div><div class="desc">For ambient sounds from the shop</div></div>
           <input type="range" id="setAmbVol" min="0" max="1" step="0.05">
+        </div>
+        <div class="setting">
+          <div><div>Tip of the day</div><div class="desc">A short study tip on the Timer screen</div></div>
+          <input type="checkbox" id="setTip">
         </div>
         <div class="setting">
           <div><div>Progression</div><div class="desc">XP, levels, coins, achievements and the shop. Turn off for a plain timer (equipped items stay on).</div></div>
@@ -1065,6 +1278,36 @@ body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .s
       </div>
 
       <div class="stack">
+        <div class="card">
+          <h2>Appearance</h2>
+          <div class="setting">
+            <div><div>Theme</div></div>
+            <select id="setTheme"><option value="auto">System</option><option value="light">Light</option><option value="dark">Dark</option></select>
+          </div>
+          <div class="setting">
+            <div><div>Liquid Glass</div><div class="desc" id="glassDesc">Frosted, translucent cards over soft colour. Lite uses less blur for older phones. Saved on this device.</div></div>
+            <select id="setGlass"><option value="off">Off</option><option value="full">Full</option><option value="lite">Lite</option></select>
+          </div>
+          <div class="setting">
+            <div><div>Animations</div><div class="desc">Full, reduced (simple fades) or off. Saved on this device.</div></div>
+            <select id="setMotion"><option value="full">Full</option><option value="reduced">Reduced</option><option value="off">Off</option></select>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Pomeo</h2>
+          <div class="setting">
+            <div><div>Show Pomeo</div><div class="desc">Your tomato buddy on the Timer screen</div></div>
+            <input type="checkbox" id="setPomeo">
+          </div>
+          <div class="setting">
+            <div><div>Pomeo talks</div><div class="desc">Taps and reminders always get an answer</div></div>
+            <select id="setPomeoTalk"><option value="often">Often</option><option value="sometimes">Sometimes</option><option value="quiet">Quiet</option></select>
+          </div>
+          <div class="setting">
+            <div><div>Water &amp; stretch nudges</div><div class="desc">A gentle reminder after about 90 minutes of focus</div></div>
+            <input type="checkbox" id="setWater">
+          </div>
+        </div>
         <div class="card">
           <h2>Account</h2>
           <div class="row between">
@@ -1115,6 +1358,57 @@ body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .s
 </main>
 </div>
 
+<!-- Reminder editor -->
+<dialog id="remDlg">
+  <form id="remForm" novalidate>
+    <div class="row between" style="margin-bottom:12px"><h2 style="margin:0" id="remDlgTitle">New reminder</h2></div>
+    <div class="rform">
+      <div class="full"><label class="field" for="remTitle">Title</label><input type="text" id="remTitle" maxlength="80" placeholder="e.g. Physics revision" autocomplete="off"></div>
+      <div><label class="field" for="remDate" id="remDateLbl">Date</label><input type="date" id="remDate"></div>
+      <div><label class="field" for="remTime">Time</label><input type="time" id="remTime"></div>
+      <div><label class="field" for="remRepeat">Repeat</label>
+        <select id="remRepeat"><option value="none">Doesn’t repeat</option><option value="daily">Every day</option><option value="weekdays">Weekdays (Mon–Fri)</option><option value="weekly">Weekly on…</option></select></div>
+      <div><label class="field" for="remBefore">Remind me</label>
+        <select id="remBefore"><option value="0">At the time</option><option value="5">5 min before</option><option value="10">10 min before</option><option value="15">15 min before</option><option value="30">30 min before</option></select></div>
+      <div class="full hidden" id="remDaysWrap"><span class="field">On these days</span>
+        <div class="daychips" id="remDays"><label><input type="checkbox" value="1"><span>Mon</span></label><label><input type="checkbox" value="2"><span>Tue</span></label><label><input type="checkbox" value="3"><span>Wed</span></label><label><input type="checkbox" value="4"><span>Thu</span></label><label><input type="checkbox" value="5"><span>Fri</span></label><label><input type="checkbox" value="6"><span>Sat</span></label><label><input type="checkbox" value="0"><span>Sun</span></label></div></div>
+      <div><label class="field" for="remPreset">Timer preset (optional)</label><select id="remPreset"></select></div>
+      <div><label class="field" for="remSession">Session name (optional)</label><input type="text" id="remSession" maxlength="80" placeholder="Same as the title" autocomplete="off" list="nameList"></div>
+    </div>
+    <p class="err" id="remErr" style="color:var(--danger);font-size:13px;min-height:18px;margin:10px 0 0"></p>
+    <div class="btn-row" style="justify-content:flex-end;margin-top:6px">
+      <button type="button" class="btn" id="remCancel">Cancel</button>
+      <button type="submit" class="btn primary">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Add a reminder to the phone's own calendar -->
+<dialog id="calDlg">
+  <h2 style="margin:0 0 6px">Add to calendar</h2>
+  <p style="margin:0"><b id="calName"></b></p>
+  <p class="muted" style="font-size:13.5px;margin:6px 0 0">Your calendar app can remind you even when Pomodorolist is closed.</p>
+  <div class="cal-btns">
+    <button class="btn" id="calIcs">Download .ics (Apple, Outlook, most calendars)</button>
+    <a class="btn" id="calGoogle" target="_blank" rel="noopener">Open in Google Calendar</a>
+  </div>
+  <div class="btn-row" style="justify-content:flex-end"><button class="btn" id="calClose">Done</button></div>
+</dialog>
+
+<!-- Pomeo's reminder pop-up -->
+<div class="pomeo-pop hidden" id="pomeoPop" role="alertdialog" aria-labelledby="popText">
+  <span class="pomeo-pic"></span>
+  <div class="pp-card">
+    <div class="pp-kicker">Reminder</div>
+    <div class="pp-text" id="popText"></div>
+    <div class="pp-acts">
+      <button class="btn primary" id="popStart">Start now</button>
+      <button class="btn" id="popSnooze">Snooze 5 min</button>
+      <button class="btn" id="popDismiss">Dismiss</button>
+    </div>
+  </div>
+</div>
+
 <!-- Preset manager -->
 <dialog id="presetDlg">
   <div class="row between" style="margin-bottom:12px">
@@ -1156,6 +1450,7 @@ body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .s
   <button class="btn primary" id="lvClose">Continue</button>
 </dialog>
 
+ <div id="glassBg" aria-hidden="true"><i class="g1"></i><i class="g2"></i><i class="g3"></i><i class="g4"></i></div>
 <canvas id="starCanvas" class="hidden" aria-hidden="true"></canvas>
 <canvas id="fxCanvas" class="hidden" aria-hidden="true"></canvas>
 <div class="toasts" id="toast" role="status" aria-live="polite"></div>
@@ -1517,13 +1812,13 @@ function floatEmoji(emoji) {
   setTimeout(() => el.remove(), 2000);
 }
 
-/* ---------- Tomato mascot: idle, focused, sleeping on breaks, celebrating ---------- */
+/* ---------- Pomeo's mood: idle, focused, sleeping on breaks, celebrating (more in POMEO below) ---------- */
 let mascotHold = 0;
 function setMascot() {
   const m = $('#mascot');
   if (!m || !USER) return;
   const t = S.timer;
-  const st = Date.now() < mascotHold ? 'celebrate' : t.phase !== 'focus' ? 'sleep' : t.status === 'running' ? 'focus' : 'idle';
+  const st = Date.now() < mascotHold ? 'celebrate' : t.phase !== 'focus' ? 'sleep' : t.status === 'running' ? 'focus' : pomeoIdleMood();
   if (m.dataset.state !== st) m.dataset.state = st;
 }
 function mascotCelebrate() { mascotHold = Date.now() + 2600; setMascot(); setTimeout(setMascot, 2700); }
@@ -1627,7 +1922,8 @@ function defaultState() {
   return {
     version: 2,
     settings: { goalMin: 60, weekStart: 1, sound: true, notify: true, theme: 'auto', autoStart: false, gamification: true, ambientVolume: 0.5,
-                shareActivity: true, shareNames: true, globalBoard: false },
+                shareActivity: true, shareNames: true, globalBoard: false,
+                pomeo: true, pomeoTalk: 'sometimes', waterNudge: true, dailyTip: true },
     presets: [
       { id: 'p-classic', name: 'Classic 25/5',    focus: 25, short: 5,  long: 15, rounds: 4 },
       { id: 'p-deep',    name: 'Deep Work 50/10', focus: 50, short: 10, long: 20, rounds: 3 },
@@ -1637,6 +1933,8 @@ function defaultState() {
     sessions: [],   // { id, name, start, end, duration(ms of focus), planned(ms), preset }
     recent: [],     // { name, presetId, ts }  most recent first
     pinned: [],     // { name, presetId }
+    reminders: [],  // see REMINDERS
+    notes: {},      // sessionId -> one-line note
     game: normalizeGame(null),  // purchases, equipped items, claimed rewards, used streak freezes
     // Device-only fields (never uploaded):
     timer: { phase: 'focus', round: 1, status: 'idle', endAt: 0, remaining: 0, planned: 0, focusStartedAt: 0, name: '' },
@@ -1653,7 +1951,8 @@ function hydrate(obj) {
   const out = { ...def, ...obj };
   for (const k of ['settings', 'timer', 'ui']) out[k] = { ...def[k], ...(obj[k] || {}) };
   if (!Array.isArray(out.presets) || !out.presets.length) out.presets = def.presets;
-  for (const k of ['sessions', 'recent', 'pinned', 'pendingSessions']) if (!Array.isArray(out[k])) out[k] = [];
+  for (const k of ['sessions', 'recent', 'pinned', 'pendingSessions', 'reminders']) if (!Array.isArray(out[k])) out[k] = [];
+  if (!out.notes || typeof out.notes !== 'object' || Array.isArray(out.notes)) out.notes = {};
   if (!out.names || typeof out.names !== 'object' || Array.isArray(out.names)) out.names = {};
   out.game = normalizeGame(obj.game);
   return out;
@@ -1742,9 +2041,18 @@ function profileFromState() {
     recent: S.recent,
     pinned: S.pinned,
     game: S.game,
+    reminders: S.reminders,
+    notes: recentNotes(),
     // Stored for reference only; the app always recalculates streaks from the session log.
     streak: { current: cur, longest, goalMin: S.settings.goalMin, today: dayKey(new Date()) },
   });
+}
+
+/** Notes for the latest 300 sessions only (keeps the profile document small). */
+function recentNotes() {
+  const keep = new Set(S.sessions.slice(-300).map(s => s.id)), out = {};
+  for (const [id, v] of Object.entries(S.notes)) if (keep.has(id) && v) out[id] = v;
+  return out;
 }
 
 function scheduleProfilePush() {
@@ -1824,6 +2132,8 @@ function applyProfile(d) {
   S.recent = Array.isArray(d.recent) ? d.recent : [];
   S.pinned = Array.isArray(d.pinned) ? d.pinned : [];
   S.game = normalizeGame(d.game);
+  if (Array.isArray(d.reminders)) S.reminders = d.reminders.filter(r => r && r.id && r.time && r.date);
+  if (d.notes && typeof d.notes === 'object') S.notes = { ...d.notes };
   S.timer.round = Math.min(S.timer.round, activePreset().rounds);
   lastProfileJSON = JSON.stringify(profileFromState());
   saveLocal();
@@ -1916,6 +2226,7 @@ function startSession(user, cloud) {
     trackWrite(FB.waitForPendingWrites(FB.db));  // shows "Syncing" until earlier offline writes land
   }
   maybeStartTour(cloud);
+  setTimeout(() => { if (USER === user && $('#tour').classList.contains('hidden') && !document.querySelector('dialog[open]')) pomeoHello(); pomeoNightCheck(); checkReminders(); }, cloud ? 2500 : 1200);
 }
 
 let authMode = 'login';
@@ -2102,6 +2413,8 @@ function mergeData(obj) {
   }
   for (const [k, v] of Object.entries(sg.freezesUsed)) if (!g.freezesUsed[k]) g.freezesUsed[k] = v;
   for (const [k, v] of Object.entries(sg.equipped)) if (!(k in g.equipped)) g.equipped[k] = v;
+  for (const r of src.reminders) if (r && r.id && r.time && r.date && !S.reminders.some(x => x.id === r.id)) S.reminders.push(r);
+  for (const [k, v] of Object.entries(src.notes)) if (!S.notes[k]) S.notes[k] = v;
   save();
   applyCosmetics();
   reconcileRewards('quiet');
@@ -2183,6 +2496,8 @@ function startTimer() {
       ensureName(t.name);
       pushRecent(t.name, S.activePresetId);
       if (extraOn('x_startcue')) playStartCue();
+      hideNote();
+      pomeoFocusStart();
     }
   }
   t.endAt = now + t.remaining;
@@ -2243,6 +2558,7 @@ function finishPhase(reason) {
   t.remaining = 0;
   t.endAt = 0;
 
+  if (reason === 'complete' && wasFocus) setTimeout(pomeoBreakStart, 5600);
   if (reason === 'complete') {
     playEndSound();
     if (wasFocus) notify('Focus complete', `Nice work on “${t.name || 'Untitled'}”. Time for a break.`);
@@ -2268,7 +2584,9 @@ function logSession(focusedMs, end) {
     preset: activePreset().name,
   };
   const levelBefore = rewardsReady() ? game().lv.level : 0;
+  const idxBefore = buildIndex(), pomeoBefore = { mins: (idxBefore[dayKey(new Date())] || {}).total || 0, streak: computeStreaks(idxBefore).cur };
   S.sessions.push(s);
+  setTimeout(() => { pomeoAfterSession(pomeoBefore); offerNote(s.id); }, 400);
   if (cloudReady()) cloudAddSessions([s]);
   else if (USER && !USER.guest) S.pendingSessions.push(s);
   G = null;
@@ -2457,6 +2775,7 @@ function renderToday() {
   const pct = Math.min(100, Math.round(mins / goal * 100));
   $('#todayPct').textContent = pct + '%';
   $('#todayBar').style.transform = `translateX(${pct - 100}%)`;
+  renderTodayExtra();
 }
 
 /* ==========================================================================
@@ -2687,7 +3006,7 @@ function renderStats() {
       ? `<ul class="sesslist">${daySessions.slice().reverse().map(s => `
           <li><span class="t">${fmtTime(s.start)}–${fmtTime(s.end)}</span>
             <span class="dot" style="background:${esc(colorFor(s.name))}"></span>
-            <span class="nm" title="${esc(s.preset || '')}">${esc(s.name)}</span>
+            <span class="nm" title="${esc(s.preset || '')}">${esc(s.name)}${S.notes[s.id] ? `<span class="note">“${esc(S.notes[s.id])}”</span>` : ''}</span>
             <span class="d">${fmtMin(s.duration / 60000)}</span>
             <button class="linkbtn" data-del="${esc(s.id)}" title="Delete this session" aria-label="Delete">✕</button></li>`).join('')}</ul>`
       : '<div class="empty" style="margin-top:12px">No focus blocks on this day.</div>';
@@ -2747,6 +3066,13 @@ function renderSettings() {
   $('#setAuto').checked = st.autoStart;
   $('#setGame').checked = st.gamification;
   $('#setMotion').value = motion();
+  $('#setGlass').value = glass();
+  $('#setGlass').disabled = !glassSupported();
+  if (!glassSupported()) $('#glassDesc').textContent = 'Needs a newer browser — this one can’t draw the glass effect.';
+  $('#setPomeo').checked = st.pomeo !== false;
+  $('#setPomeoTalk').value = st.pomeoTalk || 'sometimes';
+  $('#setWater').checked = st.waterNudge !== false;
+  $('#setTip').checked = st.dailyTip !== false;
   renderPrivacy();
   $('#setAmbVol').value = st.ambientVolume;
   const perm = 'Notification' in window ? Notification.permission : 'unsupported';
@@ -2915,10 +3241,18 @@ const ACH_BY_ID = Object.fromEntries(ACHIEVEMENTS.map(a => [a.id, a]));
 
 /* ---------- Shop catalogue (cosmetic only). price 0 = free default. lvl = minimum level. ---------- */
 const SHOP_CATS = [
-  ['sound', 'Sounds'], ['ambient', 'Ambient'], ['theme', 'Themes'], ['ring', 'Timer ring'], ['font', 'Timer font'],
+  ['pomeo', 'Pomeo'], ['sound', 'Sounds'], ['ambient', 'Ambient'], ['theme', 'Themes'], ['ring', 'Timer ring'], ['font', 'Timer font'],
   ['effect', 'Effects'], ['frame', 'Badge frame'], ['color', 'Name colour'], ['extra', 'Extras'], ['freeze', 'Streak freeze'],
 ];
 const ITEMS = [
+  { id: 'hat_none',    cat: 'pomhat', name: 'No hat',          desc: 'Pomeo as he is',             price: 0 },
+  { id: 'hat_party',   cat: 'pomhat', name: 'Party hat',       desc: 'For every finished chapter', price: 80 },
+  { id: 'hat_grad',    cat: 'pomhat', name: 'Graduation cap',  desc: 'Exam season ready',          price: 150 },
+  { id: 'hat_crown',   cat: 'pomhat', name: 'Crown',           desc: 'Focus royalty',              price: 800, lvl: 20 },
+  { id: 'acc_none',    cat: 'pomacc', name: 'No accessory',    desc: 'Simple and fresh',           price: 0 },
+  { id: 'acc_glasses', cat: 'pomacc', name: 'Round glasses',   desc: 'Very studious',              price: 100 },
+  { id: 'acc_phones',  cat: 'pomacc', name: 'Headphones',      desc: 'In the zone',                price: 160 },
+
   { id: 'snd_chime',   cat: 'sound', name: 'Chime',         desc: 'The original three-note chime', price: 0 },
   { id: 'snd_bell',    cat: 'sound', name: 'Soft bell',     desc: 'A single warm bell',             price: 60 },
   { id: 'snd_wood',    cat: 'sound', name: 'Wooden block',  desc: 'Two gentle knocks',              price: 60 },
@@ -2984,7 +3318,7 @@ const ITEMS = [
   { id: 'freeze', cat: 'freeze', name: 'Streak Freeze', desc: 'Protects your streak for one missed day. Used automatically; hold up to 2', price: 250 },
 ];
 const ITEM_BY_ID = Object.fromEntries(ITEMS.map(i => [i.id, i]));
-const DEFAULTS = { sound: 'snd_chime', ambient: 'amb_none', theme: 'th_default', ring: 'ring_classic', font: 'font_system', effect: 'fx_none', frame: 'frame_none', color: 'col_default' };
+const DEFAULTS = { pomhat: 'hat_none', pomacc: 'acc_none', sound: 'snd_chime', ambient: 'amb_none', theme: 'th_default', ring: 'ring_classic', font: 'font_system', effect: 'fx_none', frame: 'frame_none', color: 'col_default' };
 const NAME_COLORS = { col_teal: '#2f9e8f', col_sky: '#4a90c2', col_coral: '#e07a5f', col_violet: '#8a6fd1', col_rose: '#c95c84', col_gold: '#c9a227' };
 
 /* ---------- Derived game state (cached; cleared whenever state is saved) ---------- */
@@ -3608,6 +3942,7 @@ function applyCosmetics() {
   applyFont();
   updateAmbient();
   renderHeaderChip();
+  renderPomeo();
 }
 
 /* ==========================================================================
@@ -3648,9 +3983,20 @@ function renderProfile() {
     <div class="row" style="gap:14px;min-width:0">${badge}<div style="min-width:0">
       <div class="acct-name">${USER.guest ? 'Not signed in' : '@' + esc(USER.username)}</div>
       <div class="desc">${USER.guest ? 'Data stays on this device only' : 'Progress syncs across your devices'}</div></div></div>
-    <button class="btn icon-l" id="openSettings">${GEAR_SVG}Settings</button></div>`;
+    <button class="btn icon-l" id="openSettings">${GEAR_SVG}Settings</button></div>` + pomeoCard();
   if (on) renderProgress();
   else $('#progressView').innerHTML = `<div class="card empty-card"><p class="muted">Levels, badges and achievements are hidden.</p><button class="btn" id="openSettings2">Turn them on in Settings</button></div>`;
+}
+
+function pomeoCard() {
+  const o = pomeoOutfit(), wear = [o.hat, o.acc].filter(id => !/_none$/.test(id)).map(id => ITEM_BY_ID[id].name);
+  const mood = pomeoOn() ? ($('#mascot') ? $('#mascot').dataset.state : 'idle') : '';
+  return `<div class="card pomeo-card">
+    <span class="pomeo-pic">${pomeoSVG({ state: pomeoOn() ? 'happy' : 'sleep', ...o })}</span>
+    <div class="pc-main"><div class="pc-name">Pomeo</div>
+      <div class="desc">${pomeoOn() ? esc(POMEO_MOOD_TEXT[mood] || POMEO_MOOD_TEXT.idle) : 'Hidden — he’s napping'}</div>
+      <div class="desc">Wearing: ${wear.length ? esc(wear.join(' · ')) : 'nothing special yet'}</div></div>
+    ${!pomeoOn() ? '<button class="btn" id="pomeoShow">Show Pomeo</button>' : S.settings.gamification ? '<button class="btn" id="pomeoOutfit">Change outfit</button>' : ''}</div>`;
 }
 
 function renderProgress() {
@@ -3732,6 +4078,7 @@ function previewFor(it, g) {
     return `<div class="thprev${it.id === 'th_starfield' ? ' stars' : ''}" style="${st}"><div class="sf"><i></i><b></b><b class="s"></b></div></div>`;
   }
   if (it.cat === 'ring') return ringPreview(it.id);
+  if (it.cat === 'pomhat' || it.cat === 'pomacc') return pomeoSVG({ state: 'happy', hat: it.cat === 'pomhat' ? it.id : 'hat_none', acc: it.cat === 'pomacc' ? it.id : 'acc_none' });
   if (it.cat === 'font') { const f = FONTS[it.id]; return `<span class="fontpv"${f ? ` style="font-family:'${f.family}',system-ui"` : ''}>25:00</span>`; }
   if (it.cat === 'frame') return badgeSVG(g.tier, { size: 48, frame: it.id });
   if (it.cat === 'color') { const c = NAME_COLORS[it.id]; return `<span class="namepv"${c ? ` style="color:${c}"` : ''}>${esc(USER.guest ? 'You' : '@' + USER.username)}</span>`; }
@@ -3760,7 +4107,7 @@ function itemCard(it, g) {
 }
 function renderShop() {
   const g = game(), cat = SHOP_CATS.some(([id]) => id === S.ui.shopCat) ? S.ui.shopCat : 'sound';
-  const items = ITEMS.filter(i => i.cat === cat);
+  const items = ITEMS.filter(i => cat === 'pomeo' ? i.cat === 'pomhat' || i.cat === 'pomacc' : i.cat === cat);
   if (cat === 'font') items.forEach(i => loadFont(i.id, true));
   $('#shopView').innerHTML = `
     <div class="shop-head">
@@ -4642,6 +4989,7 @@ function showTab(tab) {
   if (tab === 'settings') renderSettings();
   if (tab === 'profile') renderProfile();
   if (tab === 'shop') renderShop();
+  if (tab === 'reminders') renderReminders();
   if (tab === 'board') { SOC.lbShown = null; renderBoardTab(); }
   if (tab === 'friends') { SOC.friend = null; SOC.unread = false; updateFriendsDot(); renderFriends(); }
   const y = scrollMem[tab] || 0;   // restore once the tab has laid out (charts can grow it a moment later)
@@ -4652,6 +5000,733 @@ function showTab(tab) {
   saveLocal();
   animateIn($('#tab-' + tab));
 }
+/* ==========================================================================
+   POMEO — the tomato buddy
+   Tap: a short random reaction and a line. Hold: he gets petted.
+   He talks at fitting moments (how often is a setting), shows a mood,
+   wears outfits from the shop and delivers reminders.
+   Everything respects the Animations setting: reactions that move only
+   play in "full"; blush and wink (no movement) also show in "reduced".
+   ========================================================================== */
+const POMEO_HATS = {
+  hat_party: '<g class="m-hat"><path d="M13.6 12.2 21.5-4.6l6.2 15.9Z" fill="#e8739b"/><path d="M16.1 6.9 25 9.6M18.4 1.8 26.6 4.2" stroke="#fff" stroke-width="1.2" opacity=".75"/><circle cx="21.5" cy="-4.8" r="2.1" fill="#ffd166"/></g>',
+  hat_grad: '<g class="m-hat"><path d="M13.3 6.6h13.4v4.6q-6.7 2.4-13.4 0Z" fill="#2b2d42"/><path d="M4.5 4.6 20-1.4l15.5 6L20 10.6Z" fill="#363a56"/><path d="M20 4.4 31.6 5.2v7.2" stroke="#f2c14e" stroke-width="1.1" fill="none"/><rect x="30.4" y="11.6" width="2.4" height="3.4" rx=".8" fill="#f2c14e"/></g>',
+  hat_crown: '<g class="m-hat"><path d="M11.6 12.4V2.6l4.4 4.2L20-.8l4 7.6 4.4-4.2v9.8Z" fill="#f2c14e" stroke="#d49b1f" stroke-width=".9" stroke-linejoin="round"/><circle cx="20" cy="8.2" r="1.4" fill="#e5654f"/><circle cx="15.2" cy="9.4" r=".9" fill="#5b7fd6"/><circle cx="24.8" cy="9.4" r=".9" fill="#5b7fd6"/></g>',
+};
+const POMEO_ACCS = {
+  acc_glasses: '<g class="m-acc" fill="rgba(255,255,255,.28)" stroke="#2b2b2b" stroke-width="1.1"><circle cx="15.6" cy="23.8" r="3.5"/><circle cx="24.4" cy="23.8" r="3.5"/><path d="M19.1 23.4q.9-.9 1.8 0M12.1 23.2 7.4 21.6M27.9 23.2l4.7-1.6" fill="none"/></g>',
+  acc_phones: '<g class="m-acc"><path d="M6.4 22.5Q7 7.5 20 7.2q13 .3 13.6 15.3" stroke="#3d3f4a" stroke-width="2.3" fill="none" stroke-linecap="round"/><rect x="3.4" y="19" width="5.6" height="9.4" rx="2.4" fill="#3d3f4a"/><rect x="31" y="19" width="5.6" height="9.4" rx="2.4" fill="#3d3f4a"/><rect x="4.8" y="21" width="2.6" height="5.4" rx="1.2" fill="#8c9aff"/><rect x="32.6" y="21" width="2.6" height="5.4" rx="1.2" fill="#8c9aff"/></g>',
+};
+/** The Pomeo drawing. state = idle | focus | sleep | sleepy | celebrate | happy | excited */
+function pomeoSVG({ state = 'idle', hat = 'hat_none', acc = 'acc_none', id = '', size = 0 } = {}) {
+  return `<svg class="mascot"${id ? ` id="${id}"` : ''} data-state="${state}" viewBox="-4 -8 48 48"${size ? ` width="${size}" height="${size}"` : ''} aria-hidden="true">
+    <g class="m-body">
+      <ellipse cx="20" cy="24" rx="13.5" ry="12.5" fill="#e5654f"/>
+      <ellipse cx="14.5" cy="19" rx="3.4" ry="2" fill="#fff" opacity=".25" transform="rotate(-28 14.5 19)"/>
+      <path d="M20 12.6 16.2 10.4l1.2 3.1-3.6.9 3.8.9 2.4-.6 2.4.6 3.8-.9-3.6-.9 1.2-3.1Z" fill="#5c9b57"/>
+      <path d="M20 12.8V8.8" stroke="#4e8a4a" stroke-width="1.6" stroke-linecap="round"/>
+      <circle class="m-cheek" cx="13.2" cy="27.2" r="1.9" fill="#ff9d8c" opacity=".6"/><circle class="m-cheek" cx="26.8" cy="27.2" r="1.9" fill="#ff9d8c" opacity=".6"/>
+      <g class="e e-open" fill="#3a1d18"><circle cx="15.8" cy="24" r="1.55"/><circle cx="24.2" cy="24" r="1.55"/></g>
+      <g class="e e-focus" stroke="#3a1d18" stroke-width="1.5" stroke-linecap="round"><path d="M14.2 24.2h3.2M22.6 24.2h3.2M14 21.8l3.2.8M26 21.8l-3.2.8"/></g>
+      <g class="e e-sleep" stroke="#3a1d18" stroke-width="1.4" stroke-linecap="round" fill="none"><path d="M14.2 24q1.6 1.4 3.2 0M22.6 24q1.6 1.4 3.2 0"/></g>
+      <g class="e e-happy" stroke="#3a1d18" stroke-width="1.5" stroke-linecap="round" fill="none"><path d="M14.2 24.8q1.6-2.3 3.2 0M22.6 24.8q1.6-2.3 3.2 0"/></g>
+      <g class="e-wink"><path d="M14.2 24.6q1.6-1.8 3.2 0" stroke="#3a1d18" stroke-width="1.5" stroke-linecap="round" fill="none"/><circle cx="24.2" cy="24" r="1.55" fill="#3a1d18"/></g>
+      <path d="M18.4 28.3q1.6 1.3 3.2 0" stroke="#3a1d18" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+      ${POMEO_ACCS[acc] || ''}${POMEO_HATS[hat] || ''}
+    </g>
+    <text class="zz" x="33" y="9" font-size="8" font-weight="600" fill="currentColor" style="color:var(--muted)">z</text>
+    <g class="spark" fill="#f2c14e"><path d="M3 6l1 2.4L6.4 9.4 4 10.4 3 12.8 2 10.4-.4 9.4 2 8.4Z" transform="scale(.8)"/><path d="M38 4l.8 1.8 1.8.8-1.8.8-.8 1.8-.8-1.8-1.8-.8 1.8-.8Z"/></g>
+  </svg>`;
+}
+const pomeoOn = () => S.settings.pomeo !== false;
+const pomeoOutfit = () => ({ hat: equippedId('pomhat'), acc: equippedId('pomacc') });
+const POMEO_MOOD_TEXT = { idle: 'Ready when you are', focus: 'Focused with you', sleep: 'Resting on your break', sleepy: 'A bit sleepy 🌙', celebrate: 'Celebrating!', happy: 'Happy — goal done today', excited: 'Excited about your streak!' };
+let pomeoExcitedUntil = 0;
+/** Mood when nothing else is going on: excited (streak milestone), happy (goal met), sleepy (night) or idle. */
+function pomeoIdleMood() {
+  if (Date.now() < pomeoExcitedUntil) return 'excited';
+  const h = new Date().getHours();
+  if (h >= 22 || h < 5) return 'sleepy';
+  const mins = (game().idx[dayKey(new Date())] || {}).total || 0;
+  return mins >= S.settings.goalMin ? 'happy' : 'idle';
+}
+let pomeoKey = '';
+/** Draw Pomeo in the timer card (only when his outfit changed, so running animations aren't restarted). */
+function renderPomeo() {
+  const host = $('#pomeoHost');
+  if (!host || !USER) return;
+  host.classList.toggle('hidden', !pomeoOn());
+  const o = pomeoOutfit(), key = o.hat + o.acc;
+  if (key !== pomeoKey || !$('#mascot')) {
+    pomeoKey = key;
+    const st = $('#mascot') ? $('#mascot').dataset.state : 'idle';
+    $('#pomeoBtn').innerHTML = pomeoSVG({ state: st, ...o, id: 'mascot' });
+  }
+  setMascot();
+}
+
+/* ---------- Speech bubble (one at a time, short queue) ---------- */
+const PB = { q: [], cur: null, timer: 0, lastEvent: 0 };
+/**
+ * kind: 'tap' (always), 'event' (depends on "Pomeo talks"), 'care' (gentle; skipped when Quiet),
+ *       'nudge' (water/stretch: its own setting; falls back to a toast).
+ */
+function pomeoSay(text, { kind = 'event', ms = 5200, actions = null, closable = false, onClose = null } = {}) {
+  const talk = S.settings.pomeoTalk || 'sometimes';
+  const visible = pomeoOn() && S.ui.tab === 'timer' && !document.body.classList.contains('zen');
+  if (kind === 'nudge' && !visible) { toast(text, 4200); return; }
+  if (!pomeoOn()) return;
+  if (kind === 'event') {
+    if (talk === 'quiet') return;
+    if (talk === 'sometimes' && (Date.now() - PB.lastEvent < 90000 || Math.random() < 0.4)) return;
+    PB.lastEvent = Date.now();
+  }
+  if (kind === 'care' && talk === 'quiet') return;
+  if (!visible) return;
+  const item = { text, ms, actions, closable, onClose };
+  if (kind === 'tap') { PB.q = []; showBubble(item); return; }
+  if (PB.cur) { if (PB.q.length < 3) PB.q.push(item); return; }
+  showBubble(item);
+}
+function showBubble(item) {
+  const b = $('#pomeoBubble');
+  clearTimeout(PB.timer);
+  PB.cur = item;
+  b.className = 'pomeo-bubble' + (item.closable ? ' has-x' : '');
+  b.innerHTML = `<span class="pb-t"></span>${item.closable ? '<button class="pb-x" aria-label="Dismiss">×</button>' : ''}` +
+    (item.actions ? `<div class="pb-acts">${item.actions.map(([label, , primary], i) => `<button class="btn${primary ? ' primary' : ''}" data-pba="${i}">${esc(label)}</button>`).join('')}</div>` : '');
+  b.querySelector('.pb-t').textContent = item.text;
+  void b.offsetWidth;
+  b.classList.add('show');
+  if (item.ms) PB.timer = setTimeout(hideBubble, item.ms);
+}
+function hideBubble() {
+  clearTimeout(PB.timer);
+  const item = PB.cur;
+  PB.cur = null;
+  $('#pomeoBubble').className = 'pomeo-bubble hidden';
+  if (item && item.onClose) item.onClose();
+  const next = PB.q.shift();
+  if (next) setTimeout(() => showBubble(next), 350);
+}
+$('#pomeoBubble').addEventListener('click', e => {
+  const a = e.target.closest('[data-pba]');
+  if (a) { const fn = PB.cur && PB.cur.actions[+a.dataset.pba][1]; hideBubble(); if (fn) fn(); return; }
+  if (e.target.closest('.pb-x')) hideBubble();
+});
+const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+
+/* ---------- Tap and hold ---------- */
+const TAP_LINES = ['Hi! I’m Pomeo 🍅', 'Hehe, that tickles!', 'You’ve got this 💪', 'One block at a time.', 'Ready when you are!', 'Tomatoes love focus.', 'Small steps add up ✨', 'Water break? I’ll wait 💧'];
+const PET_LINES = ['Aww, thank you! 🥰', 'Best. Pat. Ever.', 'I’m blushing! ☺️', 'Mmm, so cosy…'];
+function pomeoReact(kind) {
+  const m = $('#mascot');
+  if (!m) return;
+  m.classList.remove('r-wiggle', 'r-jump', 'r-spin', 'r-blush', 'r-wink', 'r-pet');
+  void m.getBoundingClientRect();
+  m.classList.add('r-' + kind);
+  clearTimeout(m._rt);
+  m._rt = setTimeout(() => m.classList.remove('r-' + kind), kind === 'pet' ? 1300 : 950);
+}
+function pomeoTap() {
+  const moving = motion() === 'full';
+  pomeoReact(pick(moving ? ['wiggle', 'jump', 'spin', 'blush', 'wink'] : ['blush', 'wink']));
+  pomeoSay(pick(TAP_LINES), { kind: 'tap', ms: 2800 });
+}
+function pomeoPet() {
+  pomeoReact('pet');
+  if (motion() !== 'off') {
+    const host = $('#pomeoHost');
+    const n = motion() === 'full' ? 4 : 1;
+    for (let i = 0; i < n; i++) {
+      const h = document.createElement('span');
+      h.className = 'p-heart';
+      h.textContent = '❤';
+      h.style.color = '#e8739b';
+      h.style.setProperty('--hx', `${(i - (n - 1) / 2) * 9}px`);
+      h.style.animationDelay = i * 0.12 + 's';
+      host.appendChild(h);
+      setTimeout(() => h.remove(), 1700);
+    }
+  }
+  pomeoSay(pick(PET_LINES), { kind: 'tap', ms: 2800 });
+}
+(() => {
+  const btn = $('#pomeoBtn');
+  let holdT = 0, held = false, down = false;
+  btn.addEventListener('pointerdown', e => {
+    if (e.button !== 0) return;
+    down = true; held = false;
+    holdT = setTimeout(() => { held = true; pomeoPet(); }, 450);
+  });
+  const end = () => { clearTimeout(holdT); };
+  btn.addEventListener('pointerup', () => { end(); if (down && !held) pomeoTap(); down = false; });
+  btn.addEventListener('pointerleave', () => { end(); down = false; });
+  btn.addEventListener('pointercancel', () => { end(); down = false; });
+  btn.addEventListener('contextmenu', e => e.preventDefault());
+  btn.addEventListener('click', e => { if (e.detail === 0) pomeoTap(); });   // keyboard
+})();
+
+/* ---------- Things Pomeo says at fitting moments ---------- */
+const STREAK_MARKS = [3, 7, 14, 21, 30, 50, 75, 100, 150, 200, 365];
+function pomeoAfterSession(before) {
+  const idx = buildIndex(), mins = (idx[dayKey(new Date())] || {}).total || 0, goal = S.settings.goalMin;
+  const { cur } = computeStreaks(idx);
+  if (cur > before.streak && STREAK_MARKS.includes(cur)) {
+    pomeoExcitedUntil = Date.now() + 2 * 3600e3;
+    pomeoSay(`🔥 ${cur}-day streak! I’m so proud of you.`, { kind: 'care' });
+  } else if (before.mins < goal && mins >= goal) pomeoSay('Daily goal done! 🎉 That’s a great day.', { kind: 'care' });
+  else if (mins < goal && goal - mins <= 20) pomeoSay(`Nice work! You’re ${Math.ceil(goal - mins)} min from your daily goal!`, { kind: 'event' });
+  else pomeoSay(pick(['Nice work! 🍅', 'Great focus!', 'Another one done ✨', 'That was a solid block!']), { kind: 'event' });
+}
+/** Long stretches of focus: a gentle water and stretch nudge when the break starts. */
+let lastWaterNudge = 0;
+function pomeoBreakStart() {
+  const since = Date.now() - 2.5 * 3600e3;
+  const recent = S.sessions.filter(s => s.end > since).reduce((a, s) => a + s.duration, 0) / 60000;
+  if (S.settings.waterNudge !== false && recent >= 90 && Date.now() - lastWaterNudge > 90 * 60000) {
+    lastWaterNudge = Date.now();
+    pomeoSay(`${Math.round(recent)} minutes of focus! Sip some water 💧 and stretch your shoulders.`, { kind: 'nudge', ms: 7000 });
+    return;
+  }
+  pomeoSay(pick(['Break time! Stretch 🙆', 'Break time! Look out of a window for a bit 🌿', 'Break! Stand up and shake it out 🙆']), { kind: 'event' });
+}
+function pomeoFocusStart() {
+  pomeoSay(pick(['Let’s go! I’ll stay quiet 🤫', 'Deep breath. You’ve got this.', 'Phone away, focus on 🍅']), { kind: 'event', ms: 3200 });
+}
+/** On opening the app: welcome back after a few days away, or a little encouragement. */
+function pomeoHello() {
+  const last = S.sessions.length ? S.sessions[S.sessions.length - 1].end : 0;
+  const days = last ? (Date.now() - last) / 864e5 : 0;
+  if (last && days >= 3) { pomeoSay('Welcome back! 🌱 Let’s start with something small.', { kind: 'care' }); return; }
+  const mins = (game().idx[dayKey(new Date())] || {}).total || 0, h = new Date().getHours();
+  if (!mins && h >= 5 && h < 22) pomeoSay(pick(['Ready for a focus block? Pick one small thing.', 'Good to see you! What are we studying today?', 'A short session counts too 🍅']), { kind: 'event' });
+}
+/** After 11 PM: suggest sleep, at most once per night, dismissible. */
+const NIGHT_KEY = 'pomodorolist-pomeo-night';
+function pomeoNightCheck() {
+  const now = new Date(), h = now.getHours();
+  if (!(h >= 23 || h < 4) || !USER || !pomeoOn() || S.ui.tab !== 'timer') return;
+  if (S.timer.status === 'running' && S.timer.phase === 'focus') return;
+  const night = dayKey(h < 4 ? addDays(startOfDay(now), -1) : now);
+  if (localStorage.getItem(NIGHT_KEY) === night) return;
+  if ((S.settings.pomeoTalk || 'sometimes') === 'quiet') return;
+  writeLS(NIGHT_KEY, night);
+  pomeoSay('It’s getting late. Rest helps memory too 🌙 Maybe call it a night?', { kind: 'care', ms: 0, closable: true, actions: [['Good night 🌙', null, true]] });
+}
+setInterval(pomeoNightCheck, 60000);
+
+/* ==========================================================================
+   REMINDERS
+   Stored in S.reminders, which is part of the user's own profile document
+   (users/{uid}), so they sync like presets; in "this device only" mode they
+   live in localStorage with everything else.
+   { id, title, date 'YYYY-MM-DD', time 'HH:MM', repeat none|daily|weekdays|weekly,
+     days [0-6], before 0|5|10|15|30, presetId, session, done {day: ts}, snooze {day: ts},
+     created, updated }
+   Honest limit: a web page can only alert while it is open (a background tab
+   is fine). "Add to calendar" lets the phone's own calendar remind you too.
+   ========================================================================== */
+const REM_FIRED_KEY = 'pomodorolist-rem-fired';     // occurrences already alerted on this device
+const REM_PERM_KEY = 'pomodorolist-rem-perm-asked';
+const REM_BEFORE = [0, 5, 10, 15, 30];
+const WD = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const BELL_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>';
+const CAL_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M12 14v4M10 16h4"/></svg>';
+const EDIT_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+const TRASH_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>';
+const TICK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+const INFO_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>';
+
+const parseDay = k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); };
+const remAt = (r, day) => { const [h, mi] = r.time.split(':').map(Number); const d = new Date(day); d.setHours(h, mi, 0, 0); return d.getTime(); };
+function remOnDay(r, day) {
+  const k = dayKey(day);
+  if (r.repeat === 'none') return k === r.date;
+  if (k < r.date) return false;
+  const wd = day.getDay();
+  if (r.repeat === 'daily') return true;
+  if (r.repeat === 'weekdays') return wd >= 1 && wd <= 5;
+  return (r.days || []).includes(wd);
+}
+/** Next occurrence on or after a day (null if none within a year). */
+function remNext(r, fromDay) {
+  let d = startOfDay(fromDay);
+  for (let i = 0; i < 370; i++, d = addDays(d, 1)) if (remOnDay(r, d)) return { day: dayKey(d), at: remAt(r, d) };
+  return null;
+}
+const remDone = (r, day) => !!(r.done && r.done[day]);
+function remRepeatText(r) {
+  if (r.repeat === 'daily') return 'Every day';
+  if (r.repeat === 'weekdays') return 'Weekdays';
+  if (r.repeat === 'weekly') return 'Every ' + (r.days || []).slice().sort((a, b) => ((a + 6) % 7) - ((b + 6) % 7)).map(d => WD[d]).join(', ');
+  return '';
+}
+const fmtHM = ts => new Date(ts).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+const fmtDayShort = k => parseDay(k).toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' });
+function remPrune(r) {
+  for (const f of ['done', 'snooze']) {
+    if (!r[f]) continue;
+    const keys = Object.keys(r[f]).sort();
+    for (const k of keys.slice(0, Math.max(0, keys.length - 20))) delete r[f][k];
+  }
+}
+function saveReminders() { S.reminders.forEach(remPrune); save(); renderReminderBits(); }
+
+/* ---------- Checking: every 15 s, and whenever the tab becomes visible ---------- */
+let remFired = new Set(readJSON(REM_FIRED_KEY, []));
+const POP = { cur: null };
+function checkReminders() {
+  if (!USER || !S.reminders.length) return;
+  const now = Date.now(), today = startOfDay(new Date());
+  for (const r of S.reminders) {
+    for (const day of [addDays(today, -1), today, addDays(today, 1)]) {
+      if (!remOnDay(r, day)) continue;
+      const k = dayKey(day), at = remAt(r, day);
+      if (remDone(r, k)) continue;
+      const snoozed = r.snooze && r.snooze[k];
+      const alertAt = snoozed || at - (r.before || 0) * 60000;
+      if (now < alertAt || now > at + 60 * 60000) continue;    // too early, or more than an hour late (shown as missed)
+      const key = `${r.id}@${k}@${alertAt}`;
+      if (remFired.has(key)) continue;
+      remFired.add(key);
+      writeLS(REM_FIRED_KEY, [...remFired].slice(-200));
+      fireReminder(r, k, at);
+      return;   // one at a time
+    }
+  }
+}
+function playReminderChime() {
+  if (!S.settings.sound) return;
+  const c = getCtx();
+  if (!c) return;
+  tone(c, c.destination, { f: 659.25, peak: 0.07, a: 0.04, d: 1.2 });
+  tone(c, c.destination, { f: 987.77, t: 0.22, peak: 0.05, a: 0.04, d: 1.4 });
+}
+function fireReminder(r, day, at) {
+  const mins = Math.round((at - Date.now()) / 60000);
+  const text = mins >= 1 ? `${r.title} in ${mins} minute${mins === 1 ? '' : 's'}! Ready?` : `Time for ${r.title}! Ready?`;
+  showPomeoPop(r, day, text);
+  playReminderChime();
+  if ('Notification' in window && Notification.permission === 'granted' && S.settings.notify) {
+    try {
+      const n = new Notification(pomeoOn() ? 'Pomeo · Reminder' : 'Reminder', { body: text, tag: 'rem-' + r.id, renotify: true });
+      n.onclick = () => { window.focus(); n.close(); };
+    } catch (e) { /* some mobile browsers need a service worker for notifications */ }
+  }
+}
+function showPomeoPop(r, day, text) {
+  POP.cur = { id: r.id, day };
+  const pop = $('#pomeoPop');
+  pop.classList.toggle('no-pomeo', !pomeoOn());
+  pop.querySelector('.pomeo-pic').innerHTML = pomeoSVG({ state: 'excited', ...pomeoOutfit() });
+  $('#popText').textContent = text;
+  pop.classList.remove('hidden', 'show');
+  void pop.offsetWidth;
+  pop.classList.add('show');
+  $('#popStart').focus({ preventScroll: true });
+}
+function closePop() { $('#pomeoPop').classList.add('hidden'); POP.cur = null; }
+function remById(id) { return S.reminders.find(r => r.id === id); }
+function markRemDone(r, day, on = true) {
+  r.done = r.done || {};
+  if (on) r.done[day] = Date.now(); else delete r.done[day];
+  r.updated = Date.now();
+}
+$('#pomeoPop').addEventListener('click', e => {
+  const b = e.target.closest('button');
+  if (!b || !POP.cur) return;
+  const r = remById(POP.cur.id), day = POP.cur.day;
+  closePop();
+  if (!r) return;
+  if (b.id === 'popSnooze') {
+    r.snooze = r.snooze || {};
+    r.snooze[day] = Date.now() + 5 * 60000;
+    saveReminders();
+    toast('Snoozed for 5 minutes');
+  } else if (b.id === 'popDismiss') {
+    markRemDone(r, day);
+    saveReminders();
+  } else if (b.id === 'popStart') {
+    markRemDone(r, day);
+    saveReminders();
+    startFromReminder(r);
+  }
+});
+/** "Start now": open the timer with the reminder's preset and session name, and start it if it is free. */
+function startFromReminder(r) {
+  showTab('timer');
+  const t = S.timer;
+  if (t.status !== 'idle') { toast('Finish or reset the current session first — your reminder’s name is ready below', 3600); }
+  if (t.status === 'idle') {
+    if (r.presetId && S.presets.some(p => p.id === r.presetId)) S.activePresetId = r.presetId;
+    t.phase = 'focus';
+  }
+  $('#nameInput').value = r.session || r.title;
+  onNameChange();
+  renderSessionInputs();
+  if (t.status === 'idle') startTimer();
+}
+
+/* ---------- The Reminders tab ---------- */
+function remRow(r, day, { time, sub, done, missed } = {}) {
+  const meta = [remRepeatText(r), r.before ? `${r.before} min before` : 'At the time',
+    r.presetId && S.presets.find(p => p.id === r.presetId) ? S.presets.find(p => p.id === r.presetId).name : ''].filter(Boolean);
+  return `<li class="rem${done ? ' done' : ''}" data-rid="${esc(r.id)}" data-day="${day}">
+    <div class="rem-bg"><span class="l">✓ Done</span><span class="r">Delete</span></div>
+    <div class="rem-fg">
+      <button class="rem-check" data-rdone aria-label="${done ? 'Mark as not done' : 'Mark as done'}">${TICK_SVG}</button>
+      <span class="rtime">${time}</span>
+      <div class="rem-main"><div class="rt">${esc(r.title)}</div>
+        <div class="rs">${missed ? `<span class="miss">${missed}</span> · ` : ''}${sub ? esc(sub) + ' · ' : ''}${esc(meta.join(' · '))}</div></div>
+      <div class="rem-acts">
+        <button class="iconbtn" data-rcal title="Add to calendar" aria-label="Add to calendar">${CAL_SVG}</button>
+        <button class="iconbtn hide-sm" data-redit title="Edit" aria-label="Edit">${EDIT_SVG}</button>
+        <button class="iconbtn hide-sm" data-rdel title="Delete" aria-label="Delete">${TRASH_SVG}</button>
+      </div>
+    </div></li>`;
+}
+function remLists() {
+  const now = new Date(), today = startOfDay(now), tk = dayKey(today), tomorrow = addDays(today, 1);
+  const todayL = [], upcoming = [], completed = [];
+  for (const r of S.reminders) {
+    if (r.repeat === 'none') {
+      const at = remAt(r, parseDay(r.date));
+      if (remDone(r, r.date)) completed.push({ r, day: r.date, at, sort: r.done[r.date] });
+      else if (r.date === tk) todayL.push({ r, day: tk, at, missed: at < now - 3600e3 ? 'Missed' : '' });
+      else if (r.date < tk) todayL.push({ r, day: r.date, at, missed: 'Missed · ' + fmtDayShort(r.date) });
+      else upcoming.push({ r, day: r.date, at });
+      continue;
+    }
+    if (remOnDay(r, today)) {
+      const at = remAt(r, today);
+      if (remDone(r, tk)) completed.push({ r, day: tk, at, sort: r.done[tk], sub: 'Done today' });
+      else todayL.push({ r, day: tk, at, missed: at < now - 3600e3 ? 'Missed' : '' });
+    }
+    const nx = remNext(r, tomorrow);
+    if (nx) upcoming.push({ r, day: nx.day, at: nx.at });
+  }
+  todayL.sort((a, b) => a.at - b.at);
+  upcoming.sort((a, b) => a.at - b.at);
+  completed.sort((a, b) => b.sort - a.sort);
+  return { todayL, upcoming: upcoming.slice(0, 30), completed: completed.slice(0, 30) };
+}
+function renderReminders() {
+  const body = $('#remBody');
+  if (!body || !USER) return;
+  const perm = 'Notification' in window ? Notification.permission : 'unsupported';
+  const askPerm = S.reminders.length && perm === 'default' && localStorage.getItem(REM_PERM_KEY) !== '1';
+  $('#remPerm').innerHTML = askPerm ? `<div class="card perm-card">${BELL_SVG.replace('<svg', '<svg width="22" height="22"')}
+    <p>Want a heads-up even when Pomodorolist is in another tab? Allow notifications for your reminders.</p>
+    <div class="btn-row"><button class="btn primary small" id="permAllow">Allow</button><button class="btn small" id="permLater">Not now</button></div></div>` : '';
+  if (!S.reminders.length) {
+    body.innerHTML = `<div class="card rem-empty">${pomeoOn() ? `<span class="pomeo-pic">${pomeoSVG({ state: 'happy', ...pomeoOutfit() })}</span>` : ''}
+      <h3 style="margin:8px 0 4px">No reminders yet</h3>
+      <p class="muted" style="margin:0 0 14px">Plan your next study block${pomeoOn() ? ' — Pomeo will nudge you when it’s time' : ''}.</p>
+      <button class="btn primary" data-remadd>Add a reminder</button></div>`;
+    return;
+  }
+  const { todayL, upcoming, completed } = remLists();
+  const sec = (title, rows, extra = '', empty = '') => `<div class="card rem-sec"><h2>${title}${extra}</h2>${rows.length ? `<ul class="rem-list">${rows.join('')}</ul>` : `<div class="empty">${empty}</div>`}</div>`;
+  body.innerHTML =
+    sec('Today', todayL.map(o => remRow(o.r, o.day, { time: fmtHM(o.at), missed: o.missed })), '', 'Nothing left for today 🎉') +
+    sec('Upcoming', upcoming.map(o => remRow(o.r, o.day, { time: fmtHM(o.at), sub: fmtDayShort(o.day) })), '', 'Nothing scheduled yet.') +
+    (completed.length ? sec('Completed', completed.map(o => remRow(o.r, o.day, { time: fmtHM(o.at), sub: o.sub || fmtDayShort(o.day), done: true })),
+      completed.some(o => o.r.repeat === 'none') ? '<button class="linkbtn" id="remClear" style="text-transform:none;letter-spacing:0">Clear</button>' : '') : '');
+  animateIn(body);
+}
+/** The next reminder still to come today (for the Today card). */
+function nextReminderToday() {
+  const now = Date.now(), today = startOfDay(new Date()), k = dayKey(today);
+  return S.reminders.filter(r => remOnDay(r, today) && !remDone(r, k)).map(r => ({ r, at: remAt(r, today) }))
+    .filter(o => o.at >= now - 5 * 60000).sort((a, b) => a.at - b.at)[0] || null;
+}
+function renderReminderBits() {
+  if (S.ui.tab === 'reminders') renderReminders();
+  renderTodayExtra();
+}
+
+/* ---------- Add / edit ---------- */
+let remEditing = null;
+function openRemForm(r) {
+  remEditing = r ? r.id : null;
+  const now = new Date(Date.now() + 30 * 60000);
+  now.setMinutes(now.getMinutes() < 30 ? 30 : 60, 0, 0);
+  const v = r || { title: '', date: dayKey(now), time: `${pad(now.getHours())}:${pad(now.getMinutes())}`, repeat: 'none', days: [new Date().getDay()], before: 10, presetId: '', session: '' };
+  $('#remDlgTitle').textContent = r ? 'Edit reminder' : 'New reminder';
+  $('#remTitle').value = v.title;
+  $('#remDate').value = v.date;
+  $('#remTime').value = v.time;
+  $('#remRepeat').value = v.repeat;
+  $('#remBefore').value = String(v.before);
+  $('#remPreset').innerHTML = '<option value="">No timer link</option>' + S.presets.map(p => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join('');
+  $('#remPreset').value = v.presetId || '';
+  $('#remSession').value = v.session || '';
+  $$('#remDays input').forEach(i => { i.checked = (v.days || []).includes(+i.value); });
+  $('#remErr').textContent = '';
+  syncRemForm();
+  $('#remDlg').showModal();
+  setTimeout(() => $('#remTitle').focus(), 50);
+}
+function syncRemForm() {
+  const rep = $('#remRepeat').value;
+  $('#remDaysWrap').classList.toggle('hidden', rep !== 'weekly');
+  $('#remDateLbl').textContent = rep === 'none' ? 'Date' : 'Starts on';
+}
+$('#remRepeat').addEventListener('change', syncRemForm);
+$('#remForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const title = $('#remTitle').value.trim(), date = $('#remDate').value, time = $('#remTime').value, repeat = $('#remRepeat').value;
+  const days = $$('#remDays input').filter(i => i.checked).map(i => +i.value);
+  const err = !title ? 'Give it a title, e.g. “Physics revision”.' : !date || !time ? 'Pick a date and time.' : repeat === 'weekly' && !days.length ? 'Choose at least one day.' : '';
+  if (err) { $('#remErr').textContent = err; shake($('#remForm')); return; }
+  const first = !S.reminders.length;
+  const data = { title: title.slice(0, 80), date, time, repeat, days: repeat === 'weekly' ? days : [], before: +$('#remBefore').value,
+    presetId: $('#remPreset').value, session: $('#remSession').value.trim().slice(0, 80), updated: Date.now() };
+  let r = remEditing && remById(remEditing);
+  if (r) { const changedTime = r.date !== date || r.time !== time; Object.assign(r, data); if (changedTime) r.snooze = {}; }
+  else { r = { id: 'r' + uid(), ...data, done: {}, snooze: {}, created: Date.now() }; S.reminders.push(r); }
+  if (repeat === 'none' && remAt(r, parseDay(date)) < Date.now() - 60000 && !remEditing) toast('That time has already passed — it’s listed as missed', 3600);
+  $('#remDlg').close();
+  saveReminders();
+  toast(remEditing ? 'Reminder updated' : 'Reminder added', 2200, true);
+  if (first) setTimeout(() => pomeoSay('Got it! I’ll remind you 🔔 Keep this tab open, or add it to your calendar too.', { kind: 'tap', ms: 5000 }), 300);
+  checkReminders();
+});
+$('#remCancel').addEventListener('click', () => $('#remDlg').close());
+function deleteReminder(r) {
+  if (!confirm(`Delete “${r.title}”${r.repeat !== 'none' ? ' and all its repeats' : ''}?`)) return false;
+  S.reminders = S.reminders.filter(x => x.id !== r.id);
+  saveReminders();
+  toast('Reminder deleted');
+  return true;
+}
+
+/* ---------- Calendar export (.ics download + Google Calendar link) ---------- */
+const icsDate = ts => { const d = new Date(ts); return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`; };
+const icsEsc = s => String(s).replace(/\\/g, '\\\\').replace(/[,;]/g, m => '\\' + m).replace(/\n/g, '\\n');
+const ICS_DAYS = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+function remRRule(r) {
+  if (r.repeat === 'daily') return 'FREQ=DAILY';
+  if (r.repeat === 'weekdays') return 'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR';
+  if (r.repeat === 'weekly') return 'FREQ=WEEKLY;BYDAY=' + (r.days || []).map(d => ICS_DAYS[d]).join(',');
+  return '';
+}
+function remSpan(r) {
+  const first = r.repeat === 'none' ? { at: remAt(r, parseDay(r.date)) } : remNext(r, parseDay(r.date));
+  const p = S.presets.find(x => x.id === r.presetId);
+  const start = first ? first.at : Date.now();
+  return { start, end: start + (p ? p.focus : 30) * 60000 };
+}
+function remDetails(r) {
+  return [r.session && r.session !== r.title ? 'Session: ' + r.session : '', 'Focus with Pomodorolist: ' + location.origin + location.pathname].filter(Boolean).join('\n');
+}
+function downloadIcs(r) {
+  const { start, end } = remSpan(r), rr = remRRule(r);
+  // Floating local times: the event happens at this clock time wherever the calendar is.
+  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Pomodorolist//Reminders//EN', 'CALSCALE:GREGORIAN', 'BEGIN:VEVENT',
+    `UID:${r.id}@pomodorolist.app`, `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '')}`,
+    `DTSTART:${icsDate(start)}`, `DTEND:${icsDate(end)}`, `SUMMARY:${icsEsc(r.title)}`, `DESCRIPTION:${icsEsc(remDetails(r))}`,
+    ...(rr ? ['RRULE:' + rr] : []),
+    'BEGIN:VALARM', 'ACTION:DISPLAY', `DESCRIPTION:${icsEsc(r.title)}`, `TRIGGER:-PT${r.before || 0}M`, 'END:VALARM',
+    'END:VEVENT', 'END:VCALENDAR'];
+  const blob = new Blob([lines.join('\r\n') + '\r\n'], { type: 'text/calendar' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (r.title.replace(/[^\w\- ]+/g, '').trim().replace(/\s+/g, '-') || 'reminder') + '.ics';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+function googleCalUrl(r) {
+  const { start, end } = remSpan(r), rr = remRRule(r);
+  const q = new URLSearchParams({ action: 'TEMPLATE', text: r.title, dates: `${icsDate(start)}/${icsDate(end)}`, details: remDetails(r) });
+  try { q.set('ctz', Intl.DateTimeFormat().resolvedOptions().timeZone); } catch (e) {}
+  if (rr) q.set('recur', 'RRULE:' + rr);
+  return 'https://calendar.google.com/calendar/render?' + q.toString();
+}
+let calFor = null;
+function openCal(r) {
+  calFor = r.id;
+  $('#calName').textContent = r.title;
+  $('#calGoogle').href = googleCalUrl(r);
+  $('#calDlg').showModal();
+}
+$('#calIcs').addEventListener('click', () => { const r = remById(calFor); if (r) { downloadIcs(r); toast('Calendar file downloaded — open it to add the event', 3200, true); } });
+$('#calClose').addEventListener('click', () => $('#calDlg').close());
+
+/* ---------- List interactions: buttons and swipe (phones) ---------- */
+$('#tab-reminders').addEventListener('click', e => {
+  const t = e.target;
+  if (t.closest('[data-remadd], #remAdd')) { openRemForm(); return; }
+  if (t.closest('#permAllow')) {
+    writeLS(REM_PERM_KEY, '1');
+    S.settings.notify = true; save();
+    Notification.requestPermission().then(p => { toast(p === 'granted' ? 'Notifications on — Pomeo will ping you 🔔' : 'No problem — reminders still pop up in the app', 3000); renderReminders(); });
+    return;
+  }
+  if (t.closest('#permLater')) { writeLS(REM_PERM_KEY, '1'); renderReminders(); return; }
+  if (t.closest('#remClear')) {
+    S.reminders = S.reminders.filter(r => !(r.repeat === 'none' && remDone(r, r.date)));
+    saveReminders();
+    return;
+  }
+  const li = t.closest('.rem');
+  if (!li || li.dataset.swiped) return;
+  const r = remById(li.dataset.rid), day = li.dataset.day;
+  if (!r) return;
+  if (t.closest('[data-rdone]')) {
+    const on = !remDone(r, day);
+    markRemDone(r, day, on);
+    saveReminders();
+  } else if (t.closest('[data-redit]') || (t.closest('.rem-main') && !t.closest('button'))) openRemForm(r);
+  else if (t.closest('[data-rdel]')) deleteReminder(r);
+  else if (t.closest('[data-rcal]')) openCal(r);
+});
+(() => {
+  let sw = null;
+  const host = $('#tab-reminders');
+  host.addEventListener('pointerdown', e => {
+    const li = e.target.closest('.rem');
+    if (!li || e.pointerType === 'mouse' || e.target.closest('button')) return;
+    sw = { li, x: e.clientX, y: e.clientY, dx: 0, on: false };
+  });
+  host.addEventListener('pointermove', e => {
+    if (!sw) return;
+    const dx = e.clientX - sw.x, dy = e.clientY - sw.y;
+    if (!sw.on) {
+      if (Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx)) { sw = null; return; }
+      if (Math.abs(dx) < 12) return;
+      sw.on = true;
+      sw.li.classList.add('dragging');
+    }
+    sw.dx = dx;
+    sw.li.querySelector('.rem-fg').style.transform = `translateX(${clamp(dx, -140, 140)}px)`;
+  });
+  const end = () => {
+    if (!sw) return;
+    const { li, dx, on } = sw;
+    sw = null;
+    li.classList.remove('dragging');
+    li.querySelector('.rem-fg').style.transform = '';
+    if (!on) return;
+    li.dataset.swiped = '1';
+    setTimeout(() => { delete li.dataset.swiped; }, 50);
+    const r = remById(li.dataset.rid);
+    if (!r) return;
+    if (dx > 90) { markRemDone(r, li.dataset.day, !remDone(r, li.dataset.day)); saveReminders(); }
+    else if (dx < -90) deleteReminder(r);
+  };
+  host.addEventListener('pointerup', end);
+  host.addEventListener('pointercancel', end);
+})();
+
+setInterval(checkReminders, 15000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) { checkReminders(); if (S.ui.tab === 'reminders') renderReminders(); } });
+
+/* ==========================================================================
+   LIQUID GLASS — a per-device look (like Animations): off | full | lite
+   ========================================================================== */
+const GLASS_KEY = 'pomodorolist-glass';
+const glassSupported = () => !!(window.CSS && CSS.supports('color', 'color-mix(in srgb, red 50%, blue)'));
+const glass = () => document.documentElement.dataset.glass || 'off';
+function applyGlass() {
+  let v = 'off';
+  try { v = localStorage.getItem(GLASS_KEY) || 'off'; } catch (e) {}
+  if (v === 'off' || !glassSupported()) delete document.documentElement.dataset.glass;
+  else document.documentElement.dataset.glass = v;
+  sheenLoop();
+}
+/* The light reflection drifts a little with the pointer and with scrolling (Full glass + Full animations only). */
+let sheenQueued = false, sheenX = 0.5, sheenScroll = 0, sheenOn = false;
+function paintSheen() {
+  sheenQueued = false;
+  const v = 35 + (sheenX - 0.5) * 30 + Math.sin(sheenScroll / 420) * 12;
+  document.documentElement.style.setProperty('--sx', v.toFixed(1) + '%');
+}
+function queueSheen() { if (sheenOn && !sheenQueued) { sheenQueued = true; requestAnimationFrame(paintSheen); } }
+function sheenLoop() {
+  sheenOn = glass() === 'full' && motion() === 'full';
+  if (!sheenOn) document.documentElement.style.removeProperty('--sx');
+}
+addEventListener('pointermove', e => { if (sheenOn && e.pointerType === 'mouse') { sheenX = e.clientX / innerWidth; queueSheen(); } }, { passive: true });
+addEventListener('scroll', () => { if (sheenOn) { sheenScroll = scrollY; queueSheen(); } }, { passive: true });
+applyGlass();
+
+/* ==========================================================================
+   SMALL EXTRAS — tip of the day, session notes, today summary
+   ========================================================================== */
+const DAILY_TIPS = [
+  'Write down the one thing you want finished by the end of this block.',
+  'Put your phone in another room — out of sight really is out of mind.',
+  'Test yourself instead of re-reading: recall beats review.',
+  'Spread revision out: three short sessions beat one long one.',
+  'Stuck on a problem for 10 minutes? Mark it, move on, come back later.',
+  'Explain the topic out loud as if teaching a friend. Gaps show up fast.',
+  'Start with the hardest subject while your mind is fresh.',
+  'Mix problem types in practice — it trains you to choose the method.',
+  'A glass of water before you start helps you stay sharp.',
+  'Sleep is when memory sets. A late night costs more than it gives.',
+  'After each session, write one line about what you finished.',
+  'Keep a “mistakes notebook” and revisit it every weekend.',
+  'Breaks work best away from screens: stretch, walk, look far away.',
+  'Set a tiny goal: “just 5 problems”. Starting is the hardest part.',
+  'Review today’s notes for 10 minutes tonight — and again in a week.',
+  'Timed practice builds exam stamina. Try one timed set this week.',
+  'Tidy desk, tidy mind: clear everything except what this block needs.',
+  'If your mind wanders, note the thought on paper and return to work.',
+  'Learn formulas by deriving them once — they stick far better.',
+  'Morning light and a short walk help you feel awake and focused.',
+  'Use the break to move. Your brain loves a little blood flow.',
+  'Big chapter? Split it into sub-topics and give each one a block.',
+  'Read the question twice before solving. Many errors are misreads.',
+  'Celebrate small wins — consistency beats intensity.',
+  'Plan tomorrow’s first task tonight so you can start straight away.',
+  'Practise with past papers in exam-like conditions.',
+  'Draw it: diagrams and flowcharts make tricky ideas clearer.',
+  'Noise bothers you? Try the ambient sounds or simple earplugs.',
+  'Eat something light before a long session — heavy meals make you drowsy.',
+  'Be kind to yourself on off days. Show up, even for one session.',
+  'Rotate subjects across the day to keep your mind fresh.',
+];
+function renderTip() {
+  const card = $('#tipCard');
+  if (!card) return;
+  card.classList.toggle('hidden', S.settings.dailyTip === false);
+  const n = Math.floor((startOfDay(new Date()) - new Date(new Date().getFullYear(), 0, 1)) / 864e5);
+  $('#tipText').textContent = DAILY_TIPS[n % DAILY_TIPS.length];
+}
+/** Sessions done, minutes to the goal and the next reminder — under the Today progress bar. */
+function renderTodayExtra() {
+  const el = $('#todayExtra');
+  if (!el || !USER) return;
+  const k = dayKey(new Date()), e = (game().idx[k] || {});
+  const n = S.sessions.filter(s => dayKey(new Date(s.start)) === k || dayKey(new Date(s.end)) === k).length;
+  const left = Math.max(0, S.settings.goalMin - (e.total || 0));
+  const nx = nextReminderToday();
+  el.innerHTML = `<div><b>${n}</b> session${n === 1 ? '' : 's'} today · ${left ? `<b>${fmtMin(left)}</b> to your goal` : 'goal met ✓'}</div>` +
+    (nx ? `<div>Next reminder: <button data-goremind>${esc(nx.r.title)} · ${fmtHM(nx.at)}</button></div>` : `<div><button data-goremind>+ Plan a study block</button></div>`);
+}
+$('#todayExtra').addEventListener('click', e => { if (e.target.closest('[data-goremind]')) showTab('reminders'); });
+
+/* Session note: after a focus block, an optional one-line note shown in the Stats → Day list. */
+let noteFor = null;
+function offerNote(sessionId) {
+  noteFor = sessionId;
+  $('#noteInput').value = '';
+  $('#noteRow').classList.remove('hidden');
+}
+function hideNote() { noteFor = null; $('#noteRow').classList.add('hidden'); }
+function saveNote() {
+  const v = $('#noteInput').value.trim().slice(0, 120);
+  if (noteFor && v) { S.notes[noteFor] = v; save(); toast('Note saved', 1800, true); if (S.ui.tab === 'stats') renderStats(); }
+  hideNote();
+}
+$('#noteSave').addEventListener('click', saveNote);
+$('#noteSkip').addEventListener('click', hideNote);
+$('#noteInput').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); saveNote(); } if (e.key === 'Escape') hideNote(); });
+
 /* ---------- First-time welcome tour (once per device) ---------- */
 const TOUR_KEY = 'pomodorolist-tour-done';
 const TOUR = { i: 0, steps: [] };
@@ -4668,7 +5743,8 @@ function tourSteps() {
   const on = S.settings.gamification;
   const visible = sel => [...$$(sel)].find(el => el.getClientRects().length && el.offsetWidth);
   const steps = [
-    { sel: '#tabs [data-tab="timer"]', text: 'Start a focus session here — pick a preset, name it, hit Start.' },
+    { sel: '#tabs [data-tab="timer"]', text: 'Start a focus session here — pick a preset, name it, hit Start. Tap Pomeo to say hi!' },
+    { sel: '#tabs [data-tab="reminders"]', text: 'Plan study blocks — Pomeo pops up when it’s time.' },
     { sel: '#tabs [data-tab="stats"]', text: 'See your stats, streaks and focus history.' },
     on && { sel: '#tabs [data-tab="board"]', text: 'Compete with friends on daily, weekly and all-time leaderboards.' },
     on && { sel: '#tabs [data-tab="shop"]', text: 'Spend the coins you earn on themes, sounds and streak freezes.' },
@@ -4722,7 +5798,10 @@ function renderAll() {
   renderToday();
   renderHeaderChip();
   renderGreeting();
+  renderPomeo();
+  renderTip();
   if (S.ui.tab === 'stats') renderStats();
+  if (S.ui.tab === 'reminders') renderReminders();
   if (S.ui.tab === 'profile') renderProfile();
   if (S.ui.tab === 'shop') renderShop();
 }
@@ -4869,9 +5948,15 @@ $('#setTheme').addEventListener('change', e => { S.settings.theme = e.target.val
 $('#setSound').addEventListener('change', e => { S.settings.sound = e.target.checked; save(); renderTimer(); });
 $('#setAuto').addEventListener('change', e => { S.settings.autoStart = e.target.checked; save(); });
 $('#setAmbVol').addEventListener('input', e => setAmbientVolume(e.target.value));
+$('#setGlass').addEventListener('change', e => { writeLS(GLASS_KEY, e.target.value); applyGlass(); });
+$('#setPomeo').addEventListener('change', e => { S.settings.pomeo = e.target.checked; save(); renderPomeo(); if (!e.target.checked) hideBubble(); });
+$('#setPomeoTalk').addEventListener('change', e => { S.settings.pomeoTalk = e.target.value; save(); });
+$('#setWater').addEventListener('change', e => { S.settings.waterNudge = e.target.checked; save(); });
+$('#setTip').addEventListener('change', e => { S.settings.dailyTip = e.target.checked; save(); renderTip(); });
 $('#setMotion').addEventListener('change', e => {
   localStorage.setItem(MOTION_KEY, e.target.value);   // device preference, not synced
   applyMotion();
+  sheenLoop();
   renderTimer();
   toast(`Animations: ${e.target.selectedOptions[0].textContent}`, 2000, true);
 });
@@ -4921,7 +6006,11 @@ $('#blockedList').addEventListener('click', e => { const b = e.target.closest('[
 $('#lvChip').addEventListener('click', () => showTab('profile'));
 $('#avatarBtn').addEventListener('click', () => showTab('profile'));
 $('#coinPill').addEventListener('click', () => showTab('shop'));
-$('#tab-profile').addEventListener('click', e => { if (e.target.closest('#openSettings, #openSettings2')) showTab('settings'); });
+$('#tab-profile').addEventListener('click', e => {
+  if (e.target.closest('#openSettings, #openSettings2')) showTab('settings');
+  if (e.target.closest('#pomeoOutfit')) { S.ui.shopCat = 'pomeo'; showTab('shop'); }
+  if (e.target.closest('#pomeoShow')) { S.settings.pomeo = true; save(); renderPomeo(); renderProfile(); }
+});
 $('#settingsBack').addEventListener('click', () => showTab('profile'));
 // Leaderboard tab
 $('#tab-board').addEventListener('click', e => {
