@@ -200,7 +200,7 @@ input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent);
    ========================================================================== */
 .seg { display: inline-flex; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px; }
 .seg button { border: 0; background: none; padding: 6px 14px; border-radius: 999px; color: var(--muted); cursor: pointer; }
-.seg button.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.seg button.active { background: var(--accent); color: var(--on-accent, #fff); font-weight: 600; }
 .stats-head { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 16px; }
 .range-nav { display: flex; align-items: center; gap: 8px; }
 .range-nav .lbl2 { min-width: 150px; text-align: center; font-weight: 600; }
@@ -383,6 +383,79 @@ input[type="range"] { accent-color: var(--accent); width: 160px; }
 @keyframes burst { 0% { transform: scale(.6); opacity: .7; } 100% { transform: scale(1.9); opacity: 0; } }
 @keyframes dlgIn { from { transform: translateY(8px); opacity: 0; } }
 
+/* ==========================================================================
+   FRIENDS + LEADERBOARDS
+   ========================================================================== */
+.tabs button { position: relative; display: inline-flex; align-items: center; gap: 6px; }
+.tabs button svg { display: none; width: 18px; height: 18px; }
+.tbadge {
+  position: absolute; top: -3px; right: -3px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 999px;
+  background: var(--danger); color: #fff; font-size: 10px; font-weight: 700; line-height: 16px; text-align: center; font-style: normal;
+}
+@media (max-width: 600px) {
+  .tabs button span { display: none; }
+  .tabs button svg { display: block; }
+  .tabs button { padding: 7px 10px; }
+}
+.seg .cnt:not(:empty) { margin-left: 6px; font-size: 11px; padding: 0 6px; border-radius: 999px; background: var(--danger); color: #fff; }
+.empty-card { text-align: center; padding: 32px 18px; }
+.empty-card h3 { margin: 8px 0 4px; font-weight: 600; }
+.big-icon { color: var(--accent); }
+.addrow { display: flex; gap: 8px; }
+.addrow input { flex: 1; min-width: 0; }
+.addrow .btn.primary { min-width: 0; padding: 9px 20px; }
+.code { color: var(--text); }
+.pill { font-size: 11px; padding: 1px 8px; border-radius: 999px; background: var(--accent); color: var(--on-accent, #fff); margin-left: 6px; vertical-align: 1px; }
+.plist { list-style: none; margin: 0; padding: 0; }
+.person { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+.person:first-child { border-top: 0; }
+.person[data-open] { cursor: pointer; }
+.person[data-open]:hover .nm { color: var(--accent); }
+.person .who { flex: 1; min-width: 0; }
+.person .nm, .lb .nm { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.person .lvl { color: var(--muted); font-weight: 400; font-size: 12px; margin-left: 4px; }
+.sub { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sub.now { color: var(--text); display: flex; align-items: center; gap: 6px; }
+.live { width: 8px; height: 8px; border-radius: 50%; background: #3fb950; box-shadow: 0 0 0 3px rgba(63,185,80,.18); flex: none; display: inline-block; }
+.chip-s { display: inline-flex; align-items: center; gap: 3px; font-size: 12px; color: var(--muted); }
+.chev { color: var(--muted); font-size: 18px; }
+.avatar { width: 30px; height: 30px; border-radius: 50%; display: inline-grid; place-items: center; background: var(--accent-soft); color: var(--accent); font-weight: 600; font-size: 13px; flex: none; }
+.avatar.big { width: 64px; height: 64px; font-size: 26px; }
+.lb-head { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; margin-bottom: 14px; }
+.lb-meta { margin-bottom: 6px; }
+.lb { list-style: none; margin: 0; padding: 0; }
+.lb li { display: flex; align-items: center; gap: 12px; padding: 9px 10px; border-radius: 10px; }
+.lb li + li { margin-top: 2px; }
+.lb li[data-open] { cursor: pointer; }
+.lb li[data-open]:hover { background: var(--bg); }
+.lb .rk { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 600; color: var(--muted); flex: none; font-variant-numeric: tabular-nums; }
+.lb .nm { flex: 1; min-width: 0; }
+.lb .v { font-variant-numeric: tabular-nums; font-size: 14px; }
+.lb .top1 .rk { background: rgba(201,162,39,.16); color: #a8861d; }
+.lb .top2 .rk { background: rgba(140,150,160,.18); color: #7d8790; }
+.lb .top3 .rk { background: rgba(176,112,58,.16); color: #a2662f; }
+.lb li.me { background: var(--accent-soft); }
+.lb.pinned { border-top: 1px dashed var(--line); margin-top: 8px; padding-top: 8px; }
+.lb-note { margin-top: 12px; font-size: 13px; color: var(--muted); }
+.lb-note .linkbtn { color: var(--accent); padding: 0; }
+.recap { margin-bottom: 16px; border-color: var(--accent); }
+.recap-row { display: flex; gap: 32px; flex-wrap: wrap; margin: 14px 0; }
+.chal .cp { display: grid; grid-template-columns: minmax(0, 120px) 1fr auto; gap: 10px; align-items: center; font-size: 13px; padding: 4px 0; }
+.chal .cp .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chal .cp.me .nm { font-weight: 600; }
+.chal .bar { height: 6px; background: var(--heat0); border-radius: 999px; overflow: hidden; }
+.chal .bar i { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+.back { font-size: 14px; padding: 0 0 12px; color: var(--accent); }
+.fp-head { display: flex; gap: 16px; align-items: center; }
+.fp-name { font-size: 20px; font-weight: 600; }
+.kudo-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 12px 18px; }
+.kudo { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; width: 34px; height: 30px; cursor: pointer; font-size: 15px; line-height: 1; }
+.kudo:hover { border-color: var(--accent); }
+.kudo.sent { background: var(--accent-soft); border-color: var(--accent); }
+.sesslist .kudos { display: inline-flex; gap: 4px; }
+.sesslist .kudos .kudo { width: 28px; height: 26px; font-size: 13px; }
+@media (max-width: 520px) { .sesslist li { flex-wrap: wrap; } .sesslist .kudos { width: 100%; justify-content: flex-end; } }
+
 /* Toast */
 .toast {
   position: fixed; left: 50%; bottom: max(24px, env(safe-area-inset-bottom)); transform: translateX(-50%) translateY(20px);
@@ -457,10 +530,11 @@ input[type="range"] { accent-color: var(--accent); width: 160px; }
     <button class="lvchip hidden" id="lvChip" aria-label="Your level and progress"></button>
   </div>
   <nav class="tabs" id="tabs">
-    <button data-tab="timer">Timer</button>
-    <button data-tab="stats">Stats</button>
-    <button data-tab="profile" id="profileTabBtn" class="hidden">Profile</button>
-    <button data-tab="settings">Settings</button>
+    <button data-tab="timer" aria-label="Timer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 1.5M9.5 2.5h5"/></svg><span>Timer</span></button>
+    <button data-tab="stats" aria-label="Stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20V11M12 20V5M19 20v-6"/></svg><span>Stats</span></button>
+    <button data-tab="friends" aria-label="Friends"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8.5" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><circle cx="17" cy="9.5" r="2.5"/><path d="M15.5 14.2A4.5 4.5 0 0 1 21 18.5"/></svg><span>Friends</span><i class="tbadge hidden" id="friendsBadge"></i></button>
+    <button data-tab="profile" id="profileTabBtn" class="hidden" aria-label="Profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5 19.4 7.75v8.5L12 20.5 4.6 16.25v-8.5Z"/><circle cx="12" cy="12" r="3"/></svg><span>Profile</span></button>
+    <button data-tab="settings" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg><span>Settings</span></button>
   </nav>
 </header>
 
@@ -559,6 +633,18 @@ input[type="range"] { accent-color: var(--accent); width: 160px; }
     <div id="statsBody"></div>
   </section>
 
+  <!-- ================================ FRIENDS TAB (friends · leaderboard · challenges) ================================ -->
+  <section class="tab" id="tab-friends">
+    <div class="stats-head">
+      <div class="seg" id="friendsSeg">
+        <button data-view="friends">Friends<span class="cnt" id="reqCount"></span></button>
+        <button data-view="board">Leaderboard</button>
+        <button data-view="challenges">Challenges</button>
+      </div>
+    </div>
+    <div id="friendsBody"></div>
+  </section>
+
   <!-- ================================ PROFILE TAB (progress + shop) ================================ -->
   <section class="tab" id="tab-profile">
     <div class="stats-head">
@@ -620,6 +706,26 @@ input[type="range"] { accent-color: var(--accent); width: 160px; }
             </div>
             <button class="btn" id="logoutBtn">Log out</button>
           </div>
+        </div>
+        <div class="card hidden" id="privacyCard">
+          <h2>Friends &amp; privacy</h2>
+          <div class="setting">
+            <div><div>Show my activity to friends</div><div class="desc">Last 12 weeks, recent sessions and “focusing now”</div></div>
+            <input type="checkbox" id="setShareAct">
+          </div>
+          <div class="setting">
+            <div><div>Share session names with friends</div><div class="desc">If off, friends see “Focus session”</div></div>
+            <input type="checkbox" id="setShareNames">
+          </div>
+          <div class="setting">
+            <div><div>Appear on global leaderboard</div><div class="desc">Everyone can see your username, badge and focus minutes</div></div>
+            <input type="checkbox" id="setGlobal">
+          </div>
+          <div class="setting">
+            <div><div>Invite link</div><div class="desc" id="inviteDesc"></div></div>
+            <button class="btn small" id="copyInvite">Share</button>
+          </div>
+          <div id="blockedList"></div>
         </div>
         <div class="card">
           <h2>Backup</h2>
@@ -789,7 +895,8 @@ const NAME_PALETTE = ['#2f8f83', '#5b7fd6', '#d08a3c', '#b45f8c', '#6a9a4a', '#8
 function defaultState() {
   return {
     version: 2,
-    settings: { goalMin: 60, weekStart: 1, sound: true, notify: true, theme: 'auto', autoStart: false, gamification: true, ambientVolume: 0.5 },
+    settings: { goalMin: 60, weekStart: 1, sound: true, notify: true, theme: 'auto', autoStart: false, gamification: true, ambientVolume: 0.5,
+                shareActivity: true, shareNames: true, globalBoard: false },
     presets: [
       { id: 'p-classic', name: 'Classic 25/5',    focus: 25, short: 5,  long: 15, rounds: 4 },
       { id: 'p-deep',    name: 'Deep Work 50/10', focus: 50, short: 10, long: 20, rounds: 3 },
@@ -802,7 +909,7 @@ function defaultState() {
     game: normalizeGame(null),  // purchases, equipped items, claimed rewards, used streak freezes
     // Device-only fields (never uploaded):
     timer: { phase: 'focus', round: 1, status: 'idle', endAt: 0, remaining: 0, planned: 0, focusStartedAt: 0, name: '' },
-    ui: { tab: 'timer', statsView: 'week', profileView: 'progress', shopCat: 'sound' },
+    ui: { tab: 'timer', statsView: 'week', profileView: 'progress', shopCat: 'sound', friendsView: 'friends', lbScope: 'friends', lbPeriod: 'week' },
     pendingSessions: [],  // logged while the sync service could not load at all; uploaded next time
     profileDirty: false,  // profile edited in that same situation
   };
@@ -914,6 +1021,7 @@ function scheduleProfilePush() {
   localEditPending = true;
   clearTimeout(pushTimer);
   pushTimer = setTimeout(pushProfile, 700);
+  schedulePublish();  // public profile / leaderboard numbers (deduplicated, debounced)
 }
 
 /** Upload the profile if it changed. Never before the cloud copy has been read (would overwrite it). */
@@ -1039,6 +1147,7 @@ function afterFirstLoad() {
   firstLoadDone = true;
   reconcileRewards('initial');  // first load of this version also awards XP/coins for all past sessions
   maybeOfferMigration();
+  initSocial();
 }
 
 /* ==========================================================================
@@ -1124,6 +1233,7 @@ async function onAuthSubmit(e) {
   if (!/^[a-z0-9_]{3,20}$/.test(username)) return authErr('Username must be 3–20 characters: letters, numbers or underscores.');
   if (pass.length < 6) return authErr('Password must be at least 6 characters.');
   if (authMode === 'signup' && pass !== $('#authPass2').value) return authErr('Passwords don’t match.');
+  if (authMode === 'signup' && isOffensiveName(username)) return authErr('That username isn’t allowed. Please choose another.');
   if (!firebaseConfigured()) return authErr('Firebase isn’t set up yet — see the note below.');
   if (!navigator.onLine) return authErr('No internet connection. Connect and try again.');
   if (!FB.auth) return authErr(fbLoadError || 'Still loading — try again in a moment.');
@@ -1156,9 +1266,12 @@ async function logout() {
   }
   if (localOnly) { toast('Connect to the internet to log out'); return; }
   if (pendingWrites > 0 && !confirm('Some changes have not reached the cloud yet (you may be offline). If you log out now they will be lost. Log out anyway?')) return;
+  // Stop showing "focusing now" to friends (best effort, never blocks logging out).
+  if (socialReady()) await Promise.race([FB.setDoc(FB.doc(FB.db, 'presence', USER.uid), { visible: false, now: null, updatedAt: FB.serverTimestamp() }).catch(() => {}), new Promise(r => setTimeout(r, 1500))]);
   unsubs.forEach(u => u());
   unsubs = [];
   try { await FB.signOut(FB.auth); } catch (e) { /* ignore */ }
+  Object.keys(localStorage).filter(k => k.endsWith(':' + USER.uid)).forEach(k => localStorage.removeItem(k));
   // Remove this account's data from the device (useful on shared computers).
   localStorage.removeItem(cacheKey(USER.uid));
   localStorage.removeItem(LAST_USER);
@@ -1252,7 +1365,7 @@ function mergeData(obj) {
   // Progression: keep every purchase and the earliest claim of each reward; take equipped items only where unset.
   const sg = src.game, g = S.game;
   for (const [k, v] of Object.entries(sg.purchases)) if (!g.purchases[k]) g.purchases[k] = v;
-  for (const kind of ['goalDays', 'milestones', 'achievements']) {
+  for (const kind of ['goalDays', 'milestones', 'achievements', 'social', 'challenges']) {
     for (const [k, v] of Object.entries(sg.claims[kind])) if (!g.claims[kind][k] || v < g.claims[kind][k]) g.claims[kind][k] = v;
   }
   for (const [k, v] of Object.entries(sg.freezesUsed)) if (!g.freezesUsed[k]) g.freezesUsed[k] = v;
@@ -1423,10 +1536,11 @@ function logSession(focusedMs, end) {
   else if (USER && !USER.guest) S.pendingSessions.push(s);
   G = null;
   const news = reconcileRewards('collect');
-  if (!S.settings.gamification) { toast(`Logged ${fmtMin(focusedMs / 60000)} · ${name}`); return; }
+  if (!S.settings.gamification) { toast(`Logged ${fmtMin(focusedMs / 60000)} · ${name}`); socialAfterSession(); return; }
   const goalDays = news.filter(n => n.type === 'goal').length;
   toast(`+${xpForSession(s)} XP · +${COINS_PER_SESSION + GOAL_BONUS * goalDays} coins${goalDays ? ' · daily goal reached' : ''}`);
   announce(news, 'loud');
+  socialAfterSession();
   const levelAfter = game().lv.level;
   if (levelBefore && levelAfter > levelBefore) setTimeout(() => showLevelUp(levelBefore, levelAfter), 700);
 }
@@ -1555,6 +1669,7 @@ function renderTimer() {
   $('#muteBtn').title = S.settings.sound ? 'Sound on — click to mute' : 'Muted — click for sound';
   document.body.classList.toggle('zen', extraOn('x_zen') && t.status === 'running' && t.phase === 'focus');
   updateAmbient();
+  publishPresence();
   renderClock();
 }
 
@@ -1650,8 +1765,8 @@ function segsFor(byName, topNames) {
 const chartWidth = () => clamp(($('#statsBody').clientWidth || 720) - 38, 300, 980);
 
 /** Generic stacked bar chart. cols: [{ label, sub, total, segs, tip }] */
-function barChart(cols, { goal = 0, height = 240 } = {}) {
-  const W = chartWidth(), H = height, L = 42, R = 8, T = 12, B = cols.some(c => c.sub) ? 38 : 26;
+function barChart(cols, { goal = 0, height = 240, width = 0 } = {}) {
+  const W = width || chartWidth(), H = height, L = 42, R = 8, T = 12, B = cols.some(c => c.sub) ? 38 : 26;
   const plotH = H - T - B;
   const yMax = niceMax(Math.max(goal, 30, ...cols.map(c => c.total)));
   const cw = (W - L - R) / cols.length, bw = Math.min(cw * 0.64, 46);
@@ -1888,6 +2003,7 @@ function renderSettings() {
   $('#setNotify').checked = st.notify;
   $('#setAuto').checked = st.autoStart;
   $('#setGame').checked = st.gamification;
+  renderPrivacy();
   $('#setAmbVol').value = st.ambientVolume;
   const perm = 'Notification' in window ? Notification.permission : 'unsupported';
   $('#notifStatus').textContent =
@@ -1944,6 +2060,8 @@ function normalizeGame(g) {
       goalDays: map(c.goalDays),     // 'YYYY-MM-DD' -> ts
       milestones: map(c.milestones), // '3' | '7' | '30' | '100' -> ts
       achievements: map(c.achievements),
+      social: map(c.social),           // 'f_<uid>' -> ts (new friend bonus)
+      challenges: map(c.challenges),   // challengeId -> ts (weekly challenge completed)
     },
     freezesUsed: map(g.freezesUsed), // 'YYYY-MM-DD' -> ts (day protected by a Streak Freeze)
   };
@@ -2137,6 +2255,15 @@ function earnedAt(t) {
   for (const ts of Object.values(cl.goalDays)) if (ts <= t) c += GOAL_BONUS;
   for (const [m, ts] of Object.entries(cl.milestones)) if (ts <= t) c += STREAK_BONUS[m] || 0;
   for (const [id, ts] of Object.entries(cl.achievements)) if (ts <= t && ACH_BY_ID[id]) c += ACH_BY_ID[id].coins;
+  // Social: +10 per new friend, but at most 5 per Monday-to-Sunday week, so it can't be farmed.
+  const perWeek = {};
+  for (const ts of Object.values(cl.social).sort((a, b) => a - b)) {
+    if (ts > t) continue;
+    const wk = dayKey(weekStartOf(new Date(ts), 1));
+    perWeek[wk] = (perWeek[wk] || 0) + 1;
+    if (perWeek[wk] <= SOCIAL_COIN_WEEKLY_MAX) c += SOCIAL_COIN;
+  }
+  for (const [cid, ts] of Object.entries(cl.challenges)) if (ts <= t) c += (CHALLENGES[cid.split('_')[1]] || {}).coins || 0;
   return c;
 }
 
@@ -2893,6 +3020,800 @@ function showLevelUp(from, to) {
 }
 
 /* ==========================================================================
+   SOCIAL — public profile, friends, leaderboards, kudos, nudges, challenges
+   Cloud accounts only. What other people can see lives outside users/{uid}
+   (see firestore.rules for who may read and write each collection):
+     usernames/{name}         { uid }  exact-username lookup
+     publicProfiles/{uid}     badge, level, flair, streak, hours, join date
+     publicStats/{uid}        focus minutes per period, for leaderboards
+     activity/{uid}           last 12 weeks + last 20 sessions (friends, if shared)
+     presence/{uid}           "focusing now" (friends, if shared)
+     friendships/{a_b}        request or friendship (a = smaller uid)
+     inbox/{uid}/items/{id}   kudos and nudges — preset reactions only, no text
+     challenges/{id}          weekly challenge with each member's progress
+   Reads are kept low for the free plan: leaderboards and friends' data are
+   cached for a few minutes, and a friend's history loads only when opened.
+   ========================================================================== */
+const REACTIONS = ['🔥', '👏', '💪', '⭐'];
+const MAX_FRIENDS = 100;
+const CACHE_MS = 3 * 60 * 1000;
+const SOCIAL_COIN = 10, SOCIAL_COIN_WEEKLY_MAX = 5;   // +10 per new friend, at most 5 per week
+const CHALLENGES = {
+  h5:  { name: 'Focus 5 hours this week',         goal: 300, unit: 'min',      coins: 30 },
+  h10: { name: 'Focus 10 hours this week',        goal: 600, unit: 'min',      coins: 60 },
+  g5:  { name: 'Reach your daily goal on 5 days', goal: 5,   unit: 'days',     coins: 40 },
+  s20: { name: 'Complete 20 sessions this week',  goal: 20,  unit: 'sessions', coins: 40 },
+};
+// Basic username filter (sign-up). Letters are normalised first, so "f4ck" and "sh1t" are caught too.
+const BLOCKED_WORDS = ['fuck', 'shit', 'bitch', 'cunt', 'dick', 'cock', 'pussy', 'asshole', 'bastard', 'slut', 'whore',
+  'fag', 'nigg', 'retard', 'rape', 'nazi', 'hitler', 'porn', 'penis', 'vagina', 'boob', 'tits', 'wank', 'twat', 'jizz',
+  'chutiya', 'madarchod', 'bhenchod', 'behenchod', 'gandu', 'randi', 'lund', 'punda', 'thevidiya', 'otha'];
+const RESERVED_NAMES = ['admin', 'administrator', 'support', 'moderator', 'official', 'pomodorolist', 'system', 'root'];
+function isOffensiveName(name) {
+  const n = name.toLowerCase().replace(/_/g, '').replace(/0/g, 'o').replace(/1/g, 'i').replace(/3/g, 'e')
+    .replace(/4/g, 'a').replace(/5/g, 's').replace(/7/g, 't').replace(/8/g, 'b');
+  return RESERVED_NAMES.includes(name.toLowerCase()) || BLOCKED_WORDS.some(w => n.includes(w));
+}
+
+const SOC = {
+  friendships: [],      // [{ id, users, from, to, status, fromName, toName }]
+  blocked: {},          // uid -> username
+  cache: {},            // 'col/uid' -> { v, at }
+  lb: {},               // leaderboard cache
+  challenges: null,     // this week's challenges I'm in or invited to
+  challengesAt: 0,
+  myStats: null,        // what the server has for my publicStats (to stay within the rules' limits)
+  friend: null,         // open friend profile: { uid, tab }
+  started: false,
+  inboxSeen: new Set(),
+  sent: new Set(),      // kudos / nudges already sent from this device
+};
+const socialReady = () => cloudReady() && firstLoadDone && SOC.started;
+const weekStartOf = (d, ws) => addDays(startOfDay(d), -((d.getDay() - ws + 7) % 7));
+const monWeekKey = (d = new Date()) => dayKey(weekStartOf(d, 1));
+const monthKeyOf = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}`;
+const otherUid = f => f.users[0] === USER.uid ? f.users[1] : f.users[0];
+const otherName = f => f.from === USER.uid ? f.toName : f.fromName;
+const friendsList = () => SOC.friendships.filter(f => f.status === 'accepted');
+const incoming = () => SOC.friendships.filter(f => f.status === 'pending' && f.to === USER.uid);
+const outgoing = () => SOC.friendships.filter(f => f.status === 'pending' && f.from === USER.uid);
+const tierById = id => TIERS.find(t => t.id === id) || TIERS[0];
+const lsKey = k => `pomodorolist-${k}:${USER.uid}`;
+
+/* ---------- Starting up (after the account's data has loaded) ---------- */
+async function initSocial() {
+  if (SOC.started || !cloudReady()) return;
+  SOC.started = true;
+  SOC.inboxSeen = new Set(readJSON(lsKey('inbox-seen'), []));
+  SOC.sent = new Set(readJSON(lsKey('sent'), []));
+  const uid = USER.uid;
+  unsubs.push(FB.onSnapshot(FB.query(FB.collection(FB.db, 'friendships'), FB.where('users', 'array-contains', uid)), qs => {
+    SOC.friendships = qs.docs.map(d => ({ id: d.id, ...d.data() }));
+    onFriendshipsChanged();
+  }, e => console.warn('friendships', e)));
+  unsubs.push(FB.onSnapshot(FB.collection(FB.db, 'users', uid, 'blocked'), qs => {
+    SOC.blocked = Object.fromEntries(qs.docs.map(d => [d.id, d.data().name || '']));
+    if (S.ui.tab === 'settings') renderPrivacy();
+  }, e => console.warn('blocked', e)));
+  unsubs.push(FB.onSnapshot(FB.query(FB.collection(FB.db, 'inbox', uid, 'items'), FB.orderBy('createdAt', 'desc'), FB.limit(20)), onInbox,
+    e => console.warn('inbox', e)));
+  try {
+    // Make sure the username can be found, and learn what the server already has for my stats.
+    const reg = await FB.getDoc(FB.doc(FB.db, 'usernames', USER.username));
+    if (!reg.exists()) await FB.setDoc(FB.doc(FB.db, 'usernames', USER.username), { uid });
+    const st = await FB.getDoc(FB.doc(FB.db, 'publicStats', uid));
+    SOC.myStats = st.exists() ? { ...st.data(), at: st.data().updatedAt ? st.data().updatedAt.toMillis() : 0 } : null;
+  } catch (e) { console.warn('social init', e); }
+  publishPublic(true);
+  publishPresence();
+  loadChallenges();
+  handleInvite();
+}
+
+/* ---------- Publishing my public data (only what's shown to others) ---------- */
+let pubTimer = null;
+const lastPub = {};
+function schedulePublish() {
+  if (!socialReady()) return;
+  clearTimeout(pubTimer);
+  pubTimer = setTimeout(() => publishPublic(false), 1500);
+}
+function writePublic(col, data) {
+  const json = JSON.stringify(data);
+  if (lastPub[col] === json) return null;
+  lastPub[col] = json;
+  const p = FB.setDoc(FB.doc(FB.db, col, USER.uid), { ...data, updatedAt: FB.serverTimestamp() });
+  trackWrite(p);
+  return p;
+}
+function myPeriodStats() {
+  const idx = buildIndex(), now = new Date(), today = startOfDay(now);
+  const sum = (from, to) => { let m = 0; for (let d = from; d < to; d = addDays(d, 1)) m += (idx[dayKey(d)] || {}).total || 0; return m; };
+  const mon = weekStartOf(now, 1), sun = weekStartOf(now, 0), m1 = new Date(now.getFullYear(), now.getMonth(), 1);
+  const life = Object.values(idx).reduce((a, d) => a + d.total, 0);
+  return {
+    dayKey: dayKey(now), dayMin: Math.round(sum(today, addDays(today, 1))),
+    weekKey: dayKey(mon), weekMin: Math.round(sum(mon, addDays(today, 1))),
+    weekKeySun: dayKey(sun), weekMinSun: Math.round(sum(sun, addDays(today, 1))),
+    monthKey: monthKeyOf(now), monthMin: Math.round(sum(m1, addDays(today, 1))),
+    lifeMin: Math.round(life),
+    lastWeekKey: dayKey(addDays(mon, -7)), lastWeekMin: Math.min(10080, Math.round(sum(addDays(mon, -7), mon))),
+  };
+}
+/** Keep within what the security rules allow (e.g. after importing a big history, totals catch up over a few sessions). */
+function clampStats(n, o) {
+  const cap = { dayMin: 1440, weekMin: 10080, weekMinSun: 10080, monthMin: 44640 };
+  if (!o) { for (const k in cap) n[k] = Math.min(n[k], cap[k]); n.lifeMin = Math.min(n.lifeMin, 3600000); }
+  else {
+    const allow = Math.floor(Math.max(0, (Date.now() - o.at) / 60000 - 1)) + 239;
+    for (const [kf, mf] of [['dayKey', 'dayMin'], ['weekKey', 'weekMin'], ['weekKeySun', 'weekMinSun'], ['monthKey', 'monthMin']]) {
+      n[mf] = n[kf] === o[kf] ? Math.max(o[mf], Math.min(n[mf], o[mf] + allow)) : Math.min(n[mf], allow, cap[mf]);
+    }
+    n.lifeMin = Math.max(o.lifeMin, Math.min(n.lifeMin, o.lifeMin + allow));
+  }
+  n.weekMin = Math.min(n.weekMin, n.lifeMin); n.weekMinSun = Math.min(n.weekMinSun, n.lifeMin); n.monthMin = Math.min(n.monthMin, n.lifeMin);
+  n.dayMin = Math.min(n.dayMin, n.weekMin, n.weekMinSun, n.monthMin);
+  return n;
+}
+function publishPublic(first) {
+  if (!socialReady() && !first) return;
+  const g = game(), s = S.settings, user = FB.auth.currentUser;
+  const flair = { level: g.lv.level, tier: g.tier.id, frame: equippedId('frame'), color: equippedId('color') };
+  writePublic('publicProfiles', {
+    username: USER.username, ...flair, streak: g.streak.cur, longest: g.streak.longest,
+    hours: Math.round(g.focusMs / 3.6e5) / 10,
+    joined: user && user.metadata.creationTime ? Date.parse(user.metadata.creationTime) : Date.now() - 3600e3,
+  });
+  const stats = clampStats({ username: USER.username, ...flair, global: !!s.globalBoard, ...myPeriodStats() }, SOC.myStats);
+  const p = writePublic('publicStats', stats);
+  if (p) p.then(() => { SOC.myStats = { ...stats, at: Date.now() }; SOC.statRetries = 0; }, e => {
+    // Another device may have written newer totals: re-read what the server has, then try once more.
+    if (e.code === 'permission-denied' && (SOC.statRetries = (SOC.statRetries || 0) + 1) <= 2) {
+      delete lastPub.publicStats;
+      refreshMyStats().then(schedulePublish);
+    }
+  });
+  writePublic('activity', activityDoc());
+  SOC.lb = {};  // my own numbers changed
+}
+async function refreshMyStats() {
+  try { const st = await FB.getDoc(FB.doc(FB.db, 'publicStats', USER.uid)); SOC.myStats = st.exists() ? { ...st.data(), at: st.data().updatedAt.toMillis() } : null; } catch (e) { /* offline */ }
+}
+/** What friends may see. If sharing is off, nothing but "private" is written. */
+function activityDoc() {
+  const s = S.settings;
+  if (!s.shareActivity) return { visible: false, shareNames: false, days: {}, goalDays: [], recent: [], streak: 0, longest: 0 };
+  const idx = buildIndex(), today = startOfDay(new Date()), days = {}, goalDays = [];
+  for (let i = 0; i < 84; i++) {
+    const k = dayKey(addDays(today, -i)), m = Math.round((idx[k] || {}).total || 0);
+    if (m) days[k] = m;
+    if (m && m >= s.goalMin) goalDays.push(k);
+  }
+  const recent = S.sessions.slice(-20).reverse().map(x => ({
+    id: x.id, t: Math.min(x.start, Date.now()), min: Math.min(240, Math.round(x.duration / 60000)),
+    name: s.shareNames ? String(x.name).slice(0, 80) : '',
+  }));
+  const st = game().streak;
+  return { visible: true, shareNames: !!s.shareNames, days, goalDays, recent, streak: st.cur, longest: st.longest };
+}
+/** "Focusing now": written when the timer starts, pauses or stops. */
+function publishPresence() {
+  if (!socialReady()) return;
+  const t = S.timer, s = S.settings;
+  let now = null;
+  if (s.shareActivity && t.status !== 'idle') {
+    now = { name: t.phase === 'focus' ? (s.shareNames ? currentName().slice(0, 80) : 'Focus session') : 'Break', phase: t.phase, status: t.status,
+      endAt: t.status === 'running' ? t.endAt : 0, left: t.status === 'paused' ? Math.round(t.remaining / 60000) : 0 };
+  }
+  writePublic('presence', { visible: !!s.shareActivity, now });
+}
+
+/* ---------- Friend requests ---------- */
+function onFriendshipsChanged() {
+  const n = incoming().length;
+  $('#friendsBadge').textContent = n || '';
+  $('#friendsBadge').classList.toggle('hidden', !n);
+  $('#reqCount').textContent = n || '';
+  // +10 coins the first time a friendship with someone is accepted (capped per week in earnedAt).
+  let gained = 0;
+  const before = game().earned;
+  for (const f of friendsList()) {
+    const key = 'f_' + otherUid(f);
+    if (!S.game.claims.social[key]) { S.game.claims.social[key] = Date.now(); gained++; }
+  }
+  if (gained) {
+    G = null;
+    save();
+    if (S.settings.gamification && game().earned > before) toast(`New friend · +${game().earned - before} coins`);
+  }
+  if (S.ui.tab === 'friends') renderFriends();
+}
+async function sendRequest(raw) {
+  const name = String(raw || '').trim().replace(/^@/, '').toLowerCase();
+  if (!/^[a-z0-9_]{3,20}$/.test(name)) { toast('Enter a username: 3–20 letters, numbers or _'); return; }
+  if (name === USER.username) { toast('That’s you!'); return; }
+  if (friendsList().length >= MAX_FRIENDS) { toast(`You can have up to ${MAX_FRIENDS} friends`); return; }
+  try {
+    const reg = await FB.getDoc(FB.doc(FB.db, 'usernames', name));
+    if (!reg.exists()) { toast(`No one is called @${name}`); return; }
+    const to = reg.data().uid;
+    if (SOC.blocked[to] !== undefined) { toast(`You’ve blocked @${name}. Unblock them in Settings first.`); return; }
+    const ex = SOC.friendships.find(f => f.users.includes(to));
+    if (ex && ex.status === 'accepted') { toast(`You’re already friends with @${name}`); return; }
+    if (ex && ex.to === USER.uid) { await acceptRequest(ex.id); return; }
+    if (ex) { toast(`Request to @${name} is already waiting`); return; }
+    const users = [USER.uid, to].sort();
+    await FB.setDoc(FB.doc(FB.db, 'friendships', users.join('_')), {
+      users, from: USER.uid, to, status: 'pending', fromName: USER.username, toName: name, createdAt: FB.serverTimestamp(),
+    });
+    toast(`Friend request sent to @${name}`);
+  } catch (e) {
+    console.warn(e);
+    toast(e.code === 'permission-denied' ? `Couldn’t send a request to @${name}` : 'No connection — try again when online');
+  }
+}
+async function acceptRequest(id) {
+  if (friendsList().length >= MAX_FRIENDS) { toast(`You can have up to ${MAX_FRIENDS} friends`); return; }
+  try { await FB.updateDoc(FB.doc(FB.db, 'friendships', id), { status: 'accepted', acceptedAt: FB.serverTimestamp() }); }
+  catch (e) { toast('Couldn’t accept — try again'); }
+}
+async function removeFriendship(id, msg) {
+  try { await FB.deleteDoc(FB.doc(FB.db, 'friendships', id)); if (msg) toast(msg); } catch (e) { toast('Couldn’t update — try again'); }
+}
+async function blockUser(uid, name) {
+  if (!confirm(`Block @${name}? They won’t be able to send you requests or see your profile, and you’ll stop being friends.`)) return;
+  try {
+    await FB.setDoc(FB.doc(FB.db, 'users', USER.uid, 'blocked', uid), { name, at: Date.now() });
+    const f = SOC.friendships.find(x => x.users.includes(uid));
+    if (f) await FB.deleteDoc(FB.doc(FB.db, 'friendships', f.id));
+    SOC.friend = null;
+    toast(`@${name} is blocked`);
+    renderFriends();
+  } catch (e) { toast('Couldn’t block — try again'); }
+}
+async function unblockUser(uid) {
+  try { await FB.deleteDoc(FB.doc(FB.db, 'users', USER.uid, 'blocked', uid)); } catch (e) { toast('Couldn’t unblock — try again'); }
+}
+const inviteLink = () => `${location.origin}${location.pathname}?invite=${USER.username}`;
+async function shareInvite() {
+  const url = inviteLink();
+  try {
+    if (navigator.share) await navigator.share({ title: 'Pomodorolist', text: `Focus with me on Pomodorolist — I’m @${USER.username}`, url });
+    else { await navigator.clipboard.writeText(url); toast('Invite link copied'); }
+  } catch (e) { /* share cancelled */ }
+}
+/** ?invite=username opens a "Send request?" prompt once the user is signed in. */
+function captureInvite() {
+  const m = /[?&]invite=([A-Za-z0-9_]{3,20})/.exec(location.search);
+  if (!m) return;
+  sessionStorage.setItem('pomodorolist-invite', m[1].toLowerCase());
+  history.replaceState(null, '', location.pathname + location.search.replace(/[?&]invite=[^&]*/, '').replace(/^&/, '?') + location.hash);
+}
+function handleInvite() {
+  const name = sessionStorage.getItem('pomodorolist-invite');
+  if (!name) return;
+  sessionStorage.removeItem('pomodorolist-invite');
+  if (name !== USER.username && confirm(`Send a friend request to @${name}?`)) sendRequest(name);
+}
+
+/* ---------- Kudos and nudges ---------- */
+function onInbox(qs) {
+  const fresh = Date.now() - 3 * 864e5;
+  let shown = 0;
+  for (const d of qs.docs) {
+    const it = d.data(), at = it.createdAt ? it.createdAt.toMillis() : Date.now();
+    if (at < fresh) { FB.deleteDoc(d.ref).catch(() => {}); continue; }   // tidy up old items
+    if (SOC.inboxSeen.has(d.id)) continue;
+    SOC.inboxSeen.add(d.id);
+    if (shown++ < 3) {
+      if (it.type === 'nudge') toast(`@${it.fromName}: Time to focus? 👀`, 4000);
+      else toast(`@${it.fromName} sent ${it.emoji} for your ${String(it.target).startsWith('st_') ? 'streak' : 'session'}`, 3500);
+    }
+  }
+  writeLS(lsKey('inbox-seen'), [...SOC.inboxSeen].slice(-200));
+}
+async function sendReaction(uid, type, emoji, target) {
+  const id = type === 'nudge' ? `n_${USER.uid}_${dayKey(new Date())}` : `k_${USER.uid}_${target}`;
+  const key = uid + '/' + id;
+  if (SOC.sent.has(key)) { toast(type === 'nudge' ? 'You’ve already nudged them today' : 'Kudos already sent'); return; }
+  const data = { from: USER.uid, fromName: USER.username, type, emoji, createdAt: FB.serverTimestamp() };
+  if (type === 'nudge') data.day = dayKey(new Date()); else data.target = target;
+  SOC.sent.add(key);
+  writeLS(lsKey('sent'), [...SOC.sent].slice(-300));
+  try { await FB.setDoc(FB.doc(FB.db, 'inbox', uid, 'items', id), data); toast(type === 'nudge' ? 'Nudge sent 👀' : `Sent ${emoji}`); }
+  catch (e) { toast(type === 'nudge' ? 'You’ve already nudged them today' : 'Kudos already sent'); }
+  if (SOC.friend) renderFriends();
+}
+
+/* ---------- Reading friends' public data (cached) ---------- */
+async function getPublic(col, uid, ttl = CACHE_MS) {
+  const key = col + '/' + uid, c = SOC.cache[key];
+  if (c && Date.now() - c.at < ttl) return c.v;
+  let v = null;
+  try { const d = await FB.getDoc(FB.doc(FB.db, col, uid)); v = d.exists() ? d.data() : null; }
+  catch (e) { v = e.code === 'permission-denied' ? { denied: true } : (c ? c.v : null); }
+  SOC.cache[key] = { v, at: Date.now() };
+  return v;
+}
+const cached = (col, uid) => (SOC.cache[col + '/' + uid] || {}).v;
+let friendsLoading = false;
+async function loadFriendsPublic(force) {
+  if (friendsLoading && !force) return;
+  friendsLoading = true;
+  const ids = friendsList().map(otherUid);
+  const ttl = force ? 0 : CACHE_MS;
+  await Promise.all(ids.flatMap(id => [getPublic('publicProfiles', id, ttl), getPublic('presence', id, force ? 0 : 90000)]));
+  friendsLoading = false;
+  if (S.ui.tab === 'friends' && !SOC.friend) renderFriends(true);
+}
+function presenceText(p) {
+  if (!p || p.denied || !p.visible || !p.now) return '';
+  const n = p.now;
+  if (n.status === 'running' && n.endAt > Date.now()) {
+    const left = Math.ceil((n.endAt - Date.now()) / 60000);
+    return n.phase === 'focus' ? `${n.name} – ${left} min left` : `On a break – ${left} min left`;
+  }
+  if (n.status === 'paused' && p.updatedAt && Date.now() - p.updatedAt.toMillis() < 3 * 3600e3) return `${n.phase === 'focus' ? n.name : 'Break'} – paused`;
+  return '';
+}
+
+/* ---------- Leaderboards ---------- */
+function periodField(period) {
+  if (period === 'day') return { key: 'dayKey', min: 'dayMin' };
+  if (period === 'week') return S.settings.weekStart === 0 ? { key: 'weekKeySun', min: 'weekMinSun' } : { key: 'weekKey', min: 'weekMin' };
+  if (period === 'month') return { key: 'monthKey', min: 'monthMin' };
+  return { key: null, min: 'lifeMin' };
+}
+function periodKey(period) {
+  const now = new Date();
+  if (period === 'day') return dayKey(now);
+  if (period === 'week') return dayKey(weekStartOf(now, S.settings.weekStart));
+  if (period === 'month') return monthKeyOf(now);
+  return null;
+}
+/** A stats doc's minutes for the viewer's current period (0 if it's from an older period). */
+function minutesFor(d, period) {
+  const f = periodField(period);
+  if (!d || d.denied) return 0;
+  if (f.key && d[f.key] !== periodKey(period)) return 0;
+  return d[f.min] || 0;
+}
+function resetText(period) {
+  const now = new Date();
+  let end;
+  if (period === 'day') end = addDays(startOfDay(now), 1);
+  else if (period === 'week') end = addDays(weekStartOf(now, S.settings.weekStart), 7);
+  else if (period === 'month') end = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  else return 'All-time totals';
+  const m = Math.max(1, Math.round((end - now) / 60000));
+  const d = Math.floor(m / 1440), h = Math.floor((m % 1440) / 60);
+  return 'Resets in ' + (d ? `${d}d ${h}h` : h ? `${h}h ${m % 60}m` : `${m}m`);
+}
+async function loadLeaderboard(scope, period, force) {
+  const ck = `${scope}|${period}|${periodKey(period)}|${S.settings.weekStart}`;
+  const c = SOC.lb[ck];
+  if (c && !force && Date.now() - c.at < CACHE_MS) return c;
+  const me = { uid: USER.uid, ...JSON.parse(lastPub.publicStats || '{}'), username: USER.username };
+  const mine = minutesFor(clampStats({ ...myPeriodStats() }, null), period);
+  let rows = [], myRow = null, error = '';
+  try {
+    if (scope === 'friends') {
+      const ids = friendsList().map(otherUid);
+      const docs = await Promise.all(ids.map(id => getPublic('publicStats', id, force ? 0 : CACHE_MS)));
+      rows = docs.map((d, i) => d && !d.denied ? { uid: ids[i], ...d, minutes: minutesFor(d, period) } : null).filter(Boolean);
+      rows.push({ ...me, minutes: mine });
+    } else {
+      const f = periodField(period), col = FB.collection(FB.db, 'publicStats');
+      const cons = [FB.where('global', '==', true)];
+      if (f.key) cons.push(FB.where(f.key, '==', periodKey(period)));
+      const qs = await FB.getDocs(FB.query(col, ...cons, FB.orderBy(f.min, 'desc'), FB.limit(50)));
+      rows = qs.docs.map(d => ({ uid: d.id, ...d.data(), minutes: d.data()[f.min] || 0 }));
+      if (S.settings.globalBoard && !rows.some(r => r.uid === USER.uid) && mine > 0) {
+        const cnt = await FB.getCountFromServer(FB.query(col, ...cons, FB.where(f.min, '>', mine)));
+        myRow = { ...me, minutes: mine, rank: cnt.data().count + 1 };
+      }
+    }
+  } catch (e) {
+    console.warn('leaderboard', e);
+    error = /index/i.test(e.message) ? 'This leaderboard needs a Firestore index — see the setup notes (the browser console has a one-click link).' : 'Couldn’t load the leaderboard. Check your connection.';
+  }
+  rows.sort((a, b) => b.minutes - a.minutes || (a.username < b.username ? -1 : 1));
+  rows.forEach((r, i) => { r.rank = i + 1; });
+  // Errors are cached briefly too (retry after ~20 s) so a failing query can't loop.
+  const res = { rows, myRow, error, at: error ? Date.now() - CACHE_MS + 20000 : Date.now() };
+  SOC.lb[ck] = res;
+  return res;
+}
+
+/* ---------- Weekly challenges (Monday-to-Sunday for everyone) ---------- */
+function challengeProgress(preset, weekKey) {
+  const [y, m, d] = weekKey.split('-').map(Number), from = new Date(y, m - 1, d).getTime(), to = addDays(new Date(from), 7).getTime();
+  const list = S.sessions.filter(s => s.end > from && s.start < to);
+  if (CHALLENGES[preset].unit === 'sessions') return list.length;
+  if (CHALLENGES[preset].unit === 'min') return Math.min(10080, Math.round(list.reduce((a, s) => a + s.duration, 0) / 60000));
+  const idx = buildIndex(), goal = Math.max(S.settings.goalMin, GOAL_BONUS_MIN);
+  let n = 0;
+  for (let i = 0; i < 7; i++) if (((idx[dayKey(addDays(new Date(from), i))] || {}).total || 0) >= goal) n++;
+  return n;
+}
+async function loadChallenges(force) {
+  if (!socialReady() || (!force && SOC.challenges && Date.now() - SOC.challengesAt < CACHE_MS)) return;
+  const wk = monWeekKey(), col = FB.collection(FB.db, 'challenges'), out = {};
+  try {
+    for (const field of ['members', 'invited']) {
+      const qs = await FB.getDocs(FB.query(col, FB.where(field, 'array-contains', USER.uid), FB.where('weekKey', '==', wk)));
+      qs.docs.forEach(d => { out[d.id] = { id: d.id, ...d.data() }; });
+    }
+    SOC.challenges = Object.values(out);
+    SOC.challengesAt = Date.now();
+    await syncChallengeProgress();
+  } catch (e) { console.warn('challenges', e); if (!SOC.challenges) SOC.challenges = []; }
+  if (S.ui.tab === 'friends' && S.ui.friendsView === 'challenges') renderFriends(true);
+}
+/** Push my progress to challenges I've joined, and claim the bonus when I complete one. */
+async function syncChallengeProgress() {
+  if (!SOC.challenges) return;
+  let claimed = 0;
+  for (const c of SOC.challenges) {
+    if (!c.members.includes(USER.uid) || c.weekKey !== monWeekKey()) continue;
+    const v = challengeProgress(c.preset, c.weekKey);
+    if (v > (c.progress[USER.uid] || 0)) {
+      c.progress[USER.uid] = v;
+      trackWrite(FB.updateDoc(FB.doc(FB.db, 'challenges', c.id), { ['progress.' + USER.uid]: v }));
+    }
+    if (v >= CHALLENGES[c.preset].goal && !S.game.claims.challenges[c.id]) {
+      S.game.claims.challenges[c.id] = Date.now();
+      claimed += CHALLENGES[c.preset].coins;
+    }
+  }
+  if (claimed) { save(); if (S.settings.gamification) toast(`Challenge complete · +${claimed} coins`, 3500); }
+}
+async function startChallenge(preset) {
+  const wk = monWeekKey(), id = `${wk}_${preset}_${USER.uid}`;
+  try {
+    await FB.setDoc(FB.doc(FB.db, 'challenges', id), {
+      preset, weekKey: wk, creator: USER.uid, members: [USER.uid], invited: friendsList().map(otherUid).slice(0, 100),
+      names: { [USER.uid]: USER.username }, progress: { [USER.uid]: challengeProgress(preset, wk) }, createdAt: FB.serverTimestamp(),
+    });
+    toast('Challenge started — your friends can join this week');
+    loadChallenges(true);
+  } catch (e) { toast('Couldn’t start the challenge — try again'); }
+}
+async function joinChallenge(id) {
+  const c = (SOC.challenges || []).find(x => x.id === id);
+  if (!c) return;
+  try {
+    await FB.updateDoc(FB.doc(FB.db, 'challenges', id), {
+      members: FB.arrayUnion(USER.uid), ['names.' + USER.uid]: USER.username, ['progress.' + USER.uid]: challengeProgress(c.preset, c.weekKey),
+    });
+    toast('Joined — good luck!');
+    loadChallenges(true);
+  } catch (e) { toast('Couldn’t join — try again'); }
+}
+
+/** Called after every completed session (cloud accounts). */
+function socialAfterSession() {
+  if (!socialReady()) return;
+  schedulePublish();
+  if (SOC.challenges) syncChallengeProgress();
+}
+
+/* ==========================================================================
+   RENDER — Friends tab (friends · leaderboard · challenges), friend profile
+   ========================================================================== */
+function renderFriends(fromLoad) {
+  const body = $('#friendsBody');
+  const gameOn = S.settings.gamification;
+  $('#friendsSeg').classList.toggle('hidden', !!SOC.friend || !USER || USER.guest);
+  $$('#friendsSeg [data-view=board], #friendsSeg [data-view=challenges]').forEach(b => b.classList.toggle('hidden', !gameOn));
+  if (!USER || USER.guest) {
+    body.innerHTML = `<div class="card empty-card"><div class="big-icon">${iconSVG(ICONS.names, 30)}</div><h3>Focus with friends</h3>
+      <p class="muted">Log in to add friends, see leaderboards and join weekly challenges.</p><button class="btn primary" id="guestLogin">Log in to add friends</button></div>`;
+    return;
+  }
+  if (localOnly || !socialReady()) {
+    body.innerHTML = `<div class="card empty-card"><p class="muted">${localOnly ? 'Friends need an internet connection. Your timer and stats still work offline.' : 'Loading…'}</p></div>`;
+    return;
+  }
+  if (SOC.friend) { renderFriendProfile(fromLoad); return; }
+  let view = S.ui.friendsView || 'friends';
+  if (!gameOn && view !== 'friends') view = S.ui.friendsView = 'friends';
+  $$('#friendsSeg button').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+  if (view === 'board') renderBoard(fromLoad);
+  else if (view === 'challenges') renderChallenges(fromLoad);
+  else renderFriendsList(fromLoad);
+}
+
+function personRow(uid, name, prof, extra = '') {
+  const t = prof && !prof.denied ? tierById(prof.tier) : null;
+  const col = prof && NAME_COLORS[prof.color];
+  const badge = t && S.settings.gamification ? badgeSVG(t, { size: 30, frame: prof.frame }) : `<span class="avatar">${esc(name[0] || '?').toUpperCase()}</span>`;
+  return `${badge}<div class="who"><div class="nm"${col ? ` style="color:${col}"` : ''}>@${esc(name)}${prof && !prof.denied && S.settings.gamification ? ` <span class="lvl">Lv ${prof.level}</span>` : ''}</div>${extra}</div>`;
+}
+
+function renderFriendsList(fromLoad) {
+  const fl = friendsList(), inc = incoming(), out = outgoing();
+  if (!fromLoad) loadFriendsPublic();
+  const typed = $('#addFriendName') ? $('#addFriendName').value : '';   // keep what's being typed across refreshes
+  const recap = recapCard();
+  const rows = fl.map(f => {
+    const uid = otherUid(f), prof = cached('publicProfiles', uid), pres = cached('presence', uid), now = presenceText(pres);
+    const streak = prof && !prof.denied && prof.streak ? `<span class="chip-s">${iconSVG(ICONS.flame, 13)} ${prof.streak}</span>` : '';
+    const sub = now ? `<div class="sub now"><i class="live"></i>${esc(now)}</div>` : `<div class="sub">${prof && !prof.denied ? `${fmtNum(prof.hours)}h focused` : ''}</div>`;
+    return `<li class="person" data-open="${uid}" tabindex="0">${personRow(uid, otherName(f), prof, sub)}${streak}<span class="chev">›</span></li>`;
+  }).sort((a, b) => (b.includes('class="live"') ? 1 : 0) - (a.includes('class="live"') ? 1 : 0)).join('');
+  $('#friendsBody').innerHTML = `
+    ${recap}
+    <div class="grid-2">
+      <div class="stack">
+        <div class="card">
+          <h2>Add a friend</h2>
+          <form class="addrow" id="addFriendForm" autocomplete="off">
+            <input type="text" id="addFriendName" placeholder="@username" maxlength="21" autocapitalize="none" spellcheck="false" value="${esc(typed)}">
+            <button class="btn primary" type="submit">Send</button>
+          </form>
+          <div class="row between" style="margin-top:12px">
+            <span class="lbl">Your friend code: <b class="code">@${esc(USER.username)}</b></span>
+            <button class="btn small" id="shareInvite">Share invite link</button>
+          </div>
+        </div>
+        ${inc.length ? `<div class="card"><h2>Requests <span class="pill">${inc.length}</span></h2><ul class="plist">${inc.map(f => `
+          <li class="person">${personRow(f.from, f.fromName, null, '<div class="sub">wants to be friends</div>')}
+            <button class="btn small primary" data-accept="${f.id}">Accept</button><button class="btn small" data-decline="${f.id}">Decline</button></li>`).join('')}</ul></div>` : ''}
+        ${out.length ? `<div class="card"><h2>Sent</h2><ul class="plist">${out.map(f => `
+          <li class="person">${personRow(f.to, f.toName, null, '<div class="sub">waiting for them to accept</div>')}
+            <button class="btn small" data-cancel="${f.id}">Cancel</button></li>`).join('')}</ul></div>` : ''}
+      </div>
+      <div class="card">
+        <div class="row between" style="margin-bottom:8px"><h2 style="margin:0">Friends</h2><span class="lbl">${fl.length} / ${MAX_FRIENDS}
+          <button class="linkbtn" id="refreshFriends" title="Refresh">↻</button></span></div>
+        ${fl.length ? `<ul class="plist">${rows}</ul>` : '<div class="empty">No friends yet. Send a request by username, or share your invite link.</div>'}
+      </div>
+    </div>`;
+}
+
+function recapCard() {
+  const now = new Date();
+  const wk = dayKey(addDays(weekStartOf(now, 1), -7));
+  if (now.getDay() !== 1 || localStorage.getItem(lsKey('recap')) === wk) return '';
+  const idx = buildIndex(), from = addDays(weekStartOf(now, 1), -7);
+  let total = 0, best = null;
+  for (let i = 0; i < 7; i++) {
+    const d = addDays(from, i), m = (idx[dayKey(d)] || {}).total || 0;
+    total += m;
+    if (m && (!best || m > best.m)) best = { d, m };
+  }
+  if (!total) return '';
+  // Rank among friends from their cached stats (last week's minutes).
+  const friendMins = friendsList().map(f => {
+    const d = cached('publicStats', otherUid(f));
+    if (!d || d.denied) return null;
+    return d.lastWeekKey === wk ? d.lastWeekMin : d.weekKey === wk ? d.weekMin : 0;
+  }).filter(v => v !== null);
+  if (!friendMins.length && friendsList().length && !SOC.recapTried) SOC.recapTried = true, loadLeaderboard('friends', 'week').then(() => { if (S.ui.tab === 'friends' && !SOC.friend) renderFriends(true); });
+  const rank = friendMins.length ? 1 + friendMins.filter(m => m > total).length : null;
+  SOC.recap = { wk, total, best, rank, of: friendMins.length + 1 };
+  return `<div class="card recap">
+    <div class="row between"><h2 style="margin:0">Your week · ${fmtShort(from)} – ${fmtShort(addDays(from, 6))}</h2><button class="linkbtn" id="recapClose" aria-label="Dismiss">✕</button></div>
+    <div class="recap-row">
+      <div><div class="big">${fmtMin(total)}</div><div class="lbl">focused</div></div>
+      ${rank ? `<div><div class="big">#${rank}</div><div class="lbl">of ${friendMins.length + 1} friends</div></div>` : ''}
+      ${best ? `<div><div class="big">${WEEKDAYS[best.d.getDay()]}</div><div class="lbl">best day · ${fmtMin(best.m)}</div></div>` : ''}
+    </div>
+    <button class="btn small" id="recapShare">Share</button></div>`;
+}
+/** Draw the weekly recap as an image card and share or download it. */
+async function shareRecap() {
+  const r = SOC.recap;
+  if (!r) return;
+  const c = document.createElement('canvas'), x = c.getContext('2d'), cs = getComputedStyle(document.documentElement);
+  const v = n => cs.getPropertyValue(n).trim();
+  c.width = 1080; c.height = 1350;
+  x.fillStyle = v('--bg'); x.fillRect(0, 0, 1080, 1350);
+  x.fillStyle = v('--surface'); x.beginPath(); x.roundRect(90, 160, 900, 1000, 48); x.fill();
+  x.fillStyle = v('--accent'); x.beginPath(); x.arc(170, 250, 16, 0, 7); x.fill();
+  x.fillStyle = v('--text'); x.font = '600 44px system-ui, sans-serif'; x.fillText('Pomodorolist', 206, 266);
+  x.fillStyle = v('--muted'); x.font = '36px system-ui, sans-serif';
+  const [y, m, d] = r.wk.split('-').map(Number), from = new Date(y, m - 1, d);
+  x.fillText(`Week of ${fmtShort(from)} – ${fmtShort(addDays(from, 6))}`, 150, 380);
+  x.fillStyle = v('--text'); x.font = '300 170px system-ui, sans-serif'; x.fillText(fmtMin(r.total), 140, 580);
+  x.fillStyle = v('--muted'); x.font = '38px system-ui, sans-serif'; x.fillText('of focus', 150, 650);
+  const stat = (label, val, yy) => { x.fillStyle = v('--text'); x.font = '500 64px system-ui, sans-serif'; x.fillText(val, 150, yy); x.fillStyle = v('--muted'); x.font = '34px system-ui, sans-serif'; x.fillText(label, 150, yy + 50); };
+  if (r.rank) stat(`among ${r.of} friends`, `#${r.rank}`, 800);
+  if (r.best) stat(`best day · ${fmtMin(r.best.m)}`, WEEKDAYS[r.best.d.getDay()], r.rank ? 960 : 800);
+  x.fillStyle = v('--accent'); x.font = '32px system-ui, sans-serif'; x.fillText(location.host + location.pathname, 150, 1100);
+  const blob = await new Promise(res => c.toBlob(res, 'image/png'));
+  const file = new File([blob], 'pomodorolist-week.png', { type: 'image/png' });
+  try {
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], text: `My focus week on Pomodorolist: ${location.origin}${location.pathname}` }); return; }
+  } catch (e) { return; }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = file.name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+async function renderBoard(fromLoad) {
+  const scope = S.ui.lbScope || 'friends', period = S.ui.lbPeriod || 'week';
+  const head = `
+    <div class="lb-head">
+      <div class="seg" id="lbScope"><button data-scope="friends" class="${scope === 'friends' ? 'active' : ''}">Friends</button><button data-scope="global" class="${scope === 'global' ? 'active' : ''}">Global</button></div>
+      <div class="seg" id="lbPeriod">${[['day', 'Daily'], ['week', 'Weekly'], ['month', 'Monthly'], ['life', 'Lifetime']].map(([p, n]) => `<button data-period="${p}" class="${p === period ? 'active' : ''}">${n}</button>`).join('')}</div>
+    </div>`;
+  const key = `${scope}|${period}|${periodKey(period)}|${S.settings.weekStart}`, c = SOC.lb[key];
+  if (!c || Date.now() - c.at > CACHE_MS) {
+    if (!fromLoad || !c) {
+      $('#friendsBody').innerHTML = head + '<div class="card"><div class="empty">Loading…</div></div>';
+      loadLeaderboard(scope, period).then(() => { if (S.ui.tab === 'friends' && S.ui.friendsView === 'board') renderBoard(true); });
+      return;
+    }
+  }
+  const res = c || { rows: [] };
+  const row = r => {
+    const t = tierById(r.tier), col = NAME_COLORS[r.color], me = r.uid === USER.uid;
+    return `<li class="${me ? 'me' : ''}${r.rank <= 3 ? ' top' + r.rank : ''}"${!me && scope === 'friends' ? ` data-open="${r.uid}"` : ''}>
+      <span class="rk">${r.rank}</span>${badgeSVG(t, { size: 26, frame: r.frame })}
+      <span class="nm"${col ? ` style="color:${col}"` : ''}>@${esc(r.username)}${me ? ' <span class="lbl">(you)</span>' : ''}</span>
+      <span class="v">${fmtMin(r.minutes)}</span></li>`;
+  };
+  let note = '';
+  if (scope === 'global' && !S.settings.globalBoard) note = `<div class="lb-note">You’re not on the global leaderboard. <button class="linkbtn" id="goPrivacy">Turn it on in Settings</button></div>`;
+  $('#friendsBody').innerHTML = head + `
+    <div class="card">
+      <div class="row between lb-meta"><span class="lbl">${resetText(period)}</span><span class="lbl">Updated ${Math.max(0, Math.round((Date.now() - (res.at || Date.now())) / 60000))} min ago <button class="linkbtn" id="lbRefresh" title="Refresh">↻</button></span></div>
+      ${res.error ? `<div class="empty">${esc(res.error)}</div>` : res.rows.length ? `<ol class="lb">${res.rows.map(row).join('')}</ol>` : '<div class="empty">No one has focused yet in this period.</div>'}
+      ${res.myRow ? `<ol class="lb pinned">${row(res.myRow)}</ol>` : ''}
+      ${note}
+    </div>`;
+}
+
+function renderChallenges(fromLoad) {
+  if (!fromLoad || !SOC.challenges) loadChallenges();
+  const list = SOC.challenges || [], wk = monWeekKey();
+  const mine = new Set(list.filter(c => c.creator === USER.uid).map(c => c.preset));
+  const cards = list.map(c => {
+    const p = CHALLENGES[c.preset], member = c.members.includes(USER.uid), done = !!S.game.claims.challenges[c.id];
+    const people = c.members.map(uid => {
+      const v = uid === USER.uid ? challengeProgress(c.preset, c.weekKey) : (c.progress[uid] || 0);
+      const pct = Math.min(100, v / p.goal * 100);
+      const val = p.unit === 'min' ? `${fmtMin(v)} / ${fmtMin(p.goal)}` : `${v} / ${p.goal}`;
+      return `<div class="cp${uid === USER.uid ? ' me' : ''}"><span class="nm">@${esc(c.names[uid] || '?')}</span><span class="bar"><i style="width:${pct.toFixed(1)}%"></i></span><span class="lbl">${val}</span></div>`;
+    }).join('');
+    return `<div class="card chal"><div class="row between"><b>${p.name}</b><span class="lbl">${done ? '✓ ' : ''}${COIN_SVG} +${p.coins}</span></div>
+      <div class="lbl" style="margin-bottom:10px">Started by @${esc(c.names[c.creator] || '?')} · ${c.members.length} joined</div>${people}
+      ${member ? '' : `<button class="btn small primary" data-join="${c.id}" style="margin-top:10px">Join</button>`}</div>`;
+  }).join('');
+  const starters = Object.entries(CHALLENGES).filter(([id]) => !mine.has(id)).map(([id, p]) =>
+    `<button class="btn small" data-start="${id}">${p.name} · ${COIN_SVG} ${p.coins}</button>`).join('');
+  $('#friendsBody').innerHTML = `
+    <div class="card"><h2>Start a challenge this week</h2>
+      <p class="lbl" style="margin:-4px 0 10px">Runs Monday to Sunday (week of ${fmtShort(new Date(wk + 'T00:00'))}). All your friends are invited; finishing it earns bonus coins.</p>
+      <div class="btn-row">${starters || '<span class="lbl">You’ve started every challenge this week.</span>'}</div></div>
+    <div class="stack" style="margin-top:16px">${cards || '<div class="card"><div class="empty">No challenges this week yet.</div></div>'}</div>`;
+}
+
+/* ---------- A friend's profile ---------- */
+async function openFriend(uid) {
+  SOC.friend = { uid, tab: 'activity' };
+  renderFriends();
+  await Promise.all([getPublic('publicProfiles', uid, 60000), getPublic('activity', uid, 60000), getPublic('presence', uid, 30000), getPublic('publicStats', uid, 60000)]);
+  if (SOC.friend && SOC.friend.uid === uid) renderFriends(true);
+}
+function friendStreak(act) {
+  if (!act || act.denied || !act.goalDays) return 0;
+  const theirs = new Set(act.goalDays), idx = game().idx, goal = S.settings.goalMin;
+  const both = d => ((idx[dayKey(d)] || {}).total || 0) >= goal && theirs.has(dayKey(d));
+  let d = startOfDay(new Date()), n = 0;
+  if (!both(d)) d = addDays(d, -1);
+  while (n < 84 && both(d)) { n++; d = addDays(d, -1); }
+  return n;
+}
+function renderFriendProfile() {
+  const { uid, tab } = SOC.friend;
+  const f = SOC.friendships.find(x => x.users.includes(uid));
+  const name = f ? otherName(f) : (cached('publicProfiles', uid) || {}).username || '';
+  const prof = cached('publicProfiles', uid), act = cached('activity', uid), pres = cached('presence', uid);
+  const back = '<button class="linkbtn back" id="friendBack">‹ Friends</button>';
+  if (prof === undefined) { $('#friendsBody').innerHTML = back + '<div class="card"><div class="empty">Loading…</div></div>'; return; }
+  if (!prof || prof.denied) { $('#friendsBody').innerHTML = back + '<div class="card"><div class="empty">This profile isn’t available.</div></div>'; return; }
+  const t = tierById(prof.tier), col = NAME_COLORS[prof.color], gameOn = S.settings.gamification;
+  const isFriend = f && f.status === 'accepted';
+  const shared = act && !act.denied && act.visible;
+  const fs = isFriend ? friendStreak(act) : 0;
+  const now = presenceText(pres);
+  const tile = (v, s) => `<div class="tile"><div class="v">${v}</div><div class="s">${s}</div></div>`;
+  const nudged = SOC.sent.has(uid + '/' + `n_${USER.uid}_${dayKey(new Date())}`);
+  const kudosBtns = target => REACTIONS.map(e => `<button class="kudo${SOC.sent.has(uid + '/k_' + USER.uid + '_' + target) ? ' sent' : ''}" data-kudos="${e}" data-target="${target}" title="Send ${e}">${e}</button>`).join('');
+  let actHtml = '';
+  if (!isFriend) actHtml = '';
+  else if (!shared) actHtml = `<div class="card"><div class="empty">@${esc(name)} keeps their activity private.</div></div>`;
+  else if (tab === 'compare') actHtml = compareView(act, name);
+  else actHtml = activityView(act, uid, kudosBtns);
+  $('#friendsBody').innerHTML = `${back}
+    <div class="card fp-head">
+      ${gameOn ? badgeSVG(t, { size: 64, frame: prof.frame }) : `<span class="avatar big">${esc(name[0] || '?').toUpperCase()}</span>`}
+      <div style="flex:1;min-width:0">
+        <div class="fp-name"${col ? ` style="color:${col}"` : ''}>@${esc(name)}</div>
+        <div class="lbl">${gameOn ? `${t.name} · Level ${prof.level} · ` : ''}joined ${new Date(prof.joined).toLocaleDateString([], { month: 'short', year: 'numeric' })}</div>
+        ${now ? `<div class="sub now" style="margin-top:4px"><i class="live"></i>${esc(now)}</div>` : ''}
+      </div>
+      ${isFriend ? `<button class="btn small" id="nudgeBtn"${nudged ? ' disabled' : ''}>${nudged ? 'Nudged today' : 'Nudge 👀'}</button>` : ''}
+    </div>
+    <div class="tiles4" style="margin:16px 0">
+      ${tile(prof.streak + 'd', 'Current streak')}${tile(prof.longest + 'd', 'Longest streak')}${tile(fmtNum(prof.hours) + 'h', 'Total focus')}${tile(isFriend && shared ? fs + 'd' : '—', 'Friend streak')}
+    </div>
+    ${isFriend && prof.streak ? `<div class="card kudo-row"><span class="lbl">Cheer their ${prof.streak}-day streak</span><span>${kudosBtns('st_' + dayKey(new Date()))}</span></div>` : ''}
+    ${isFriend && shared ? `<div class="stats-head" style="margin-top:16px"><div class="seg" id="fpTab"><button data-fptab="activity" class="${tab !== 'compare' ? 'active' : ''}">Activity</button><button data-fptab="compare" class="${tab === 'compare' ? 'active' : ''}">Compare</button></div></div>` : ''}
+    ${actHtml}
+    ${f ? `<div class="btn-row" style="margin-top:16px;justify-content:flex-end">
+      ${isFriend ? `<button class="btn small" data-remove="${f.id}">Remove friend</button>` : ''}
+      <button class="btn small danger" data-block="${uid}" data-name="${esc(name)}">Block</button></div>` : ''}`;
+}
+function activityView(act, uid, kudosBtns) {
+  const today = startOfDay(new Date()), w = clamp($('#friendsBody').clientWidth - 38, 300, 980);
+  const cols = Array.from({ length: 7 }, (_, i) => {
+    const d = addDays(today, i - 6), m = act.days[dayKey(d)] || 0;
+    return { label: WEEKDAYS[d.getDay()], sub: String(d.getDate()), total: m, segs: m ? [{ name: 'Focus', min: m, color: 'var(--accent)' }] : [], tip: fmtShort(d) };
+  });
+  const sessions = (act.recent || []).map(s => `
+    <li><span class="t">${new Date(s.t).toLocaleDateString([], { day: 'numeric', month: 'short' })} · ${fmtTime(s.t)}</span>
+      <span class="nm">${esc(act.shareNames && s.name ? s.name : 'Focus session')}</span><span class="d">${fmtMin(s.min)}</span>
+      <span class="kudos">${kudosBtns('s_' + s.id)}</span></li>`).join('');
+  return `<div class="card chart-card"><h2>Last 7 days</h2>${barChart(cols, { width: w, height: 200 })}<div class="tip" data-tipbox></div></div>
+    <div class="card chart-card"><h2>12 weeks</h2>${twelveWeeks(act.days)}</div>
+    <div class="card chart-card"><h2>Recent sessions</h2>${sessions ? `<ul class="sesslist">${sessions}</ul>` : '<div class="empty">No sessions yet.</div>'}</div>`;
+}
+function twelveWeeks(days) {
+  const ws = S.settings.weekStart, today = startOfDay(new Date());
+  const start = addDays(weekStartOf(today, ws), -77);
+  const C = 14, G = 4, L = 30, T = 4, W = L + 12 * (C + G), H = T + 7 * (C + G);
+  let svg = `<svg class="chart" viewBox="0 0 ${W} ${H}" style="max-width:${Math.round(W * 1.15)}px" role="img">`;
+  for (let row = 1; row < 7; row += 2) svg += `<text class="axis" x="0" y="${T + row * (C + G) + C - 2}">${WEEKDAYS[(ws + row) % 7]}</text>`;
+  for (let i = 0; i < 84; i++) {
+    const d = addDays(start, i);
+    if (d > today) break;
+    const m = days[dayKey(d)] || 0, lv = m <= 0 ? 0 : m < 30 ? 1 : m < 60 ? 2 : m < 120 ? 3 : 4;
+    const x = L + Math.floor(i / 7) * (C + G), y = T + (i % 7) * (C + G);
+    svg += lv ? `<rect x="${x}" y="${y}" width="${C}" height="${C}" rx="3" style="fill:var(--accent);opacity:${HEAT_OPACITY[lv]}"><title>${fmtShort(d)} · ${fmtMin(m)}</title></rect>`
+      : `<rect x="${x}" y="${y}" width="${C}" height="${C}" rx="3" style="fill:var(--heat0)"><title>${fmtShort(d)} · 0m</title></rect>`;
+  }
+  return svg + '</svg>';
+}
+function compareView(act, name) {
+  const idx = game().idx, start = weekStartOf(new Date(), S.settings.weekStart);
+  const W = clamp($('#friendsBody').clientWidth - 38, 300, 980), H = 210, L = 42, B = 30, T = 10;
+  const mine = [], theirs = [];
+  for (let i = 0; i < 7; i++) { const k = dayKey(addDays(start, i)); mine.push((idx[k] || {}).total || 0); theirs.push(act.days[k] || 0); }
+  const yMax = niceMax(Math.max(30, ...mine, ...theirs)), plot = H - T - B, cw = (W - L) / 7, bw = Math.min(cw * 0.3, 22);
+  let svg = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img">`;
+  for (let i = 0; i <= 3; i++) { const y = T + plot * (1 - i / 3); svg += `<line class="grid" x1="${L}" x2="${W}" y1="${y}" y2="${y}"/><text class="axis" x="${L - 6}" y="${y + 4}" text-anchor="end">${i ? fmtMin(yMax * i / 3) : '0'}</text>`; }
+  for (let i = 0; i < 7; i++) {
+    const x = L + cw * i + cw / 2, d = addDays(start, i);
+    const bar = (v, dx, col, who) => { const h = v / yMax * plot; return `<rect x="${(x + dx).toFixed(1)}" y="${(T + plot - h).toFixed(1)}" width="${bw}" height="${Math.max(0, h).toFixed(1)}" rx="2" style="fill:${col}"><title>${who} · ${WEEKDAYS[d.getDay()]} · ${fmtMin(v)}</title></rect>`; };
+    svg += bar(mine[i], -bw - 1, 'var(--accent)', 'You') + bar(theirs[i], 1, 'var(--muted)', '@' + name);
+    svg += `<text class="axis-b" x="${x}" y="${H - B + 16}" text-anchor="middle">${WEEKDAYS[d.getDay()]}</text>`;
+  }
+  svg += '</svg>';
+  const tm = mine.reduce((a, b) => a + b, 0), tt = theirs.reduce((a, b) => a + b, 0);
+  return `<div class="card chart-card"><h2>This week</h2>
+    <div class="legend"><i style="background:var(--accent)"></i> You · ${fmtMin(tm)} <i style="background:var(--muted);margin-left:12px"></i> @${esc(name)} · ${fmtMin(tt)}</div>${svg}</div>`;
+}
+
+/* ---------- Settings: friends & privacy ---------- */
+function renderPrivacy() {
+  const card = $('#privacyCard');
+  if (!USER || USER.guest) { card.classList.add('hidden'); return; }
+  card.classList.remove('hidden');
+  $('#setShareAct').checked = S.settings.shareActivity;
+  $('#setShareNames').checked = S.settings.shareNames;
+  $('#setGlobal').checked = S.settings.globalBoard;
+  $('#inviteDesc').textContent = `Friend code @${USER.username}`;
+  const b = Object.entries(SOC.blocked);
+  $('#blockedList').innerHTML = b.length ? `<div class="setting"><div><div>Blocked</div>${b.map(([uid, n]) =>
+    `<div class="row" style="gap:6px;margin-top:4px"><span class="desc">@${esc(n)}</span><button class="linkbtn" data-unblock="${uid}">Unblock</button></div>`).join('')}</div></div>` : '';
+}
+
+/* ==========================================================================
    MASTER RENDER + TABS
    ========================================================================== */
 function showTab(tab) {
@@ -2902,6 +3823,7 @@ function showTab(tab) {
   if (tab === 'stats') renderStats();
   if (tab === 'settings') renderSettings();
   if (tab === 'profile') renderProfile();
+  if (tab === 'friends') { SOC.friend = null; renderFriends(); }
   saveLocal();
 }
 function renderAll() {
@@ -3062,6 +3984,46 @@ $('#setGame').addEventListener('change', e => {
   renderAll();
 });
 
+// Friends tab
+$('#tab-friends').addEventListener('click', e => {
+  const t = e.target;
+  const seg = t.closest('#friendsSeg button');
+  if (seg) { S.ui.friendsView = seg.dataset.view; SOC.friend = null; saveLocal(); renderFriends(); return; }
+  if (t.closest('#guestLogin')) { logout(); return; }
+  if (t.closest('#shareInvite')) { shareInvite(); return; }
+  if (t.closest('#refreshFriends')) { loadFriendsPublic(true); return; }
+  if (t.closest('#recapClose')) { writeLS(lsKey('recap'), SOC.recap ? SOC.recap.wk : ''); renderFriends(true); return; }
+  if (t.closest('#recapShare')) { shareRecap(); return; }
+  if (t.closest('#friendBack')) { SOC.friend = null; renderFriends(); return; }
+  if (t.closest('#lbRefresh')) { SOC.lb = {}; renderFriends(); return; }
+  if (t.closest('#goPrivacy')) { showTab('settings'); $('#privacyCard').scrollIntoView({ behavior: 'smooth' }); return; }
+  if (t.closest('#nudgeBtn')) { sendReaction(SOC.friend.uid, 'nudge', '👀'); return; }
+  const b = t.closest('[data-scope],[data-period],[data-fptab],[data-accept],[data-decline],[data-cancel],[data-remove],[data-block],[data-kudos],[data-start],[data-join],[data-open]');
+  if (!b) { showTip(e); return; }
+  const d = b.dataset;
+  if (d.scope) { S.ui.lbScope = d.scope; saveLocal(); renderFriends(); }
+  else if (d.period) { S.ui.lbPeriod = d.period; saveLocal(); renderFriends(); }
+  else if (d.fptab) { SOC.friend.tab = d.fptab; renderFriends(true); }
+  else if (d.accept) acceptRequest(d.accept);
+  else if (d.decline) removeFriendship(d.decline, 'Request declined');
+  else if (d.cancel) removeFriendship(d.cancel, 'Request cancelled');
+  else if (d.remove) { if (confirm('Remove this friend?')) { removeFriendship(d.remove, 'Friend removed'); SOC.friend = null; } }
+  else if (d.block) blockUser(d.block, d.name);
+  else if (d.kudos) sendReaction(SOC.friend.uid, 'kudos', d.kudos, d.target);
+  else if (d.start) startChallenge(d.start);
+  else if (d.join) joinChallenge(d.join);
+  else if (d.open) openFriend(d.open);
+});
+$('#tab-friends').addEventListener('submit', e => { if (e.target.id === 'addFriendForm') { e.preventDefault(); sendRequest($('#addFriendName').value).then(() => { const i = $('#addFriendName'); if (i) i.value = ''; }); } });
+$('#tab-friends').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.dataset.open) openFriend(e.target.dataset.open); });
+$('#tab-friends').addEventListener('mouseover', showTip);
+// Privacy settings
+for (const [id, key] of [['#setShareAct', 'shareActivity'], ['#setShareNames', 'shareNames'], ['#setGlobal', 'globalBoard']]) {
+  $(id).addEventListener('change', e => { S.settings[key] = e.target.checked; save(); publishPresence(); SOC.lb = {}; });
+}
+$('#copyInvite').addEventListener('click', shareInvite);
+$('#blockedList').addEventListener('click', e => { const b = e.target.closest('[data-unblock]'); if (b) unblockUser(b.dataset.unblock); });
+
 // Progress + shop
 $('#lvChip').addEventListener('click', () => { S.ui.profileView = 'progress'; showTab('profile'); });
 $('#tab-profile').addEventListener('click', e => {
@@ -3119,6 +4081,11 @@ $('#wipeBtn').addEventListener('click', () => {
   const where = USER.guest ? 'on this device' : 'in your account on ALL devices';
   if (!confirm(`Erase ALL sessions, presets and settings ${where}? This cannot be undone.`)) return;
   S = defaultState();
+  if (socialReady()) {
+    // Public totals can only grow (security rules), so remove them and let them be re-created from zero.
+    for (const col of ['publicStats', 'activity', 'publicProfiles', 'presence']) { delete lastPub[col]; trackWrite(FB.deleteDoc(FB.doc(FB.db, col, USER.uid))); }
+    SOC.myStats = null;
+  }
   if (cloudReady()) {
     const batch = FB.writeBatch(FB.db);
     for (const m of monthDocIds) batch.delete(monthRef(m));
@@ -3223,6 +4190,7 @@ function initInputs() {
 }
 
 async function boot() {
+  captureInvite();
   applyTheme(readJSON(THEME_KEY, 'auto'));
   const guest = localStorage.getItem(GUEST_FLAG) === '1';
 
