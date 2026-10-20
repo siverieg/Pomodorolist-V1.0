@@ -3113,7 +3113,9 @@ function startSession(user, cloud) {
   if (USER && !USER.guest && user.uid && USER.uid === user.uid) return;
   USER = user;
   if (!user.guest) writeLS(LAST_USER, user);
-  S = hydrate(readJSON(user.guest ? LEGACY_KEY : cacheKey(user.uid), null));
+  const stored = readJSON(user.guest ? LEGACY_KEY : cacheKey(user.uid), null);
+  firstUseHere = !stored;   // nothing saved on this device yet for this user
+  S = hydrate(stored);
   initInputs();
   applyCosmetics();
   showView('appView');
@@ -8842,7 +8844,7 @@ function tutNext() {
   if (TUT.i < TUT_STEPS - 1) { TUT.i++; renderTut(); }
 }
 function finishTutorial() {
-  S.onboarded = true; save(); setTourDone();
+  S.onboarded = true; save(); setTourDone(); writeLS(onbKey(), '1');
   if ($('#tutDlg').open) $('#tutDlg').close();
   setTimeout(maybeShowLogin, 500);
 }
@@ -8888,7 +8890,7 @@ const TIPS = {
 const tipsSeen = () => new Set(readJSON(TIPS_KEY, []));
 let tipT = 0;
 function maybeTip(tab) {
-  if (!USER || !TIPS[tab] || !S.onboarded || !tourDone() || $('#tutDlg').open || !$('#tour').classList.contains('hidden')) return;
+  if (!USER || !TIPS[tab] || !S.onboarded || $('#tutDlg').open || !$('#tour').classList.contains('hidden')) return;
   const seen = tipsSeen();
   if (seen.has(tab)) return;
   clearTimeout(tipT);
@@ -9039,15 +9041,29 @@ const TOUR_KEY = 'pomodorolist-tour-done';
 const TOUR = { i: 0, steps: [] };
 const tourDone = () => { try { return localStorage.getItem(TOUR_KEY) === '1'; } catch { return true; } };
 const setTourDone = () => { try { localStorage.setItem(TOUR_KEY, '1'); } catch {} };
+/* The tutorial is remembered per account (S.onboarded in users/{uid}, plus a local copy), not per device,
+   so a new account on a browser that has used Pomodorolist before still gets it. */
+let firstUseHere = false;
+const onbKey = () => 'pomodorolist-onboarded:' + (USER.guest ? 'guest' : USER.uid);
+const tutDone = () => !!USER && (!!S.onboarded || localStorage.getItem(onbKey()) === '1');
+/** New account = created in the last 2 days (Firebase Auth). Older accounts get the What's new card instead. */
+function isNewUser() {
+  if (S.sessions.length >= 3) return false;
+  if (USER.guest) return firstUseHere || !tourDone();   // first guest use, or a guest who never finished the old tour
+  const c = FB.auth && FB.auth.currentUser && Date.parse(FB.auth.currentUser.metadata.creationTime);
+  return !!c && Date.now() - c < 2 * 864e5;
+}
 function maybeStartTour(cloud, tries = 0) {
-  if (tourDone()) return;
-  // wait for a signed-in user's history so returning users on a new device aren't toured
-  if (cloud && !firstLoadDone && tries < 20) { setTimeout(() => maybeStartTour(cloud, tries + 1), 500); return; }
-  if (S.onboarded || S.sessions.length >= 3) { setTourDone(); return; }
+  if (!USER || tutDone()) return;
+  const who = USER;
+  // wait for a signed-in user's profile and history first
+  if (cloud && !firstLoadDone && tries < 40) { setTimeout(() => { if (USER === who) maybeStartTour(cloud, tries + 1); }, 500); return; }
+  if (S.onboarded || !isNewUser()) { writeLS(onbKey(), '1'); return; }
   setTimeout(() => {
-    if (tourDone() || !USER) return;
+    if (USER !== who || tutDone()) return;
     if ($('#appView').offsetParent === null) return;
-    if (document.querySelector('dialog[open]')) { if (tries < 40) setTimeout(() => maybeStartTour(cloud, tries + 1), 1500); return; }
+    if (document.querySelector('dialog[open]') || !$('#tour').classList.contains('hidden')) { if (tries < 80) setTimeout(() => maybeStartTour(cloud, tries + 1), 1500); return; }
+    if ($('#newsSlot .news-card')) newsDone();   // a brand-new account doesn't need "What's new"
     startTutorial();
   }, 700);
 }
