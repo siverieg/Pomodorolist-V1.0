@@ -82,7 +82,7 @@ h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacin
 .coinpill .coin { width: 16px; height: 16px; }
 .coinpill:hover, .lvchip:hover { border-color: var(--muted); }
 /* Tablets: compact top bar with the label under each icon */
-@media (min-width: 641px) and (max-width: 1160px) {
+@media (min-width: 641px) and (max-width: 1300px) {
   .sync b { display: none; }
   .tabs { border-radius: 18px; }
   .tabs button { flex-direction: column; gap: 2px; padding: 5px 11px; font-size: 11px; border-radius: 14px; }
@@ -100,7 +100,7 @@ h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacin
   .tabs button { flex: 1 1 0; min-width: 0; flex-direction: column; gap: 3px; padding: 4px 2px; font-size: 10.5px; border-radius: 12px; }
   .tabs button span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
   .tabs button svg { width: 22px; height: 22px; }
-  .tabs button[data-tab="profile"] { display: none; }
+  .tabs button[data-tab="profile"], .tabs button[data-tab="shop"] { display: none; }   /* Shop: the coin pill in the header */
   .tabs.has-ind > .seg-ind { background: transparent; top: 6px; bottom: auto; height: 30px; }
   .tabs > .seg-ind::before { content: ""; position: absolute; left: 50%; top: 0; width: 56px; height: 30px; margin-left: -28px; border-radius: 999px; background: var(--accent-soft); }
   main { padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
@@ -417,7 +417,7 @@ input[type="range"] { accent-color: var(--accent); width: 160px; }
    FRIENDS + LEADERBOARDS
    ========================================================================== */
 .tbadge { position: absolute; top: 4px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--danger); box-shadow: 0 0 0 2px var(--surface); }
-@media (max-width: 1160px) { .tbadge { right: calc(50% - 16px); top: 3px; } }
+@media (max-width: 1300px) { .tbadge { right: calc(50% - 16px); top: 3px; } }
 :root[data-motion="full"] .tbadge:not(.hidden) { animation: dotPop .4s var(--spring) both; }
 @keyframes dotPop { from { transform: scale(0); } }
 .prof-acct { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
@@ -1010,6 +1010,228 @@ body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .s
   }
 }
 
+/* ==========================================================================
+   QUESTS — weekly boss battle
+   ========================================================================== */
+.boss-card { position: relative; overflow: hidden; }
+.boss-top { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+.boss-art { width: 132px; height: 132px; flex: none; display: grid; place-items: center; border-radius: 22px; background: var(--accent-soft); position: relative; }
+.boss-art svg { width: 116px; height: 116px; overflow: visible; }
+.boss-info { flex: 1; min-width: 200px; }
+.boss-kicker { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+.boss-name { font-size: 22px; font-weight: 650; line-height: 1.2; margin: 2px 0 4px; }
+.boss-desc { font-size: 13.5px; color: var(--muted); margin: 0 0 10px; }
+.hpbar { position: relative; height: 16px; border-radius: 999px; background: var(--heat0); overflow: hidden; border: 1px solid var(--line); }
+.hpbar i { position: absolute; inset: 0; border-radius: inherit; transform-origin: 0 50%; background: linear-gradient(90deg, #e5654f, #f08a5d); transition: transform .9s var(--ease); }
+.hpbar b { position: absolute; inset: 0; border-radius: inherit; transform-origin: 0 50%; background: #ffd9a8; opacity: .8; transition: transform 1.4s .45s var(--ease); }
+.hp-row { display: flex; justify-content: space-between; font-size: 13px; margin-top: 6px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.hp-row strong { color: var(--text); }
+.boss-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; align-items: center; }
+.boss-meta .pill { font-size: 12.5px; padding: 3px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.dmg-float { position: absolute; left: 50%; top: 30%; font-weight: 800; font-size: 22px; color: #e5654f; pointer-events: none; text-shadow: 0 2px 8px rgba(0,0,0,.2); opacity: 0; }
+:root[data-motion="full"] .dmg-float { animation: dmgUp 1.3s var(--ease) forwards; }
+:root:not([data-motion="full"]) .dmg-float { animation: fadeInOut 1.3s forwards; }
+@keyframes dmgUp { 0% { opacity: 0; transform: translate(-50%, 10px) scale(.7); } 20% { opacity: 1; transform: translate(-50%, 0) scale(1.15); } 100% { opacity: 0; transform: translate(-50%, -48px) scale(1); } }
+:root[data-motion="full"] .boss-art.hit svg { animation: bossHit .5s ease both; }
+@keyframes bossHit { 0% { filter: brightness(2.2); transform: translateX(0); } 20% { transform: translateX(-7px) rotate(-3deg); } 45% { transform: translateX(6px) rotate(2deg); } 70% { transform: translateX(-3px); } 100% { filter: none; transform: none; } }
+:root[data-motion="full"] .boss-art.idle svg { animation: bossIdle 3.6s ease-in-out infinite; }
+@keyframes bossIdle { 50% { transform: translateY(-4px) scale(1.02); } }
+.boss-art.defeated svg { filter: grayscale(1) opacity(.5); transform: rotate(-8deg) scale(.9); }
+:root[data-motion="full"] .boss-art.defeating svg { animation: bossDown 1.1s var(--ease) both; }
+@keyframes bossDown { 0% { transform: none; filter: brightness(2); } 40% { transform: scale(1.1) rotate(4deg); } 100% { transform: rotate(-8deg) scale(.9); filter: grayscale(1) opacity(.5); } }
+.victory { margin-top: 14px; padding: 14px 16px; border-radius: 14px; background: var(--accent-soft); display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.victory .vt { font-weight: 700; font-size: 16px; color: var(--accent); }
+:root[data-motion="full"] .victory.fresh { animation: popIn .6s var(--spring) both; }
+@keyframes popIn { from { opacity: 0; transform: scale(.85); } }
+.squad-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.squad-list li { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; align-items: center; font-size: 14px; }
+.squad-list .sbar { grid-column: 1 / -1; height: 7px; border-radius: 999px; background: var(--heat0); overflow: hidden; }
+.squad-list .sbar i { display: block; height: 100%; border-radius: inherit; background: var(--accent); transform-origin: 0 50%; transition: transform .8s var(--ease); }
+.squad-pick { list-style: none; margin: 0 0 12px; padding: 0; max-height: 50vh; overflow: auto; }
+.squad-pick li { border-top: 1px solid var(--line); }
+.squad-pick label { display: flex; align-items: center; gap: 10px; padding: 9px 2px; cursor: pointer; }
+.quest-grid { display: grid; gap: 16px; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); }
+@media (max-width: 800px) { .quest-grid { grid-template-columns: 1fr; } }
+.past-bosses { display: flex; gap: 8px; flex-wrap: wrap; }
+.past-bosses .pb { width: 46px; height: 46px; border-radius: 12px; background: var(--heat0); display: grid; place-items: center; }
+.past-bosses .pb svg { width: 38px; height: 38px; }
+.past-bosses .pb.lost svg { filter: grayscale(1) opacity(.35); }
+
+/* Trophy shelf, aura tiers and the daily reward track on Profile */
+.shelf { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 10px; }
+.trophy { text-align: center; padding: 10px 6px 8px; border-radius: 14px; background: linear-gradient(180deg, transparent 60%, var(--accent-soft)); border: 1px solid var(--line); }
+.trophy svg { width: 54px; height: 54px; }
+.trophy .tn { font-size: 11.5px; font-weight: 600; line-height: 1.25; margin-top: 2px; }
+.trophy .tw { font-size: 10.5px; color: var(--muted); }
+.trophy .tm { font-size: 10px; color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+.aura-tiers { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+.aura-tiers .at { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 64px; font-size: 11px; color: var(--muted); text-align: center; }
+.aura-tiers .at .dot { width: 30px; height: 30px; border-radius: 50%; background: var(--surface); border: 1px solid var(--line); }
+.aura-tiers .at.cur { color: var(--text); font-weight: 600; }
+.aura-tiers .at.locked { opacity: .45; }
+.track7 { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; margin: 10px 0 4px; }
+.track7 .d { border: 1px solid var(--line); border-radius: 12px; padding: 8px 2px 6px; text-align: center; font-size: 11px; color: var(--muted); background: var(--surface); position: relative; }
+.track7 .d .c { display: block; font-size: 15px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+.track7 .d .c .coin { width: 12px; height: 12px; vertical-align: -1px; }
+.track7 .d.got { background: var(--accent-soft); border-color: transparent; }
+.track7 .d.got::after { content: "✓"; position: absolute; top: 2px; right: 5px; color: var(--accent); font-weight: 700; font-size: 11px; }
+.track7 .d.today { border: 2px solid var(--accent); }
+:root[data-motion="full"] .track7 .d.today.ready { animation: readyPulse 1.8s ease-in-out infinite; }
+@keyframes readyPulse { 50% { box-shadow: 0 0 0 5px var(--accent-soft); } }
+.login-dlg { text-align: center; }
+.login-dlg .ld-pomeo .mascot { position: static; width: 72px; height: 72px; margin: 0 auto; display: block; }
+.rem-empty .mascot, .pomeo-pop .mascot { position: static; }
+.login-dlg h3 { margin: 6px 0 2px; font-size: 19px; }
+.login-dlg .gift { font-size: 13px; color: var(--muted); min-height: 18px; }
+.lvchip, .tabs button { position: relative; }
+.lvchip .tbadge { top: -2px; right: -2px; }
+
+/* ==========================================================================
+   AURA — a soft glow around the badge, from the current streak
+   ========================================================================== */
+.aura { position: relative; display: inline-grid; place-items: center; border-radius: 50%; flex: none; }
+.aura::before { content: ""; position: absolute; inset: -4px; border-radius: 50%; pointer-events: none; opacity: .9; }
+.aura > svg { position: relative; }
+.aura-soft::before { box-shadow: 0 0 8px 2px rgba(255, 255, 255, .85), 0 0 2px 1px rgba(180, 180, 180, .5); }
+.aura-green::before { box-shadow: 0 0 10px 3px rgba(76, 190, 110, .6); }
+.aura-blue::before { box-shadow: 0 0 11px 3px rgba(70, 150, 240, .62); }
+.aura-purple::before { box-shadow: 0 0 12px 4px rgba(150, 95, 235, .62); }
+.aura-gold::before { box-shadow: 0 0 13px 4px rgba(242, 180, 40, .7); }
+.aura-rainbow::before { inset: -5px; background: conic-gradient(#ff6b6b, #ffd166, #6ee7a7, #6ab8ff, #b18cff, #ff6b6b); filter: blur(5px); opacity: .85; }
+:root[data-theme="dark"] .aura-soft::before { box-shadow: 0 0 9px 2px rgba(255, 255, 255, .45); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .aura-soft::before { box-shadow: 0 0 9px 2px rgba(255, 255, 255, .45); } }
+:root[data-motion="full"] .aura:not(.aura-rainbow)::before { animation: auraPulse 3.2s ease-in-out infinite; }
+:root[data-motion="full"] .aura-rainbow::before { animation: auraSpin 6s linear infinite; }
+@keyframes auraPulse { 50% { opacity: .45; transform: scale(1.06); } }
+@keyframes auraSpin { to { transform: rotate(360deg); } }
+.aura-tiers .at .dot.aura::before { inset: -3px; }
+
+/* ==========================================================================
+   EXAM COUNTDOWN · PARKING LOT · AFTER-SESSION ROW · REVISION
+   ========================================================================== */
+.exam-card { cursor: pointer; }
+.exam-card .ex-main { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.exam-card .ex-name { font-weight: 650; font-size: 16px; }
+.exam-card .ex-days { font-size: 26px; font-weight: 300; font-variant-numeric: tabular-nums; line-height: 1.1; white-space: nowrap; }
+.exam-card .ex-days small { font-size: 13px; color: var(--muted); margin-left: 3px; }
+.exam-card .ex-sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
+.exam-card .ex-more { font-size: 12.5px; color: var(--muted); margin-top: 8px; border-top: 1px solid var(--line); padding-top: 8px; display: grid; gap: 2px; }
+.exam-card.near { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent), 0 8px 24px -14px var(--accent); }
+.exam-card.near .ex-days { color: var(--accent); }
+.exam-card.empty { text-align: left; color: var(--muted); font-size: 14px; }
+.exam-list { list-style: none; margin: 0 0 14px; padding: 0; }
+.exam-list li { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-top: 1px solid var(--line); }
+.exam-list li:first-child { border-top: 0; }
+.exam-list .nm { flex: 1; min-width: 0; }
+.exam-list .past { color: var(--muted); }
+.exam-form { display: grid; grid-template-columns: 1fr 160px auto; gap: 8px; }
+@media (max-width: 480px) { .exam-form { grid-template-columns: 1fr 1fr; } .exam-form .btn { grid-column: 1 / -1; } }
+
+.timer-card .park-btn { position: absolute; top: 12px; right: 58px; z-index: 3; font-size: 15px; }
+.park-pop { position: absolute; top: 56px; right: 12px; z-index: 6; width: min(300px, calc(100% - 24px)); display: flex; gap: 6px; padding: 8px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); box-shadow: 0 14px 30px -14px rgba(0, 0, 0, .45); }
+.park-pop input { flex: 1; min-width: 0; }
+:root[data-motion="full"] .park-pop:not(.hidden) { animation: bubbleIn .3s var(--spring) both; transform-origin: 90% 0; }
+.park-panel { margin-top: 14px; padding: 12px 14px; border-radius: 14px; background: var(--accent-soft); text-align: left; }
+.park-panel h3 { margin: 0 0 6px; font-size: 14px; }
+.plist { list-style: none; margin: 0; padding: 0; }
+.plist li { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 14px; }
+.plist li .tx { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.plist li.done .tx { text-decoration: line-through; color: var(--muted); }
+.plist .iconbtn { width: 30px; height: 30px; }
+.plist .iconbtn svg { width: 15px; height: 15px; }
+.plist .when { font-size: 11.5px; color: var(--muted); white-space: nowrap; }
+.after-row { margin-top: 14px; }
+.after-row .note-row { margin-top: 0; }
+.after-acts { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.after-acts .btn { padding: 6px 12px; font-size: 13px; min-width: 0; }
+.rev-list { list-style: none; margin: 0; padding: 0; }
+.rev-list li { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); flex-wrap: wrap; }
+.rev-list li:first-child { border-top: 0; }
+.rev-list .rv-main { flex: 1; min-width: 160px; }
+.rev-list .rv-t { font-weight: 600; }
+.rev-list .rv-s { font-size: 12.5px; color: var(--muted); }
+.rev-list .rv-s .due { color: var(--accent); font-weight: 600; }
+.rev-list .rv-s .over { color: var(--warn); font-weight: 600; }
+.rev-dots { letter-spacing: 2px; color: var(--accent); font-size: 13px; }
+.rev-acts { display: flex; gap: 6px; flex-wrap: wrap; }
+.rev-acts .btn { padding: 5px 11px; font-size: 12.5px; min-width: 0; }
+
+/* ==========================================================================
+   TOMATO GARDEN (separate from Pomeo)
+   ========================================================================== */
+.garden { position: relative; display: grid; gap: 8px; }
+.bed { display: grid; grid-template-columns: 44px 1fr; gap: 8px; align-items: end; }
+.bed .bl { font-size: 11.5px; color: var(--muted); padding-bottom: 6px; text-align: right; }
+.bed .soil { min-height: 50px; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 2px 0; padding: 4px 6px 0; border-radius: 10px; border-bottom: 8px solid #a0724e; background: linear-gradient(180deg, transparent 70%, rgba(160, 114, 78, .16)); }
+:root[data-theme="dark"] .bed .soil { border-bottom-color: #6b4a33; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .bed .soil { border-bottom-color: #6b4a33; } }
+.bed .soil .none { font-size: 12px; color: var(--muted); padding: 0 0 8px 4px; }
+.plant { border: 0; background: none; padding: 0; width: 30px; height: 44px; cursor: pointer; display: block; }
+.plant svg { width: 100%; height: 100%; overflow: visible; display: block; }
+.plant svg .sway { transform-box: fill-box; transform-origin: 50% 100%; }
+:root[data-motion="full"] .plant svg .sway { animation: sway 4.5s ease-in-out infinite; animation-delay: var(--d, 0s); }
+@keyframes sway { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+.plant:focus-visible { outline: 2px solid var(--accent); border-radius: 6px; }
+:root[data-motion="full"] .plant.new svg { animation: grow .7s var(--spring) both; transform-origin: 50% 100%; }
+@keyframes grow { from { transform: scale(.2); opacity: 0; } }
+.garden-tip { position: absolute; z-index: 5; pointer-events: none; padding: 6px 10px; border-radius: 10px; background: var(--text); color: var(--bg); font-size: 12.5px; white-space: nowrap; transform: translate(-50%, -100%); box-shadow: 0 8px 18px -10px rgba(0, 0, 0, .5); }
+.garden-stats { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13.5px; color: var(--muted); margin: 4px 0 12px; }
+.garden-stats b { color: var(--text); font-size: 16px; }
+.garden-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 11.5px; color: var(--muted); margin-top: 10px; }
+.garden-legend span { display: inline-flex; align-items: center; gap: 4px; }
+.garden-legend svg { width: 16px; height: 22px; }
+
+/* ==========================================================================
+   WRAPPED — story slides
+   ========================================================================== */
+.wrapped-banner { display: flex; align-items: center; gap: 14px; justify-content: space-between; flex-wrap: wrap; margin-bottom: 16px;
+  background: radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 60%), var(--surface); }
+.wrapped-banner .wb-t { font-weight: 650; font-size: 16px; }
+.wrapped-banner .wb-s { font-size: 13px; color: var(--muted); }
+.wrapped-banner .btn-row { gap: 8px; }
+.wrapped { position: fixed; inset: 0; z-index: 130; display: grid; place-items: center; background: rgba(5, 6, 10, .82); }
+.wr-story { position: relative; width: min(420px, 100vw); height: min(760px, 100dvh); overflow: hidden; color: #fff; user-select: none; -webkit-user-select: none;
+  background: radial-gradient(90% 60% at 10% 0%, var(--wr-a, #2f8f83) 0%, transparent 65%), radial-gradient(80% 60% at 100% 100%, var(--wr-b, #8a6fd1) 0%, transparent 60%), #10121a; }
+@media (min-width: 480px) { .wr-story { border-radius: 22px; box-shadow: 0 30px 80px -30px rgba(0, 0, 0, .8); } }
+.wr-bars { position: absolute; top: max(12px, env(safe-area-inset-top)); left: 12px; right: 12px; display: flex; gap: 4px; z-index: 3; }
+.wr-bars i { flex: 1; height: 3px; border-radius: 3px; background: rgba(255, 255, 255, .3); overflow: hidden; }
+.wr-bars i b { display: block; height: 100%; background: #fff; transform-origin: 0 50%; transform: scaleX(0); }
+.wr-bars i.done b { transform: none; }
+.wr-bars i.cur b { animation: wrBar var(--dur, 7s) linear forwards; }
+.wr-story.paused .wr-bars i.cur b { animation-play-state: paused; }
+@keyframes wrBar { to { transform: none; } }
+.wr-close { position: absolute; top: calc(max(12px, env(safe-area-inset-top)) + 10px); right: 10px; z-index: 4; border: 0; background: none; color: #fff; font-size: 26px; cursor: pointer; padding: 6px 10px; line-height: 1; }
+.wr-slide { position: absolute; inset: 0; padding: 70px 28px 40px; display: flex; flex-direction: column; justify-content: center; gap: 12px; }
+.wr-k { font-size: 12px; letter-spacing: .16em; text-transform: uppercase; opacity: .75; font-weight: 600; }
+.wr-big { font-size: 64px; font-weight: 800; line-height: 1; letter-spacing: -.02em; }
+.wr-big small { font-size: 22px; font-weight: 600; margin-left: 6px; opacity: .8; }
+.wr-h { font-size: 26px; font-weight: 700; line-height: 1.2; }
+.wr-p { font-size: 16px; opacity: .85; line-height: 1.45; }
+.wr-bars2 { display: grid; gap: 10px; margin-top: 6px; }
+.wr-bars2 .r { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; font-size: 15px; }
+.wr-bars2 .r i { grid-column: 1 / -1; height: 10px; border-radius: 6px; background: rgba(255, 255, 255, .9); transform-origin: 0 50%; }
+.wr-hours { display: grid; grid-template-columns: repeat(24, 1fr); gap: 2px; align-items: end; height: 90px; margin-top: 8px; }
+.wr-hours i { background: rgba(255, 255, 255, .85); border-radius: 2px 2px 0 0; min-height: 2px; transform-origin: 50% 100%; }
+.wr-emoji { font-size: 56px; line-height: 1; }
+.wr-garden { display: flex; flex-wrap: wrap; gap: 0; margin-top: 6px; }
+.wr-garden svg { width: 26px; height: 38px; }
+.wr-sum { background: rgba(255, 255, 255, .1); border: 1px solid rgba(255, 255, 255, .22); border-radius: 18px; padding: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.wr-sum div b { display: block; font-size: 24px; }
+.wr-sum div span { font-size: 12px; opacity: .75; }
+.wr-share { background: #fff; color: #111; border: 0; border-radius: 999px; padding: 12px 22px; font-weight: 700; font-size: 15px; cursor: pointer; align-self: flex-start; margin-top: 8px; }
+.wr-nav { position: absolute; top: 60px; bottom: 0; width: 34%; z-index: 2; border: 0; background: none; cursor: pointer; }
+.wr-nav.prev { left: 0; } .wr-nav.next { right: 0; width: 66%; }
+.wr-slide .wr-share, .wr-slide button { position: relative; z-index: 3; }
+:root[data-motion="full"] .wr-slide .wr-in { animation: wrIn .6s var(--spring-soft) both; animation-delay: calc(var(--i, 0) * 130ms); }
+:root[data-motion="reduced"] .wr-slide .wr-in { animation: fadeIn .4s both; animation-delay: calc(var(--i, 0) * 100ms); }
+@keyframes wrIn { from { opacity: 0; transform: translateY(18px) scale(.97); } }
+:root[data-motion="full"] .wr-bars2 .r i, :root[data-motion="full"] .wr-hours i { animation: wrGrow .9s .35s var(--ease) both; }
+@keyframes wrGrow { from { transform: scale(0); } }
+
+/* Keyboard shortcuts sheet */
+.keys { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; align-items: center; }
+kbd { display: inline-block; min-width: 26px; padding: 3px 7px; border-radius: 7px; border: 1px solid var(--line); border-bottom-width: 2px; background: var(--bg); font: 600 12.5px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; text-align: center; color: var(--text); }
+
 .tabs .ls { display: none; }
 @media (max-width: 400px) { .tabs .lf { display: none; } .tabs .ls { display: inline; } .tabs button { font-size: 10px; } }
 </style>
@@ -1068,11 +1290,12 @@ body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .s
   <nav class="tabs" id="tabs" aria-label="Main">
     <button data-tab="timer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2h4"/><path d="M12 14l3-3"/><circle cx="12" cy="14" r="8"/></svg><span>Timer</span></button>
     <button data-tab="reminders" id="remTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span>Reminders</span></button>
+    <button data-tab="quests" id="questTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 17.5 3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 21l2-2"/><path d="M14.5 6.5 18 3h3v3l-3.5 3.5"/><path d="M5 14l4 4"/><path d="M7 17l-3 3"/><path d="M3 19l2 2"/></svg><span>Quests</span></button>
     <button data-tab="stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg><span>Stats</span></button>
     <button data-tab="board" id="boardTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg><span class="lf">Leaderboard</span><span class="ls">Ranks</span></button>
     <button data-tab="shop" id="shopTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><span>Shop</span></button>
     <button data-tab="friends"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Friends</span><i class="tbadge hidden" id="friendsBadge" aria-label="New activity"></i></button>
-    <button data-tab="profile" id="profileTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.66V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.66"/></svg><span>Profile</span></button>
+    <button data-tab="profile" id="profileTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.66V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.66"/></svg><span>Profile</span><i class="tbadge hidden" id="profileDot" aria-label="Daily reward ready"></i></button>
   </nav>
   <div class="hdr-right">
     <button class="coinpill hidden" id="coinPill" aria-label="Your coins — open the shop"></button>
@@ -1092,6 +1315,8 @@ body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .s
             <button class="pomeo-btn" id="pomeoBtn" aria-label="Pomeo, your tomato buddy. Tap to say hi, hold to pet."></button>
             <div class="pomeo-bubble hidden" id="pomeoBubble" role="status" aria-live="polite"></div>
           </div>
+ <button class="iconbtn park-btn hidden" id="parkBtn" title="Park a distracting thought (P)" aria-label="Park a distracting thought">🅿️</button>
+          <div class="park-pop hidden" id="parkPop"><input type="text" id="parkInput" maxlength="140" placeholder="Park a thought… (Enter)" aria-label="Distracting thought" autocomplete="off"><button class="btn small" id="parkSave">Park</button></div>
           <button class="iconbtn corner" id="muteBtn" title="Toggle sound" aria-label="Toggle sound"></button>
           <div class="phase-label" id="phaseLabel">Focus</div>
           <div class="dots" id="roundDots"></div>
@@ -1114,11 +1339,15 @@ body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .s
             <button class="btn primary" id="mainBtn"><span class="mb-lbl">Start</span></button>
             <button class="btn" id="skipBtn">Skip</button>
           </div>
-          <div class="note-row hidden" id="noteRow">
-            <input type="text" id="noteInput" maxlength="120" placeholder="Add a note? e.g. finished ch. 5 problems" aria-label="Note for the session you just finished">
-            <button class="btn" id="noteSave">Save</button>
-            <button class="iconbtn" id="noteSkip" aria-label="Skip the note">×</button>
+          <div class="after-row hidden" id="noteRow">
+            <div class="note-row">
+              <input type="text" id="noteInput" maxlength="120" placeholder="Add a note? e.g. finished ch. 5 problems" aria-label="Note for the session you just finished">
+              <button class="btn" id="noteSave">Save</button>
+              <button class="iconbtn" id="noteSkip" aria-label="Close">×</button>
+            </div>
+            <div class="after-acts"><button class="btn" id="revSchedule">🔁 Schedule revision</button></div>
           </div>
+          <div class="park-panel hidden" id="parkPanel"></div>
         </div>
 
         <div class="card">
@@ -1148,6 +1377,7 @@ body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .s
       </div>
 
       <div class="stack">
+        <div class="card exam-card empty" id="examCard" role="button" tabindex="0" aria-label="Exam countdown — tap to manage exams"></div>
         <div class="card">
           <div class="row between"><h2 style="margin:0">Today</h2><span class="lbl" id="todayDate"></span></div>
           <div class="streak-nums" style="margin-top:12px">
@@ -1187,6 +1417,11 @@ body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .s
       <span>Web reminders only fire while Pomodorolist is open — a background tab is fine, a closed tab or a locked phone is not. Use the calendar button on a reminder to add it to your phone’s calendar, which can remind you even when the app is closed.</span></p>
   </section>
 
+  <!-- ================================ QUESTS TAB (weekly boss) ================================ -->
+  <section class="tab" id="tab-quests">
+    <div id="questBody"></div>
+  </section>
+
   <!-- ================================ STATS TAB ================================ -->
   <section class="tab" id="tab-stats">
     <div class="stats-head">
@@ -1202,8 +1437,10 @@ body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .s
         <button class="iconbtn" id="nextBtn" aria-label="Next">›</button>
       </div>
     </div>
+    <div id="wrappedSlot"></div>
     <div class="tiles" id="tiles"></div>
     <div id="statsBody"></div>
+    <div id="gardenSlot" style="margin-top:16px"></div>
   </section>
 
   <!-- ================================ FRIENDS TAB (friends · leaderboard · challenges) ================================ -->
@@ -1266,6 +1503,18 @@ body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .s
         <div class="setting">
           <div><div>Ambient volume</div><div class="desc">For ambient sounds from the shop</div></div>
           <input type="range" id="setAmbVol" min="0" max="1" step="0.05">
+        </div>
+        <div class="setting">
+          <div><div>Exams</div><div class="desc">Countdown on the Timer screen. You enter the dates.</div></div>
+          <button class="btn small" id="examsBtn">Manage exams</button>
+        </div>
+        <div class="setting">
+          <div><div>Revision intervals</div><div class="desc">Days after a session when a topic comes back</div></div>
+          <input type="text" id="setRevInt" inputmode="numeric" style="max-width:150px" placeholder="1, 3, 7, 21, 45">
+        </div>
+        <div class="setting">
+          <div><div>Keyboard shortcuts</div><div class="desc">Press <kbd>?</kbd> to see them all</div></div>
+          <input type="checkbox" id="setKeys">
         </div>
         <div class="setting">
           <div><div>Tip of the day</div><div class="desc">A short study tip on the Timer screen</div></div>
@@ -1367,7 +1616,7 @@ body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .s
       <div><label class="field" for="remDate" id="remDateLbl">Date</label><input type="date" id="remDate"></div>
       <div><label class="field" for="remTime">Time</label><input type="time" id="remTime"></div>
       <div><label class="field" for="remRepeat">Repeat</label>
-        <select id="remRepeat"><option value="none">Doesn’t repeat</option><option value="daily">Every day</option><option value="weekdays">Weekdays (Mon–Fri)</option><option value="weekly">Weekly on…</option></select></div>
+        <select id="remRepeat"><option value="none">Doesn’t repeat</option><option value="daily">Every day</option><option value="weekdays">Weekdays (Mon–Fri)</option><option value="weekly">Weekly on…</option><option value="revision">Revision plan (spaced)</option></select></div>
       <div><label class="field" for="remBefore">Remind me</label>
         <select id="remBefore"><option value="0">At the time</option><option value="5">5 min before</option><option value="10">10 min before</option><option value="15">15 min before</option><option value="30">30 min before</option></select></div>
       <div class="full hidden" id="remDaysWrap"><span class="field">On these days</span>
@@ -1406,6 +1655,65 @@ body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .s
       <button class="btn" id="popSnooze">Snooze 5 min</button>
       <button class="btn" id="popDismiss">Dismiss</button>
     </div>
+  </div>
+</div>
+
+<!-- Boss squad -->
+<dialog id="squadDlg">
+  <h2 style="margin:0 0 4px">Your squad</h2>
+  <p class="muted" style="font-size:13.5px;margin:0 0 12px">Pick up to 5 friends. Their focus minutes this week join yours against the boss. They don’t need to do anything.</p>
+  <ul class="squad-pick" id="squadPick"></ul>
+  <p style="color:var(--danger);font-size:13px;min-height:18px;margin:0" id="squadErr"></p>
+  <div class="btn-row" style="justify-content:flex-end"><button class="btn" id="squadCancel">Cancel</button><button class="btn primary" id="squadSave">Save squad</button></div>
+</dialog>
+
+<!-- Daily login reward -->
+<dialog id="loginDlg" class="login-dlg">
+  <div class="ld-pomeo" id="loginPomeo"></div>
+  <h3 id="loginTitle">Daily reward</h3>
+  <p class="muted" style="margin:0;font-size:13.5px">Open Pomodorolist every day — the rewards grow for 7 days.</p>
+  <div id="loginTrack"></div>
+  <div class="gift" id="loginGift"></div>
+  <div class="btn-row" style="justify-content:center;margin-top:10px"><button class="btn" id="loginLater">Later</button><button class="btn primary" id="loginClaim">Claim</button></div>
+</dialog>
+
+<!-- Exams -->
+<dialog id="examDlg">
+  <h2 style="margin:0 0 10px">Exam countdown</h2>
+  <ul class="exam-list" id="examList"></ul>
+  <form class="exam-form" id="examForm" novalidate>
+    <input type="text" id="examName" maxlength="60" placeholder="Exam name, e.g. JEE Main" aria-label="Exam name" autocomplete="off">
+    <input type="date" id="examDate" aria-label="Exam date">
+    <button class="btn primary" type="submit">Add</button>
+  </form>
+  <p class="lbl" style="margin:10px 0 0">Enter the date yourself — check the official schedule. Pomodorolist never guesses exam dates.</p>
+  <div class="btn-row" style="justify-content:flex-end;margin-top:12px"><button class="btn" id="examClose">Done</button></div>
+</dialog>
+
+<!-- Keyboard shortcuts -->
+<dialog id="keysDlg">
+  <h2 style="margin:0 0 14px">Keyboard shortcuts</h2>
+  <div class="keys">
+    <kbd>Space</kbd><span>Start / pause the timer</span>
+    <kbd>R</kbd><span>Reset</span>
+    <kbd>S</kbd><span>Skip to the next phase</span>
+    <kbd>P</kbd><span>Park a distracting thought (during focus)</span>
+    <kbd>N</kbd><span>Type the session name</span>
+    <span><kbd>1</kbd>–<kbd>8</kbd></span><span>Timer · Reminders · Quests · Stats · Leaderboard · Shop · Friends · Profile</span>
+    <kbd>?</kbd><span>Show this sheet</span>
+  </div>
+  <p class="lbl" style="margin:14px 0 0">Shortcuts are paused while you type. Turn them off in Settings.</p>
+  <div class="btn-row" style="justify-content:flex-end;margin-top:10px"><button class="btn" id="keysClose">Close</button></div>
+</dialog>
+
+<!-- Wrapped stories -->
+<div class="wrapped hidden" id="wrapped" role="dialog" aria-modal="true" aria-label="Wrapped">
+  <div class="wr-story">
+    <div class="wr-bars"></div>
+    <button class="wr-close" aria-label="Close">×</button>
+    <button class="wr-nav prev" aria-label="Previous"></button>
+    <button class="wr-nav next" aria-label="Next"></button>
+    <div class="wr-slide"></div>
   </div>
 </div>
 
@@ -1923,7 +2231,8 @@ function defaultState() {
     version: 2,
     settings: { goalMin: 60, weekStart: 1, sound: true, notify: true, theme: 'auto', autoStart: false, gamification: true, ambientVolume: 0.5,
                 shareActivity: true, shareNames: true, globalBoard: false,
-                pomeo: true, pomeoTalk: 'sometimes', waterNudge: true, dailyTip: true },
+                pomeo: true, pomeoTalk: 'sometimes', waterNudge: true, dailyTip: true,
+                bossMode: 'solo', shortcuts: true, revIntervals: [1, 3, 7, 21, 45] },
     presets: [
       { id: 'p-classic', name: 'Classic 25/5',    focus: 25, short: 5,  long: 15, rounds: 4 },
       { id: 'p-deep',    name: 'Deep Work 50/10', focus: 50, short: 10, long: 20, rounds: 3 },
@@ -1935,10 +2244,15 @@ function defaultState() {
     pinned: [],     // { name, presetId }
     reminders: [],  // see REMINDERS
     notes: {},      // sessionId -> one-line note
+    revisions: [],  // spaced-revision topics (see SPACED REVISION)
+    exams: [],      // { id, name, date, added }
+    parked: [],     // distraction parking lot, last 50
+    abandoned: [],  // focus blocks stopped before 80% (wilted plants), last 300
+    squad: [],      // boss squad: [{ uid, name }], up to 5 friends
     game: normalizeGame(null),  // purchases, equipped items, claimed rewards, used streak freezes
     // Device-only fields (never uploaded):
     timer: { phase: 'focus', round: 1, status: 'idle', endAt: 0, remaining: 0, planned: 0, focusStartedAt: 0, name: '' },
-    ui: { tab: 'timer', statsView: 'week', shopCat: 'sound', friendsView: 'friends', lbScope: 'friends', lbPeriod: 'week' },
+    ui: { tab: 'timer', statsView: 'week', gardenView: 'week', shopCat: 'sound', friendsView: 'friends', lbScope: 'friends', lbPeriod: 'week' },
     pendingSessions: [],  // logged while the sync service could not load at all; uploaded next time
     profileDirty: false,  // profile edited in that same situation
   };
@@ -1951,7 +2265,7 @@ function hydrate(obj) {
   const out = { ...def, ...obj };
   for (const k of ['settings', 'timer', 'ui']) out[k] = { ...def[k], ...(obj[k] || {}) };
   if (!Array.isArray(out.presets) || !out.presets.length) out.presets = def.presets;
-  for (const k of ['sessions', 'recent', 'pinned', 'pendingSessions', 'reminders']) if (!Array.isArray(out[k])) out[k] = [];
+  for (const k of ['sessions', 'recent', 'pinned', 'pendingSessions', 'reminders', 'revisions', 'exams', 'parked', 'abandoned', 'squad']) if (!Array.isArray(out[k])) out[k] = [];
   if (!out.notes || typeof out.notes !== 'object' || Array.isArray(out.notes)) out.notes = {};
   if (!out.names || typeof out.names !== 'object' || Array.isArray(out.names)) out.names = {};
   out.game = normalizeGame(obj.game);
@@ -2043,6 +2357,11 @@ function profileFromState() {
     game: S.game,
     reminders: S.reminders,
     notes: recentNotes(),
+    revisions: S.revisions,
+    exams: S.exams,
+    parked: S.parked.slice(-50),
+    abandoned: S.abandoned.slice(-300),
+    squad: S.squad.slice(0, 5),
     // Stored for reference only; the app always recalculates streaks from the session log.
     streak: { current: cur, longest, goalMin: S.settings.goalMin, today: dayKey(new Date()) },
   });
@@ -2134,6 +2453,7 @@ function applyProfile(d) {
   S.game = normalizeGame(d.game);
   if (Array.isArray(d.reminders)) S.reminders = d.reminders.filter(r => r && r.id && r.time && r.date);
   if (d.notes && typeof d.notes === 'object') S.notes = { ...d.notes };
+  for (const k of ['revisions', 'exams', 'parked', 'abandoned', 'squad']) if (Array.isArray(d[k])) S[k] = d[k].filter(x => x && typeof x === 'object');
   S.timer.round = Math.min(S.timer.round, activePreset().rounds);
   lastProfileJSON = JSON.stringify(profileFromState());
   saveLocal();
@@ -2226,7 +2546,8 @@ function startSession(user, cloud) {
     trackWrite(FB.waitForPendingWrites(FB.db));  // shows "Syncing" until earlier offline writes land
   }
   maybeStartTour(cloud);
-  setTimeout(() => { if (USER === user && $('#tour').classList.contains('hidden') && !document.querySelector('dialog[open]')) pomeoHello(); pomeoNightCheck(); checkReminders(); }, cloud ? 2500 : 1200);
+  setTimeout(() => { if (USER === user && $('#tour').classList.contains('hidden') && !document.querySelector('dialog[open]')) pomeoHello(); pomeoNightCheck(); checkReminders(); examDayCheck(); }, cloud ? 2500 : 1200);
+  setTimeout(() => { if (USER === user) { maybeShowLogin(); checkBoss(); } }, cloud ? 3200 : 1800);
 }
 
 let authMode = 'login';
@@ -2408,13 +2729,15 @@ function mergeData(obj) {
   // Progression: keep every purchase and the earliest claim of each reward; take equipped items only where unset.
   const sg = src.game, g = S.game;
   for (const [k, v] of Object.entries(sg.purchases)) if (!g.purchases[k]) g.purchases[k] = v;
-  for (const kind of ['goalDays', 'milestones', 'achievements', 'social', 'challenges']) {
+  for (const kind of ['goalDays', 'milestones', 'achievements', 'social', 'challenges', 'login', 'bosses']) {
     for (const [k, v] of Object.entries(sg.claims[kind])) if (!g.claims[kind][k] || v < g.claims[kind][k]) g.claims[kind][k] = v;
   }
   for (const [k, v] of Object.entries(sg.freezesUsed)) if (!g.freezesUsed[k]) g.freezesUsed[k] = v;
   for (const [k, v] of Object.entries(sg.equipped)) if (!(k in g.equipped)) g.equipped[k] = v;
   for (const r of src.reminders) if (r && r.id && r.time && r.date && !S.reminders.some(x => x.id === r.id)) S.reminders.push(r);
   for (const [k, v] of Object.entries(src.notes)) if (!S.notes[k]) S.notes[k] = v;
+  for (const k of ['revisions', 'exams', 'parked', 'abandoned']) for (const x of src[k]) if (x && x.id && !S[k].some(y => y.id === x.id)) S[k].push(x);
+  for (const [k, v] of Object.entries(sg.trophies)) if (!g.trophies[k]) g.trophies[k] = v;
   save();
   applyCosmetics();
   reconcileRewards('quiet');
@@ -2545,7 +2868,13 @@ function finishPhase(reason) {
       const fx = equippedId('effect');
       setTimeout(() => playEffect(fx), reason === 'complete' && motion() === 'full' ? 700 : 0);
     }
-    else if (reason !== 'complete' && focused > 0) toast('Not logged — under 80% of the focus time');
+    else if (reason !== 'complete' && focused > 0) {
+      toast('Not logged — under 80% of the focus time');
+      if (focused >= 60000) {   // a wilted plant in the Tomato Garden
+        S.abandoned.push({ id: 'a' + uid(), name: currentName(), start: t.focusStartedAt || end - focused, end, duration: Math.round(focused), planned: t.planned });
+        if (S.abandoned.length > 300) S.abandoned = S.abandoned.slice(-300);
+      }
+    }
   }
 
   if (reason === 'reset') {
@@ -2587,6 +2916,8 @@ function logSession(focusedMs, end) {
   const idxBefore = buildIndex(), pomeoBefore = { mins: (idxBefore[dayKey(new Date())] || {}).total || 0, streak: computeStreaks(idxBefore).cur };
   S.sessions.push(s);
   setTimeout(() => { pomeoAfterSession(pomeoBefore); offerNote(s.id); }, 400);
+  revisionAfterSession(name);
+  setTimeout(checkBoss, 600);
   if (cloudReady()) cloudAddSessions([s]);
   else if (USER && !USER.guest) S.pendingSessions.push(s);
   G = null;
@@ -2594,7 +2925,7 @@ function logSession(focusedMs, end) {
   if (!S.settings.gamification) { toast(`Logged ${fmtMin(focusedMs / 60000)} · ${name}`); socialAfterSession(); return; }
   const goalDays = news.filter(n => n.type === 'goal').length;
   toast(`+${xpForSession(s)} XP · +${COINS_PER_SESSION + GOAL_BONUS * goalDays} coins${goalDays ? ' · daily goal reached' : ''}`);
-  floatUp([[`+${xpForSession(s)} XP`], [`+${COINS_PER_SESSION + GOAL_BONUS * goalDays} coins`, 'coin']]);
+  floatUp([[`+${xpForSession(s)} XP`], [`+${COINS_PER_SESSION + GOAL_BONUS * goalDays} coins`, 'coin'], ...(S.game.claims.bosses[dayKey(weekMonday())] ? [] : [[`⚔️ −${Math.round(focusedMs / 60000)} HP`]])]);
   announce(news, 'loud');
   socialAfterSession();
   const levelAfter = game().lv.level;
@@ -2725,6 +3056,7 @@ function renderTimer() {
   document.body.classList.toggle('zen', extraOn('x_zen') && t.status === 'running' && t.phase === 'focus');
   document.body.classList.toggle('focus-dim', t.status === 'running' && t.phase === 'focus' && S.ui.tab === 'timer');
   setMascot();
+  renderPark();
   if (t.status === 'running') ensureRingLoop();
   updateAmbient();
   publishPresence();
@@ -2956,6 +3288,8 @@ function topList(top, total) {
 }
 
 function renderStats() {
+  renderWrappedBanner();
+  renderGarden();
   const view = S.ui.statsView;
   const r = getRange(view, statsOffset);
   const idx = buildIndex();
@@ -3073,6 +3407,8 @@ function renderSettings() {
   $('#setPomeoTalk').value = st.pomeoTalk || 'sometimes';
   $('#setWater').checked = st.waterNudge !== false;
   $('#setTip').checked = st.dailyTip !== false;
+  $('#setKeys').checked = st.shortcuts !== false;
+  $('#setRevInt').value = revIntervals().join(', ');
   renderPrivacy();
   $('#setAmbVol').value = st.ambientVolume;
   const perm = 'Notification' in window ? Notification.permission : 'unsupported';
@@ -3132,7 +3468,10 @@ function normalizeGame(g) {
       achievements: map(c.achievements),
       social: map(c.social),           // 'f_<uid>' -> ts (new friend bonus)
       challenges: map(c.challenges),   // challengeId -> ts (weekly challenge completed)
+      login: map(c.login),             // 'YYYY-MM-DD' -> ts (daily login reward)
+      bosses: map(c.bosses),           // week Monday 'YYYY-MM-DD' -> ts (weekly boss defeated)
     },
+    trophies: map(g.trophies),       // week -> { boss, mode, hp, coins, size, at }
     freezesUsed: map(g.freezesUsed), // 'YYYY-MM-DD' -> ts (day protected by a Streak Freeze)
   };
 }
@@ -3342,6 +3681,9 @@ function earnedAt(t) {
     if (perWeek[wk] <= SOCIAL_COIN_WEEKLY_MAX) c += SOCIAL_COIN;
   }
   for (const [cid, ts] of Object.entries(cl.challenges)) if (ts <= t) c += (CHALLENGES[cid.split('_')[1]] || {}).coins || 0;
+  const lc = loginCycle();
+  for (const [k, ts] of Object.entries(cl.login)) if (ts <= t) c += LOGIN_COINS[(lc[k] || 1) - 1];
+  for (const [wk, ts] of Object.entries(cl.bosses)) if (ts <= t) c += Math.min(120, Math.max(0, +((S.game.trophies[wk] || {}).coins) || 0));
   return c;
 }
 
@@ -3956,14 +4298,16 @@ function renderHeaderChip() {
   $('#avatarBtn').classList.toggle('hidden', on);
   $('#boardTabBtn').classList.toggle('hidden', !on);
   $('#shopTabBtn').classList.toggle('hidden', !on);
-  if (!on) { if (S.ui.tab === 'board' || S.ui.tab === 'shop') showTab('timer'); return; }
+  $('#questTabBtn').classList.toggle('hidden', !on);
+  if (!on) { updateLoginDot(); if (S.ui.tab === 'board' || S.ui.tab === 'shop' || S.ui.tab === 'quests') showTab('timer'); return; }
   const g = game(), col = NAME_COLORS[equippedId('color')];
   const goalPct = Math.min(100, Math.round(((g.idx[dayKey(new Date())] || {}).total || 0) / S.settings.goalMin * 100));
   const fromPct = lastGoalPct ?? goalPct;
   $('#lvChip').innerHTML = `<span class="gring" title="Today: ${goalPct}% of your daily goal"><svg viewBox="0 0 36 36" aria-hidden="true"><circle class="gt" cx="18" cy="18" r="16"/>` +
     `<circle class="gp" cx="18" cy="18" r="16" pathLength="100" stroke-dasharray="100" style="stroke-dashoffset:${100 - fromPct}"/></svg>` +
-    badgeSVG(g.tier, { size: 20, frame: equippedId('frame') }) + '</span>' +
-    `<span class="uname"${col ? ` style="color:${col}"` : ''}>${esc(USER.guest ? 'You' : '@' + USER.username)}</span><span class="lvn">Lv ${g.lv.level}</span>`;
+    withAura(badgeSVG(g.tier, { size: 20, frame: equippedId('frame') }), g.streak.cur) + '</span>' +
+    `<span class="uname"${col ? ` style="color:${col}"` : ''}>${esc(USER.guest ? 'You' : '@' + USER.username)}</span><span class="lvn">Lv ${g.lv.level}</span><i class="tbadge hidden" aria-hidden="true"></i>`;
+  updateLoginDot();
   $('#lvChip').title = `${g.tier.name} · Level ${g.lv.level} · ${fmtNum(g.lv.need - g.lv.into)} XP to level ${g.lv.level + 1}`;
   if (fromPct !== goalPct) { const gp = $('#lvChip .gp'); void gp.getBoundingClientRect(); requestAnimationFrame(() => { gp.style.strokeDashoffset = 100 - goalPct; }); }
   lastGoalPct = goalPct;
@@ -3978,7 +4322,7 @@ const USER_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" str
 function renderProfile() {
   if (!USER) return;
   const on = S.settings.gamification, g = game();
-  const badge = on ? badgeSVG(g.tier, { size: 44, frame: equippedId('frame') }) : `<span class="avatar big" style="width:44px;height:44px;font-size:18px">${USER.guest ? '?' : esc(USER.username[0].toUpperCase())}</span>`;
+  const badge = on ? withAura(badgeSVG(g.tier, { size: 44, frame: equippedId('frame') }), g.streak.cur) : `<span class="avatar big" style="width:44px;height:44px;font-size:18px">${USER.guest ? '?' : esc(USER.username[0].toUpperCase())}</span>`;
   $('#profileHead').innerHTML = `<div class="card prof-acct">
     <div class="row" style="gap:14px;min-width:0">${badge}<div style="min-width:0">
       <div class="acct-name">${USER.guest ? 'Not signed in' : '@' + esc(USER.username)}</div>
@@ -4025,7 +4369,7 @@ function renderProgress() {
     <div class="grid-2">
       <div class="stack">
         <div class="card prog-hero" style="--tier:${g.tier.color}">
-          <div class="bigbadge">${badgeSVG(g.tier, { size: 76, frame })}</div>
+          <div class="bigbadge">${withAura(badgeSVG(g.tier, { size: 76, frame }), g.streak.cur)}</div>
           <div style="flex:1;min-width:0">
             <div class="tiername">${g.tier.name}</div>
             <div class="big">Level ${lv.level}</div>
@@ -4040,13 +4384,16 @@ function renderProgress() {
           ${tile(`<span data-count="xp" data-val="${g.xp}">${fmtNum(g.xp)}</span>`, 'Total XP')}
           ${tile(`${g.freezesHeld}/${MAX_FREEZES}`, 'Streak freezes')}
         </div>
+        ${loginCard()}
         <div class="card"><h2>Badges</h2><div class="tiergrid">${tiers}</div></div>
+        ${auraCard()}
       </div>
       <div class="card">
         <div class="row between" style="margin-bottom:6px"><h2 style="margin:0">Achievements</h2><span class="lbl">${done} / ${ACHIEVEMENTS.length}</span></div>
         <div class="achlist">${achs}</div>
       </div>
-    </div>`;
+    </div>
+    <div style="margin-top:16px">${trophyShelf()}</div>`;
   animateCounts($('#progressView'));
   animateFills($('#progressView'));
 }
@@ -4239,6 +4586,7 @@ async function initSocial() {
   loadChallenges();
   handleInvite();
   if (S.ui.tab === 'board') renderBoardTab();
+  loadSquadStats(true);
 }
 
 /* ---------- Publishing my public data (only what's shown to others) ---------- */
@@ -4664,7 +5012,7 @@ function renderFriends(fromLoad) {
 function personRow(uid, name, prof, extra = '') {
   const t = prof && !prof.denied ? tierById(prof.tier) : null;
   const col = prof && NAME_COLORS[prof.color];
-  const badge = t && S.settings.gamification ? badgeSVG(t, { size: 30, frame: prof.frame }) : `<span class="avatar">${esc(name[0] || '?').toUpperCase()}</span>`;
+  const badge = t && S.settings.gamification ? withAura(badgeSVG(t, { size: 30, frame: prof.frame }), profStreak(prof)) : `<span class="avatar">${esc(name[0] || '?').toUpperCase()}</span>`;
   return `${badge}<div class="who"><div class="nm"${col ? ` style="color:${col}"` : ''}>@${esc(name)}${prof && !prof.denied && S.settings.gamification ? ` <span class="lvl">Lv ${prof.level}</span>` : ''}</div>${extra}</div>`;
 }
 
@@ -4792,7 +5140,7 @@ async function renderBoard(fromLoad) {
   const row = r => {
     const t = tierById(r.tier), col = NAME_COLORS[r.color], me = r.uid === USER.uid;
     return `<li class="${me ? 'me' : ''}${r.rank <= 3 ? ' top' + r.rank : ''}" data-uid="${r.uid}"${!me && scope === 'friends' ? ` data-open="${r.uid}"` : ''}>
-      <span class="rk">${r.rank}</span>${badgeSVG(t, { size: 26, frame: r.frame })}
+      <span class="rk">${r.rank}</span>${withAura(badgeSVG(t, { size: 26, frame: r.frame }), me ? myStreak() : profStreak(cached('publicProfiles', r.uid)))}
       <span class="nm"${col ? ` style="color:${col}"` : ''}>@${esc(r.username)}${me ? ' <span class="lbl">(you)</span>' : ''}</span>
       <span class="v">${fmtMin(r.minutes)}</span></li>`;
   };
@@ -4978,7 +5326,7 @@ function renderPrivacy() {
    ========================================================================== */
 const scrollMem = {};
 function showTab(tab) {
-  if ((tab === 'board' || tab === 'shop') && !S.settings.gamification) tab = 'timer';
+  if ((tab === 'board' || tab === 'shop' || tab === 'quests') && !S.settings.gamification) tab = 'timer';
   if (!$('#tab-' + tab)) tab = 'timer';
   if (S.ui.tab !== tab && $('#tab-' + S.ui.tab) && $('#tab-' + S.ui.tab).classList.contains('active')) scrollMem[S.ui.tab] = window.scrollY;
   S.ui.tab = tab;
@@ -4990,6 +5338,7 @@ function showTab(tab) {
   if (tab === 'profile') renderProfile();
   if (tab === 'shop') renderShop();
   if (tab === 'reminders') renderReminders();
+  if (tab === 'quests') { renderQuests(); loadSquadStats(); }
   if (tab === 'board') { SOC.lbShown = null; renderBoardTab(); }
   if (tab === 'friends') { SOC.friend = null; SOC.unread = false; updateFriendsDot(); renderFriends(); }
   const y = scrollMem[tab] || 0;   // restore once the tab has laid out (charts can grow it a moment later)
@@ -5277,9 +5626,9 @@ function saveReminders() { S.reminders.forEach(remPrune); save(); renderReminder
 let remFired = new Set(readJSON(REM_FIRED_KEY, []));
 const POP = { cur: null };
 function checkReminders() {
-  if (!USER || !S.reminders.length) return;
+  if (!USER) return;
   const now = Date.now(), today = startOfDay(new Date());
-  for (const r of S.reminders) {
+  for (const r of [...S.reminders, ...revisionReminders()]) {
     for (const day of [addDays(today, -1), today, addDays(today, 1)]) {
       if (!remOnDay(r, day)) continue;
       const k = dayKey(day), at = remAt(r, day);
@@ -5305,7 +5654,8 @@ function playReminderChime() {
 }
 function fireReminder(r, day, at) {
   const mins = Math.round((at - Date.now()) / 60000);
-  const text = mins >= 1 ? `${r.title} in ${mins} minute${mins === 1 ? '' : 's'}! Ready?` : `Time for ${r.title}! Ready?`;
+  const what = r.rev ? `Revision of ${r.rev.topic}` : r.title;
+  const text = mins >= 1 ? `${what} in ${mins} minute${mins === 1 ? '' : 's'}! Ready?` : r.rev ? `Time to revise ${r.rev.topic}! Ready?` : `Time for ${r.title}! Ready?`;
   showPomeoPop(r, day, text);
   playReminderChime();
   if ('Notification' in window && Notification.permission === 'granted' && S.settings.notify) {
@@ -5327,7 +5677,7 @@ function showPomeoPop(r, day, text) {
   $('#popStart').focus({ preventScroll: true });
 }
 function closePop() { $('#pomeoPop').classList.add('hidden'); POP.cur = null; }
-function remById(id) { return S.reminders.find(r => r.id === id); }
+function remById(id) { return S.reminders.find(r => r.id === id) || revisionReminders().find(r => r.id === id); }
 function markRemDone(r, day, on = true) {
   r.done = r.done || {};
   if (on) r.done[day] = Date.now(); else delete r.done[day];
@@ -5420,25 +5770,25 @@ function renderReminders() {
     <p>Want a heads-up even when Pomodorolist is in another tab? Allow notifications for your reminders.</p>
     <div class="btn-row"><button class="btn primary small" id="permAllow">Allow</button><button class="btn small" id="permLater">Not now</button></div></div>` : '';
   if (!S.reminders.length) {
-    body.innerHTML = `<div class="card rem-empty">${pomeoOn() ? `<span class="pomeo-pic">${pomeoSVG({ state: 'happy', ...pomeoOutfit() })}</span>` : ''}
+    body.innerHTML = revisionSection() + `<div class="card rem-empty">${pomeoOn() ? `<span class="pomeo-pic">${pomeoSVG({ state: 'happy', ...pomeoOutfit() })}</span>` : ''}
       <h3 style="margin:8px 0 4px">No reminders yet</h3>
       <p class="muted" style="margin:0 0 14px">Plan your next study block${pomeoOn() ? ' — Pomeo will nudge you when it’s time' : ''}.</p>
-      <button class="btn primary" data-remadd>Add a reminder</button></div>`;
+      <button class="btn primary" data-remadd>Add a reminder</button></div>` + parkedSection();
     return;
   }
   const { todayL, upcoming, completed } = remLists();
   const sec = (title, rows, extra = '', empty = '') => `<div class="card rem-sec"><h2>${title}${extra}</h2>${rows.length ? `<ul class="rem-list">${rows.join('')}</ul>` : `<div class="empty">${empty}</div>`}</div>`;
-  body.innerHTML =
+  body.innerHTML = revisionSection() +
     sec('Today', todayL.map(o => remRow(o.r, o.day, { time: fmtHM(o.at), missed: o.missed })), '', 'Nothing left for today 🎉') +
     sec('Upcoming', upcoming.map(o => remRow(o.r, o.day, { time: fmtHM(o.at), sub: fmtDayShort(o.day) })), '', 'Nothing scheduled yet.') +
     (completed.length ? sec('Completed', completed.map(o => remRow(o.r, o.day, { time: fmtHM(o.at), sub: o.sub || fmtDayShort(o.day), done: true })),
-      completed.some(o => o.r.repeat === 'none') ? '<button class="linkbtn" id="remClear" style="text-transform:none;letter-spacing:0">Clear</button>' : '') : '');
+      completed.some(o => o.r.repeat === 'none') ? '<button class="linkbtn" id="remClear" style="text-transform:none;letter-spacing:0">Clear</button>' : '') : '') + parkedSection();
   animateIn(body);
 }
 /** The next reminder still to come today (for the Today card). */
 function nextReminderToday() {
   const now = Date.now(), today = startOfDay(new Date()), k = dayKey(today);
-  return S.reminders.filter(r => remOnDay(r, today) && !remDone(r, k)).map(r => ({ r, at: remAt(r, today) }))
+  return [...S.reminders, ...revisionReminders()].filter(r => remOnDay(r, today) && !remDone(r, k)).map(r => ({ r, at: remAt(r, today) }))
     .filter(o => o.at >= now - 5 * 60000).sort((a, b) => a.at - b.at)[0] || null;
 }
 function renderReminderBits() {
@@ -5449,11 +5799,11 @@ function renderReminderBits() {
 /* ---------- Add / edit ---------- */
 let remEditing = null;
 function openRemForm(r) {
-  remEditing = r ? r.id : null;
+  remEditing = r && r.id ? r.id : null;
   const now = new Date(Date.now() + 30 * 60000);
   now.setMinutes(now.getMinutes() < 30 ? 30 : 60, 0, 0);
-  const v = r || { title: '', date: dayKey(now), time: `${pad(now.getHours())}:${pad(now.getMinutes())}`, repeat: 'none', days: [new Date().getDay()], before: 10, presetId: '', session: '' };
-  $('#remDlgTitle').textContent = r ? 'Edit reminder' : 'New reminder';
+  const v = r && r.id ? r : { title: r ? r.title : '', date: dayKey(now), time: `${pad(now.getHours())}:${pad(now.getMinutes())}`, repeat: 'none', days: [new Date().getDay()], before: 10, presetId: '', session: '' };
+  $('#remDlgTitle').textContent = r && r.id ? 'Edit reminder' : 'New reminder';
   $('#remTitle').value = v.title;
   $('#remDate').value = v.date;
   $('#remTime').value = v.time;
@@ -5471,7 +5821,7 @@ function openRemForm(r) {
 function syncRemForm() {
   const rep = $('#remRepeat').value;
   $('#remDaysWrap').classList.toggle('hidden', rep !== 'weekly');
-  $('#remDateLbl').textContent = rep === 'none' ? 'Date' : 'Starts on';
+  $('#remDateLbl').textContent = rep === 'none' ? 'Date' : rep === 'revision' ? 'First revision' : 'Starts on';
 }
 $('#remRepeat').addEventListener('change', syncRemForm);
 $('#remForm').addEventListener('submit', e => {
@@ -5480,6 +5830,10 @@ $('#remForm').addEventListener('submit', e => {
   const days = $$('#remDays input').filter(i => i.checked).map(i => +i.value);
   const err = !title ? 'Give it a title, e.g. “Physics revision”.' : !date || !time ? 'Pick a date and time.' : repeat === 'weekly' && !days.length ? 'Choose at least one day.' : '';
   if (err) { $('#remErr').textContent = err; shake($('#remForm')); return; }
+  if (repeat === 'revision') {
+    if (addRevision(title, { presetId: $('#remPreset').value, time, first: date })) $('#remDlg').close();
+    return;
+  }
   const first = !S.reminders.length;
   const data = { title: title.slice(0, 80), date, time, repeat, days: repeat === 'weekly' ? days : [], before: +$('#remBefore').value,
     presetId: $('#remPreset').value, session: $('#remSession').value.trim().slice(0, 80), updated: Date.now() };
@@ -5567,6 +5921,16 @@ $('#tab-reminders').addEventListener('click', e => {
     return;
   }
   if (t.closest('#permLater')) { writeLS(REM_PERM_KEY, '1'); renderReminders(); return; }
+  if (onParkClick(e)) return;
+  const rv = t.closest('[data-rev]');
+  if (rv) {
+    if (rv.dataset.rev === 'clear') { S.revisions = revActive(); save(); renderReminderBits(); return; }
+    const v = S.revisions.find(x => x.id === rv.closest('[data-vid]').dataset.vid);
+    if (!v) return;
+    if (rv.dataset.rev === 'del') { if (confirm(`Delete the revision plan for “${v.topic}”?`)) { S.revisions = S.revisions.filter(x => x !== v); save(); renderReminderBits(); } return; }
+    markRevised(v, rv.dataset.rev);
+    return;
+  }
   if (t.closest('#remClear')) {
     S.reminders = S.reminders.filter(r => !(r.repeat === 'none' && remDone(r, r.date)));
     saveReminders();
@@ -5712,20 +6076,865 @@ $('#todayExtra').addEventListener('click', e => { if (e.target.closest('[data-go
 
 /* Session note: after a focus block, an optional one-line note shown in the Stats → Day list. */
 let noteFor = null;
+let revFor = '';
 function offerNote(sessionId) {
   noteFor = sessionId;
+  const s = S.sessions.find(x => x.id === sessionId);
+  revFor = s && s.name !== 'Untitled' && !revActive().some(r => r.topic.toLowerCase() === s.name.toLowerCase()) ? s.name : '';
   $('#noteInput').value = '';
+  $('#noteRow .note-row').classList.remove('hidden');
+  $('#revSchedule').disabled = false;
+  $('#revSchedule').textContent = `🔁 Schedule revision of “${revFor}”`;
+  $('#noteRow .after-acts').classList.toggle('hidden', !revFor);
   $('#noteRow').classList.remove('hidden');
 }
 function hideNote() { noteFor = null; $('#noteRow').classList.add('hidden'); }
 function saveNote() {
   const v = $('#noteInput').value.trim().slice(0, 120);
   if (noteFor && v) { S.notes[noteFor] = v; save(); toast('Note saved', 1800, true); if (S.ui.tab === 'stats') renderStats(); }
-  hideNote();
+  $('#noteRow .note-row').classList.add('hidden');
+  if (!revFor || $('#revSchedule').disabled) hideNote();
 }
+$('#revSchedule').addEventListener('click', () => {
+  if (!revFor || !addRevision(revFor)) return;
+  $('#revSchedule').disabled = true;
+  $('#revSchedule').textContent = 'Revision planned ✓';
+  if ($('#noteRow .note-row').classList.contains('hidden')) setTimeout(hideNote, 1400);
+});
 $('#noteSave').addEventListener('click', saveNote);
 $('#noteSkip').addEventListener('click', hideNote);
 $('#noteInput').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); saveNote(); } if (e.key === 'Escape') hideNote(); });
+
+/* ==========================================================================
+   QUESTS — a new boss every Monday-to-Sunday week
+   Solo: every focus minute this week is 1 damage; HP ≈ 5 days of your goal.
+   Squad: you pick up to 5 friends; damage is everyone's weekMin from their
+   publicStats docs (already readable by friends), so nothing new is shared.
+   Each person keeps their own squad and claims their own reward.
+   Rewards are recorded in game.claims.bosses + game.trophies (users/{uid}).
+   ========================================================================== */
+const BOSS_ART = {
+  dragon: '<path d="M22 98q-8-12 2-26l-12-6 16-2q4-22 26-30l8-16 6 14q22-2 34 14 12 18 2 36-6 12-22 18Z" fill="#5aa469"/><path d="M44 52 16 28l8 32-12 4 24 6Z" fill="#3f8a54"/><ellipse cx="64" cy="80" rx="18" ry="15" fill="#cfe8ad"/><path d="M60 24l2-14 6 14M80 30l12-8-4 14" fill="#f2d16b"/><path d="M70 50q4-3 8 0M88 54q4-3 8 0" stroke="#1c2b20" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M96 66q-6 4-12 2" stroke="#1c2b20" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="104" cy="58" r="3" fill="#c9ccd1"/><circle cx="110" cy="50" r="4.5" fill="#dfe2e6"/><circle cx="114" cy="40" r="6" fill="#eceef1"/>',
+  goblin: '<path d="M34 50 6 36l22 30ZM86 50l28-14-22 30Z" fill="#79ad4b"/><path d="M30 112q4-34 30-34t30 34Z" fill="#6c4f8f"/><ellipse cx="60" cy="54" rx="30" ry="28" fill="#8bbf5a"/><rect x="47" y="80" width="26" height="32" rx="5" fill="#2b2d42"/><rect x="50.5" y="84" width="19" height="22" rx="2.5" fill="#7fd4ff"/><path d="M54 90h12M54 95h9M54 100h11" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".8"/><circle cx="48" cy="56" r="6" fill="#fff"/><circle cx="72" cy="56" r="6" fill="#fff"/><circle cx="49" cy="60" r="3" fill="#1c1c1c"/><circle cx="71" cy="60" r="3" fill="#1c1c1c"/><path d="M48 70q12 7 24 0" stroke="#3b5a22" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M55 72.5v3M65 72.5v3" stroke="#fff" stroke-width="2.4"/>',
+  sloth: '<path d="M4 18h112" stroke="#7a5236" stroke-width="7" stroke-linecap="round"/><path d="M36 22q-8 22 6 38M84 22q8 22-6 38" stroke="#8f6c4e" stroke-width="11" fill="none" stroke-linecap="round"/><ellipse cx="60" cy="74" rx="32" ry="34" fill="#a8825f"/><ellipse cx="60" cy="66" rx="23" ry="18" fill="#ead8b8"/><ellipse cx="49" cy="64" rx="8" ry="5" fill="#5e4632" transform="rotate(-15 49 64)"/><ellipse cx="71" cy="64" rx="8" ry="5" fill="#5e4632" transform="rotate(15 71 64)"/><path d="M46 64q3 2.4 6 0M68 64q3 2.4 6 0" stroke="#f3e7d3" stroke-width="1.8" fill="none" stroke-linecap="round"/><ellipse cx="60" cy="71" rx="4" ry="2.6" fill="#3a2a1d"/><path d="M55 76q5 3 10 0" stroke="#3a2a1d" stroke-width="1.8" fill="none" stroke-linecap="round"/><text x="92" y="44" font-size="15" font-weight="700" fill="#9aa3b5">z</text><text x="101" y="34" font-size="11" font-weight="700" fill="#9aa3b5">z</text>',
+  hydra: '<path d="M42 84q-16-24-10-50M60 78V28M78 84q16-24 10-50" stroke="#7c5cc4" stroke-width="13" fill="none" stroke-linecap="round"/><ellipse cx="60" cy="92" rx="36" ry="22" fill="#7c5cc4"/><circle cx="32" cy="30" r="12" fill="#9274dc"/><circle cx="60" cy="24" r="13" fill="#9274dc"/><circle cx="88" cy="30" r="12" fill="#9274dc"/><g fill="#ffd166"><circle cx="28" cy="28" r="2.6"/><circle cx="36" cy="28" r="2.6"/><circle cx="55" cy="22" r="2.8"/><circle cx="65" cy="22" r="2.8"/><circle cx="84" cy="28" r="2.6"/><circle cx="92" cy="28" r="2.6"/></g><circle cx="60" cy="92" r="12" fill="#fff"/><path d="M60 92v-8M60 92l6 3.5" stroke="#3b2a66" stroke-width="2.4" stroke-linecap="round"/>',
+  kraken: '<path d="M36 70q-10 20-26 22M48 76q-4 22-16 32M60 78v32M72 76q4 22 16 32M84 70q10 20 26 22" stroke="#e0607e" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M26 72q0-52 34-52t34 52Z" fill="#ec7090"/><circle cx="48" cy="52" r="8" fill="#fff"/><circle cx="72" cy="52" r="8" fill="#fff"/><circle cx="49" cy="54" r="4" fill="#2a1520"/><circle cx="71" cy="54" r="4" fill="#2a1520"/><path d="M52 66q8 5 16 0" stroke="#7a2a42" stroke-width="2.4" fill="none" stroke-linecap="round"/><circle cx="98" cy="24" r="11" fill="#ff3b30"/><text x="98" y="28.5" font-size="12" font-weight="800" fill="#fff" text-anchor="middle">9+</text><circle cx="18" cy="36" r="8" fill="#ff3b30"/><text x="18" y="40" font-size="10" font-weight="800" fill="#fff" text-anchor="middle">3</text>',
+  golem: '<rect x="14" y="62" width="18" height="34" rx="7" fill="#7b848e"/><rect x="88" y="62" width="18" height="34" rx="7" fill="#7b848e"/><rect x="28" y="56" width="64" height="52" rx="12" fill="#8d96a0"/><rect x="36" y="26" width="48" height="36" rx="10" fill="#a3acb6"/><path d="M46 44h9M65 44h9" stroke="#2c3138" stroke-width="3" stroke-linecap="round"/><path d="M54 53h12" stroke="#2c3138" stroke-width="2.4" stroke-linecap="round"/><path d="M40 74l10 8-4 12M78 70l-6 12 8 8" stroke="#6d757e" stroke-width="2" fill="none"/><circle cx="60" cy="16" r="10" fill="#f2c14e"/><circle cx="60" cy="16" r="6.5" fill="#fff"/><path d="M60 16v-4M60 16l3 2" stroke="#333" stroke-width="1.6" stroke-linecap="round"/><path d="M50 9l-3-3M70 9l3-3" stroke="#f2c14e" stroke-width="3" stroke-linecap="round"/>',
+  phantom: '<path d="M28 104V56a32 32 0 0 1 64 0v48l-10.7-9-10.6 9-10.7-9-10.7 9-10.6-9Z" fill="#b9a7e8"/><path d="M28 56a32 32 0 0 1 22-30q-12 14-12 30v40l-10 8Z" fill="#fff" opacity=".25"/><ellipse cx="49" cy="58" rx="6" ry="8" fill="#2e2648"/><ellipse cx="71" cy="58" rx="6" ry="8" fill="#2e2648"/><ellipse cx="60" cy="76" rx="5" ry="6" fill="#2e2648"/><text x="92" y="30" font-size="26" font-weight="800" fill="#8f7ad6">?</text>',
+  gremlin: '<path d="M60 22l8 14 14-8-2 16 16 2-10 12 12 10-16 4 4 16-14-6-6 14-6-14-14 6 4-16-16-4 12-10-10-12 16-2-2-16 14 8Z" fill="#f0954a"/><circle cx="51" cy="60" r="8" fill="#fff"/><circle cx="70" cy="58" r="6" fill="#fff"/><circle cx="52" cy="61" r="3.6" fill="#2a1a0e"/><circle cx="70" cy="59" r="2.8" fill="#2a1a0e"/><path d="M50 76q8-5 18 2" stroke="#7a3d12" stroke-width="2.5" fill="none" stroke-linecap="round"/><g transform="rotate(-18 18 96)"><rect x="8" y="86" width="22" height="26" rx="2" fill="#fff" stroke="#d9d9d9"/><path d="M12 93h14M12 98h10M12 103h13" stroke="#b5b5b5" stroke-width="1.5"/></g><g transform="rotate(16 100 96)"><rect x="90" y="84" width="22" height="26" rx="2" fill="#fff" stroke="#d9d9d9"/><path d="M94 91h14M94 96h9M94 101h12" stroke="#b5b5b5" stroke-width="1.5"/></g>',
+};
+const BOSSES = [
+  { id: 'dragon',  name: 'The Procrastination Dragon', desc: 'Breathes “later” on everything. Only focus wakes it up.' },
+  { id: 'goblin',  name: 'Scroll Goblin',              desc: 'Feeds on endless feeds. Put the phone down and strike.' },
+  { id: 'sloth',   name: 'Sleepy Sloth',               desc: 'Makes “five more minutes” sound like a great idea.' },
+  { id: 'hydra',   name: 'Deadline Hydra',             desc: 'Cut one deadline and two more appear.' },
+  { id: 'kraken',  name: 'Notification Kraken',        desc: 'Pings you from every tentacle at once.' },
+  { id: 'golem',   name: 'Snooze Golem',               desc: 'Built entirely from snooze buttons.' },
+  { id: 'phantom', name: 'Phantom of Doubt',           desc: 'Whispers “you can’t”. Every session proves it wrong.' },
+  { id: 'gremlin', name: 'Clutter Gremlin',            desc: 'Hides your notes and scatters your plans.' },
+];
+const BOSS_BY_ID = Object.fromEntries(BOSSES.map(b => [b.id, b]));
+const bossSVG = (id, cls = '') => `<svg viewBox="0 0 120 120"${cls ? ` class="${cls}"` : ''} aria-hidden="true">${BOSS_ART[id] || ''}</svg>`;
+const MAX_SQUAD = 5;
+const weekMonday = (d = new Date()) => weekStartOf(d, 1);
+function bossOfWeek(mon = weekMonday()) {
+  const n = Math.round((startOfDay(mon) - new Date(2024, 0, 1)) / 864e5 / 7);
+  return BOSSES[((n % BOSSES.length) + BOSSES.length) % BOSSES.length];
+}
+const soloHP = () => Math.max(100, Math.round(S.settings.goalMin * 5 / 10) * 10);
+/** Reward: about a third of what a week of sessions earns (a full 60-minute-goal week ≈ 110 coins). */
+const soloCoins = hp => clamp(Math.round(hp / 8), 30, 75);
+const squadMembers = () => {
+  if (!cloudReady() || !SOC.started) return [];
+  const friends = new Map(friendsList().map(f => [otherUid(f), otherName(f)]));
+  return (S.squad || []).filter(m => friends.has(m.uid)).slice(0, MAX_SQUAD).map(m => ({ uid: m.uid, name: friends.get(m.uid) }));
+};
+const bossMode = () => (S.settings.bossMode === 'squad' && squadMembers().length ? 'squad' : 'solo');
+function weekLeftText() {
+  const end = addDays(weekMonday(), 7), m = Math.max(1, Math.round((end - Date.now()) / 60000));
+  const d = Math.floor(m / 1440), h = Math.floor((m % 1440) / 60);
+  return d ? `${d}d ${h}h left` : h ? `${h}h ${m % 60}m left` : `${m}m left`;
+}
+/** Current battle numbers. Friends' minutes come from their publicStats (cached, refreshed every few minutes). */
+function bossState() {
+  const wk = dayKey(weekMonday()), boss = bossOfWeek(), mine = myPeriodStats().weekMin;
+  const done = S.game.claims.bosses[wk] ? S.game.trophies[wk] : null;
+  const mode = done ? done.mode : bossMode();
+  const members = [{ uid: USER.uid, name: USER.guest ? 'You' : USER.username, min: mine, me: true }];
+  if (mode === 'squad') for (const m of squadMembers()) {
+    const st = cached('publicStats', m.uid);
+    members.push({ uid: m.uid, name: m.name, min: st && !st.denied && st.weekKey === wk ? st.weekMin || 0 : 0, loading: st === undefined });
+  }
+  const size = members.length, base = soloHP();
+  const hp = done ? done.hp : mode === 'squad' ? Math.round(base * (1 + 0.8 * (size - 1)) / 10) * 10 : base;
+  const dmg = members.reduce((a, m) => a + m.min, 0);
+  const coins = done ? done.coins : mode === 'squad' ? Math.min(120, Math.round(soloCoins(base) * (1 + 0.12 * (size - 1)))) : soloCoins(base);
+  return { wk, boss, mode, members, hp, dmg: Math.min(dmg, hp), rawDmg: dmg, coins, done };
+}
+let bossLoading = false;
+async function loadSquadStats(force) {
+  if (bossLoading || bossMode() !== 'squad') return;
+  bossLoading = true;
+  try { await Promise.all(squadMembers().map(m => getPublic('publicStats', m.uid, force ? 0 : CACHE_MS))); } catch (e) {}
+  bossLoading = false;
+  if (S.ui.tab === 'quests') renderQuests();
+  checkBoss();
+}
+/** Claim the week's victory once the boss is out of HP. */
+function checkBoss() {
+  if (!USER || !S.settings.gamification || !rewardsReady()) return false;
+  const st = bossState();
+  if (st.done || st.rawDmg < st.hp) return false;
+  if (st.mode === 'squad' && st.members.some(m => m.loading)) return false;
+  S.game.claims.bosses[st.wk] = Date.now();
+  S.game.trophies[st.wk] = { boss: st.boss.id, mode: st.mode, hp: st.hp, coins: st.coins, size: st.members.length, at: Date.now() };
+  G = null;
+  save();
+  bossFresh = st.wk;
+  if (S.ui.tab === 'quests') renderQuests();
+  else { toast(`🏆 ${st.boss.name} defeated! +${st.coins} coins`, 4200, true); pomeoSay(`We beat ${st.boss.name}! 🏆`, { kind: 'care' }); }
+  playTierChord();
+  renderHeaderChip();
+  return true;
+}
+let bossFresh = null;
+const BOSS_SEEN_KEY = 'pomodorolist-boss-seen';
+function renderQuests() {
+  const el = $('#questBody');
+  if (!el || !USER) return;
+  const st = bossState(), b = st.boss, pct = st.hp ? st.dmg / st.hp : 0;
+  const seen = readJSON(BOSS_SEEN_KEY, {});
+  const lastSeen = seen.wk === st.wk ? Math.min(seen.dmg, st.dmg) : 0;
+  const hit = st.dmg - lastSeen;
+  const canSquad = !USER.guest && cloudReady();
+  const friendsN = canSquad && SOC.started ? friendsList().length : 0;
+  const victory = st.done ? `<div class="victory${bossFresh === st.wk ? ' fresh' : ''}"><span class="vt">🏆 Defeated!</span>
+      <span>+${st.done.coins} coins · a ${esc(b.name)} trophy is on your <button class="linkbtn" data-goprofile>trophy shelf</button></span></div>` : '';
+  const squadCard = st.mode === 'squad' ? `<div class="card"><div class="row between" style="margin-bottom:10px"><h2 style="margin:0">Squad · ${st.members.length}</h2>
+      ${st.done ? '' : '<button class="linkbtn" id="squadEdit">Edit squad</button>'}</div>
+      <ul class="squad-list">${st.members.slice().sort((a, c) => c.min - a.min).map(m => `<li><span>${m.me ? '<b>You</b>' : '@' + esc(m.name)}</span><span class="lbl">${m.loading ? '…' : fmtMin(m.min)}</span>
+        <span class="sbar"><i style="transform:scaleX(${st.rawDmg ? (m.min / Math.max(st.rawDmg, 1)).toFixed(3) : 0})"></i></span></li>`).join('')}</ul>
+      <p class="lbl" style="margin:10px 0 0">Everyone’s focus minutes this week (Mon–Sun) hit the boss together. Friends’ numbers update every few minutes.</p></div>`
+    : `<div class="card"><h2>Squad mode</h2><p class="muted" style="margin:0 0 12px;font-size:14px">${!canSquad ? 'Log in and add friends to fight bosses together.' : !friendsN ? 'Add friends to build a squad of up to 5.' : 'Team up with up to 5 friends: bigger boss, bigger reward.'}</p>
+      ${canSquad && friendsN ? `<button class="btn" id="squadEdit">${(S.squad || []).length ? 'Edit squad' : 'Pick your squad'}</button>` : canSquad ? '<button class="btn" data-gofriends>Add friends</button>' : ''}</div>`;
+  const past = Array.from({ length: 6 }, (_, i) => dayKey(addDays(weekMonday(), -7 * (i + 1)))).reverse()
+    .map(wk => { const t = S.game.trophies[wk], bb = t ? BOSS_BY_ID[t.boss] : bossOfWeek(parseDay(wk)); return `<span class="pb${t ? '' : ' lost'}" title="${esc(bb.name)} · week of ${fmtDayShort(wk)}${t ? ' · defeated' : ' · got away'}">${bossSVG(bb.id)}</span>`; }).join('');
+  el.innerHTML = `
+    <div class="quest-grid">
+      <div class="card boss-card">
+        <div class="boss-top">
+          <div class="boss-art ${st.done ? (bossFresh === st.wk ? 'defeating' : 'defeated') : 'idle'}" id="bossArt">${bossSVG(b.id)}</div>
+          <div class="boss-info">
+            <div class="boss-kicker">Boss of the week · ${st.mode === 'squad' ? 'Squad' : 'Solo'}</div>
+            <div class="boss-name">${esc(b.name)}</div>
+            <p class="boss-desc">${esc(b.desc)}</p>
+            <div class="hpbar" role="progressbar" aria-label="Boss health" aria-valuemin="0" aria-valuemax="${st.hp}" aria-valuenow="${st.hp - st.dmg}"><b style="transform:scaleX(${(1 - lastSeen / st.hp).toFixed(4)})"></b><i style="transform:scaleX(${(1 - lastSeen / st.hp).toFixed(4)})"></i></div>
+            <div class="hp-row"><span><strong>${fmtNum(st.hp - st.dmg)}</strong> / ${fmtNum(st.hp)} HP</span><span>${st.done ? 'Week complete' : weekLeftText()}</span></div>
+          </div>
+        </div>
+        <div class="boss-meta">
+          <span class="pill">⚔️ ${fmtNum(st.rawDmg)} damage</span>
+          <span class="pill">🪙 ${st.coins} coin reward</span>
+          ${canSquad ? `<div class="seg" id="bossModeSeg" style="margin-left:auto">${['solo', 'squad'].map(m => `<button data-bmode="${m}" class="${st.mode === m ? 'active' : ''}"${st.done ? ' disabled' : ''}>${m === 'solo' ? 'Solo' : 'Squad'}</button>`).join('')}</div>` : ''}
+        </div>
+        ${victory}
+        <p class="lbl" style="margin:12px 0 0">1 focus minute = 1 damage. HP is about 5 days of your daily goal${st.mode === 'squad' ? ', bigger for each squad member' : ''}. Bosses that get away leave quietly — no penalty.</p>
+      </div>
+      <div class="stack">
+        ${squadCard}
+        <div class="card"><h2>Recent weeks</h2><div class="past-bosses">${past}</div></div>
+      </div>
+    </div>`;
+  animateIn(el);
+  writeLS(BOSS_SEEN_KEY, { wk: st.wk, dmg: st.dmg });
+  // HP drains from what you last saw to now, with a hit and floating damage.
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    const p = 1 - st.dmg / st.hp;
+    $$('#questBody .hpbar i, #questBody .hpbar b').forEach(x => { x.style.transform = `scaleX(${p.toFixed(4)})`; });
+    if (hit > 0 && !st.done) bossHit(hit);
+  }));
+  if (bossFresh === st.wk && st.done) {
+    setTimeout(() => { if (motion() !== 'off') burstParticles($('#bossArt'), 22); }, 500);
+    bossFresh = null;
+  }
+}
+function bossHit(dmg) {
+  const art = $('#bossArt');
+  if (!art) return;
+  restartClass(art, 'hit', 520);
+  const f = document.createElement('span');
+  f.className = 'dmg-float';
+  f.textContent = `−${fmtNum(dmg)}`;
+  art.appendChild(f);
+  setTimeout(() => f.remove(), 1400);
+}
+function openSquad() {
+  const fl = friendsList();
+  const sel = new Set((S.squad || []).map(m => m.uid));
+  $('#squadPick').innerHTML = fl.length ? fl.map(f => { const u = otherUid(f); return `<li><label><input type="checkbox" value="${esc(u)}" data-name="${esc(otherName(f))}"${sel.has(u) ? ' checked' : ''}> @${esc(otherName(f))}</label></li>`; }).join('')
+    : '<li class="empty">No friends yet.</li>';
+  $('#squadErr').textContent = '';
+  $('#squadDlg').showModal();
+}
+$('#squadPick').addEventListener('change', e => {
+  const on = $$('#squadPick input:checked');
+  if (on.length > MAX_SQUAD) { e.target.checked = false; $('#squadErr').textContent = `A squad has up to ${MAX_SQUAD} friends.`; }
+});
+$('#squadSave').addEventListener('click', () => {
+  S.squad = $$('#squadPick input:checked').map(i => ({ uid: i.value, name: i.dataset.name })).slice(0, MAX_SQUAD);
+  S.settings.bossMode = S.squad.length ? 'squad' : 'solo';
+  save();
+  $('#squadDlg').close();
+  renderQuests();
+  loadSquadStats(true);
+});
+$('#squadCancel').addEventListener('click', () => $('#squadDlg').close());
+$('#tab-quests').addEventListener('click', e => {
+  const t = e.target;
+  if (t.closest('#squadEdit')) { openSquad(); return; }
+  if (t.closest('[data-gofriends]')) { showTab('friends'); return; }
+  if (t.closest('[data-goprofile]')) { showTab('profile'); return; }
+  const m = t.closest('[data-bmode]');
+  if (m && !m.disabled) {
+    if (m.dataset.bmode === 'squad' && !squadMembers().length) { if (friendsList().length) openSquad(); else toast('Add friends first to form a squad'); return; }
+    S.settings.bossMode = m.dataset.bmode;
+    save();
+    renderQuests();
+    loadSquadStats();
+  }
+});
+/** Trophy shelf for the Profile page. */
+function trophyShelf() {
+  const list = Object.entries(S.game.trophies).filter(([wk]) => S.game.claims.bosses[wk]).sort((a, b) => (a[0] < b[0] ? 1 : -1));
+  return `<div class="card"><div class="row between" style="margin-bottom:10px"><h2 style="margin:0">Trophy shelf</h2><span class="lbl">${list.length} boss${list.length === 1 ? '' : 'es'}</span></div>
+    ${list.length ? `<div class="shelf">${list.map(([wk, t]) => { const b = BOSS_BY_ID[t.boss] || BOSSES[0]; return `<div class="trophy" title="${esc(b.name)}">${bossSVG(b.id)}<div class="tn">${esc(b.name.replace(/^The /, ''))}</div><div class="tw">${fmtDayShort(wk)}</div><div class="tm">${t.mode === 'squad' ? `Squad of ${t.size}` : 'Solo'}</div></div>`; }).join('')}</div>`
+      : '<div class="empty">Defeat a weekly boss in Quests to earn your first trophy.</div>'}</div>`;
+}
+
+/* ==========================================================================
+   AURA — a glow around the badge from the current streak.
+   Friends see it from the streak already in publicProfiles. A profile not
+   updated for 2+ days may hold a stale streak, so its aura fades.
+   ========================================================================== */
+const AURAS = [
+  { min: 3, id: 'soft', name: 'Soft white' }, { min: 7, id: 'green', name: 'Green' }, { min: 14, id: 'blue', name: 'Blue' },
+  { min: 30, id: 'purple', name: 'Purple' }, { min: 60, id: 'gold', name: 'Gold' }, { min: 100, id: 'rainbow', name: 'Rainbow' },
+];
+const auraFor = streak => AURAS.filter(a => streak >= a.min).pop() || null;
+/** Wrap a badge in its aura (no wrapper at all below 3 days). */
+function withAura(html, streak) {
+  if (!S.settings.gamification) return html;
+  const a = auraFor(+streak || 0);
+  return a ? `<span class="aura aura-${a.id}" title="${a.name} aura · ${streak}-day streak">${html}</span>` : html;
+}
+const myStreak = () => game().streak.cur;
+function profStreak(prof) {
+  if (!prof || prof.denied) return 0;
+  const at = prof.updatedAt && prof.updatedAt.toMillis ? prof.updatedAt.toMillis() : 0;
+  return at && Date.now() - at > 2 * 864e5 ? 0 : +prof.streak || 0;
+}
+function auraCard() {
+  const s = myStreak(), cur = auraFor(s), next = AURAS.find(a => s < a.min);
+  return `<div class="card"><h2>Aura</h2>
+    <p style="margin:0;font-size:14px">${cur ? `Your <b>${cur.name}</b> aura glows from your ${s}-day streak.` : 'Keep a 3-day streak to light up your first aura.'}
+      ${next ? `<span class="muted">Next aura at <b>${next.min} days</b> (${next.min - s} to go).</span>` : '<span class="muted">The rarest aura — legendary consistency.</span>'}</p>
+    <div class="aura-tiers">${AURAS.map(a => `<div class="at${cur && cur.id === a.id ? ' cur' : ''}${s < a.min ? ' locked' : ''}"><span class="dot aura aura-${a.id}"></span>${a.name}<br>${a.min}+ days</div>`).join('')}</div></div>`;
+}
+
+/* ==========================================================================
+   DAILY LOGIN REWARDS — a 7-day cycle; a missed day starts it again.
+   Claims live in game.claims.login { 'YYYY-MM-DD': time } in users/{uid}, so
+   a day can only be claimed once on any device. Signed in, the day is taken
+   from the Firestore server clock (written to users/{uid}/meta/clock).
+   ========================================================================== */
+const LOGIN_COINS = [2, 3, 3, 4, 5, 6, 12];   // ≈ 35 coins a week: a bonus, not a substitute for sessions
+const LOGIN_LATER_KEY = 'pomodorolist-login-later';
+/** Cycle day (1–7) of every claimed date. */
+function loginCycle() {
+  const keys = Object.keys(S.game.claims.login).sort(), out = {};
+  let prev = null, run = 0;
+  for (const k of keys) {
+    run = prev && dayKey(addDays(parseDay(prev), 1)) === k ? run + 1 : 1;
+    out[k] = ((run - 1) % 7) + 1;
+    prev = k;
+  }
+  return out;
+}
+function loginToday() {
+  const k = dayKey(new Date()), cyc = loginCycle(), cl = S.game.claims.login;
+  if (cl[k]) return { claimed: true, day: cyc[k], key: k };
+  const y = dayKey(addDays(startOfDay(new Date()), -1));
+  return { claimed: false, day: cl[y] ? (cyc[y] % 7) + 1 : 1, key: k };
+}
+const loginOn = () => !!USER && S.settings.gamification && rewardsReady();
+function loginTrackHTML(info) {
+  const start = addDays(startOfDay(new Date()), -(info.day - 1));
+  return `<div class="track7">${LOGIN_COINS.map((c, i) => {
+    const k = dayKey(addDays(start, i)), got = !!S.game.claims.login[k] && i < info.day, today = i === info.day - 1;
+    return `<div class="d${got ? ' got' : ''}${today ? ' today' : ''}${today && !info.claimed ? ' ready' : ''}">Day ${i + 1}<span class="c">${i === 6 ? '🎁' : ''}${c}</span></div>`;
+  }).join('')}</div>`;
+}
+function loginCard() {
+  const info = loginToday();
+  return `<div class="card" id="loginCard"><div class="row between"><h2 style="margin:0">Daily reward</h2>
+      ${info.claimed ? '<span class="lbl">Claimed today ✓</span>' : `<button class="btn primary small" data-claimlogin>Claim day ${info.day}</button>`}</div>
+    ${loginTrackHTML(info)}
+    <p class="lbl" style="margin:6px 0 0">Open the app each day: coins grow over 7 days, with a surprise cosmetic on day 7. Missing a day starts again at day 1 — your focus streak is separate.</p></div>`;
+}
+function updateLoginDot() {
+  const show = loginOn() && !loginToday().claimed;
+  $('#profileDot').classList.toggle('hidden', !show);
+  const chipDot = $('#lvChip .tbadge');
+  if (chipDot) chipDot.classList.toggle('hidden', !show);
+}
+function maybeShowLogin() {
+  if (!loginOn() || loginToday().claimed) return;
+  if (localStorage.getItem(LOGIN_LATER_KEY) === dayKey(new Date())) return;
+  if (document.querySelector('dialog[open]') || !$('#tour').classList.contains('hidden')) return;
+  openLoginDlg();
+}
+function openLoginDlg() {
+  const info = loginToday();
+  $('#loginTitle').textContent = info.claimed ? 'See you tomorrow!' : `Day ${info.day} reward`;
+  $('#loginPomeo').innerHTML = pomeoOn() ? pomeoSVG({ state: 'excited', ...pomeoOutfit() }) : '';
+  $('#loginTrack').innerHTML = loginTrackHTML(info);
+  $('#loginGift').textContent = info.day === 7 && !info.claimed ? 'Day 7: coins plus a surprise cosmetic 🎁' : '';
+  $('#loginClaim').textContent = info.claimed ? 'Done' : `Claim +${LOGIN_COINS[info.day - 1]} coins`;
+  $('#loginClaim').disabled = false;
+  $('#loginDlg').showModal();
+}
+/** Server time (signed in): write a server timestamp under users/{uid}/meta/clock and read it back. */
+async function serverNow() {
+  if (!cloudReady() || !navigator.onLine) return null;
+  try {
+    const ref = FB.doc(FB.db, 'users', USER.uid, 'meta', 'clock');
+    const go = (async () => { await FB.setDoc(ref, { t: FB.serverTimestamp() }); const s = await FB.getDocFromServer(ref); return s.data().t.toMillis(); })();
+    return await Promise.race([go, new Promise(r => setTimeout(() => r(null), 5000))]);
+  } catch (e) { return null; }
+}
+let claiming = false;
+async function claimLogin() {
+  if (claiming || !loginOn()) return;
+  let info = loginToday();
+  if (info.claimed) { $('#loginDlg').open && $('#loginDlg').close(); return; }
+  claiming = true;
+  $('#loginClaim').disabled = true;
+  const srv = await serverNow();
+  claiming = false;
+  if (srv && Math.abs(srv - Date.now()) > 15 * 60000 && dayKey(new Date(srv)) !== info.key) {
+    toast('Your device’s date or time looks off — fix it to claim today’s reward', 4500);
+    $('#loginClaim').disabled = false;
+    return;
+  }
+  info = loginToday();
+  if (info.claimed) return;
+  const now = srv || Date.now();
+  S.game.claims.login[info.key] = now;
+  let gift = null;
+  if (info.day === 7) gift = pickLoginGift(now);
+  G = null;
+  save();
+  applyCosmetics();
+  const coins = LOGIN_COINS[info.day - 1];
+  toast(`Day ${info.day}: +${coins} coins${gift ? ` · 🎁 ${gift.name}!` : ''}`, 3600, true);
+  coinDrop($('#loginClaim'));
+  if (gift) pomeoSay(`A gift for you: ${gift.name}! 🎁`, { kind: 'care' });
+  setTimeout(() => { if ($('#loginDlg').open) $('#loginDlg').close(); }, motion() === 'off' ? 0 : 900);
+  $('#loginTrack').innerHTML = loginTrackHTML(loginToday());
+  updateLoginDot();
+  if (S.ui.tab === 'profile') renderProfile();
+}
+/** Day 7: a random cheap cosmetic you don't own yet (recorded as a free purchase), else a Streak Freeze if there's room. */
+function pickLoginGift(at) {
+  const g = game();
+  const pool = ITEMS.filter(i => i.price > 0 && i.price <= 80 && !['freeze', 'extra'].includes(i.cat) && !(i.lvl > g.lv.level) && !isOwned(i.id));
+  let it = pool.length ? pool[Math.floor(Math.random() * pool.length)] : g.freezesHeld < MAX_FREEZES ? ITEM_BY_ID.freeze : null;
+  if (!it) return null;
+  S.game.purchases['g' + uid()] = { item: it.id, price: 0, at, gift: true };
+  return it;
+}
+$('#loginClaim').addEventListener('click', () => { if (loginToday().claimed) $('#loginDlg').close(); else claimLogin(); });
+$('#loginLater').addEventListener('click', () => { writeLS(LOGIN_LATER_KEY, dayKey(new Date())); $('#loginDlg').close(); });
+
+/* ==========================================================================
+   SPACED REVISION — topics come back after 1, 3, 7, 21, 45 days (editable).
+   S.revisions: { id, topic, presetId, time 'HH:MM', step, next 'YYYY-MM-DD',
+                  created, log [{at, how}], done {day: ts}, snooze {day: ts} }
+   Each topic behaves like a one-off reminder on its next date, so Pomeo
+   delivers it through the normal reminder engine.
+   ========================================================================== */
+const DEFAULT_REV = [1, 3, 7, 21, 45];
+const revIntervals = () => { const v = S.settings.revIntervals; return Array.isArray(v) && v.length ? v : DEFAULT_REV; };
+const revGap = step => { const iv = revIntervals(); return step <= 0 ? iv[0] : (iv[step] || iv[iv.length - 1]) - (iv[step - 1] || 0); };
+const revActive = () => S.revisions.filter(r => r.step < revIntervals().length);
+/** Revision topics as reminder objects (sharing their done/snooze maps). */
+function revisionReminders() {
+  return revActive().map(v => {
+    v.done ||= {}; v.snooze ||= {};
+    return { id: 'rev:' + v.id, rev: v, title: 'Revise: ' + v.topic, date: v.next, time: v.time || '18:00', repeat: 'none', days: [], before: 0,
+      presetId: v.presetId || '', session: v.topic, done: v.done, snooze: v.snooze };
+  });
+}
+function addRevision(topic, { presetId = '', time = '', first = '' } = {}) {
+  topic = String(topic || '').trim().slice(0, 80);
+  if (!topic || topic === 'Untitled') { toast('Give the session a name first, so Pomeo knows what to revise'); return null; }
+  if (revActive().some(r => r.topic.toLowerCase() === topic.toLowerCase())) { toast(`“${topic}” already has a revision plan`); return null; }
+  const now = new Date();
+  const t = time || `${pad(now.getHours())}:${pad(now.getMinutes() < 30 ? 0 : 30)}`;
+  const r = { id: 'v' + uid(), topic, presetId, time: t, step: 0, next: first || dayKey(addDays(startOfDay(now), revIntervals()[0])), created: Date.now(), log: [], done: {}, snooze: {} };
+  S.revisions.push(r);
+  save();
+  renderReminderBits();
+  toast(`Revision plan for “${topic}”: ${revIntervals().map(d => d + 'd').join(' · ')}`, 3400, true);
+  return r;
+}
+/** how: 'ok' moves to the next interval, 'hard' brings it back sooner (same step), 'easy' pushes it further. */
+function markRevised(v, how = 'ok') {
+  const today = startOfDay(new Date());
+  if (how === 'hard') v.next = dayKey(addDays(today, Math.max(1, Math.ceil(revGap(v.step) / 2))));
+  else {
+    v.step += 1;
+    if (v.step < revIntervals().length) v.next = dayKey(addDays(today, how === 'easy' ? Math.round(revGap(v.step) * 1.5) : revGap(v.step)));
+  }
+  v.log = [...(v.log || []), { at: Date.now(), how }].slice(-12);
+  v.done = {}; v.snooze = {};
+  save();
+  renderReminderBits();
+  const fin = v.step >= revIntervals().length;
+  toast(fin ? `“${v.topic}” mastered ✓` : `Next revision: ${fmtDayShort(v.next)}`, 2600, true);
+}
+/** A completed focus session on a due topic counts as revising it. */
+function revisionAfterSession(name) {
+  const k = dayKey(new Date());
+  const v = revActive().find(r => r.topic.toLowerCase() === String(name).toLowerCase() && r.next <= k);
+  if (v) markRevised(v, 'ok');
+}
+function revDots(v) { const n = revIntervals().length; return '●'.repeat(Math.min(v.step, n)) + '○'.repeat(Math.max(0, n - v.step)); }
+function revWhen(v) {
+  const k = dayKey(new Date());
+  if (v.next === k) return '<span class="due">Due today</span>';
+  if (v.next < k) { const d = Math.round((startOfDay(new Date()) - parseDay(v.next)) / 864e5); return `<span class="over">Overdue · ${d} day${d === 1 ? '' : 's'}</span>`; }
+  const d = Math.round((parseDay(v.next) - startOfDay(new Date())) / 864e5);
+  return d === 1 ? 'Tomorrow' : `${fmtDayShort(v.next)} · in ${d} days`;
+}
+function revisionSection() {
+  const act = revActive().sort((a, b) => (a.next < b.next ? -1 : 1));
+  const mastered = S.revisions.filter(r => r.step >= revIntervals().length);
+  if (!act.length && !mastered.length) return '';
+  return `<div class="card rem-sec"><h2>Revision<span class="lbl" style="text-transform:none;letter-spacing:0">${revIntervals().join(' · ')} days</span></h2>
+    <ul class="rev-list">${act.map(v => `<li data-vid="${esc(v.id)}"><div class="rv-main"><div class="rv-t">${esc(v.topic)}</div>
+      <div class="rv-s">${revWhen(v)} · ${fmtHM(remAt({ time: v.time || '18:00' }, new Date()))} <span class="rev-dots" title="${v.step} of ${revIntervals().length} revisions done">${revDots(v)}</span></div></div>
+      <div class="rev-acts"><button class="btn small primary" data-rev="ok">Mark revised</button><button class="btn small" data-rev="hard" title="Bring it back sooner">Hard</button><button class="btn small" data-rev="easy" title="Push it further out">Easy</button>
+      <button class="iconbtn" data-rev="del" aria-label="Delete plan" title="Delete plan">${TRASH_SVG}</button></div></li>`).join('')}</ul>
+    ${mastered.length ? `<p class="lbl" style="margin:10px 0 0">Mastered: ${mastered.slice(-8).map(v => esc(v.topic)).join(', ')} ✓ <button class="linkbtn" data-rev="clear">Clear</button></p>` : ''}</div>`;
+}
+
+/* ==========================================================================
+   EXAM COUNTDOWN — S.exams [{ id, name, date 'YYYY-MM-DD', added }]
+   The user enters every date; nothing is assumed.
+   ========================================================================== */
+const daysUntil = k => Math.round((parseDay(k) - startOfDay(new Date())) / 864e5);
+const upcomingExams = () => S.exams.filter(x => daysUntil(x.date) >= 0).sort((a, b) => (a.date < b.date ? -1 : 1));
+function focusSince(ts) { return S.sessions.filter(s => s.end >= ts).reduce((a, s) => a + s.duration, 0) / 3.6e6; }
+function dailyAvgHours() {
+  // the last 14 days, or fewer if the app is newer than that
+  const first = S.sessions.length ? Math.min(...S.sessions.map(s => s.start)) : Date.now();
+  const days = clamp(Math.ceil((Date.now() - startOfDay(new Date(first))) / 864e5), 1, 14);
+  const from = addDays(startOfDay(new Date()), -(days - 1)).getTime();
+  return S.sessions.filter(s => s.end >= from).reduce((a, s) => a + s.duration, 0) / 3.6e6 / days;
+}
+function renderExamCard() {
+  const el = $('#examCard');
+  if (!el || !USER) return;
+  const list = upcomingExams();
+  if (!list.length) {
+    el.className = 'card exam-card empty';
+    el.innerHTML = `<div class="row between"><span>📅 Add an exam to see a countdown</span><span class="lbl">Tap to add</span></div>`;
+    return;
+  }
+  const x = list[0], d = daysUntil(x.date), so = focusSince(x.added || Date.now()), avg = dailyAvgHours();
+  el.className = 'card exam-card' + (d <= 7 ? ' near' : '');
+  el.innerHTML = `<div class="ex-main"><span class="ex-name">${esc(x.name)}</span>
+      <span class="ex-days">${d === 0 ? 'Today!' : `${d}<small>day${d === 1 ? '' : 's'} left</small>`}</span></div>
+    <div class="ex-sub">${d === 0 ? 'You’ve got this! 🍀' : `<b>${so.toFixed(1)}h</b> focused since you added it · on track for <b>~${Math.round(so + avg * d)}h</b> by exam day`}</div>
+    ${list.length > 1 ? `<div class="ex-more">${list.slice(1, 4).map(e => `<span>${esc(e.name)} · ${daysUntil(e.date)} days</span>`).join('')}</div>` : ''}`;
+}
+const EXAM_DAY_KEY = 'pomodorolist-exam-day';
+function examDayCheck() {
+  const today = upcomingExams().find(x => daysUntil(x.date) === 0);
+  if (!today || localStorage.getItem(EXAM_DAY_KEY) === dayKey(new Date())) return;
+  writeLS(EXAM_DAY_KEY, dayKey(new Date()));
+  pomeoSay(`${today.name} today. You’ve got this! 🍀`, { kind: 'tap', ms: 7000 });
+}
+function openExams() {
+  $('#examList').innerHTML = S.exams.length ? S.exams.slice().sort((a, b) => (a.date < b.date ? -1 : 1)).map(x => {
+    const d = daysUntil(x.date);
+    return `<li><span class="nm${d < 0 ? ' past' : ''}"><b>${esc(x.name)}</b><br><span class="lbl">${parseDay(x.date).toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })} · ${d < 0 ? 'done' : d === 0 ? 'today' : d + ' days left'}</span></span>
+      <button class="iconbtn" data-exdel="${esc(x.id)}" aria-label="Delete ${esc(x.name)}">${TRASH_SVG}</button></li>`;
+  }).join('') : '<li class="empty">No exams yet.</li>';
+  $('#examName').value = '';
+  $('#examDate').value = '';
+  $('#examDate').min = dayKey(new Date());
+  if (!$('#examDlg').open) $('#examDlg').showModal();
+}
+$('#examForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const name = $('#examName').value.trim().slice(0, 60), date = $('#examDate').value;
+  if (!name || !date) { shake($('#examForm')); return; }
+  if (daysUntil(date) < 0) { toast('Pick a date today or later'); return; }
+  S.exams.push({ id: 'x' + uid(), name, date, added: Date.now() });
+  save();
+  openExams();
+  renderExamCard();
+});
+$('#examList').addEventListener('click', e => {
+  const b = e.target.closest('[data-exdel]');
+  if (!b) return;
+  S.exams = S.exams.filter(x => x.id !== b.dataset.exdel);
+  save(); openExams(); renderExamCard();
+});
+$('#examClose').addEventListener('click', () => $('#examDlg').close());
+$('#examCard').addEventListener('click', openExams);
+
+/* ==========================================================================
+   DISTRACTION PARKING LOT — jot a thought without stopping the timer.
+   S.parked [{ id, text, at, done }] (last 50), synced in users/{uid}.
+   ========================================================================== */
+const PARK_TO_REM_SVG = BELL_SVG;
+const focusActive = () => S.timer.phase === 'focus' && S.timer.status !== 'idle';
+function openPark() {
+  if (!focusActive()) { toast('The parking lot opens during a focus session'); return; }
+  $('#parkPop').classList.remove('hidden');
+  $('#parkInput').value = '';
+  setTimeout(() => $('#parkInput').focus(), 20);
+}
+function closePark() { $('#parkPop').classList.add('hidden'); }
+function parkThought() {
+  const v = $('#parkInput').value.trim().slice(0, 140);
+  closePark();
+  if (!v) return;
+  S.parked.push({ id: 'p' + uid(), text: v, at: Date.now(), done: false });
+  if (S.parked.length > 50) S.parked = S.parked.slice(-50);
+  save();
+  toast('Parked 🅿️ — back to focus', 1600);
+}
+$('#parkBtn').addEventListener('click', () => ($('#parkPop').classList.contains('hidden') ? openPark() : closePark()));
+$('#parkSave').addEventListener('click', parkThought);
+$('#parkInput').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); parkThought(); } if (e.key === 'Escape') { e.stopPropagation(); closePark(); } });
+/** On a break: the thoughts parked during the last focus block. */
+function renderPark() {
+  const t = S.timer;
+  $('#parkBtn').classList.toggle('hidden', !focusActive());
+  if (!focusActive()) closePark();
+  const panel = $('#parkPanel');
+  const recent = t.phase !== 'focus' && t.focusStartedAt ? S.parked.filter(p => p.at >= t.focusStartedAt) : [];
+  if (!recent.length) { panel.classList.add('hidden'); return; }
+  panel.classList.remove('hidden');
+  panel.innerHTML = `<h3>You parked ${recent.length} thought${recent.length === 1 ? '' : 's'} 🅿️</h3><ul class="plist">${recent.map(parkRow).join('')}</ul>`;
+}
+function parkRow(p) {
+  return `<li class="${p.done ? 'done' : ''}" data-pid="${esc(p.id)}"><button class="rem-check" data-pk="done" aria-label="${p.done ? 'Not done' : 'Done'}" style="${p.done ? 'background:var(--accent);border-color:var(--accent)' : ''}">${p.done ? TICK_SVG.replace('<svg', '<svg style="opacity:1"') : ''}</button>
+    <span class="tx">${esc(p.text)}</span><span class="when">${fmtHM(p.at)}</span>
+    <button class="iconbtn" data-pk="rem" title="Turn into a reminder" aria-label="Turn into a reminder">${PARK_TO_REM_SVG}</button>
+    <button class="iconbtn" data-pk="del" title="Delete" aria-label="Delete">${TRASH_SVG}</button></li>`;
+}
+function parkedSection() {
+  if (!S.parked.length) return '';
+  const list = S.parked.slice().sort((a, b) => (a.done - b.done) || b.at - a.at);
+  return `<div class="card rem-sec"><h2>Parked thoughts<span>${S.parked.some(p => p.done) ? '<button class="linkbtn" data-pk="clear" style="text-transform:none;letter-spacing:0">Clear done</button>' : ''}</span></h2>
+    <ul class="plist">${list.map(parkRow).join('')}</ul></div>`;
+}
+function onParkClick(e) {
+  const b = e.target.closest('[data-pk]');
+  if (!b) return false;
+  if (b.dataset.pk === 'clear') { S.parked = S.parked.filter(p => !p.done); save(); renderReminderBits(); return true; }
+  const p = S.parked.find(x => x.id === b.closest('[data-pid]').dataset.pid);
+  if (!p) return true;
+  if (b.dataset.pk === 'done') p.done = !p.done;
+  else if (b.dataset.pk === 'del') S.parked = S.parked.filter(x => x !== p);
+  else if (b.dataset.pk === 'rem') { openRemForm({ title: p.text.slice(0, 80) }); p.done = true; }
+  save();
+  renderPark();
+  renderReminderBits();
+  return true;
+}
+$('#parkPanel').addEventListener('click', onParkClick);
+
+/* ==========================================================================
+   TOMATO GARDEN — one plant per focus session (separate from Pomeo).
+   < 20 min sprout · 20–44 leafy · 45–89 ripe tomatoes · 90+ golden ·
+   sessions abandoned before 80% (S.abandoned) leave a small wilted plant.
+   ========================================================================== */
+const plantKind = s => (s.wilted ? 'wilted' : s.duration >= 90 * 60000 ? 'golden' : s.duration >= 45 * 60000 ? 'ripe' : s.duration >= 20 * 60000 ? 'leafy' : 'sprout');
+const PLANT_ART = {
+  sprout: '<path d="M20 46V34" stroke="#5c9b57" stroke-width="2.2" stroke-linecap="round"/><path d="M20 36q-8-1-9-8 8 0 9 8ZM20 34q7-2 9-9-8 1-9 9Z" fill="#7cc06e"/>',
+  leafy: '<path d="M20 46V18" stroke="#4e8a4a" stroke-width="2.4" stroke-linecap="round"/><path d="M20 38q-10 0-12-9 10 0 12 9ZM20 32q10-1 12-10-10 1-12 10ZM20 26q-9-1-10-9 9 1 10 9ZM20 21q7-2 8-9-7 2-8 9Z" fill="#6fb162"/>',
+  ripe: '<path d="M20 46V14" stroke="#4e8a4a" stroke-width="2.4" stroke-linecap="round"/><path d="M20 38q-10 0-12-9 10 0 12 9ZM20 31q10-1 12-10-10 1-12 10ZM20 24q-9-1-10-9 9 1 10 9ZM20 18q7-2 8-9-7 2-8 9Z" fill="#6fb162"/><circle cx="12" cy="33" r="4.2" fill="#e5654f"/><circle cx="28.5" cy="26.5" r="4.4" fill="#e5654f"/><circle cx="14" cy="21" r="3.4" fill="#ef7e66"/><path d="M12 29.2v-1.6M28.5 22.4v-1.6M14 17.8v-1.4" stroke="#4e8a4a" stroke-width="1.4" stroke-linecap="round"/>',
+  golden: '<path d="M20 46V12" stroke="#4e8a4a" stroke-width="2.4" stroke-linecap="round"/><path d="M20 38q-10 0-12-9 10 0 12 9ZM20 31q10-1 12-10-10 1-12 10ZM20 24q-9-1-10-9 9 1 10 9ZM20 17q7-2 8-9-7 2-8 9Z" fill="#6fb162"/><circle cx="11.5" cy="33" r="4.6" fill="#f2c14e" stroke="#d49b1f" stroke-width=".8"/><circle cx="28.5" cy="26" r="4.8" fill="#f2c14e" stroke="#d49b1f" stroke-width=".8"/><circle cx="13.5" cy="20" r="3.8" fill="#f6d06b" stroke="#d49b1f" stroke-width=".8"/><path d="M31 9l1 2.4 2.4 1-2.4 1-1 2.4-1-2.4-2.4-1 2.4-1Z" fill="#f2c14e"/>',
+  wilted: '<path d="M20 46q0-10-2-14t-8-4" stroke="#9b8a6a" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M14 32q-6 3-9 0 4-4 9 0ZM18 38q6 2 8-2-5-3-8 2Z" fill="#b4a37f"/>',
+};
+const plantSVG = kind => `<svg viewBox="0 0 40 48" aria-hidden="true"><g class="sway">${PLANT_ART[kind]}</g></svg>`;
+const PLANT_NAMES = { sprout: 'Sprout', leafy: 'Leafy plant', ripe: 'Ripe tomatoes', golden: 'Golden tomatoes', wilted: 'Wilted' };
+function gardenItems(from, to) {
+  const s = S.sessions.filter(x => x.start >= from && x.start < to).map(x => ({ ...x }));
+  const a = (S.abandoned || []).filter(x => x.start >= from && x.start < to).map(x => ({ ...x, wilted: true }));
+  return [...s, ...a].sort((p, q) => p.start - q.start);
+}
+function gardenStats(items) {
+  const st = { grown: 0, golden: 0, ripe: 0, wilted: 0 };
+  for (const it of items) { const k = plantKind(it); if (k === 'wilted') st.wilted++; else { st.grown++; if (k === 'golden') st.golden++; if (k === 'ripe') st.ripe++; } }
+  return st;
+}
+let gardenNewest = 0;
+function renderGarden() {
+  const el = $('#gardenSlot');
+  if (!el || !USER) return;
+  const view = S.ui.gardenView === 'month' ? 'month' : 'week';
+  const now = new Date(), today = startOfDay(now);
+  const from = view === 'week' ? weekStartOf(now, S.settings.weekStart) : new Date(now.getFullYear(), now.getMonth(), 1);
+  const to = view === 'week' ? addDays(from, 7) : new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  const items = gardenItems(from.getTime(), to.getTime()), st = gardenStats(items);
+  const seen = +(localStorage.getItem('pomodorolist-garden-seen') || 0);
+  let i = 0;
+  const plant = it => `<button class="plant${it.end > seen && seen ? ' new' : ''}" style="--d:${(-(i++ * 0.37) % 4.5).toFixed(2)}s" data-plant="${esc(it.id)}" data-w="${it.wilted ? 1 : 0}"
+      aria-label="${esc(PLANT_NAMES[plantKind(it)])}: ${esc(it.name)}, ${fmtMin(it.duration / 60000)}">${plantSVG(plantKind(it))}</button>`;
+  let beds = '';
+  if (view === 'week') {
+    for (let d = from; d < to; d = addDays(d, 1)) {
+      const day = items.filter(it => sameDay(new Date(it.start), d));
+      beds += `<div class="bed"><span class="bl">${WD[d.getDay()]}</span><div class="soil">${day.length ? day.map(plant).join('') : `<span class="none">${d > today ? '' : '·'}</span>`}</div></div>`;
+    }
+  } else {
+    const weeks = [];
+    for (let d = weekStartOf(from, S.settings.weekStart); d < to; d = addDays(d, 7)) weeks.push(d);
+    for (const w of weeks) {
+      const wk = items.filter(it => it.start >= w.getTime() && it.start < addDays(w, 7).getTime());
+      beds += `<div class="bed"><span class="bl">${w.getDate()} ${w.toLocaleDateString([], { month: 'short' })}</span><div class="soil">${wk.length ? wk.map(plant).join('') : '<span class="none">·</span>'}</div></div>`;
+    }
+  }
+  el.innerHTML = `<div class="card"><div class="row between" style="margin-bottom:6px;flex-wrap:wrap;gap:8px"><h2 style="margin:0">🍅 Tomato garden</h2>
+      <div class="seg" id="gardenSeg"><button data-gview="week" class="${view === 'week' ? 'active' : ''}">This week</button><button data-gview="month" class="${view === 'month' ? 'active' : ''}">This month</button></div></div>
+    <div class="garden-stats"><span><b>${st.grown}</b> plants grown</span><span><b>${st.golden}</b> golden</span><span><b>${st.ripe}</b> ripe</span><span><b>${st.wilted}</b> wilted</span></div>
+    <div class="garden" id="garden">${beds}</div>
+    <div class="garden-legend">${['sprout', 'leafy', 'ripe', 'golden', 'wilted'].map(k => `<span>${plantSVG(k)}${PLANT_NAMES[k]}${{ sprout: ' <20m', leafy: ' 20–44m', ripe: ' 45–89m', golden: ' 90m+', wilted: ' stopped early' }[k]}</span>`).join('')}</div></div>`;
+  writeLS('pomodorolist-garden-seen', String(Date.now()));
+}
+const sameDay = (a, b) => dayKey(a) === dayKey(b);
+let gardenTipT = 0;
+$('#gardenSlot').addEventListener('click', e => {
+  const v = e.target.closest('[data-gview]');
+  if (v) { S.ui.gardenView = v.dataset.gview; saveLocal(); renderGarden(); return; }
+  const p = e.target.closest('[data-plant]');
+  const old = $('#garden .garden-tip');
+  if (old) old.remove();
+  if (!p) return;
+  const list = p.dataset.w === '1' ? S.abandoned : S.sessions, s = list.find(x => x.id === p.dataset.plant);
+  if (!s) return;
+  const g = $('#garden'), gr = g.getBoundingClientRect(), pr = p.getBoundingClientRect();
+  const tip = document.createElement('div');
+  tip.className = 'garden-tip';
+  tip.textContent = `${s.name} · ${new Date(s.start).toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' })} · ${fmtMin(s.duration / 60000)}${p.dataset.w === '1' ? ' (stopped early)' : ''}`;
+  tip.style.left = clamp(pr.left - gr.left + pr.width / 2, 90, gr.width - 90) + 'px';
+  tip.style.top = (pr.top - gr.top - 4) + 'px';
+  g.appendChild(tip);
+  clearTimeout(gardenTipT);
+  gardenTipT = setTimeout(() => tip.remove(), 3200);
+});
+
+/* ==========================================================================
+   WRAPPED — monthly (previous month, from the 1st) and yearly (from Dec 20)
+   Story slides computed on the device from the session log.
+   ========================================================================== */
+function wrappedPeriods() {
+  const now = new Date(), out = [];
+  const pm = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  out.push({ kind: 'month', label: pm.toLocaleDateString([], { month: 'long', year: 'numeric' }), short: pm.toLocaleDateString([], { month: 'long' }), from: pm, to: new Date(now.getFullYear(), now.getMonth(), 1) });
+  const yr = now.getMonth() === 11 && now.getDate() >= 20 ? now.getFullYear() : now.getMonth() === 0 ? now.getFullYear() - 1 : null;
+  if (yr !== null) out.unshift({ kind: 'year', label: String(yr), short: String(yr), from: new Date(yr, 0, 1), to: new Date(Math.min(Date.now() + 1, new Date(yr + 1, 0, 1).getTime())) });
+  return out.map(p => ({ ...p, sessions: S.sessions.filter(s => s.start >= p.from.getTime() && s.start < p.to.getTime()) })).filter(p => p.sessions.length);
+}
+function renderWrappedBanner() {
+  const el = $('#wrappedSlot');
+  if (!el || !USER) return;
+  const ps = wrappedPeriods();
+  el.innerHTML = ps.length ? `<div class="card wrapped-banner"><div><div class="wb-t">✨ ${ps[0].kind === 'year' ? `Your ${ps[0].label} Wrapped is here` : `Your ${ps[0].short} Wrapped is ready`}</div>
+      <div class="wb-s">Your focus story in a few taps.</div></div>
+    <div class="btn-row">${ps.map((p, i) => `<button class="btn${i ? '' : ' primary'} small" data-wrapped="${i}">${p.kind === 'year' ? p.label + ' Wrapped' : p.short + ' Wrapped'}</button>`).join('')}</div></div>` : '';
+}
+function wrappedData(p) {
+  const ss = p.sessions, mins = ss.reduce((a, s) => a + s.duration, 0) / 60000;
+  const byName = {};
+  for (const s of ss) byName[s.name] = (byName[s.name] || 0) + s.duration / 60000;
+  const top = Object.entries(byName).sort((a, b) => b[1] - a[1]).slice(0, 4);
+  const byDay = {};
+  for (const s of ss) { const k = dayKey(new Date(s.start)); byDay[k] = (byDay[k] || 0) + s.duration / 60000; }
+  const best = Object.entries(byDay).sort((a, b) => b[1] - a[1])[0];
+  const hours = Array(24).fill(0);
+  for (const s of ss) hours[new Date(s.start).getHours()] += s.duration / 60000;
+  const peak = hours.indexOf(Math.max(...hours));
+  const part = h => (h >= 5 && h < 12 ? 'morning' : h >= 12 && h < 17 ? 'afternoon' : h >= 17 && h < 21 ? 'evening' : 'night');
+  const parts = { morning: 0, afternoon: 0, evening: 0, night: 0 };
+  hours.forEach((m, h) => { parts[part(h)] += m; });
+  const bestPart = Object.entries(parts).sort((a, b) => b[1] - a[1])[0][0];
+  const peakIn = hours.map((m, h) => [m, h]).filter(([, h]) => part(h) === bestPart).sort((a, b) => b[0] - a[0])[0];
+  const peakPart = peakIn ? peakIn[1] : peak;
+  // longest run of days with any focus inside the period
+  let run = 0, longest = 0;
+  for (let d = startOfDay(p.from); d < p.to && d <= new Date(); d = addDays(d, 1)) { run = byDay[dayKey(d)] ? run + 1 : 0; longest = Math.max(longest, run); }
+  const totalDays = Math.max(1, Math.round((Math.min(p.to, new Date()) - p.from) / 864e5));
+  const active = Object.keys(byDay).length;
+  const bosses = Object.entries(S.game.trophies).filter(([wk]) => S.game.claims.bosses[wk] && parseDay(wk) >= startOfDay(addDays(p.from, -6)) && parseDay(wk) < p.to).map(([, t]) => t);
+  const garden = gardenStats(gardenItems(p.from.getTime(), p.to.getTime()));
+  const gItems = gardenItems(p.from.getTime(), p.to.getTime());
+  const avgLen = mins / ss.length, early = (hours.slice(4, 9).reduce((a, b) => a + b, 0)) / mins, night = (hours.slice(21).reduce((a, b) => a + b, 0) + hours.slice(0, 4).reduce((a, b) => a + b, 0)) / mins;
+  const weekend = ss.filter(s => [0, 6].includes(new Date(s.start).getDay())).reduce((a, s) => a + s.duration, 0) / 60000 / mins;
+  const persona = night > 0.35 ? { t: 'Night Owl Scholar', e: '🦉', d: 'Your best ideas arrive after dark.' }
+    : early > 0.3 ? { t: 'Early Bird', e: '🐦', d: 'You beat the sunrise to your desk.' }
+    : avgLen >= 45 ? { t: 'Marathon Focuser', e: '🏃', d: 'Long, deep blocks are your superpower.' }
+    : active / totalDays >= 0.7 ? { t: 'Consistent Climber', e: '🧗', d: 'Day after day, you kept showing up.' }
+    : weekend > 0.4 ? { t: 'Weekend Warrior', e: '⚔️', d: 'Saturdays and Sundays are your training ground.' }
+    : { t: 'Rising Scholar', e: '🌱', d: 'Every session planted something. Keep growing.' };
+  return { mins, n: ss.length, top, best, hours, peak, peakPart, bestPart, longest, active, totalDays, bosses, garden, gItems, persona };
+}
+const W = { i: 0, slides: [], timer: 0, p: null, d: null };
+const fmtHr = h => new Date(2000, 0, 1, h).toLocaleTimeString([], { hour: 'numeric' });
+function openWrapped(i) {
+  const p = wrappedPeriods()[i];
+  if (!p) return;
+  const d = wrappedData(p), maxTop = d.top.length ? d.top[0][1] : 1, maxH = Math.max(...d.hours, 1);
+  const ix = n => `class="wr-in" style="--i:${n}"`;
+  W.p = p; W.d = d;
+  W.slides = [
+    `<div ${ix(0)} class="wr-in wr-k">${p.kind === 'year' ? 'Year' : 'Month'} in focus</div><div ${ix(1)} class="wr-in wr-h">Your ${esc(p.label)}<br>Wrapped ✨</div><div ${ix(2)} class="wr-in wr-p">Tap to see how it went.</div>`,
+    `<div class="wr-in wr-k" style="--i:0">You focused for</div><div class="wr-in wr-big" style="--i:1">${(d.mins / 60).toFixed(1)}<small>hours</small></div><div class="wr-in wr-p" style="--i:2">across <b>${d.n}</b> session${d.n === 1 ? '' : 's'} on <b>${d.active}</b> day${d.active === 1 ? '' : 's'}.</div>`,
+    `<div class="wr-in wr-k" style="--i:0">Your top subjects</div><div class="wr-in wr-bars2" style="--i:1">${d.top.map(([n, m]) => `<div class="r"><span>${esc(n)}</span><span>${fmtMin(m)}</span><i style="transform:scaleX(${(m / maxTop).toFixed(3)})"></i></div>`).join('')}</div>`,
+    `<div class="wr-in wr-k" style="--i:0">Best day</div><div class="wr-in wr-h" style="--i:1">${d.best ? parseDay(d.best[0]).toLocaleDateString([], { weekday: 'long', day: 'numeric', month: 'long' }) : '—'}</div><div class="wr-in wr-p" style="--i:2">${d.best ? fmtMin(d.best[1]) + ' of focus in one day.' : ''}</div>
+     <div class="wr-in wr-k" style="--i:3;margin-top:22px">Longest streak</div><div class="wr-in wr-big" style="--i:4">${d.longest}<small>day${d.longest === 1 ? '' : 's'} in a row</small></div>`,
+    `<div class="wr-in wr-k" style="--i:0">Most productive time</div><div class="wr-in wr-h" style="--i:1">The ${d.bestPart} · around ${fmtHr(d.peakPart)}</div><div class="wr-in wr-hours" style="--i:2">${d.hours.map(m => `<i style="height:${Math.max(2, m / maxH * 100).toFixed(1)}%"></i>`).join('')}</div><div class="wr-in wr-p" style="--i:3;display:flex;justify-content:space-between;font-size:12px"><span>12 AM</span><span>12 PM</span><span>11 PM</span></div>`,
+    `<div class="wr-in wr-k" style="--i:0">Bosses & garden</div><div class="wr-in wr-h" style="--i:1">${d.bosses.length ? `${d.bosses.length} boss${d.bosses.length === 1 ? '' : 'es'} defeated ⚔️` : 'The bosses got away this time'}</div>
+     <div class="wr-in wr-p" style="--i:2">Your garden grew <b>${d.garden.grown}</b> plant${d.garden.grown === 1 ? '' : 's'}${d.garden.golden ? `, including <b>${d.garden.golden}</b> golden tomato plant${d.garden.golden === 1 ? '' : 's'}` : ''}${d.garden.wilted ? ` (${d.garden.wilted} wilted)` : ''}.</div>
+     <div class="wr-in wr-garden" style="--i:3">${d.gItems.slice(-40).map(it => plantSVG(plantKind(it))).join('')}</div>`,
+    `<div class="wr-in wr-k" style="--i:0">Your focus personality</div><div class="wr-in wr-emoji" style="--i:1">${d.persona.e}</div><div class="wr-in wr-h" style="--i:2">${d.persona.t}</div><div class="wr-in wr-p" style="--i:3">${d.persona.d}</div>`,
+    `<div class="wr-in wr-k" style="--i:0">${esc(p.label)} · Wrapped</div><div class="wr-in wr-h" style="--i:1">${d.persona.e} ${d.persona.t}</div>
+     <div class="wr-in wr-sum" style="--i:2"><div><b>${(d.mins / 60).toFixed(1)}h</b><span>focused</span></div><div><b>${d.n}</b><span>sessions</span></div><div><b>${d.longest}</b><span>day streak</span></div><div><b>${d.garden.grown}</b><span>plants grown</span></div>
+     <div style="grid-column:1/-1"><b style="font-size:17px">${d.top[0] ? esc(d.top[0][0]) : '—'}</b><span>top subject</span></div></div>
+     <button class="wr-in wr-share" style="--i:3" id="wrShare">Share</button>`,
+  ];
+  const story = $('#wrapped .wr-story');
+  const cs = getComputedStyle(document.documentElement);
+  story.style.setProperty('--wr-a', cs.getPropertyValue('--accent').trim() || '#2f8f83');
+  $('#wrapped .wr-bars').innerHTML = W.slides.map(() => '<i><b></b></i>').join('');
+  $('#wrapped').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+  wrShow(0);
+}
+function wrShow(i) {
+  clearTimeout(W.timer);
+  if (i < 0) i = 0;
+  if (i >= W.slides.length) { closeWrapped(); return; }
+  W.i = i;
+  $('#wrapped .wr-slide').innerHTML = W.slides[i];
+  $$('#wrapped .wr-bars i').forEach((b, k) => { b.className = k < i ? 'done' : k === i ? 'cur' : ''; });
+  const last = i === W.slides.length - 1;
+  const bar = $$('#wrapped .wr-bars i')[i];
+  if (last) { bar.className = 'done'; return; }      // the summary card stays until closed
+  W.timer = setTimeout(() => wrShow(W.i + 1), 7000);
+}
+function closeWrapped() { clearTimeout(W.timer); $('#wrapped').classList.add('hidden'); document.body.style.overflow = ''; }
+$('#wrapped').addEventListener('click', e => {
+  if (e.target.closest('.wr-close')) { closeWrapped(); return; }
+  if (e.target.closest('#wrShare')) { shareWrapped(); return; }
+  if (e.target === $('#wrapped')) { closeWrapped(); return; }
+  if (e.target.closest('.wr-nav.prev')) wrShow(W.i - 1);
+  else if (e.target.closest('.wr-nav.next')) wrShow(W.i + 1);
+});
+document.addEventListener('keydown', e => {
+  if ($('#wrapped').classList.contains('hidden')) return;
+  if (e.key === 'Escape') closeWrapped();
+  else if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); wrShow(W.i + 1); }
+  else if (e.key === 'ArrowLeft') wrShow(W.i - 1);
+}, true);
+// hold to pause, like stories
+$('#wrapped').addEventListener('pointerdown', e => { if (e.target.closest('.wr-nav')) { W.hold = setTimeout(() => { $('#wrapped .wr-story').classList.add('paused'); clearTimeout(W.timer); W.paused = true; }, 250); } });
+$('#wrapped').addEventListener('pointerup', e => {
+  clearTimeout(W.hold);
+  if (W.paused) { W.paused = false; $('#wrapped .wr-story').classList.remove('paused'); e.stopPropagation(); W.skipClick = true; W.timer = setTimeout(() => wrShow(W.i + 1), 3500); }
+}, true);
+$('#wrapped').addEventListener('click', e => { if (W.skipClick) { W.skipClick = false; e.stopImmediatePropagation(); } }, true);
+$('#wrappedSlot').addEventListener('click', e => { const b = e.target.closest('[data-wrapped]'); if (b) openWrapped(+b.dataset.wrapped); });
+/** A share image (canvas → PNG) with the app link at the bottom. */
+function wrappedImage() {
+  const { p, d } = W, c = document.createElement('canvas'), w = 1080, h = 1350;
+  c.width = w; c.height = h;
+  const x = c.getContext('2d');
+  const acc = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#2f8f83';
+  x.fillStyle = '#10121a'; x.fillRect(0, 0, w, h);
+  let g = x.createRadialGradient(150, 80, 0, 150, 80, 900); g.addColorStop(0, acc); g.addColorStop(1, 'rgba(16,18,26,0)');
+  x.fillStyle = g; x.fillRect(0, 0, w, h);
+  g = x.createRadialGradient(w, h, 0, w, h, 800); g.addColorStop(0, '#8a6fd1'); g.addColorStop(1, 'rgba(16,18,26,0)');
+  x.fillStyle = g; x.fillRect(0, 0, w, h);
+  const font = (wt, sz) => `${wt} ${sz}px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`;
+  x.fillStyle = '#fff'; x.textBaseline = 'alphabetic';
+  x.font = font(600, 34); x.globalAlpha = .8; x.fillText(`POMODOROLIST · ${p.label.toUpperCase()} WRAPPED`, 80, 140); x.globalAlpha = 1;
+  x.font = font(800, 76); x.fillText(`${d.persona.e} ${d.persona.t}`, 80, 260, w - 160);
+  x.font = font(400, 34); x.globalAlpha = .85; x.fillText(d.persona.d, 80, 320, w - 160); x.globalAlpha = 1;
+  const tile = (tx, ty, big, small) => {
+    x.fillStyle = 'rgba(255,255,255,.1)'; x.strokeStyle = 'rgba(255,255,255,.22)'; x.lineWidth = 2;
+    x.beginPath(); x.roundRect(tx, ty, 440, 200, 28); x.fill(); x.stroke();
+    x.fillStyle = '#fff'; x.font = font(800, 72); x.fillText(big, tx + 36, ty + 110, 370);
+    x.font = font(500, 30); x.globalAlpha = .75; x.fillText(small, tx + 36, ty + 160); x.globalAlpha = 1;
+  };
+  tile(80, 400, (d.mins / 60).toFixed(1) + 'h', 'focused'); tile(560, 400, String(d.n), 'sessions');
+  tile(80, 640, String(d.longest), 'day streak'); tile(560, 640, String(d.garden.grown), 'plants grown');
+  x.fillStyle = '#fff'; x.font = font(500, 32); x.globalAlpha = .75; x.fillText('Top subjects', 80, 930); x.globalAlpha = 1;
+  d.top.slice(0, 3).forEach(([n, m], i) => { x.font = font(700, 40); x.fillText(`${i + 1}. ${n}`, 80, 990 + i * 60, 700); x.font = font(500, 34); x.textAlign = 'right'; x.fillText(fmtMin(m), w - 80, 990 + i * 60); x.textAlign = 'left'; });
+  x.fillStyle = 'rgba(255,255,255,.18)'; x.fillRect(80, h - 150, w - 160, 2);
+  x.fillStyle = '#fff'; x.font = font(600, 32); x.fillText('Focus with me on Pomodorolist', 80, h - 92);
+  x.font = font(500, 28); x.globalAlpha = .75; x.fillText(location.origin + location.pathname.replace(/index\.html$/, ''), 80, h - 50, w - 160); x.globalAlpha = 1;
+  return c;
+}
+async function shareWrapped() {
+  const c = wrappedImage();
+  const blob = await new Promise(r => c.toBlob(r, 'image/png'));
+  const file = new File([blob], `pomodorolist-wrapped-${W.p.label.replace(/\s+/g, '-').toLowerCase()}.png`, { type: 'image/png' });
+  try {
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: 'My Pomodorolist Wrapped', text: location.origin + location.pathname }); return; }
+  } catch (e) { if (e.name === 'AbortError') return; }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = file.name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+  toast('Wrapped image downloaded', 2400, true);
+}
+
+/* ==========================================================================
+   KEYBOARD SHORTCUTS (desktop). Off while typing, and switchable in Settings.
+   ========================================================================== */
+const TAB_KEYS = ['timer', 'reminders', 'quests', 'stats', 'board', 'shop', 'friends', 'profile'];
+document.addEventListener('keydown', e => {
+  if (!USER || e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
+  if (e.target.closest('input, select, textarea, [contenteditable="true"]')) return;
+  if (document.querySelector('dialog[open]') || !$('#tour').classList.contains('hidden') || !$('#wrapped').classList.contains('hidden')) return;
+  if (e.code === 'Space') {   // Space has always started/paused the timer
+    if (e.target.closest('button') || S.ui.tab !== 'timer') return;
+    e.preventDefault(); $('#mainBtn').click(); return;
+  }
+  if (S.settings.shortcuts === false) return;
+  const k = e.key.toLowerCase();
+  if (e.key === '?') { e.preventDefault(); $('#keysDlg').showModal(); return; }
+  if (/^[1-8]$/.test(k)) {
+    const tab = TAB_KEYS[+k - 1], btn = $(`#tabs [data-tab="${tab}"]`);
+    if (btn && !btn.classList.contains('hidden')) { e.preventDefault(); showTab(tab); }
+    return;
+  }
+  if (k === 'n') { e.preventDefault(); showTab('timer'); setTimeout(() => $('#nameInput').focus(), 30); return; }
+  if (S.ui.tab !== 'timer') return;
+  if (k === 'r') { e.preventDefault(); $('#resetBtn').click(); }
+  else if (k === 's') { e.preventDefault(); $('#skipBtn').click(); }
+  else if (k === 'p') { e.preventDefault(); openPark(); }
+});
+$('#keysClose').addEventListener('click', () => $('#keysDlg').close());
 
 /* ---------- First-time welcome tour (once per device) ---------- */
 const TOUR_KEY = 'pomodorolist-tour-done';
@@ -5745,10 +6954,10 @@ function tourSteps() {
   const steps = [
     { sel: '#tabs [data-tab="timer"]', text: 'Start a focus session here — pick a preset, name it, hit Start. Tap Pomeo to say hi!' },
     { sel: '#tabs [data-tab="reminders"]', text: 'Plan study blocks — Pomeo pops up when it’s time.' },
-    { sel: '#tabs [data-tab="stats"]', text: 'See your stats, streaks and focus history.' },
-    on && { sel: '#tabs [data-tab="board"]', text: 'Compete with friends on daily, weekly and all-time leaderboards.' },
-    on && { sel: '#tabs [data-tab="shop"]', text: 'Spend the coins you earn on themes, sounds and streak freezes.' },
-    { sel: '#tabs [data-tab="friends"]', text: on ? 'Add friends, send kudos and join challenges. Your profile and settings live behind your level badge.' : 'Add friends, send kudos and join challenges.' },
+    on && { sel: '#tabs [data-tab="quests"]', text: 'A new boss every week — every focus minute is a hit. Team up with friends!' },
+    { sel: '#tabs [data-tab="stats"]', text: 'Stats, your Tomato Garden and monthly Wrapped.' },
+    on && { sel: '#tabs [data-tab="shop"], #coinPill', text: 'Spend the coins you earn on themes, sounds and outfits for Pomeo.' },
+    { sel: '#tabs [data-tab="friends"]', text: on ? 'Add friends and climb the leaderboards. Your profile and settings live behind your level badge.' : 'Add friends, send kudos and join challenges.' },
     !on && { sel: '#tabs [data-tab="profile"], #avatarBtn', text: 'Your profile and settings are here.' },
   ].filter(Boolean);
   return steps.map(st => ({ ...st, el: () => visible(st.sel) })).filter(st => st.el());
@@ -5783,7 +6992,7 @@ function placeTour() {
   const y = r.top + r.height / 2 < vh / 2 ? r.bottom + pad + 14 : r.top - pad - 14 - th;
   tip.style.transform = `translate(${x}px, ${Math.max(12, y)}px)`;
 }
-function endTour() { setTourDone(); $('#tour').classList.add('hidden'); }
+function endTour() { setTourDone(); $('#tour').classList.add('hidden'); setTimeout(maybeShowLogin, 400); }
 $('#tourNext').addEventListener('click', () => { if (++TOUR.i >= TOUR.steps.length) endTour(); else placeTour(); });
 $('#tourSkip').addEventListener('click', endTour);
 $('#tour').addEventListener('keydown', e => { if (e.key === 'Escape') endTour(); });
@@ -5800,6 +7009,9 @@ function renderAll() {
   renderGreeting();
   renderPomeo();
   renderTip();
+  renderExamCard();
+  updateLoginDot();
+  if (S.ui.tab === 'quests') renderQuests();
   if (S.ui.tab === 'stats') renderStats();
   if (S.ui.tab === 'reminders') renderReminders();
   if (S.ui.tab === 'profile') renderProfile();
@@ -5871,12 +7083,6 @@ $('#presetSelect').addEventListener('change', e => {
   renderTimer();
 });
 
-// Space bar = start / pause (ignored while typing)
-document.addEventListener('keydown', e => {
-  if (!USER || e.code !== 'Space' || e.target.closest('input, select, textarea, button, dialog') || S.ui.tab !== 'timer') return;
-  e.preventDefault();
-  $('#mainBtn').click();
-});
 
 // Chips: tap to load, star to pin
 $('#chips').addEventListener('click', e => {
@@ -5952,6 +7158,14 @@ $('#setGlass').addEventListener('change', e => { writeLS(GLASS_KEY, e.target.val
 $('#setPomeo').addEventListener('change', e => { S.settings.pomeo = e.target.checked; save(); renderPomeo(); if (!e.target.checked) hideBubble(); });
 $('#setPomeoTalk').addEventListener('change', e => { S.settings.pomeoTalk = e.target.value; save(); });
 $('#setWater').addEventListener('change', e => { S.settings.waterNudge = e.target.checked; save(); });
+$('#setKeys').addEventListener('change', e => { S.settings.shortcuts = e.target.checked; save(); });
+$('#examsBtn').addEventListener('click', openExams);
+$('#setRevInt').addEventListener('change', e => {
+  const v = e.target.value.split(/[^0-9]+/).filter(Boolean).map(Number).filter(n => n >= 1 && n <= 365).slice(0, 8);
+  const ok = v.length && v.every((n, i) => !i || n > v[i - 1]);
+  if (!ok) { toast('Use increasing days, e.g. 1, 3, 7, 21, 45'); e.target.value = revIntervals().join(', '); return; }
+  S.settings.revIntervals = v; save(); e.target.value = v.join(', '); toast('Revision intervals saved', 1800, true);
+});
 $('#setTip').addEventListener('change', e => { S.settings.dailyTip = e.target.checked; save(); renderTip(); });
 $('#setMotion').addEventListener('change', e => {
   localStorage.setItem(MOTION_KEY, e.target.value);   // device preference, not synced
@@ -6007,6 +7221,7 @@ $('#lvChip').addEventListener('click', () => showTab('profile'));
 $('#avatarBtn').addEventListener('click', () => showTab('profile'));
 $('#coinPill').addEventListener('click', () => showTab('shop'));
 $('#tab-profile').addEventListener('click', e => {
+  if (e.target.closest('[data-claimlogin]')) { openLoginDlg(); return; }
   if (e.target.closest('#openSettings, #openSettings2')) showTab('settings');
   if (e.target.closest('#pomeoOutfit')) { S.ui.shopCat = 'pomeo'; showTab('shop'); }
   if (e.target.closest('#pomeoShow')) { S.settings.pomeo = true; save(); renderPomeo(); renderProfile(); }
