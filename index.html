@@ -16,7 +16,7 @@
   --bg: #f6f6f3;
   --surface: #ffffff;
   --text: #1f2322;
-  --muted: #6c7471;
+  --muted: #626a67;
   --line: #e5e5df;
   --accent: #2f8f83;
   --accent-soft: rgba(47, 143, 131, .12);
@@ -82,7 +82,7 @@ h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacin
 .coinpill .coin { width: 16px; height: 16px; }
 .coinpill:hover, .lvchip:hover { border-color: var(--muted); }
 /* Tablets: compact top bar with the label under each icon */
-@media (min-width: 641px) and (max-width: 1300px) {
+@media (min-width: 641px) and (max-width: 1380px) {
   .sync b { display: none; }
   .tabs { border-radius: 18px; }
   .tabs button { flex-direction: column; gap: 2px; padding: 5px 11px; font-size: 11px; border-radius: 14px; }
@@ -417,7 +417,7 @@ input[type="range"] { accent-color: var(--accent); width: 160px; }
    FRIENDS + LEADERBOARDS
    ========================================================================== */
 .tbadge { position: absolute; top: 4px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--danger); box-shadow: 0 0 0 2px var(--surface); }
-@media (max-width: 1300px) { .tbadge { right: calc(50% - 16px); top: 3px; } }
+@media (max-width: 1380px) { .tbadge { right: calc(50% - 16px); top: 3px; } }
 :root[data-motion="full"] .tbadge:not(.hidden) { animation: dotPop .4s var(--spring) both; }
 @keyframes dotPop { from { transform: scale(0); } }
 .prof-acct { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
@@ -1353,7 +1353,7 @@ kbd { display: inline-block; min-width: 26px; padding: 3px 7px; border-radius: 7
 .tabs button.active::before { opacity: .45; }
 :root[data-motion="full"] .tabs button.active::before { animation: tabBreath 3.4s ease-in-out infinite; }
 @keyframes tabBreath { 0%, 100% { opacity: .25; transform: scale(.85); } 50% { opacity: .7; transform: scale(1.12); } }
-@media (max-width: 1300px) { .tabs button::before { left: 50%; top: 0; margin: 0 0 0 -15px; width: 30px; height: 30px; } }
+@media (max-width: 1380px) { .tabs button::before { left: 50%; top: 0; margin: 0 0 0 -15px; width: 30px; height: 30px; } }
 @media (max-width: 640px) { .tabs button::before { top: 0; } }
 /* Small sparkle for small wins (much smaller than the big celebrations) */
 .mini-spark { position: fixed; z-index: 95; width: 5px; height: 5px; margin: -2.5px 0 0 -2.5px; border-radius: 50%; pointer-events: none; animation: miniSpark .6s var(--ease) forwards; }
@@ -1361,11 +1361,186 @@ kbd { display: inline-block; min-width: 26px; padding: 3px 7px; border-radius: 7
 /* Settings: pack preview row */
 .uis-row { display: flex; gap: 6px; align-items: center; }
 
+/* ==========================================================================
+   DESIGN TOKENS + CONSISTENCY (v1.7)
+   One spacing scale, radii, shadows, type sizes and icon size for every screen.
+   ========================================================================== */
+:root {
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 20px; --sp-6: 24px;
+  --r-sm: 10px; --r-md: 14px; --r-lg: 16px; --r-pill: 999px;
+  --sh-1: 0 1px 2px rgba(0, 0, 0, .04), 0 6px 16px -10px rgba(0, 0, 0, .22);
+  --sh-2: 0 20px 44px -18px rgba(0, 0, 0, .45);
+  --fs-xs: 12px; --fs-sm: 13px; --fs-md: 15px; --fs-lg: 17px; --fs-xl: 22px;
+  --icon: 18px; --card-pad: 18px;
+}
+@media (max-width: 640px) { :root { --card-pad: 16px; } }
+.card { padding: var(--card-pad); border-radius: var(--r-lg); }
+.stack, .grid-2 { gap: var(--sp-4); }
+.iconbtn svg, .linkbtn svg { width: var(--icon); height: var(--icon); }
+.iconbtn.sm svg { width: 15px; height: 15px; }
+.desc, .lbl, .field { font-size: var(--fs-xs); line-height: 1.45; }
+.desc { margin-top: 2px; }
+h1 { font-size: var(--fs-xl); font-weight: 650; letter-spacing: -.01em; }
+.setting { min-height: 56px; }
+.setting > :first-child { min-width: 0; }
+.setting > :last-child:not(:first-child) { flex: none; }
+/* readable minimum sizes */
+.trophy .tw, .plist .when, .bed .bl, .garden-legend, .trophy .tn { font-size: var(--fs-xs); }
+.trophy .tm, .item .pv .tag, .track7 .d, .aura-tiers .at, .sub-check li .k, .tour-step, .ac-k, .boss-kicker, .pomeo-pop .pp-kicker { font-size: 11px; }
+.chart .axis, .chart .axis-b { font-size: 11.5px; }
+@media (max-width: 640px) { .tabs button { font-size: 11px; } }
+@media (max-width: 400px) { .tabs button { font-size: 10.5px; } }
+
+/* ---------- Empty states: line illustration · one sentence · one action ---------- */
+.empty:not(.card) { text-align: center; padding: var(--sp-4) var(--sp-2); color: var(--muted); font-size: var(--fs-sm); }
+.empty:not(.card)::before {
+  content: ""; display: block; width: 38px; height: 38px; margin: 0 auto var(--sp-2); background: currentColor; opacity: .55;
+  -webkit-mask: var(--empty-ic) center / contain no-repeat; mask: var(--empty-ic) center / contain no-repeat;
+}
+.empty { --empty-ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='20' cy='22' r='12'/%3E%3Cpath d='M20 10V6M16 6h8M20 22l5-4'/%3E%3C/svg%3E"); }
+.empty.e-inbox { --empty-ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 22l5-12h18l5 12v10H6z'/%3E%3Cpath d='M6 22h9a5 5 0 0 0 10 0h9'/%3E%3C/svg%3E"); }
+.empty.e-list { --empty-ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round'%3E%3Crect x='8' y='7' width='24' height='28' rx='3'/%3E%3Cpath d='M14 15h12M14 21h12M14 27h7'/%3E%3C/svg%3E"); }
+.empty.e-trophy { --empty-ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M13 7h14v9a7 7 0 0 1-14 0zM13 10H8a4 4 0 0 0 5 6M27 10h5a4 4 0 0 1-5 6M20 23v6M14 33h12'/%3E%3C/svg%3E"); }
+.empty.e-people { --empty-ic: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round'%3E%3Ccircle cx='15' cy='14' r='5'/%3E%3Cpath d='M6 32c0-5 4-9 9-9s9 4 9 9'/%3E%3Ccircle cx='28' cy='16' r='4'/%3E%3Cpath d='M26 24c5 0 8 3 8 8'/%3E%3C/svg%3E"); }
+.empty .btn { margin-top: var(--sp-3); }
+.empty-card .empty::before, .rem-empty .empty::before { display: none; }
+
+/* ---------- Header: inbox bell + command search ---------- */
+.hdr-right .iconbtn { position: relative; width: 34px; height: 34px; }
+.hdr-right .iconbtn svg { width: 17px; height: 17px; }
+.hdr-count { position: absolute; top: -4px; right: -5px; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 999px; background: var(--danger); color: #fff; font: 700 10.5px/17px system-ui, sans-serif; text-align: center; box-shadow: 0 0 0 2px var(--bg); }
+:root[data-motion="full"] .hdr-count:not(.hidden) { animation: dotPop .4s var(--spring) both; }
+@media (max-width: 640px) { .hdr-right { gap: 6px; } .hdr-right #cmdBtn { display: inline-grid; } }
+@media (max-width: 380px) { .brand span { display: none; } }
+/* Tablets: keep the header on one line next to the tab bar */
+@media (min-width: 641px) and (max-width: 1000px) { .brand span, .lvchip .lvn { display: none; } .hdr-right { gap: 6px; } }
+@media (min-width: 641px) and (max-width: 760px) { #coinPill { display: none !important; } .top { gap: 8px; } }
+
+/* ---------- Side sheets (inbox) and the command palette ---------- */
+dialog.sheet { margin: 0 0 0 auto; height: 100dvh; max-height: 100dvh; width: min(420px, 100vw); border-radius: 20px 0 0 20px; padding: 0; display: flex; flex-direction: column; border-right: 0; }
+dialog.sheet:not([open]) { display: none; }
+:root[data-motion="full"] dialog.sheet[open] { animation: sheetIn .4s var(--spring-soft) both; }
+:root:not([data-motion="off"]) dialog.sheet.closing { animation: sheetOut .2s var(--ease) both; }
+@keyframes sheetIn { from { transform: translateX(40px); opacity: 0; } }
+@keyframes sheetOut { to { transform: translateX(40px); opacity: 0; } }
+@media (max-width: 640px) {
+  dialog.sheet { margin: auto 0 0; width: 100vw; max-width: 100vw; height: 88dvh; border-radius: 20px 20px 0 0; border-bottom: 0; border-right: 1px solid var(--line); }
+  @keyframes sheetIn { from { transform: translateY(60px); opacity: 0; } }
+  @keyframes sheetOut { to { transform: translateY(60px); opacity: 0; } }
+}
+.sheet-head { display: flex; align-items: center; gap: var(--sp-2); padding: var(--sp-4) var(--sp-4) var(--sp-2); }
+.sheet-head h2 { margin: 0; flex: 1; font-size: var(--fs-lg); text-transform: none; letter-spacing: 0; color: var(--text); }
+.sheet-filters { padding: 0 var(--sp-4) var(--sp-2); }
+.sheet-body { flex: 1; overflow-y: auto; padding: 0 var(--sp-4) calc(var(--sp-4) + env(safe-area-inset-bottom)); overscroll-behavior: contain; }
+.ib-group { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin: var(--sp-4) 0 var(--sp-1); }
+.ib-list { list-style: none; margin: 0; padding: 0; }
+.ib-item { position: relative; display: flex; align-items: flex-start; gap: var(--sp-3); padding: 10px var(--sp-2); border-radius: var(--r-md); cursor: pointer; touch-action: pan-y; transition: background-color .15s, transform .25s var(--spring-soft), opacity .2s; }
+.ib-item:hover { background: var(--accent-soft); }
+.ib-item .ib-ic { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; flex: none; background: var(--heat0); font-size: 16px; }
+.ib-item .ib-main { flex: 1; min-width: 0; }
+.ib-item .ib-t { font-size: 14px; overflow-wrap: anywhere; }
+.ib-item.unread .ib-t { font-weight: 600; }
+.ib-item .ib-s { font-size: var(--fs-xs); color: var(--muted); margin-top: 1px; }
+.ib-item .ib-x { border: 0; background: none; color: var(--muted); cursor: pointer; font-size: 15px; padding: 2px 6px; border-radius: 8px; opacity: .55; }
+.ib-item:hover .ib-x, .ib-item .ib-x:focus-visible { opacity: 1; }
+.ib-item .ib-dot { position: absolute; left: 0; top: 50%; width: 6px; height: 6px; margin-top: -3px; border-radius: 50%; background: var(--accent); }
+.ib-item:not(.unread) .ib-dot { display: none; }
+.cmd { margin: 12vh auto auto; width: min(560px, calc(100vw - 24px)); padding: 0; overflow: hidden; }
+.cmd-in { display: flex; align-items: center; gap: var(--sp-2); padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--line); }
+.cmd-in svg { width: 18px; height: 18px; color: var(--muted); flex: none; }
+.cmd-in input { border: 0; background: none; padding: 6px 0; font-size: 16px; outline: none; }
+.cmd-in input:focus { outline: none; border: 0; }
+.cmd-in kbd { flex: none; }
+.cmd-list { list-style: none; margin: 0; padding: var(--sp-2); max-height: min(420px, 60vh); overflow-y: auto; }
+.cmd-list li { display: flex; align-items: center; gap: var(--sp-3); padding: 9px var(--sp-3); border-radius: var(--r-sm); cursor: pointer; font-size: 14px; }
+.cmd-list li .g { margin-left: auto; font-size: var(--fs-xs); color: var(--muted); white-space: nowrap; }
+.cmd-list li .ci { width: 22px; text-align: center; flex: none; opacity: .85; }
+.cmd-list li.sel { background: var(--accent-soft); color: var(--text); }
+.cmd-list li mark { background: none; color: var(--accent); font-weight: 700; }
+.cmd-list .none { color: var(--muted); padding: 14px; cursor: default; }
+.cmd-foot { display: flex; gap: var(--sp-3); padding: var(--sp-2) var(--sp-4); border-top: 1px solid var(--line); font-size: var(--fs-xs); color: var(--muted); }
+@media (max-width: 640px) { .cmd { margin-top: 8vh; } .cmd-foot { display: none; } }
+
+/* ---------- Undo toast ---------- */
+.toast-item.has-undo { pointer-events: auto; padding-right: 8px; }
+.toast-item .undo { border: 0; background: color-mix(in srgb, var(--bg) 22%, transparent); color: inherit; font: inherit; font-weight: 700; border-radius: 999px; padding: 4px 12px; margin-left: 6px; cursor: pointer; }
+.toast-item .undo:hover { background: color-mix(in srgb, var(--bg) 35%, transparent); }
+
+/* ---------- Offline banner, pull to refresh ---------- */
+.net-banner { position: fixed; left: 50%; top: calc(76px + env(safe-area-inset-top)); z-index: 70; transform: translate(-50%, -16px); opacity: 0; pointer-events: none;
+  display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 999px; font-size: var(--fs-sm); background: var(--text); color: var(--bg); box-shadow: var(--sh-2); transition: transform .4s var(--spring-soft), opacity .25s var(--ease); max-width: calc(100vw - 32px); }
+.net-banner.show { transform: translate(-50%, 0); opacity: 1; }
+.net-banner.ok { background: var(--accent); color: var(--on-accent, #fff); }
+.net-banner i { width: 8px; height: 8px; border-radius: 50%; background: var(--warn); flex: none; }
+.net-banner.ok i { background: currentColor; }
+@media (max-width: 640px) { .net-banner { top: calc(64px + env(safe-area-inset-top)); } }
+.ptr { position: fixed; left: 50%; top: calc(64px + env(safe-area-inset-top)); z-index: 60; width: 36px; height: 36px; margin-left: -18px; border-radius: 50%; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--sh-1); display: grid; place-items: center; color: var(--accent); opacity: 0; pointer-events: none; transform: translateY(-40px); }
+.ptr svg { width: 18px; height: 18px; }
+.ptr.ready svg { color: var(--accent); }
+.ptr.spin svg { animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+html, body { overscroll-behavior-y: contain; }
+:root[data-motion="full"] .tab.active.from-r { animation: fromR .32s var(--ease) both; }
+:root[data-motion="full"] .tab.active.from-l { animation: fromL .32s var(--ease) both; }
+@keyframes fromR { from { opacity: 0; transform: translateX(28px); } }
+@keyframes fromL { from { opacity: 0; transform: translateX(-28px); } }
+
+/* ---------- Settings: sections, search, About, footer ---------- */
+.set-wrap { max-width: 740px; margin: 0 auto; display: grid; gap: var(--sp-4); }
+.set-wrap > .back { justify-self: start; margin-bottom: -6px; }
+.set-search { position: sticky; top: calc(70px + env(safe-area-inset-top)); z-index: 5; display: flex; align-items: center; gap: var(--sp-2); padding: 4px 6px 4px 14px; border-radius: var(--r-pill); background: var(--surface); border: 1px solid var(--line); box-shadow: var(--sh-1); }
+.set-search svg { width: 17px; height: 17px; color: var(--muted); flex: none; }
+.set-search input { border: 0; background: none; padding: 9px 4px; }
+.set-search input:focus { outline: none; }
+.set-search:focus-within { border-color: var(--accent); }
+@media (max-width: 640px) { .set-search { top: calc(62px + env(safe-area-inset-top)); } }
+@media (min-width: 641px) and (max-width: 1380px) { .set-search { top: calc(84px + env(safe-area-inset-top)); } }
+.set-none { text-align: center; color: var(--muted); margin: var(--sp-4) 0; }
+.set-sec .setting:first-of-type, .set-sec h2 + .setting, .set-sec h2 + div > .setting:first-child, .set-sec h2 + .hidden + div > .setting:first-child { border-top: 0; padding-top: 4px; }
+.setting.hit { animation: hit 1.6s var(--ease); border-radius: var(--r-sm); }
+@keyframes hit { 0%, 40% { background: var(--accent-soft); } }
+.setting .btn-row { gap: 6px; flex-wrap: nowrap; }
+a.btn { color: var(--text); text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+.app-foot { text-align: center; font-size: var(--fs-xs); color: var(--muted); padding: var(--sp-2) 0 var(--sp-4); }
+.app-foot a { color: inherit; text-decoration: underline; text-decoration-color: color-mix(in srgb, currentColor 40%, transparent); text-underline-offset: 2px; }
+.app-foot a:hover { color: var(--accent); }
+.about-hero { display: flex; align-items: center; gap: var(--sp-5); flex-wrap: wrap; }
+.about-hero h1 { margin: 0 0 2px; }
+.about-hero p { margin: 0 0 8px; }
+.about-logo { width: 96px; height: 96px; border-radius: 24px; display: grid; place-items: center; background: var(--accent-soft); flex: none; }
+.about-logo .mascot { position: static; width: 76px; height: 76px; }
+.ver-pill { display: inline-block; font-size: var(--fs-xs); font-weight: 600; padding: 3px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+.changelog { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--sp-3); }
+.changelog li { display: grid; grid-template-columns: 58px 1fr; gap: var(--sp-2) var(--sp-3); }
+.changelog .v { font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
+.changelog .t { font-weight: 600; }
+.changelog .d { grid-column: 2; font-size: var(--fs-sm); color: var(--muted); margin-top: -6px; }
+.about-list { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 14px; }
+.about-list a, .changelog a { color: var(--accent); }
+/* "What's new" card on the Timer screen */
+.news-card { display: flex; gap: var(--sp-4); align-items: flex-start; margin-bottom: var(--sp-4); background: radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 60%), var(--surface); }
+.news-card .nc-main { flex: 1; min-width: 0; }
+.news-card h3 { margin: 0 0 6px; font-size: var(--fs-md); }
+.news-card ul { margin: 0 0 10px; padding-left: 18px; font-size: var(--fs-sm); display: grid; gap: 3px; }
+.news-card .nc-x { border: 0; background: none; color: var(--muted); font-size: 18px; cursor: pointer; padding: 0 4px; line-height: 1; }
+
+/* ---------- Splash ---------- */
+.splash { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; background: var(--bg); transition: opacity .28s var(--ease); }
+.splash.out { opacity: 0; pointer-events: none; }
+.splash-in { display: grid; justify-items: center; gap: 10px; }
+.splash-in svg { width: 72px; height: 72px; }
+.splash-in b { font-size: 20px; letter-spacing: .01em; }
+:root[data-motion="full"] .splash-in svg { animation: splashBob 1.6s ease-in-out infinite; }
+@keyframes splashBob { 50% { transform: translateY(-4px); } }
+
 .tabs .ls { display: none; }
 @media (max-width: 400px) { .tabs .lf { display: none; } .tabs .ls { display: inline; } .tabs button { font-size: 10px; } }
 </style>
 </head>
 <body>
+<div class="splash" id="splash" aria-hidden="true"><div class="splash-in">
+  <svg viewBox="-4 -8 48 48"><ellipse cx="20" cy="24" rx="13.5" ry="12.5" fill="#e5654f"/><ellipse cx="14.5" cy="19" rx="3.4" ry="2" fill="#fff" opacity=".25" transform="rotate(-28 14.5 19)"/><path d="M20 12.6 16.2 10.4l1.2 3.1-3.6.9 3.8.9 2.4-.6 2.4.6 3.8-.9-3.6-.9 1.2-3.1Z" fill="#5c9b57"/><path d="M20 12.8V8.8" stroke="#4e8a4a" stroke-width="1.6" stroke-linecap="round"/><path d="M14.2 24.8q1.6-2.3 3.2 0M22.6 24.8q1.6-2.3 3.2 0" stroke="#3a1d18" stroke-width="1.5" stroke-linecap="round" fill="none"/><path d="M18.4 28.3q1.6 1.3 3.2 0" stroke="#3a1d18" stroke-width="1.3" stroke-linecap="round" fill="none"/><circle cx="13.2" cy="27.2" r="1.9" fill="#ff9d8c" opacity=".6"/><circle cx="26.8" cy="27.2" r="1.9" fill="#ff9d8c" opacity=".6"/></svg>
+  <b>Pomodorolist</b></div></div>
 
 <!-- ================================ BOOT (while Firebase loads) ================================ -->
 <div class="boot" id="bootView"><div class="boot-in"><span class="boot-dot"></span><span>Loading…</span></div></div>
@@ -1427,6 +1602,8 @@ kbd { display: inline-block; min-width: 26px; padding: 3px 7px; border-radius: 7
     <button data-tab="profile" id="profileTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.66V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.66"/></svg><span>Profile</span><i class="tbadge hidden" id="profileDot" aria-label="Daily reward ready"></i></button>
   </nav>
   <div class="hdr-right">
+    <button class="iconbtn" id="cmdBtn" aria-label="Search and commands (Ctrl+K)" title="Search &amp; commands (Ctrl/⌘ K)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+    <button class="iconbtn" id="inboxBtn" aria-label="Inbox" title="Inbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span class="hdr-count hidden" id="inboxCount" aria-hidden="true"></span></button>
     <button class="coinpill hidden" id="coinPill" aria-label="Your coins — open the shop"></button>
     <button class="lvchip hidden" id="lvChip" aria-label="Your level — open your profile"></button>
     <button class="iconbtn hidden" id="avatarBtn" aria-label="Profile and settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.66V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.66"/></svg></button>
@@ -1437,6 +1614,7 @@ kbd { display: inline-block; min-width: 26px; padding: 3px 7px; border-radius: 7
   <!-- ================================ TIMER TAB ================================ -->
   <section class="tab" id="tab-timer">
     <div class="greet" id="greet" aria-live="polite"></div>
+    <div id="newsSlot"></div>
     <div class="grid-2">
       <div class="stack">
         <div class="card timer-card">
@@ -1617,160 +1795,212 @@ kbd { display: inline-block; min-width: 26px; padding: 3px 7px; border-radius: 7
 
   <!-- ================================ SETTINGS TAB ================================ -->
   <section class="tab" id="tab-settings">
-    <button class="linkbtn back" id="settingsBack">‹ Profile</button>
-    <div class="grid-2">
-      <div class="card">
-        <h2>Preferences</h2>
-        <div class="setting">
+    <div class="set-wrap">
+      <button class="linkbtn back" id="settingsBack">‹ Profile</button>
+      <div class="set-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="search" id="setSearch" placeholder="Search settings" aria-label="Search settings" autocomplete="off">
+      </div>
+      <p class="set-none hidden" id="setNone">No settings match “<span></span>”.</p>
+
+      <div class="card set-sec" id="sec-timer">
+        <h2>Timer</h2>
+        <div class="setting" data-k="goal minutes streak target">
           <div><div>Daily goal</div><div class="desc">Minutes of focus for a day to count toward your streak</div></div>
-          <input type="number" id="setGoal" min="5" max="1440" step="5">
+          <input type="number" id="setGoal" min="5" max="1440" step="5" aria-label="Daily goal in minutes">
         </div>
-        <div class="setting">
-          <div><div>Week starts on</div></div>
-          <select id="setWeek"><option value="1">Monday</option><option value="0">Sunday</option></select>
+        <div class="setting" data-k="week monday sunday calendar">
+          <div><div>Week starts on</div><div class="desc">For weekly stats and the garden</div></div>
+          <select id="setWeek" aria-label="Week starts on"><option value="1">Monday</option><option value="0">Sunday</option></select>
         </div>
-        <div class="setting">
-          <div><div>Sound</div><div class="desc">Gentle chime when a session ends</div></div>
-          <input type="checkbox" id="setSound">
-        </div>
-        <div class="setting">
-          <div><div>Notifications</div><div class="desc" id="notifStatus"></div></div>
-          <input type="checkbox" id="setNotify">
-        </div>
-        <div class="setting">
+        <div class="setting" data-k="auto start break automatic">
           <div><div>Auto-start next phase</div><div class="desc">Begin breaks and focus blocks automatically</div></div>
-          <input type="checkbox" id="setAuto">
+          <input type="checkbox" id="setAuto" aria-label="Auto-start next phase">
         </div>
-        <div class="setting">
-          <div><div>Welcome tour</div><div class="desc">A quick look at each section of the app</div></div>
-          <button class="btn small" id="replayTour">Replay tour</button>
+        <div class="setting" data-k="keyboard shortcuts keys hotkeys">
+          <div><div>Keyboard shortcuts</div><div class="desc">Press <kbd>?</kbd> to see them all, <kbd>Ctrl</kbd>+<kbd>K</kbd> for the command palette</div></div>
+          <input type="checkbox" id="setKeys" aria-label="Keyboard shortcuts">
         </div>
-        <div class="setting">
-          <div><div>Ambient volume</div><div class="desc">For ambient sounds from the shop</div></div>
-          <input type="range" id="setAmbVol" min="0" max="1" step="0.05">
-        </div>
-        <div class="setting">
-          <div><div>Exams</div><div class="desc">Countdown on the Timer screen. You enter the dates.</div></div>
-          <button class="btn small" id="examsBtn">Manage exams</button>
-        </div>
-        <div class="setting">
-          <div><div>Revision intervals</div><div class="desc">Days after a session when a topic comes back</div></div>
-          <input type="text" id="setRevInt" inputmode="numeric" style="max-width:150px" placeholder="1, 3, 7, 21, 45">
-        </div>
-        <div class="setting">
-          <div><div>Keyboard shortcuts</div><div class="desc">Press <kbd>?</kbd> to see them all</div></div>
-          <input type="checkbox" id="setKeys">
-        </div>
-        <div class="setting">
+        <div class="setting" data-k="tip daily study advice">
           <div><div>Tip of the day</div><div class="desc">A short study tip on the Timer screen</div></div>
-          <input type="checkbox" id="setTip">
+          <input type="checkbox" id="setTip" aria-label="Tip of the day">
         </div>
-        <div class="setting">
-          <div><div>Progression</div><div class="desc">XP, levels, coins, achievements and the shop. Turn off for a plain timer (equipped items stay on).</div></div>
-          <input type="checkbox" id="setGame">
+        <div class="setting" data-k="progression xp level coins shop gamification game quests">
+          <div><div>Progression</div><div class="desc">XP, levels, coins, quests and the shop. Turn off for a plain timer (equipped items stay on).</div></div>
+          <input type="checkbox" id="setGame" aria-label="Progression">
         </div>
       </div>
 
-      <div class="stack">
-        <div class="card">
-          <h2>Appearance</h2>
-          <div class="setting">
-            <div><div>Theme</div></div>
-            <select id="setTheme"><option value="auto">System</option><option value="light">Light</option><option value="dark">Dark</option></select>
-          </div>
-          <div class="setting">
-            <div><div>Liquid Glass</div><div class="desc" id="glassDesc">Frosted, translucent cards over soft colour. Lite uses less blur for older phones. Saved on this device.</div></div>
-            <select id="setGlass"><option value="off">Off</option><option value="full">Full</option><option value="lite">Lite</option></select>
-          </div>
-          <div class="setting">
-            <div><div>Animations</div><div class="desc">Full, reduced (simple fades) or off. Saved on this device.</div></div>
-            <select id="setMotion"><option value="full">Full</option><option value="reduced">Reduced</option><option value="off">Off</option></select>
-          </div>
+      <div class="card set-sec" id="sec-sounds">
+        <h2>Sounds</h2>
+        <div class="setting" data-k="sound mute chime timer end volume">
+          <div><div>Sound</div><div class="desc">Timer chime when a session ends. Off mutes every sound.</div></div>
+          <input type="checkbox" id="setSound" aria-label="Sound">
         </div>
-        <div class="card">
-          <h2>Interface sounds</h2>
-          <div class="setting">
-            <div><div>Interface sounds</div><div class="desc">Soft taps, ticks and chimes. Saved on this device.</div></div>
-            <input type="checkbox" id="uisOn">
-          </div>
-          <div class="setting">
-            <div><div>Volume</div><div class="desc">Kept well below the timer sounds</div></div>
-            <input type="range" id="uisVol" min="0" max="1" step="0.05" aria-label="Interface sound volume">
-          </div>
-          <div class="setting" id="uisHoverRow">
-            <div><div>Hover sounds</div><div class="desc">A tiny blip when the mouse moves over buttons</div></div>
-            <input type="checkbox" id="uisHover">
-          </div>
-          <div class="setting">
-            <div><div>Sound pack</div></div>
-            <div class="uis-row"><select id="uisPack"><option value="soft">Soft</option><option value="crisp">Crisp</option><option value="wood">Wood</option><option value="bubbles">Bubbles</option></select>
-              <button class="iconbtn" id="uisTry" title="Play a sample" aria-label="Play a sample"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l10-6.5Z"/></svg></button></div>
-          </div>
-          <div class="setting">
-            <div><div>Quiet during focus</div><div class="desc">Much quieter while a focus block runs. Timer and reminder sounds are unaffected.</div></div>
-            <input type="checkbox" id="uisQuiet">
-          </div>
+        <div class="setting" data-k="ambient volume rain noise">
+          <div><div>Ambient volume</div><div class="desc">For ambient sounds from the shop</div></div>
+          <input type="range" id="setAmbVol" min="0" max="1" step="0.05" aria-label="Ambient volume">
         </div>
-        <div class="card">
-          <h2>Pomeo</h2>
-          <div class="setting">
-            <div><div>Show Pomeo</div><div class="desc">Your tomato buddy on the Timer screen</div></div>
-            <input type="checkbox" id="setPomeo">
-          </div>
-          <div class="setting">
-            <div><div>Pomeo talks</div><div class="desc">Taps and reminders always get an answer</div></div>
-            <select id="setPomeoTalk"><option value="often">Often</option><option value="sometimes">Sometimes</option><option value="quiet">Quiet</option></select>
-          </div>
-          <div class="setting">
-            <div><div>Water &amp; stretch nudges</div><div class="desc">A gentle reminder after about 90 minutes of focus</div></div>
-            <input type="checkbox" id="setWater">
-          </div>
+        <div class="setting" data-k="interface ui sounds clicks taps">
+          <div><div>Interface sounds</div><div class="desc">Soft taps, ticks and chimes. Saved on this device.</div></div>
+          <input type="checkbox" id="uisOn" aria-label="Interface sounds">
         </div>
-        <div class="card">
-          <h2>Account</h2>
-          <div class="row between">
-            <div style="min-width:0">
-              <div class="acct-name" id="acctName"></div>
-              <div class="desc" id="acctDesc"></div>
-            </div>
-            <button class="btn" id="logoutBtn">Log out</button>
-          </div>
+        <div class="setting" data-k="interface volume ui sounds">
+          <div><div>Interface volume</div><div class="desc">Kept well below the timer sounds</div></div>
+          <input type="range" id="uisVol" min="0" max="1" step="0.05" aria-label="Interface sound volume">
         </div>
-        <div class="card hidden" id="privacyCard">
-          <h2>Friends &amp; privacy</h2>
-          <div class="setting">
+        <div class="setting" id="uisHoverRow" data-k="hover sounds mouse">
+          <div><div>Hover sounds</div><div class="desc">A tiny blip when the mouse moves over buttons</div></div>
+          <input type="checkbox" id="uisHover" aria-label="Hover sounds">
+        </div>
+        <div class="setting" data-k="sound pack soft crisp wood bubbles">
+          <div><div>Sound pack</div><div class="desc">How the interface sounds feel</div></div>
+          <div class="uis-row"><select id="uisPack" aria-label="Sound pack"><option value="soft">Soft</option><option value="crisp">Crisp</option><option value="wood">Wood</option><option value="bubbles">Bubbles</option></select>
+            <button class="iconbtn" id="uisTry" title="Play a sample" aria-label="Play a sample"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l10-6.5Z"/></svg></button></div>
+        </div>
+        <div class="setting" data-k="quiet focus mute distraction">
+          <div><div>Quiet during focus</div><div class="desc">Interface sounds much quieter while a focus block runs</div></div>
+          <input type="checkbox" id="uisQuiet" aria-label="Quiet during focus">
+        </div>
+        <div class="setting" data-k="haptics vibration vibrate phone buzz">
+          <div><div>Vibration</div><div class="desc">Light haptics on key actions, on phones that support it. Saved on this device.</div></div>
+          <input type="checkbox" id="setHaptics" aria-label="Vibration">
+        </div>
+      </div>
+
+      <div class="card set-sec" id="sec-appearance">
+        <h2>Appearance</h2>
+        <div class="setting" data-k="theme dark light mode system colour color">
+          <div><div>Theme</div><div class="desc">Light, dark or follow your device</div></div>
+          <select id="setTheme" aria-label="Theme"><option value="auto">System</option><option value="light">Light</option><option value="dark">Dark</option></select>
+        </div>
+        <div class="setting" data-k="liquid glass blur frosted translucent">
+          <div><div>Liquid Glass</div><div class="desc" id="glassDesc">Frosted, translucent cards over soft colour. Lite uses less blur for older phones. Saved on this device.</div></div>
+          <select id="setGlass" aria-label="Liquid Glass"><option value="off">Off</option><option value="full">Full</option><option value="lite">Lite</option></select>
+        </div>
+        <div class="setting" data-k="animations motion reduce effects">
+          <div><div>Animations</div><div class="desc">Full, reduced (simple fades) or off. Saved on this device.</div></div>
+          <select id="setMotion" aria-label="Animations"><option value="full">Full</option><option value="reduced">Reduced</option><option value="off">Off</option></select>
+        </div>
+        <div class="setting" data-k="pomeo mascot tomato show hide">
+          <div><div>Show Pomeo</div><div class="desc">Your tomato buddy on the Timer screen</div></div>
+          <input type="checkbox" id="setPomeo" aria-label="Show Pomeo">
+        </div>
+        <div class="setting" data-k="tour welcome help intro">
+          <div><div>Welcome tour</div><div class="desc">A quick look at each section of the app</div></div>
+          <button class="btn small" id="replayTour">Replay tour</button>
+        </div>
+      </div>
+
+      <div class="card set-sec" id="sec-notify">
+        <h2>Notifications &amp; reminders</h2>
+        <div class="setting" data-k="notifications browser alerts permission">
+          <div><div>Notifications</div><div class="desc" id="notifStatus"></div></div>
+          <input type="checkbox" id="setNotify" aria-label="Notifications">
+        </div>
+        <div class="setting" data-k="pomeo talks speech quiet often">
+          <div><div>Pomeo talks</div><div class="desc">Taps and reminders always get an answer</div></div>
+          <select id="setPomeoTalk" aria-label="Pomeo talks"><option value="often">Often</option><option value="sometimes">Sometimes</option><option value="quiet">Quiet</option></select>
+        </div>
+        <div class="setting" data-k="water stretch nudge break health">
+          <div><div>Water &amp; stretch nudges</div><div class="desc">A gentle reminder after about 90 minutes of focus</div></div>
+          <input type="checkbox" id="setWater" aria-label="Water and stretch nudges">
+        </div>
+        <div class="setting" data-k="exams countdown test date">
+          <div><div>Exams</div><div class="desc">Countdown on the Timer screen. You enter the dates.</div></div>
+          <button class="btn small" id="examsBtn">Manage exams</button>
+        </div>
+        <div class="setting" data-k="revision spaced intervals days repeat">
+          <div><div>Revision intervals</div><div class="desc">Days after a session when a topic comes back</div></div>
+          <input type="text" id="setRevInt" inputmode="numeric" style="max-width:150px" placeholder="1, 3, 7, 21, 45" aria-label="Revision intervals in days">
+        </div>
+      </div>
+
+      <div class="card set-sec" id="sec-friends">
+        <h2>Friends &amp; privacy</h2>
+        <div class="setting hidden" id="privacyGuest" data-k="friends privacy login">
+          <div><div>Friends need an account</div><div class="desc">Log in to add friends, join leaderboards and share your progress. Everything else works on this device.</div></div>
+          <button class="btn small" id="privacyLogin">Log in</button>
+        </div>
+        <div class="hidden" id="privacyCard">
+          <div class="setting" data-k="activity share friends privacy visible">
             <div><div>Show my activity to friends</div><div class="desc">Last 12 weeks, recent sessions and “focusing now”</div></div>
-            <input type="checkbox" id="setShareAct">
+            <input type="checkbox" id="setShareAct" aria-label="Show my activity to friends">
           </div>
-          <div class="setting">
+          <div class="setting" data-k="session names share privacy">
             <div><div>Share session names with friends</div><div class="desc">If off, friends see “Focus session”</div></div>
-            <input type="checkbox" id="setShareNames">
+            <input type="checkbox" id="setShareNames" aria-label="Share session names with friends">
           </div>
-          <div class="setting">
+          <div class="setting" data-k="global leaderboard public ranking">
             <div><div>Appear on global leaderboard</div><div class="desc">Everyone can see your username, badge and focus minutes</div></div>
-            <input type="checkbox" id="setGlobal">
+            <input type="checkbox" id="setGlobal" aria-label="Appear on global leaderboard">
           </div>
-          <div class="setting">
+          <div class="setting" data-k="invite link friend code share">
             <div><div>Invite link</div><div class="desc" id="inviteDesc"></div></div>
             <button class="btn small" id="copyInvite">Share</button>
           </div>
           <div id="blockedList"></div>
         </div>
-        <div class="card">
-          <h2>Backup</h2>
-          <p class="muted" style="margin:0 0 14px;font-size:14px">Download a JSON copy of your data, or import a backup. Imports are merged into your account without creating duplicates.</p>
-          <div class="btn-row">
-            <button class="btn" id="exportBtn">Export JSON</button>
-            <button class="btn" id="importBtn">Import JSON</button>
-            <input type="file" id="importFile" accept="application/json,.json" class="hidden">
-          </div>
-        </div>
-        <div class="card">
-          <h2>Danger zone</h2>
-          <button class="btn danger" id="wipeBtn">Erase all data</button>
-        </div>
-        <p class="muted" style="font-size:12px;text-align:center;margin:0">Shortcut: <b>Space</b> starts / pauses the timer.</p>
       </div>
+
+      <div class="card set-sec" id="sec-account">
+        <h2>Account &amp; data</h2>
+        <div class="setting" data-k="account username log out sign out login">
+          <div style="min-width:0"><div class="acct-name" id="acctName"></div><div class="desc" id="acctDesc"></div></div>
+          <button class="btn small" id="logoutBtn">Log out</button>
+        </div>
+        <div class="setting" data-k="backup export import json download restore">
+          <div><div>Backup</div><div class="desc">Download a JSON copy, or import one. Imports merge without duplicates.</div></div>
+          <div class="btn-row"><button class="btn small" id="exportBtn">Export</button><button class="btn small" id="importBtn">Import</button>
+            <input type="file" id="importFile" accept="application/json,.json" class="hidden"></div>
+        </div>
+        <div class="setting" data-k="erase delete wipe reset danger">
+          <div><div>Erase all data</div><div class="desc">Removes every session, preset and setting. This can’t be undone.</div></div>
+          <button class="btn small danger" id="wipeBtn">Erase…</button>
+        </div>
+      </div>
+
+      <div class="card set-sec" id="sec-about">
+        <h2>About</h2>
+        <div class="setting" data-k="version changelog what's new update">
+          <div><div>Version <span class="appver"></span></div><div class="desc">See what changed in each update</div></div>
+          <button class="btn small" data-go-about>What’s new</button>
+        </div>
+        <div class="setting" data-k="about credits privacy info">
+          <div><div>About Pomodorolist</div><div class="desc">Privacy, credits and the full changelog</div></div>
+          <button class="btn small" data-go-about>Open</button>
+        </div>
+        <div class="setting" data-k="feedback bug report issue github">
+          <div><div>Send feedback</div><div class="desc">Report a bug or suggest an idea on GitHub</div></div>
+          <a class="btn small" href="https://github.com/siverieg/siverieg.github.io/issues" target="_blank" rel="noopener">Open GitHub</a>
+        </div>
+      </div>
+      <footer class="app-foot">© 2026 Pomodorolist · Made by <a href="https://github.com/siverieg" target="_blank" rel="noopener">siverieg</a></footer>
+    </div>
+  </section>
+
+  <!-- ================================ ABOUT ================================ -->
+  <section class="tab" id="tab-about">
+    <div class="set-wrap">
+      <button class="linkbtn back" id="aboutBack">‹ Settings</button>
+      <div class="card about-hero">
+        <div class="about-logo"><span class="pomeo-pic" id="aboutPomeo"></span></div>
+        <div><h1>Pomodorolist</h1><p class="muted">A calm focus timer with friends, quests and a tomato named Pomeo.</p><span class="ver-pill">Version <span class="appver"></span></span></div>
+      </div>
+      <div class="card"><h2>What’s new</h2><ol class="changelog" id="changelog"></ol></div>
+      <div class="card"><h2>Privacy</h2>
+        <ul class="about-list">
+          <li>Your sessions, settings and notes are stored in your own account (or only on this device if you don’t log in).</li>
+          <li>Friends only see what you allow in Settings → Friends &amp; privacy: your badge, streak, focus minutes and, if you choose, session names.</li>
+          <li>No ads and no tracking. Sounds, animations, the inbox and the welcome tour are saved on this device only.</li>
+        </ul></div>
+      <div class="card"><h2>Credits</h2>
+        <ul class="about-list">
+          <li>Designed and built by <a href="https://github.com/siverieg" target="_blank" rel="noopener">siverieg</a>.</li>
+          <li>Cloud sync by Firebase. Icons in the style of Lucide. Every sound is generated live with the Web Audio API.</li>
+        </ul>
+        <div class="btn-row" style="margin-top:12px"><a class="btn" href="https://github.com/siverieg/siverieg.github.io/issues" target="_blank" rel="noopener">Send feedback</a></div></div>
+      <footer class="app-foot">© 2026 Pomodorolist · Made by <a href="https://github.com/siverieg" target="_blank" rel="noopener">siverieg</a></footer>
     </div>
   </section>
 </main>
@@ -1866,6 +2096,24 @@ kbd { display: inline-block; min-width: 26px; padding: 3px 7px; border-radius: 7
   <div class="btn-row" style="justify-content:flex-end"><button class="btn" id="tplClose">Done</button></div>
 </dialog>
 
+<!-- Inbox -->
+<dialog id="inboxDlg" class="sheet" aria-labelledby="ibTitle">
+  <div class="sheet-head"><h2 id="ibTitle">Inbox</h2><button class="btn small" id="ibReadAll">Mark all read</button><button class="iconbtn sm" id="ibClose" aria-label="Close inbox">✕</button></div>
+  <div class="sheet-filters"><div class="seg" id="ibSeg" role="tablist" aria-label="Filter">
+    <button data-f="all">All</button><button data-f="social">Social</button><button data-f="reminders">Reminders</button><button data-f="rewards">Rewards</button></div></div>
+  <div class="sheet-body" id="ibBody"></div>
+</dialog>
+
+<!-- Command palette -->
+<dialog id="cmdDlg" class="cmd" aria-label="Command palette">
+  <div class="cmd-in"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="text" id="cmdInput" placeholder="Search screens, settings and actions…" aria-label="Search commands" role="combobox" aria-controls="cmdList" aria-expanded="true" autocomplete="off" spellcheck="false"><kbd>Esc</kbd></div>
+  <ul class="cmd-list" id="cmdList" role="listbox"></ul>
+  <div class="cmd-foot"><span><kbd>↑</kbd><kbd>↓</kbd> move</span><span><kbd>Enter</kbd> run</span><span><kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>K</kbd> toggle</span></div>
+</dialog>
+
+<div class="net-banner" id="netBanner" role="status" aria-live="polite"><i></i><span></span></div>
+<div class="ptr" id="ptr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg></div>
+
 <!-- Keyboard shortcuts -->
 <dialog id="keysDlg">
   <h2 style="margin:0 0 14px">Keyboard shortcuts</h2>
@@ -1878,6 +2126,7 @@ kbd { display: inline-block; min-width: 26px; padding: 3px 7px; border-radius: 7
     <kbd>T</kbd><span>Add a subtask</span>
     <span><kbd>1</kbd>–<kbd>9</kbd></span><span>On the Timer with a checklist: tick that subtask. Otherwise 1–8 switch tabs.</span>
     <span><kbd>Shift</kbd>+<kbd>1</kbd>–<kbd>8</kbd></span><span>Always switch tabs: Timer · Reminders · Quests · Stats · Leaderboard · Shop · Friends · Profile</span>
+    <span><kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>K</kbd></span><span>Command palette: jump to any screen, setting or action</span>
     <kbd>?</kbd><span>Show this sheet</span>
   </div>
   <p class="lbl" style="margin:14px 0 0">Shortcuts are paused while you type. Turn them off in Settings.</p>
@@ -2017,9 +2266,16 @@ function fmtClock(ms) {
 }
 
 // Toasts stack (up to 3 at once) and slide in and out; ok = true adds a small drawn check mark.
-function toast(msg, ms = 2600, ok = false) {
-  const host = $('#toast');
+/** Toasts live in the top-most open dialog (so an Undo button stays clickable), otherwise on the page. */
+function toastHost() {
+  const host = $('#toast'), dlg = [...document.querySelectorAll('dialog[open]')].filter(d => !d.classList.contains('closing')).pop() || document.body;
+  if (host.parentElement !== dlg) dlg.appendChild(host);
+  return host;
+}
+function toast(msg, ms = 2600, ok = false, opt = {}) {
+  const host = toastHost();
   if ([...host.children].some(c => c.dataset.msg === msg && !c.classList.contains('out'))) return;
+  inboxLog(msg, opt);   // every toast is also kept in the inbox
   const el = document.createElement('div');
   el.className = 'toast-item';
   el.dataset.msg = msg;
@@ -2333,7 +2589,7 @@ function renderGreeting() {
 /* ---------- Rewards: achievement card, level-up particles, coins ---------- */
 const achQueue = [];
 let achBusy = false;
-function showAchCard(a) { achQueue.push(a); if (!achBusy) nextAch(); }
+function showAchCard(a) { inboxAdd({ type: 'ach', key: 'ach:' + a.id, title: `Achievement unlocked: ${a.name}`, body: `${a.desc} · +${a.coins} coins`, go: { tab: 'profile' }, read: true }); achQueue.push(a); if (!achBusy) nextAch(); }
 function nextAch() {
   const a = achQueue.shift(), el = $('#achCard');
   if (!a) { achBusy = false; return; }
@@ -2599,9 +2855,10 @@ function cloudRemoveSession(s) {
 function trackWrite(promise) {
   pendingWrites++;
   renderSync();
-  promise.then(() => { syncError = false; }, onSyncError).finally(() => { pendingWrites--; renderSync(); });
+  promise.then(() => { syncError = false; syncRetry = 0; }, onSyncError).finally(() => { pendingWrites--; renderSync(); });
 }
 function onSyncError(err) {
+  if (quietRetry(err)) { console.warn('Sync hiccup — retrying quietly', err); return; }
   console.error('Sync error', err);
   syncError = true;
   renderSync();
@@ -2699,6 +2956,7 @@ function afterFirstLoad() {
    SESSION START / LOGIN / LOGOUT
    ========================================================================== */
 function showView(id) {
+  if (id !== 'bootView') setTimeout(hideSplash, 0);
   for (const v of ['bootView', 'authView', 'appView']) $('#' + v).classList.toggle('hidden', v !== id);
 }
 
@@ -2730,6 +2988,8 @@ function startSession(user, cloud) {
     trackWrite(FB.waitForPendingWrites(FB.db));  // shows "Syncing" until earlier offline writes land
   }
   maybeStartTour(cloud);
+  ibLoad(); renderInboxBadge(); newsCheck();
+  setTimeout(() => { if (USER === user) ibRefresh(); }, cloud ? 3000 : 900);
   setTimeout(() => { if (USER === user && $('#tour').classList.contains('hidden') && !document.querySelector('dialog[open]')) pomeoHello(); pomeoNightCheck(); checkReminders(); examDayCheck(); }, cloud ? 2500 : 1200);
   setTimeout(() => { if (USER === user) { maybeShowLogin(); checkBoss(); } }, cloud ? 3200 : 1800);
 }
@@ -2995,7 +3255,7 @@ function startTimer() {
   ensureAudio();
   askNotifyPermission();
   const t = S.timer, now = Date.now();
-  if (recentGesture()) { uiClaim(); if (!(t.status === 'idle' && t.phase === 'focus' && extraOn('x_startcue'))) uiSound('start', { always: true }); }
+  if (recentGesture()) { uiClaim(); haptic(15); if (!(t.status === 'idle' && t.phase === 'focus' && extraOn('x_startcue'))) uiSound('start', { always: true }); }
   if (t.status === 'idle') {
     t.planned = phaseMs(t.phase);
     t.remaining = t.planned;
@@ -3017,7 +3277,7 @@ function startTimer() {
 
 function pauseTimer() {
   const t = S.timer;
-  if (recentGesture()) { uiClaim(); uiSound('pause', { always: true }); }
+  if (recentGesture()) { uiClaim(); haptic(10); uiSound('pause', { always: true }); }
   t.remaining = Math.max(0, t.endAt - Date.now());
   t.status = 'paused';
   saveLocal();
@@ -3471,7 +3731,7 @@ function yearHeat(r, idx) {
 }
 
 function topList(top, total) {
-  if (!top.length) return '<div class="empty">No focus sessions in this period yet.</div>';
+  if (!top.length) return '<div class="empty e-list">No focus sessions in this period yet.<br><button class="btn small" data-gotab="timer">Start a session</button></div>';
   const max = top[0][1];
   return `<ol class="toplist">${top.slice(0, 6).map(([n, m]) => `
     <li><span class="dot" style="background:${esc(colorFor(n))}"></span>
@@ -3603,6 +3863,9 @@ function renderSettings() {
   $('#setTip').checked = st.dailyTip !== false;
   $('#setKeys').checked = st.shortcuts !== false;
   renderUisSettings();
+  $('#setHaptics').checked = hapticsOn();
+  $$('.appver').forEach(x => { x.textContent = 'v' + APP_VERSION; });
+  if ($('#setSearch').value) filterSettings();
   $('#setRevInt').value = revIntervals().join(', ');
   renderPrivacy();
   $('#setAmbVol').value = st.ambientVolume;
@@ -4011,7 +4274,7 @@ function announce(news, mode) {
   for (const n of news) {
     if (n.type === 'freeze') toast(`Streak Freeze used for ${n.n === 1 ? 'a missed day' : n.n + ' missed days'} — your streak is safe`, 4000);
     else if (mode !== 'loud') continue;
-    else if (n.type === 'streak') toast(`${n.m}-day streak · +${STREAK_BONUS[n.m]} coins`);
+    else if (n.type === 'streak') toast(`${n.m}-day streak · +${STREAK_BONUS[n.m]} coins`, 2600, false, { type: 'streak', go: { tab: 'profile' } });
     else if (n.type === 'ach') showAchCard(n.a);
   }
 }
@@ -4248,7 +4511,7 @@ document.addEventListener('pointerdown', () => { if (USER && !audioCtx) { ensure
 const SKIN_VARS = ['bg', 'surface', 'text', 'muted', 'line', 'accent', 'accent-soft', 'heat0', 'on-accent'];
 const SKINS = {
   th_paper: {
-    light: { bg: '#f4efe4', surface: '#fbf8f1', text: '#2b2620', muted: '#7a7064', line: '#e6ddcc', accent: '#a8692f', heat0: '#ebe3d3' },
+    light: { bg: '#f4efe4', surface: '#fbf8f1', text: '#2b2620', muted: '#6b6156', line: '#e6ddcc', accent: '#a8692f', heat0: '#ebe3d3' },
     dark:  { bg: '#1c1a16', surface: '#24211c', text: '#ece4d6', muted: '#a09584', line: '#363128', accent: '#d09a5e', heat0: '#2e2a23', 'on-accent': '#1c1a16' },
   },
   th_mono: {
@@ -4256,11 +4519,11 @@ const SKINS = {
     dark:  { bg: '#000000', surface: '#0b0b0b', text: '#ffffff', muted: '#a3a3a3', line: '#2b2b2b', accent: '#ffffff', heat0: '#1c1c1c', 'accent-soft': 'rgba(255,255,255,.1)', 'on-accent': '#000000' },
   },
   th_forest: {
-    light: { bg: '#f2f4ef', surface: '#fbfcf9', text: '#1f2a20', muted: '#66735f', line: '#dfe5d8', accent: '#4a7c4e', heat0: '#e6ebe0' },
+    light: { bg: '#f2f4ef', surface: '#fbfcf9', text: '#1f2a20', muted: '#5d6a57', line: '#dfe5d8', accent: '#4a7c4e', heat0: '#e6ebe0' },
     dark:  { bg: '#111612', surface: '#18201a', text: '#e3eae0', muted: '#8a9a88', line: '#26302a', accent: '#7fb27f', heat0: '#1f2822', 'on-accent': '#111612' },
   },
   th_ocean: {
-    light: { bg: '#f0f5f8', surface: '#fafcfd', text: '#14232e', muted: '#5f7380', line: '#dbe6ec', accent: '#2a7ab0', heat0: '#e3edf2' },
+    light: { bg: '#f0f5f8', surface: '#fafcfd', text: '#14232e', muted: '#566a77', line: '#dbe6ec', accent: '#2a7ab0', heat0: '#e3edf2' },
     dark:  { bg: '#0d1820', surface: '#13212b', text: '#dde9f0', muted: '#87a0b0', line: '#21323e', accent: '#5cb0e0', heat0: '#1a2a35', 'on-accent': '#0d1820' },
   },
   th_sunset: {
@@ -4268,12 +4531,12 @@ const SKINS = {
     dark:  { bg: '#1a1214', surface: '#22181a', text: '#f2e2dc', muted: '#a88a84', line: '#33262a', accent: '#f08a5d', heat0: '#2c2024', 'on-accent': '#1a1214' },
   },
   th_sakura: {
-    light: { bg: '#fbf4f6', surface: '#fffafb', text: '#2e1e24', muted: '#8a6c76', line: '#f0dde3', accent: '#c25480', heat0: '#f3e4e9' },
+    light: { bg: '#fbf4f6', surface: '#fffafb', text: '#2e1e24', muted: '#7a5e68', line: '#f0dde3', accent: '#c25480', heat0: '#f3e4e9' },
     dark:  { bg: '#1a1316', surface: '#22191d', text: '#f1e2e7', muted: '#a68892', line: '#34262c', accent: '#e88aab', heat0: '#2c2025', 'on-accent': '#1a1316' },
   },
   th_nord: {
     light: { bg: '#eceff4', surface: '#f8f9fb', text: '#2e3440', muted: '#5e6a82', line: '#d8dee9', accent: '#5e81ac', heat0: '#e1e5ec' },
-    dark:  { bg: '#2e3440', surface: '#3b4252', text: '#eceff4', muted: '#a3adbf', line: '#4c566a', accent: '#88c0d0', heat0: '#434c5e', 'on-accent': '#2e3440' },
+    dark:  { bg: '#2e3440', surface: '#3b4252', text: '#eceff4', muted: '#b4bccb', line: '#4c566a', accent: '#88c0d0', heat0: '#434c5e', 'on-accent': '#2e3440' },
   },
   th_midnight: {
     force: 'dark',
@@ -4679,6 +4942,7 @@ function previewItem(id) {
 /** Level-up moment. A new tier gets a bigger badge, expanding rings and a soft chord. */
 function showLevelUp(from, to) {
   if (!S.settings.gamification) return;
+  inboxAdd({ type: 'level', key: 'lv:' + to, title: tierFor(from).id !== tierFor(to).id ? `New tier: ${tierFor(to).name} · level ${to}` : `Level up! You reached level ${to}`, go: { tab: 'profile' }, read: true });
   const t = tierFor(to), tierUp = tierFor(from).id !== t.id, dlg = $('#levelDlg');
   dlg.classList.toggle('tierup', tierUp);
   dlg.style.setProperty('--tier', t.color);
@@ -4900,8 +5164,9 @@ function onFriendshipsChanged() {
   if (gained) {
     G = null;
     save();
-    if (S.settings.gamification && game().earned > before) toast(`New friend · +${game().earned - before} coins`);
+    if (S.settings.gamification && game().earned > before) toast(`New friend · +${game().earned - before} coins`, 2600, false, { type: 'friendNew', go: { tab: 'friends' } });
   }
+  ibRefresh();
   if (S.ui.tab === 'friends') renderFriends();
 }
 async function sendRequest(raw) {
@@ -4981,11 +5246,13 @@ function onInbox(qs) {
     if (at < fresh) { FB.deleteDoc(d.ref).catch(() => {}); continue; }   // tidy up old items
     if (SOC.inboxSeen.has(d.id)) continue;
     SOC.inboxSeen.add(d.id);
+    inboxAdd({ type: it.type === 'nudge' ? 'nudge' : 'kudos', key: 'kudo:' + d.id, at,
+      title: it.type === 'nudge' ? `@${it.fromName}: Time to focus? 👀` : `@${it.fromName} sent ${it.emoji} for your ${String(it.target).startsWith('st_') ? 'streak' : 'session'}`, go: { tab: 'friends' } });
     if (S.ui.tab !== 'friends') { SOC.unread = true; updateFriendsDot(); }
     if (shown++ < 3) {
       if (shown === 1) floatEmoji(it.emoji);
-      if (it.type === 'nudge') toast(`@${it.fromName}: Time to focus? 👀`, 4000);
-      else toast(`@${it.fromName} sent ${it.emoji} for your ${String(it.target).startsWith('st_') ? 'streak' : 'session'}`, 3500);
+      if (it.type === 'nudge') toast(`@${it.fromName}: Time to focus? 👀`, 4000, false, { log: false });
+      else toast(`@${it.fromName} sent ${it.emoji} for your ${String(it.target).startsWith('st_') ? 'streak' : 'session'}`, 3500, false, { log: false });
     }
   }
   writeLS(lsKey('inbox-seen'), [...SOC.inboxSeen].slice(-200));
@@ -5127,6 +5394,7 @@ async function loadChallenges(force) {
     await syncChallengeProgress();
   } catch (e) { console.warn('challenges', e); if (!SOC.challenges) SOC.challenges = []; }
   if (S.ui.tab === 'friends' && S.ui.friendsView === 'challenges') renderFriends(true);
+  ibRefresh();
 }
 /** Push my progress to challenges I've joined, and claim the bonus when I complete one. */
 async function syncChallengeProgress() {
@@ -5144,7 +5412,7 @@ async function syncChallengeProgress() {
       claimed += CHALLENGES[c.preset].coins;
     }
   }
-  if (claimed) { save(); if (S.settings.gamification) toast(`Challenge complete · +${claimed} coins`, 3500); }
+  if (claimed) { save(); if (S.settings.gamification) toast(`Challenge complete · +${claimed} coins`, 3500, false, { type: 'challenge', go: { tab: 'friends', view: 'challenges' } }); }
 }
 async function startChallenge(preset) {
   const wk = monWeekKey(), id = `${wk}_${preset}_${USER.uid}`;
@@ -5507,6 +5775,7 @@ function compareView(act, name) {
 /* ---------- Settings: friends & privacy ---------- */
 function renderPrivacy() {
   const card = $('#privacyCard');
+  $('#privacyGuest').classList.toggle('hidden', !!(USER && !USER.guest));
   if (!USER || USER.guest) { card.classList.add('hidden'); return; }
   card.classList.remove('hidden');
   $('#setShareAct').checked = S.settings.shareActivity;
@@ -5528,7 +5797,8 @@ function showTab(tab) {
   if (S.ui.tab !== tab && recentGesture(800)) { uiClaim(); uiSound('swoosh'); }
   if (S.ui.tab !== tab && $('#tab-' + S.ui.tab) && $('#tab-' + S.ui.tab).classList.contains('active')) scrollMem[S.ui.tab] = window.scrollY;
   S.ui.tab = tab;
-  const navTab = tab === 'settings' ? 'profile' : tab;   // Settings is part of Profile
+  const navTab = tab === 'settings' || tab === 'about' ? 'profile' : tab;   // Settings and About are part of Profile
+  if (tab === 'about') renderAbout();
   $$('#tabs button').forEach(b => { b.classList.toggle('active', b.dataset.tab === navTab); b.setAttribute('aria-current', b.dataset.tab === navTab ? 'page' : 'false'); });
   $$('.tab').forEach(s => s.classList.toggle('active', s.id === 'tab-' + tab));
   if (tab === 'stats') renderStats();
@@ -5855,6 +6125,7 @@ function fireReminder(r, day, at) {
   const what = r.rev ? `Revision of ${r.rev.topic}` : r.title;
   const text = mins >= 1 ? `${what} in ${mins} minute${mins === 1 ? '' : 's'}! Ready?` : r.rev ? `Time to revise ${r.rev.topic}! Ready?` : `Time for ${r.title}! Ready?`;
   showPomeoPop(r, day, text);
+  inboxAdd({ type: 'reminder', key: `rem:${r.id}@${day}@${at}`, title: text, body: fmtDayShort(day) + ' · ' + fmtHM(at), go: { tab: 'reminders' } });
   playReminderChime();
   if ('Notification' in window && Notification.permission === 'granted' && S.settings.notify) {
     try {
@@ -6047,10 +6318,10 @@ $('#remForm').addEventListener('submit', e => {
 });
 $('#remCancel').addEventListener('click', () => $('#remDlg').close());
 function deleteReminder(r) {
-  if (!confirm(`Delete “${r.title}”${r.repeat !== 'none' ? ' and all its repeats' : ''}?`)) return false;
+  const i = S.reminders.indexOf(r);
   S.reminders = S.reminders.filter(x => x.id !== r.id);
   saveReminders();
-  toast('Reminder deleted');
+  toastUndo(`Deleted “${r.title}”`, () => { S.reminders.splice(Math.max(0, i), 0, r); saveReminders(); });
   return true;
 }
 
@@ -6125,13 +6396,15 @@ $('#tab-reminders').addEventListener('click', e => {
     if (rv.dataset.rev === 'clear') { S.revisions = revActive(); save(); renderReminderBits(); return; }
     const v = S.revisions.find(x => x.id === rv.closest('[data-vid]').dataset.vid);
     if (!v) return;
-    if (rv.dataset.rev === 'del') { if (confirm(`Delete the revision plan for “${v.topic}”?`)) { S.revisions = S.revisions.filter(x => x !== v); save(); renderReminderBits(); } return; }
+    if (rv.dataset.rev === 'del') { const i = S.revisions.indexOf(v); S.revisions = S.revisions.filter(x => x !== v); save(); renderReminderBits(); toastUndo(`Revision plan for “${v.topic}” deleted`, () => { S.revisions.splice(i, 0, v); save(); renderReminderBits(); }); return; }
     markRevised(v, rv.dataset.rev);
     return;
   }
   if (t.closest('#remClear')) {
+    const before = S.reminders.slice();
     S.reminders = S.reminders.filter(r => !(r.repeat === 'none' && remDone(r, r.date)));
     saveReminders();
+    toastUndo('Completed reminders cleared', () => { S.reminders = before; saveReminders(); });
     return;
   }
   const li = t.closest('.rem');
@@ -6141,7 +6414,7 @@ $('#tab-reminders').addEventListener('click', e => {
   if (t.closest('[data-rdone]')) {
     const on = !remDone(r, day);
     uiClaim(); uiSound(on ? 'tick' : 'off');
-    if (on) miniBurst(t.closest('[data-rdone]'));
+    if (on) { miniBurst(t.closest('[data-rdone]')); haptic(8); }
     markRemDone(r, day, on);
     saveReminders();
   } else if (t.closest('[data-redit]') || (t.closest('.rem-main') && !t.closest('button'))) openRemForm(r);
@@ -6397,7 +6670,9 @@ function checkBoss() {
   save();
   bossFresh = st.wk;
   if (S.ui.tab === 'quests') renderQuests();
-  else { toast(`🏆 ${st.boss.name} defeated! +${st.coins} coins`, 4200, true); pomeoSay(`We beat ${st.boss.name}! 🏆`, { kind: 'care' }); }
+  else { toast(`🏆 ${st.boss.name} defeated! +${st.coins} coins`, 4200, true, { log: false }); pomeoSay(`We beat ${st.boss.name}! 🏆`, { kind: 'care' }); }
+  inboxAdd({ type: 'boss', key: 'won:' + st.wk, title: `🏆 ${st.boss.name} defeated! +${st.coins} coins`, body: st.mode === 'squad' ? `Squad of ${st.members.length}` : 'Solo victory', go: { tab: 'profile' }, read: S.ui.tab === 'quests' });
+  haptic([12, 50, 12]);
   playTierChord();
   renderHeaderChip();
   return true;
@@ -6514,7 +6789,7 @@ function trophyShelf() {
   const list = Object.entries(S.game.trophies).filter(([wk]) => S.game.claims.bosses[wk]).sort((a, b) => (a[0] < b[0] ? 1 : -1));
   return `<div class="card"><div class="row between" style="margin-bottom:10px"><h2 style="margin:0">Trophy shelf</h2><span class="lbl">${list.length} boss${list.length === 1 ? '' : 'es'}</span></div>
     ${list.length ? `<div class="shelf">${list.map(([wk, t]) => { const b = BOSS_BY_ID[t.boss] || BOSSES[0]; return `<div class="trophy" title="${esc(b.name)}">${bossSVG(b.id)}<div class="tn">${esc(b.name.replace(/^The /, ''))}</div><div class="tw">${fmtDayShort(wk)}</div><div class="tm">${t.mode === 'squad' ? `Squad of ${t.size}` : 'Solo'}</div></div>`; }).join('')}</div>`
-      : '<div class="empty">Defeat a weekly boss in Quests to earn your first trophy.</div>'}</div>`;
+      : '<div class="empty e-trophy">Defeat a weekly boss in Quests to earn your first trophy.<br><button class="btn small" data-gotab="quests">Go to Quests</button></div>'}</div>`;
 }
 
 /* ==========================================================================
@@ -6644,6 +6919,8 @@ async function claimLogin() {
   const coins = LOGIN_COINS[info.day - 1];
   uiClaim(); uiSound('reward', { always: true });
   toast(`Day ${info.day}: +${coins} coins${gift ? ` · 🎁 ${gift.name}!` : ''}`, 3600, true);
+  ibMarkKey('login:' + info.key);
+  haptic([10, 40, 10]);
   coinDrop($('#loginClaim'));
   if (gift) pomeoSay(`A gift for you: ${gift.name}! 🎁`, { kind: 'care' });
   setTimeout(() => { if ($('#loginDlg').open) $('#loginDlg').close(); }, motion() === 'off' ? 0 : 900);
@@ -6855,11 +7132,11 @@ function parkedSection() {
 function onParkClick(e) {
   const b = e.target.closest('[data-pk]');
   if (!b) return false;
-  if (b.dataset.pk === 'clear') { S.parked = S.parked.filter(p => !p.done); save(); renderReminderBits(); return true; }
+  if (b.dataset.pk === 'clear') { const before = S.parked.slice(); S.parked = S.parked.filter(p => !p.done); save(); renderReminderBits(); toastUndo('Done thoughts cleared', () => { S.parked = before; save(); renderReminderBits(); }); return true; }
   const p = S.parked.find(x => x.id === b.closest('[data-pid]').dataset.pid);
   if (!p) return true;
   if (b.dataset.pk === 'done') { p.done = !p.done; uiClaim(); uiSound(p.done ? 'tick' : 'off'); if (p.done) miniBurst(b); }
-  else if (b.dataset.pk === 'del') S.parked = S.parked.filter(x => x !== p);
+  else if (b.dataset.pk === 'del') { deleteParked(p); return true; }
   else if (b.dataset.pk === 'rem') { openRemForm({ title: p.text.slice(0, 80) }); p.done = true; }
   save();
   renderPark();
@@ -7192,7 +7469,7 @@ function toggleSub(id) {
   x.d = !x.d;
   x.at = x.d ? Date.now() : 0;
   uiClaim();
-  if (x.d) { subFresh = id; playTick(); } else uiSound('off');
+  if (x.d) { subFresh = id; playTick(); haptic(8); } else uiSound('off');
   subChanged();
   flipPlay(first, '#subCheck li[data-uid]');
   if (x.d) miniBurst($(`#subCheckList li[data-uid="${id}"] .sub-box`), 6);
@@ -7204,7 +7481,11 @@ function toggleSub(id) {
     if (!pomeoOn() || S.ui.tab !== 'timer') toast('All subtasks done 🎉', 2400, true);
   }
 }
-function removeSub(id) { S.timer.subtasks = subs().filter(x => x.id !== id); subChanged(); }
+function removeSub(id) {
+  const i = subs().findIndex(x => x.id === id), x = subs()[i];
+  S.timer.subtasks = subs().filter(s => s.id !== id); subChanged();
+  if (x) toastUndo(`Subtask deleted`, () => { subs().splice(i, 0, x); subChanged(); });
+}
 function renderSubtasks() {
   if (!USER) return;
   const list = subs(), done = list.filter(x => x.d).length;
@@ -7387,10 +7668,11 @@ $('#subTpls').addEventListener('click', e => {
   if (t) {
     const tp = S.subTemplates.find(x => x.id === t.dataset.tpl);
     if (!tp) return;
-    if (subs().some(x => !x.d) && !confirm(`Replace the current subtasks with “${tp.name}”?`)) return;
+    const prev = subs().slice();
     tp.used = Date.now(); save();
     loadItems(tp.items);
-    toast(`Loaded “${tp.name}”`, 1600, true);
+    if (prev.some(x => !x.d)) toastUndo(`Loaded “${tp.name}”`, () => { S.timer.subtasks = prev; subChanged(); });
+    else toast(`Loaded “${tp.name}”`, 1600, true);
     return;
   }
   if (e.target.closest('#tplSaveOpen')) { $('#tplSave').classList.toggle('hidden'); if (!$('#tplSave').classList.contains('hidden')) $('#tplName').focus(); }
@@ -7423,7 +7705,11 @@ function openTemplates() {
 $('#tplList').addEventListener('click', e => {
   const l = e.target.closest('[data-tload]'), d = e.target.closest('[data-tdel]');
   if (l) { const tp = S.subTemplates.find(x => x.id === l.dataset.tload); if (tp) { tp.used = Date.now(); save(); loadItems(tp.items); $('#tplDlg').close(); } }
-  if (d) { S.subTemplates = S.subTemplates.filter(x => x.id !== d.dataset.tdel); save(); openTemplates(); renderSubtasks(); }
+  if (d) {
+    const i = S.subTemplates.findIndex(x => x.id === d.dataset.tdel), tp = S.subTemplates[i];
+    S.subTemplates = S.subTemplates.filter(x => x.id !== d.dataset.tdel); save(); openTemplates(); renderSubtasks();
+    if (tp) toastUndo(`Template “${tp.name}” deleted`, () => { S.subTemplates.splice(i, 0, tp); save(); if ($('#tplDlg').open) openTemplates(); renderSubtasks(); });
+  }
 });
 $('#tplClose').addEventListener('click', () => $('#tplDlg').close());
 
@@ -7686,6 +7972,508 @@ function updateFades(el) {
 document.addEventListener('scroll', e => { if (e.target.classList && e.target.classList.contains('catrow')) updateFades(e.target); }, true);
 addEventListener('resize', () => $$('.catrow').forEach(updateFades));
 
+/* ==========================================================================
+   v1.7 — POLISH: inbox, what's new / about, settings search, undo,
+   command palette, offline banner, pull to refresh, tab swipes, haptics.
+   Everything here is stored on this device (localStorage); no new cloud data.
+   ========================================================================== */
+const APP_VERSION = '1.7';
+const VER_KEY = 'pomodorolist-seen-version';
+const CHANGELOG = [
+  { v: '1.7', t: 'Polish update', d: 'Inbox for everything that happens, command palette (Ctrl/⌘ K), tidier searchable Settings, Undo instead of “Are you sure?”, offline banner, pull to refresh and swipes on phones.' },
+  { v: '1.6.2', t: 'Sounds & feel', d: 'Soft interface sounds in four packs, quiet during focus, plus cursor glow, tilt and magnetic buttons.' },
+  { v: '1.6.1', t: 'Subtasks', d: 'An optional checklist for each session, with templates, carry-over and history.' },
+  { v: '1.6', t: 'Quests, garden & Wrapped', d: 'Weekly boss battles (solo or squad), the Tomato Garden, monthly Wrapped, spaced revision, exam countdown, parking lot, aura and daily rewards.' },
+  { v: '1.5', t: 'Pomeo & reminders', d: 'Pomeo the tomato, the Reminders tab with calendar export, Liquid Glass, tips and session notes.' },
+  { v: '1.4', t: 'Animations & navigation', d: 'Smooth animations everywhere, a phone tab bar and a welcome tour.' },
+  { v: '1.3', t: 'Friends & leaderboards', d: 'Friends, kudos, nudges, weekly challenges and leaderboards.' },
+  { v: '1.2', t: 'Levels & shop', d: 'XP, levels, achievements, coins and a cosmetic shop.' },
+  { v: '1.1', t: 'Accounts & sync', d: 'Log in and keep your sessions in sync on every device, even offline.' },
+  { v: '1.0', t: 'Focus timer', d: 'Pomodoro timer with named sessions, presets, streaks and stats.' },
+];
+const NEWS = ['🔔 An inbox for requests, reminders and rewards', '⌘ Command palette — press Ctrl/⌘ K or tap 🔍', '⚙️ Settings in clear sections, with search', '↩️ Undo instead of “Are you sure?”'];
+
+/* ---------- Haptics ---------- */
+const HAPTIC_KEY = 'pomodorolist-haptics';
+const hapticsOn = () => localStorage.getItem(HAPTIC_KEY) !== '0';
+function haptic(p = 10) { try { if (hapticsOn() && navigator.vibrate && matchMedia('(pointer: coarse)').matches) navigator.vibrate(p); } catch (e) {} }
+
+/* ---------- Undo toast (replaces "Are you sure?" for small, reversible actions) ---------- */
+function toastUndo(msg, undo, ms = 5000) {
+  const host = toastHost();
+  const el = document.createElement('div');
+  el.className = 'toast-item has-undo';
+  el.setAttribute('role', 'status');
+  el.appendChild(document.createTextNode(msg));
+  const b = document.createElement('button');
+  b.className = 'undo'; b.textContent = 'Undo';
+  b.addEventListener('click', () => { undo(); dismissToast(el); uiClaim(); uiSound('off'); haptic(8); toast('Restored', 1600, true, { log: false }); });
+  el.appendChild(b);
+  glideToasts(host, () => host.appendChild(el));
+  const live = [...host.children].filter(c => !c.classList.contains('out'));
+  if (live.length > 3) dismissToast(live[0]);
+  requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('in')));
+  setTimeout(() => dismissToast(el), ms);
+  inboxLog(msg);
+  haptic(12);
+}
+
+/* ==========================================================================
+   INBOX / NOTIFICATION CENTRE — last 100 items, on this device.
+   { id, key, type, title, body, at, read, go }
+   ========================================================================== */
+const IB_TYPES = {
+  friend: { ic: '👋', cat: 'social' }, friendNew: { ic: '🤝', cat: 'social' }, kudos: { ic: '🔥', cat: 'social' }, nudge: { ic: '👀', cat: 'social' }, challenge: { ic: '🏁', cat: 'social' },
+  reminder: { ic: '🔔', cat: 'reminders' }, missed: { ic: '⏰', cat: 'reminders' },
+  ach: { ic: '🏅', cat: 'rewards' }, level: { ic: '⭐', cat: 'rewards' }, boss: { ic: '⚔️', cat: 'rewards' }, login: { ic: '🎁', cat: 'rewards' }, streak: { ic: '🔥', cat: 'rewards' },
+  info: { ic: '💬', cat: 'other' },
+};
+const ibKey = () => 'pomodorolist-inbox:' + (USER ? (USER.guest ? 'guest' : USER.uid) : 'none');
+let IB = [], ibLoadedFor = '';
+function ibLoad() { if (ibLoadedFor !== ibKey()) { IB = readJSON(ibKey(), []); ibLoadedFor = ibKey(); } }
+function ibSave() { writeLS(ibKey(), IB.slice(0, 100)); renderInboxBadge(); if ($('#inboxDlg').open) renderInbox(); }
+function inboxAdd({ type = 'info', title, body = '', go = null, key = '', read = false, at = Date.now() }) {
+  if (!USER || !title) return null;
+  ibLoad();
+  if (key && IB.some(x => x.key === key)) return null;
+  const it = { id: 'n' + uid(), key, type, title: String(title).slice(0, 160), body: String(body).slice(0, 200), at, read: read || type === 'info', go };
+  IB.unshift(it);
+  IB = IB.slice(0, 100);
+  ibSave();
+  return it;
+}
+/** Every toast is also logged (as already-read "Other" items, so they don't count as unread). */
+function inboxLog(msg, opt = {}) {
+  if (opt.log === false || !USER) return;
+  ibLoad();
+  if (IB[0] && IB[0].title === msg && Date.now() - IB[0].at < 5000) return;
+  inboxAdd({ type: opt.type || 'info', title: msg, go: opt.go || null, key: opt.key || '', read: opt.type ? !!opt.read : true });
+}
+function ibMarkKey(key) { ibLoad(); const it = IB.find(x => x.key === key); if (it && !it.read) { it.read = true; ibSave(); } }
+const ibUnread = () => { ibLoad(); return IB.filter(x => !x.read).length; };
+function renderInboxBadge() {
+  if (!USER) return;
+  const n = ibUnread(), el = $('#inboxCount');
+  el.textContent = n > 99 ? '99+' : n;
+  el.classList.toggle('hidden', !n);
+  $('#inboxBtn').setAttribute('aria-label', n ? `Inbox, ${n} unread` : 'Inbox');
+}
+let ibFilter = 'all';
+function ibWhen(at) {
+  const d = new Date(at), today = startOfDay(new Date());
+  return d >= today ? fmtHM(at) : d >= addDays(today, -1) ? 'Yesterday ' + fmtHM(at) : d.toLocaleDateString([], { day: 'numeric', month: 'short' }) + ', ' + fmtHM(at);
+}
+function renderInbox() {
+  ibLoad();
+  $$('#ibSeg button').forEach(b => b.classList.toggle('active', b.dataset.f === ibFilter));
+  const list = IB.filter(x => ibFilter === 'all' || (IB_TYPES[x.type] || IB_TYPES.info).cat === ibFilter);
+  const today = startOfDay(new Date()).getTime(), yest = addDays(startOfDay(new Date()), -1).getTime();
+  const groups = [['Today', list.filter(x => x.at >= today)], ['Yesterday', list.filter(x => x.at >= yest && x.at < today)], ['Earlier', list.filter(x => x.at < yest)]];
+  $('#ibBody').innerHTML = list.length ? groups.filter(([, g]) => g.length).map(([name, g]) => `<div class="ib-group">${name}</div><ul class="ib-list">${g.map(x => `
+    <li class="ib-item${x.read ? '' : ' unread'}" data-ib="${esc(x.id)}" tabindex="0" role="button" aria-label="${esc(x.title)}${x.read ? '' : ' (unread)'}">
+      <span class="ib-dot" aria-hidden="true"></span><span class="ib-ic" aria-hidden="true">${(IB_TYPES[x.type] || IB_TYPES.info).ic}</span>
+      <span class="ib-main"><span class="ib-t">${esc(x.title)}</span>${x.body ? `<span class="ib-s" style="display:block">${esc(x.body)}</span>` : ''}<span class="ib-s" style="display:block">${ibWhen(x.at)}</span></span>
+      ${x.read ? '' : `<button class="ib-x" data-ibread aria-label="Mark as read" title="Mark as read">●</button>`}
+      <button class="ib-x" data-ibdel aria-label="Dismiss" title="Dismiss">✕</button></li>`).join('')}</ul>`).join('')
+    : `<div class="empty e-inbox">${ibFilter === 'all' ? 'You’re all caught up. New requests, reminders and rewards will show up here.' : 'Nothing here yet.'}</div>`;
+  $('#ibReadAll').disabled = !IB.some(x => !x.read);
+}
+function openInbox() {
+  ibRefresh();
+  renderInbox();
+  if (!$('#inboxDlg').open) $('#inboxDlg').showModal();
+}
+function ibGo(it) {
+  const g = it.go || {};
+  $('#inboxDlg').close();
+  if (g.action === 'login') { showTab('profile'); setTimeout(() => { if (loginOn() && !loginToday().claimed) openLoginDlg(); }, 250); return; }
+  if (g.view) S.ui.friendsView = g.view;
+  if (g.tab) showTab(g.tab);
+}
+function ibDismiss(id) {
+  ibLoad();
+  const i = IB.findIndex(x => x.id === id);
+  if (i < 0) return;
+  const [it] = IB.splice(i, 1);
+  ibSave();
+  toastUndo('Dismissed', () => { ibLoad(); IB.splice(i, 0, it); ibSave(); });
+}
+$('#inboxBtn').addEventListener('click', openInbox);
+$('#ibClose').addEventListener('click', () => $('#inboxDlg').close());
+$('#ibReadAll').addEventListener('click', () => { ibLoad(); IB.forEach(x => { x.read = true; }); ibSave(); });
+$('#ibSeg').addEventListener('click', e => { const b = e.target.closest('[data-f]'); if (b) { ibFilter = b.dataset.f; renderInbox(); } });
+$('#ibBody').addEventListener('click', e => {
+  const li = e.target.closest('[data-ib]');
+  if (!li || li.dataset.swiped) return;
+  if (e.target.closest('[data-ibdel]')) { ibDismiss(li.dataset.ib); return; }
+  ibLoad();
+  const it = IB.find(x => x.id === li.dataset.ib);
+  if (!it) return;
+  it.read = true; ibSave();
+  if (e.target.closest('[data-ibread]')) return;
+  ibGo(it);
+});
+$('#ibBody').addEventListener('keydown', e => { const li = e.target.closest('[data-ib]'); if (li && e.target === li && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); li.click(); } if (li && e.key === 'Delete') ibDismiss(li.dataset.ib); });
+/** Things worth knowing that aren't toasts: missed reminders, daily reward, this week's boss, challenge invites. */
+function ibRefresh() {
+  if (!USER) return;
+  const now = Date.now(), today = startOfDay(new Date());
+  for (const r of [...S.reminders, ...revisionReminders()]) for (const day of [addDays(today, -1), today]) {
+    if (!remOnDay(r, day)) continue;
+    const k = dayKey(day), at = remAt(r, day);
+    if (remDone(r, k) || now < at + 3600e3) continue;
+    inboxAdd({ type: 'missed', key: `miss:${r.id}@${k}`, title: `Missed: ${r.title}`, body: `${fmtDayShort(k)} · ${fmtHM(at)}`, go: { tab: 'reminders' }, at: at + 3600e3 });
+  }
+  if (loginOn()) {
+    const li = loginToday();
+    if (!li.claimed) inboxAdd({ type: 'login', key: 'login:' + li.key, title: `Your day ${li.day} reward is ready`, body: 'Open the app every day — rewards grow for 7 days', go: { action: 'login' } });
+    else ibMarkKey('login:' + li.key);
+  }
+  if (S.settings.gamification) {
+    const wk = dayKey(weekMonday()), b = bossOfWeek(), lastWk = dayKey(addDays(weekMonday(), -7));
+    inboxAdd({ type: 'boss', key: 'boss:' + wk, title: `This week’s boss: ${b.name}`, body: 'Every focus minute is a hit', go: { tab: 'quests' }, read: !S.sessions.length });
+    const hadLastWeek = S.sessions.some(s => s.start >= parseDay(lastWk).getTime() && s.start < weekMonday().getTime());
+    if (hadLastWeek && !S.game.claims.bosses[lastWk]) inboxAdd({ type: 'boss', key: 'away:' + lastWk, title: `${bossOfWeek(parseDay(lastWk)).name} got away`, body: 'No penalty — the new boss is waiting', go: { tab: 'quests' }, read: true });
+  }
+  if (SOC.challenges) for (const c of SOC.challenges) {
+    if (c.creator !== USER.uid && !(c.members || []).includes(USER.uid)) inboxAdd({ type: 'challenge', key: 'chinv:' + c.id, title: `You’re invited to a weekly challenge: ${(CHALLENGES[c.preset] || {}).name || 'focus challenge'}`, go: { tab: 'friends', view: 'challenges' } });
+  }
+  for (const f of SOC.friendships || []) if (f.status === 'pending' && f.to === USER.uid) inboxAdd({ type: 'friend', key: 'freq:' + f.id, title: `@${f.fromName} sent you a friend request`, go: { tab: 'friends' } });
+  renderInboxBadge();
+}
+
+/* ==========================================================================
+   WHAT'S NEW + ABOUT
+   ========================================================================== */
+function renderAbout() {
+  $$('.appver').forEach(x => { x.textContent = 'v' + APP_VERSION; });
+  $('#changelog').innerHTML = CHANGELOG.map(c => `<li><span class="v">v${c.v}</span><span class="t">${esc(c.t)}</span><span class="d">${esc(c.d)}</span></li>`).join('');
+  $('#aboutPomeo').innerHTML = pomeoSVG({ state: 'happy', ...pomeoOutfit() });
+}
+function newsCheck() {
+  const seen = localStorage.getItem(VER_KEY);
+  if (!seen && !tourDone()) { writeLS(VER_KEY, APP_VERSION); return; }   // brand-new user: the welcome tour is enough
+  if (seen === APP_VERSION) { $('#newsSlot').innerHTML = ''; return; }
+  $('#newsSlot').innerHTML = `<div class="card news-card" role="region" aria-label="What's new">
+    <span class="pomeo-pic" style="width:44px;height:44px;flex:none">${pomeoOn() ? pomeoSVG({ state: 'excited', ...pomeoOutfit() }).replace('class="mascot"', 'class="mascot" style="position:static;width:44px;height:44px"') : '✨'}</span>
+    <div class="nc-main"><h3>What’s new in v${APP_VERSION}</h3><ul>${NEWS.map(n => `<li>${esc(n)}</li>`).join('')}</ul>
+      <button class="btn small" data-go-about>See all changes</button></div>
+    <button class="nc-x" id="newsClose" aria-label="Dismiss what's new">✕</button></div>`;
+}
+function newsDone() { writeLS(VER_KEY, APP_VERSION); $('#newsSlot').innerHTML = ''; }
+document.addEventListener('click', e => {
+  if (e.target.closest('[data-go-about]')) { if (e.target.closest('#newsSlot')) newsDone(); showTab('about'); }
+  if (e.target.closest('#newsClose')) newsDone();
+});
+$('#aboutBack').addEventListener('click', () => showTab('settings'));
+$('#privacyLogin').addEventListener('click', () => logout());
+
+/* ==========================================================================
+   SETTINGS SEARCH
+   ========================================================================== */
+const norm = s => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+function filterSettings() {
+  const q = norm($('#setSearch').value.trim());
+  let any = false;
+  for (const sec of $$('#tab-settings .set-sec')) {
+    let n = 0;
+    for (const row of sec.querySelectorAll('.setting')) {
+      if (row.closest('.hidden') && row.closest('.hidden') !== row) { continue; }
+      const hit = !q || norm(row.textContent + ' ' + (row.dataset.k || '') + ' ' + sec.querySelector('h2').textContent).includes(q);
+      row.classList.toggle('filtered', !hit);
+      row.style.display = hit ? '' : 'none';
+      if (hit && !row.classList.contains('hidden')) n++;
+    }
+    sec.style.display = n ? '' : 'none';
+    if (n) any = true;
+  }
+  $('#setNone').classList.toggle('hidden', any);
+  $('#setNone span').textContent = $('#setSearch').value.trim();
+}
+$('#setSearch').addEventListener('input', filterSettings);
+$('#setSearch').addEventListener('keydown', e => { if (e.key === 'Escape' && e.target.value) { e.preventDefault(); e.stopPropagation(); e.target.value = ''; filterSettings(); } });
+$('#setHaptics').addEventListener('change', e => { writeLS(HAPTIC_KEY, e.target.checked ? '1' : '0'); if (e.target.checked) haptic(15); });
+function goSetting(row) {
+  showTab('settings');
+  $('#setSearch').value = ''; filterSettings();
+  setTimeout(() => { row.scrollIntoView({ block: 'center', behavior: motion() === 'full' ? 'smooth' : 'auto' }); restartClass(row, 'hit', 1700); const c = row.querySelector('input, select, button'); if (c) c.focus({ preventScroll: true }); }, 60);
+}
+
+/* ==========================================================================
+   COMMAND PALETTE — Ctrl/⌘ K (or the search button)
+   ========================================================================== */
+function cmdList(q) {
+  const L = [], add = (ic, t, g, run, k = '') => L.push({ ic, t, g, run, k });
+  const tabs = [['timer', '⏱️', 'Timer'], ['reminders', '🔔', 'Reminders'], ['quests', '⚔️', 'Quests'], ['stats', '📊', 'Stats'], ['board', '🏆', 'Leaderboard'], ['shop', '🛍️', 'Shop'], ['friends', '👥', 'Friends'], ['profile', '👤', 'Profile'], ['settings', '⚙️', 'Settings'], ['about', 'ℹ️', 'About']];
+  for (const [id, ic, n] of tabs) if (!(['quests', 'board', 'shop'].includes(id) && !S.settings.gamification)) add(ic, n, 'Go to', () => showTab(id), id === 'board' ? 'ranks leaderboard' : '');
+  add('📥', 'Inbox', 'Open', openInbox, 'notifications messages');
+  const t = S.timer;
+  add(t.status === 'running' ? '⏸️' : '▶️', t.status === 'running' ? 'Pause timer' : t.status === 'paused' ? 'Resume timer' : 'Start timer', 'Timer', () => { showTab('timer'); $('#mainBtn').click(); }, 'start pause resume focus');
+  add('↺', 'Reset timer', 'Timer', () => { showTab('timer'); $('#resetBtn').click(); });
+  add('⏭️', 'Skip to next phase', 'Timer', () => { showTab('timer'); $('#skipBtn').click(); });
+  for (const p of S.presets) add('⏱️', `Start ${p.name}`, `${p.focus} min focus`, () => cmdStartPreset(p), `start ${p.focus} min minutes`);
+  const m = /(\d{1,3})\s*(m|min|mins|minute|minutes)?\b/.exec(q || '');
+  if (m && +m[1] >= 1 && +m[1] <= 240 && /start|focus|min|^\d/.test(q) && !S.presets.some(p => p.focus === +m[1])) add('⏱️', `Start a ${+m[1]}-minute focus`, 'New preset', () => cmdStartMinutes(+m[1]), `start ${m[1]} min`);
+  add('➕', 'Add reminder', 'Reminders', () => { showTab('reminders'); openRemForm(); }, 'new reminder');
+  add('☑️', 'Add subtask', 'Timer', focusSubAdd, 'new subtask checklist');
+  if (focusActive()) add('🅿️', 'Park a thought', 'Timer', () => { showTab('timer'); openPark(); });
+  add('🌓', 'Toggle dark mode', 'Appearance', cmdToggleDark, 'theme dark light night');
+  add('🧊', `Liquid Glass: ${glass() === 'off' ? 'turn on' : 'turn off'}`, 'Appearance', () => { writeLS(GLASS_KEY, glass() === 'off' ? 'full' : 'off'); applyGlass(); toast(`Liquid Glass ${glass() === 'off' ? 'off' : 'on'}`, 1800, true); }, 'glass blur');
+  add(S.settings.sound ? '🔇' : '🔊', S.settings.sound ? 'Mute all sounds' : 'Turn sounds on', 'Sounds', () => $('#muteBtn').click(), 'sound mute audio');
+  add('🎚️', `Interface sounds: ${UIS.prefs.on ? 'off' : 'on'}`, 'Sounds', () => { UIS.prefs.on = !UIS.prefs.on; uisSave(); if (UIS.prefs.on) ensureAudio(); toast(`Interface sounds ${UIS.prefs.on ? 'on' : 'off'}`, 1800, true); }, 'ui sounds clicks');
+  for (const mo of ['full', 'reduced', 'off']) if (mo !== motion()) add('✨', `Animations: ${mo[0].toUpperCase() + mo.slice(1)}`, 'Appearance', () => { localStorage.setItem(MOTION_KEY, mo); applyMotion(); sheenLoop(); renderTimer(); toast(`Animations: ${mo}`, 1800, true); }, 'motion');
+  const wp = wrappedPeriods();
+  if (wp.length) add('🎁', `Open ${wp[0].kind === 'year' ? wp[0].label : wp[0].short} Wrapped`, 'Stats', () => { showTab('stats'); openWrapped(0); }, 'wrapped story recap');
+  if (loginOn() && !loginToday().claimed) add('🎁', 'Claim daily reward', 'Rewards', () => { showTab('profile'); openLoginDlg(); }, 'login daily');
+  add('📅', 'Manage exams', 'Timer', openExams, 'exam countdown');
+  add('⌨️', 'Keyboard shortcuts', 'Help', () => $('#keysDlg').showModal(), 'keys help');
+  add('🧭', 'Replay welcome tour', 'Help', () => $('#replayTour').click(), 'tour help');
+  add('✨', 'What’s new', 'Help', () => showTab('about'), 'changelog version');
+  add('💾', 'Export data (JSON)', 'Data', () => $('#exportBtn').click(), 'backup download');
+  for (const row of $$('#tab-settings .setting')) {
+    const label = row.querySelector(':scope > div > div:first-child, :scope > div:first-child > .acct-name');
+    const name = label ? label.textContent.trim() : '';
+    if (name && !row.classList.contains('hidden') && !row.closest('.hidden')) add('⚙️', name, 'Setting', () => goSetting(row), 'settings ' + (row.dataset.k || ''));
+  }
+  return L;
+}
+/** Fuzzy score: every query character in order; bonus for word starts and runs. */
+function fuzzy(q, s) {
+  q = norm(q); s = norm(s);
+  if (!q) return { score: 1, idx: [] };
+  if (s.includes(q)) { const i = s.indexOf(q); return { score: 100 - i + (i === 0 || s[i - 1] === ' ' ? 30 : 0), idx: Array.from({ length: q.length }, (_, k) => i + k) }; }
+  let si = 0, score = 0, run = 0; const idx = [];
+  for (const ch of q) {
+    if (ch === ' ') continue;
+    const j = s.indexOf(ch, si);
+    if (j < 0) return null;
+    run = j === si ? run + 1 : 0;
+    score += 1 + run * 2 + (j === 0 || s[j - 1] === ' ' ? 4 : 0);
+    idx.push(j); si = j + 1;
+  }
+  return { score, idx };
+}
+let CMD = { items: [], sel: 0 };
+function renderCmd() {
+  const q = $('#cmdInput').value.trim();
+  const all = cmdList(q);
+  CMD.items = all.map(c => { const a = fuzzy(q, c.t), b = q ? fuzzy(q, c.k) : null; const best = a && (!b || a.score >= b.score) ? a : b ? { score: b.score - 5, idx: [] } : null; return best ? { ...c, ...best, hi: a ? a.idx : [] } : null; })
+    .filter(Boolean).sort((x, y) => y.score - x.score).slice(0, q ? 12 : 10);
+  CMD.sel = Math.min(CMD.sel, Math.max(0, CMD.items.length - 1));
+  $('#cmdList').innerHTML = CMD.items.length ? CMD.items.map((c, i) => {
+    const hi = new Set(c.hi), txt = [...c.t].map((ch, k) => hi.has(k) ? `<mark>${esc(ch)}</mark>` : esc(ch)).join('');
+    return `<li role="option" id="cmd-${i}" data-ci="${i}" class="${i === CMD.sel ? 'sel' : ''}" aria-selected="${i === CMD.sel}"><span class="ci" aria-hidden="true">${c.ic}</span><span>${txt}</span><span class="g">${esc(c.g)}</span></li>`;
+  }).join('') : '<li class="none">No matches. Try “stats”, “dark”, “start 25”.</li>';
+  $('#cmdInput').setAttribute('aria-activedescendant', CMD.items.length ? 'cmd-' + CMD.sel : '');
+  const s = $('#cmdList .sel'); if (s) s.scrollIntoView({ block: 'nearest' });
+}
+function openCmd() {
+  if (!USER) return;
+  $('#cmdInput').value = '';
+  CMD.sel = 0;
+  renderCmd();
+  if (!$('#cmdDlg').open) $('#cmdDlg').showModal();
+  setTimeout(() => $('#cmdInput').focus(), 20);
+}
+function runCmd(i) {
+  const c = CMD.items[i];
+  if (!c) return;
+  $('#cmdDlg').close();
+  setTimeout(() => c.run(), motion() === 'off' ? 0 : 200);   // after the palette has closed and handed focus back
+}
+function cmdStartPreset(p) {
+  showTab('timer');
+  if (S.timer.status !== 'idle') { toast('Finish or reset the current session first'); return; }
+  S.activePresetId = p.id; S.timer.phase = 'focus'; save(); renderAll(); startTimer();
+}
+function cmdStartMinutes(n) {
+  let p = S.presets.find(x => x.focus === n);
+  if (!p) { p = { id: 'p-' + uid(), name: `Quick ${n}`, focus: n, short: 5, long: 15, rounds: 4 }; S.presets.push(p); toast(`New preset “Quick ${n}” saved`, 2400, true); }
+  cmdStartPreset(p);
+}
+function cmdToggleDark() {
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark' || (!document.documentElement.getAttribute('data-theme') && systemDark());
+  S.settings.theme = dark ? 'light' : 'dark';
+  save(); applyCosmetics();
+  toast(dark ? 'Light mode' : 'Dark mode', 1600, true);
+}
+$('#cmdInput').addEventListener('input', () => { CMD.sel = 0; renderCmd(); });
+$('#cmdInput').addEventListener('keydown', e => {
+  if (e.key === 'ArrowDown') { e.preventDefault(); CMD.sel = (CMD.sel + 1) % Math.max(1, CMD.items.length); renderCmd(); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); CMD.sel = (CMD.sel - 1 + CMD.items.length) % Math.max(1, CMD.items.length); renderCmd(); }
+  else if (e.key === 'Enter') { e.preventDefault(); runCmd(CMD.sel); }
+});
+$('#cmdList').addEventListener('click', e => { const li = e.target.closest('[data-ci]'); if (li) runCmd(+li.dataset.ci); });
+$('#cmdBtn').addEventListener('click', openCmd);
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && !e.altKey && e.key.toLowerCase() === 'k' && USER && !$('#appView').classList.contains('hidden')) {
+    e.preventDefault();
+    if ($('#cmdDlg').open) $('#cmdDlg').close(); else { $$('dialog[open]').forEach(d => d.close()); openCmd(); }
+  }
+});
+
+/* ==========================================================================
+   OFFLINE BANNER + QUIET SYNC RETRY
+   ========================================================================== */
+let netT = 0, wasOffline = false;
+function netBanner(text, ok, ms) {
+  const el = $('#netBanner');
+  clearTimeout(netT);
+  el.querySelector('span').textContent = text;
+  el.classList.toggle('ok', !!ok);
+  el.classList.add('show');
+  if (ms) netT = setTimeout(() => el.classList.remove('show'), ms);
+}
+addEventListener('offline', () => { if (!USER) return; wasOffline = true; netBanner('You’re offline — changes will sync when you’re back', false, 0); });
+addEventListener('online', () => {
+  if (!USER || !wasOffline) { $('#netBanner').classList.remove('show'); return; }
+  wasOffline = false;
+  netBanner('Back online · syncing…', true, 0);
+  const done = () => { if (pendingWrites > 0 && !USER.guest && !localOnly) return setTimeout(done, 400); netBanner(USER.guest ? 'Back online' : 'Back online · synced', true, 2400); };
+  setTimeout(done, 300);
+});
+let syncRetry = 0, syncRetryT = 0;
+/** Retries a failed upload quietly (5 s, 15 s, 45 s) before telling the user. Returns true if it will retry. */
+function quietRetry(err) {
+  if (err && err.code === 'permission-denied') return false;
+  if (syncRetry >= 3) return false;
+  const wait = [5000, 15000, 45000][syncRetry++];
+  clearTimeout(syncRetryT);
+  syncRetryT = setTimeout(() => { if (cloudReady()) { lastProfileJSON = ''; pushProfile(true); } }, wait);
+  return true;
+}
+
+/* ==========================================================================
+   PHONES: pull to refresh, swipe between tabs, swipe-to-dismiss helper
+   ========================================================================== */
+const coarse = matchMedia('(pointer: coarse)');
+const PTR_TABS = ['stats', 'friends', 'board'];
+async function ptrRefresh(where) {
+  if (where === 'inbox') { ibRefresh(); renderInbox(); return; }
+  if (where === 'stats') { renderStats(); return; }
+  if (!cloudReady()) { if (where === 'friends') renderFriends(); else renderBoardTab(); return; }
+  if (where === 'friends') { await loadFriendsPublic(true).catch(() => {}); SOC.challengesAt = 0; await loadChallenges(true).catch(() => {}); renderFriends(); }
+  if (where === 'board') { SOC.lb = {}; renderBoardTab(); }
+}
+(() => {
+  const ptr = $('#ptr');
+  let st = null;
+  const scroller = () => ($('#inboxDlg').open ? $('#ibBody') : null);
+  document.addEventListener('touchstart', e => {
+    if (e.touches.length !== 1) return;
+    const inbox = $('#inboxDlg').open && e.target.closest('#ibBody');
+    const where = inbox ? 'inbox' : !document.querySelector('dialog[open]') && PTR_TABS.includes(S.ui.tab) ? S.ui.tab : '';
+    const top = inbox ? scroller().scrollTop <= 0 : scrollY <= 0;
+    if (!where || !top || e.target.closest('input, textarea, select, .wrapped')) { st = null; return; }
+    st = { where, y: e.touches[0].clientY, x: e.touches[0].clientX, d: 0, on: false };
+  }, { passive: true });
+  document.addEventListener('touchmove', e => {
+    if (!st) return;
+    const dy = e.touches[0].clientY - st.y, dx = e.touches[0].clientX - st.x;
+    if (!st.on) { if (Math.abs(dx) > Math.abs(dy) || dy < 8) { if (dy < -4 || Math.abs(dx) > 10) st = null; return; } st.on = true; }
+    st.d = Math.min(110, dy * 0.5);
+    ptr.style.opacity = Math.min(1, st.d / 50);
+    ptr.style.transform = `translateY(${st.d - 30}px) rotate(${st.d * 4}deg)`;
+    ptr.classList.toggle('ready', st.d > 60);
+  }, { passive: true });
+  document.addEventListener('touchend', async () => {
+    if (!st) return;
+    const { d, on, where } = st;
+    st = null;
+    if (!on) return;
+    if (d > 60) {
+      haptic(12);
+      ptr.classList.add('spin');
+      ptr.style.transform = 'translateY(30px)';
+      try { await ptrRefresh(where); } catch (e) {}
+      setTimeout(() => { ptr.classList.remove('spin', 'ready'); ptr.style.opacity = 0; ptr.style.transform = 'translateY(-40px)'; }, 450);
+    } else { ptr.style.opacity = 0; ptr.style.transform = 'translateY(-40px)'; }
+  });
+})();
+/** Left/right swipes on the page move between the tabs in the bottom bar. */
+(() => {
+  let sw = null;
+  const NO_SWIPE = 'input, textarea, select, button, .catrow, .chips, .rem, .sub-ed-list, .plist, .ib-item, .wrapped, dialog, .tabs, .park-pop, .garden, .hpbar, [data-noswipe], .shopgrid';
+  const scrollsX = el => { for (let n = el; n && n !== document.body; n = n.parentElement) { const s = getComputedStyle(n); if (/(auto|scroll)/.test(s.overflowX) && n.scrollWidth > n.clientWidth + 2) return true; } return false; };
+  document.addEventListener('touchstart', e => {
+    sw = null;
+    if (e.touches.length !== 1 || !coarse.matches || !USER || document.querySelector('dialog[open]')) return;
+    const t = e.touches[0];
+    if (t.clientX < 24 || t.clientX > innerWidth - 24) return;           // leave the screen edges to the browser's back gesture
+    if (!e.target.closest('main') || e.target.closest(NO_SWIPE) || scrollsX(e.target)) return;
+    sw = { x: t.clientX, y: t.clientY, t: Date.now() };
+  }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (!sw) return;
+    const t = e.changedTouches[0], dx = t.clientX - sw.x, dy = t.clientY - sw.y, fast = Date.now() - sw.t < 650;
+    sw = null;
+    if (!fast || Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 2) return;
+    const order = $$('#tabs button').filter(b => b.offsetWidth && !b.classList.contains('hidden')).map(b => b.dataset.tab);
+    const i = order.indexOf(S.ui.tab);
+    if (i < 0) return;
+    const next = order[i + (dx < 0 ? 1 : -1)];
+    if (!next) return;
+    UIS.gesture = performance.now();
+    haptic(8);
+    showTab(next);
+    const sec = $('#tab-' + next);
+    sec.classList.remove('from-l', 'from-r');
+    void sec.offsetWidth;
+    sec.classList.add(dx < 0 ? 'from-r' : 'from-l');
+    setTimeout(() => sec.classList.remove('from-l', 'from-r'), 400);
+  }, { passive: true });
+})();
+/** Swipe a list item left to act on it (touch). */
+function swipeable(host, itemSel, onLeft) {
+  let s = null;
+  host.addEventListener('pointerdown', e => {
+    const li = e.target.closest(itemSel);
+    if (!li || e.pointerType === 'mouse' || e.target.closest('button, input')) return;
+    s = { li, x: e.clientX, y: e.clientY, on: false, dx: 0 };
+  });
+  host.addEventListener('pointermove', e => {
+    if (!s) return;
+    const dx = e.clientX - s.x, dy = e.clientY - s.y;
+    if (!s.on) { if (Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx)) { s = null; return; } if (Math.abs(dx) < 12) return; s.on = true; }
+    s.dx = Math.min(0, dx);
+    s.li.style.transition = 'none';
+    s.li.style.transform = `translateX(${Math.max(-160, s.dx)}px)`;
+    s.li.style.opacity = String(1 + Math.max(-160, s.dx) / 260);
+  });
+  const end = () => {
+    if (!s) return;
+    const { li, on, dx } = s;
+    s = null;
+    li.style.transition = ''; li.style.transform = ''; li.style.opacity = '';
+    if (!on) return;
+    li.dataset.swiped = '1';
+    setTimeout(() => { delete li.dataset.swiped; }, 60);
+    if (dx < -90) onLeft(li);
+  };
+  host.addEventListener('pointerup', end);
+  host.addEventListener('pointercancel', end);
+}
+swipeable($('#ibBody'), '.ib-item', li => ibDismiss(li.dataset.ib));
+swipeable($('#parkPanel'), '.plist li', li => { const p = S.parked.find(x => x.id === li.dataset.pid); if (p) deleteParked(p); });
+swipeable($('#remBody'), '.plist li', li => { const p = S.parked.find(x => x.id === li.dataset.pid); if (p) deleteParked(p); });
+function deleteParked(p) {
+  const i = S.parked.indexOf(p);
+  S.parked = S.parked.filter(x => x !== p);
+  save(); renderPark(); renderReminderBits();
+  toastUndo('Thought deleted', () => { S.parked.splice(i, 0, p); save(); renderPark(); renderReminderBits(); });
+}
+
+/* ---------- Splash: fades as soon as the first real screen is shown ---------- */
+function hideSplash() {
+  const sp = $('#splash');
+  if (!sp || sp.classList.contains('out')) return;
+  sp.classList.add('out');
+  setTimeout(() => sp.remove(), motion() === 'off' ? 0 : 320);
+}
+
+document.addEventListener('click', e => { const g = e.target.closest('[data-gotab]'); if (g) showTab(g.dataset.gotab); });
+setInterval(() => { if (USER) ibRefresh(); }, 60000);
+
 /* ---------- First-time welcome tour (once per device) ---------- */
 const TOUR_KEY = 'pomodorolist-tour-done';
 const TOUR = { i: 0, steps: [] };
@@ -7848,10 +8636,11 @@ $('#chips').addEventListener('keydown', e => {
 });
 $('#clearRecent').addEventListener('click', () => {
   if (!S.recent.length) return;
-  if (!confirm('Clear recently used? Pinned favourites stay.')) return;
+  const before = S.recent.slice();
   S.recent = [];
   save();
   renderChips();
+  toastUndo('Recently used cleared', () => { S.recent = before; save(); renderChips(); });
 });
 
 // Tabs
@@ -7883,7 +8672,7 @@ $('#statsBody').addEventListener('click', e => {
   const del = e.target.closest('[data-del]');
   if (!del) return;
   const s = S.sessions.find(x => x.id === del.dataset.del);
-  if (!s || !confirm('Delete this session from your log?')) return;
+  if (!s) return;
   const pending = S.pendingSessions.some(x => x.id === s.id);
   if (localOnly && !pending) { toast('Connect to the internet to delete synced sessions'); return; }
   S.sessions = S.sessions.filter(x => x.id !== s.id);
@@ -7891,6 +8680,11 @@ $('#statsBody').addEventListener('click', e => {
   if (cloudReady()) cloudRemoveSession(s);
   save();
   renderStats();
+  toastUndo('Session deleted', () => {
+    S.sessions.push(s); S.sessions.sort((a, b) => a.start - b.start);
+    if (cloudReady()) cloudAddSessions([s]); else if (USER && !USER.guest) S.pendingSessions.push(s);
+    G = null; save(); renderAll(); if (S.ui.tab === 'stats') renderStats();
+  });
   renderToday();
 });
 
@@ -8081,7 +8875,8 @@ $('#presetList').addEventListener('click', e => {
   if (ed) fillPresetForm(S.presets.find(p => p.id === ed.dataset.edit));
   if (dl && S.presets.length > 1) {
     const p = S.presets.find(x => x.id === dl.dataset.delp);
-    if (!confirm(`Delete preset “${p.name}”? Logged sessions are kept.`)) return;
+    const snap = { presets: S.presets.slice(), pinned: S.pinned.slice(), recent: S.recent.slice(), active: S.activePresetId };
+    toastUndo(`Preset “${p.name}” deleted`, () => { S.presets = snap.presets; S.pinned = snap.pinned; S.recent = snap.recent; S.activePresetId = snap.active; save(); renderPresetList(); renderAll(); });
     S.presets = S.presets.filter(x => x.id !== p.id);
     S.pinned = S.pinned.filter(x => x.presetId !== p.id);
     S.recent = S.recent.filter(x => x.presetId !== p.id);
