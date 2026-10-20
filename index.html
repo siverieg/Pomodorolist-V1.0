@@ -1551,6 +1551,95 @@ a.btn { color: var(--text); text-decoration: none; display: inline-flex; align-i
 @keyframes avShine { 0%, 15% { transform: rotate(20deg) translateX(-6px); } 60%, 100% { transform: rotate(20deg) translateX(34px); } }
 @keyframes avTwinkle { 50% { opacity: .25; } }
 :root:not([data-motion="full"]) .av-anim .av-shine { display: none; }
+
+/* ==========================================================================
+   TRUE MINIMALIST — <html data-minimal>: more space, fewer accents, calm motion
+   ========================================================================== */
+:root[data-minimal] { --card-pad: 24px; }
+@media (max-width: 640px) { :root[data-minimal] { --card-pad: 18px; } }
+:root[data-minimal] main { padding-top: 28px; }
+:root[data-minimal] .stack, :root[data-minimal] .grid-2 { gap: 22px; }
+:root[data-minimal] .tabs { --accent-soft: color-mix(in srgb, var(--text) 8%, transparent); }
+:root[data-minimal] .tabs button.active { color: var(--text); }
+:root[data-minimal] .tabs button.active::before { display: none; }
+:root[data-minimal] .card h2 { letter-spacing: .06em; }
+:root[data-minimal] .coin-hint, :root[data-minimal] #ibSeg [data-f="rewards"] { display: none; }
+
+/* ==========================================================================
+   TUTORIAL WITH POMEO + one-time tips
+   ========================================================================== */
+dialog.tut { width: min(460px, calc(100vw - 24px)); padding: 22px 22px 16px; }
+.tut-top { display: flex; gap: 14px; align-items: flex-start; }
+.tut-pomeo { width: 64px; height: 64px; flex: none; display: grid; place-items: center; border-radius: 20px; background: var(--accent-soft); }
+.tut-pomeo .mascot { position: static; width: 56px; height: 56px; }
+.tut-bubble { flex: 1; min-width: 0; }
+.tut-step { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+.tut-bubble h3 { margin: 4px 0 6px; font-size: 19px; line-height: 1.3; }
+.tut-body p { margin: 12px 0 4px; color: var(--muted); font-size: 14.5px; line-height: 1.5; }
+.tut-switch input[type="checkbox"] { flex: none; }
+.tut-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0 4px; }
+.tut-opt { border: 1px solid var(--line); background: var(--surface); color: var(--text); border-radius: var(--r-md); padding: 12px 10px; cursor: pointer; text-align: left; font: inherit; font-size: 14px; display: grid; gap: 2px; }
+.tut-opt small { color: var(--muted); font-size: 12px; }
+.tut-opt:hover { border-color: var(--accent); }
+.tut-opt.on { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
+.tut-row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; align-items: center; }
+.tut-row input { flex: 1; min-width: 120px; }
+.tut-foot { display: flex; align-items: center; gap: 10px; margin-top: 18px; }
+.tut-foot .tut-dots { flex: 1; display: flex; justify-content: center; gap: 5px; }
+.tut-dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--line); }
+.tut-dots i.on { background: var(--accent); width: 16px; border-radius: 3px; }
+.tut-switch { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border: 1px solid var(--line); border-radius: var(--r-md); margin-top: 10px; }
+.tut-big { display: grid; gap: 8px; margin-top: 12px; }
+.tut-big .btn { width: 100%; justify-content: center; display: flex; }
+.tour-tip .tour-pomeo { float: left; width: 34px; height: 34px; margin: 0 10px 4px 0; }
+.tour-tip .tour-pomeo .mascot { position: static; width: 34px; height: 34px; }
+.tip-pop { position: fixed; right: 16px; bottom: calc(20px + env(safe-area-inset-bottom)); z-index: 85; display: flex; gap: 10px; align-items: flex-start; max-width: min(360px, calc(100vw - 32px));
+  padding: 12px 12px 12px 10px; border-radius: 18px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--sh-2); }
+.tip-pop .pomeo-pic .mascot { position: static; width: 40px; height: 40px; }
+.tip-pop p { margin: 2px 0 8px; font-size: 14px; }
+.tip-pop .btn { padding: 5px 14px; font-size: 13px; min-width: 0; }
+:root[data-motion="full"] .tip-pop.show { animation: popUp .45s var(--spring) both; }
+:root[data-motion="reduced"] .tip-pop.show { animation: fadeIn .25s both; }
+@media (max-width: 640px) { .tip-pop { left: 12px; right: 12px; max-width: none; bottom: calc(84px + env(safe-area-inset-bottom)); } }
+:root[data-glass] .tip-pop { background-color: color-mix(in srgb, var(--surface) var(--glass-fill), transparent); -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)); backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)); border-color: var(--glass-edge); }
+
+/* ==========================================================================
+   SESSION SUMMARY + ENERGY CHECK-IN + INSIGHTS
+   ========================================================================== */
+.after-row:not(.hidden) { padding: 14px; border-radius: var(--r-md); background: color-mix(in srgb, var(--accent) 7%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 18%, var(--line)); text-align: left; }
+.sum-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.sum-head b { font-size: 15px; }
+.sum-head span { font-size: 12.5px; color: var(--muted); }
+.energy { margin-bottom: 10px; }
+.energy .eq { font-size: 13.5px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+.energy .opts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.energy .opts button { border: 1px solid var(--line); background: var(--surface); color: var(--text); border-radius: 12px; padding: 7px 4px; cursor: pointer; font: inherit; font-size: 12px; display: grid; gap: 1px; justify-items: center; }
+.energy .opts button span { font-size: 19px; line-height: 1.2; }
+.energy .opts button:hover { border-color: var(--accent); }
+.energy .opts button.on { border-color: var(--accent); background: var(--accent-soft); }
+.energy .bar { height: 3px; border-radius: 3px; background: var(--line); overflow: hidden; margin-top: 8px; }
+.energy .bar i { display: block; height: 100%; background: var(--accent); transform-origin: 0 50%; }
+:root:not([data-motion="off"]) .energy .bar i { animation: shrinkBar var(--edur, 12s) linear forwards; }
+@keyframes shrinkBar { to { transform: scaleX(0); } }
+.energy.done .eq { color: var(--accent); }
+.qs-row { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-top: 12px; }
+.qs-row .lbl { align-self: center; }
+.qs-row button { border: 1px solid var(--line); background: var(--surface); color: var(--text); border-radius: 999px; padding: 5px 12px; font-size: 13px; cursor: pointer; }
+.qs-row button:hover { border-color: var(--accent); color: var(--accent); }
+.ins-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; margin-top: 4px; }
+.ins { padding: 12px 14px; border-radius: var(--r-md); background: var(--bg); border: 1px solid var(--line); }
+.ins .k { font-size: 12px; color: var(--muted); }
+.ins .v { font-size: 15px; font-weight: 600; margin-top: 2px; }
+.ins .s { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+.ins-chart { display: flex; align-items: flex-end; gap: 10px; height: 92px; margin-top: 6px; }
+.ins-chart div { flex: 1; display: grid; justify-items: center; gap: 4px; font-size: 11.5px; color: var(--muted); }
+.ins-chart i { display: block; width: 100%; max-width: 44px; border-radius: 6px 6px 2px 2px; background: var(--accent); opacity: .85; transform-origin: 50% 100%; }
+:root[data-motion="full"] .ins-chart i { animation: wrGrow .7s var(--ease) both; }
+.ins-progress { height: 6px; border-radius: 4px; background: var(--heat0); overflow: hidden; margin-top: 8px; max-width: 280px; }
+.ins-progress i { display: block; height: 100%; background: var(--accent); }
+.sesslist .en { font-size: 14px; margin-left: 4px; }
+.app-foot .sep { opacity: .6; margin: 0 4px; }
+
 .tabs .ls { display: none; }
 @media (max-width: 400px) { .tabs .lf { display: none; } .tabs .ls { display: inline; } .tabs button { font-size: 10px; } }
 </style>
@@ -1665,12 +1754,15 @@ a.btn { color: var(--text); text-decoration: none; display: inline-flex; align-i
             <button class="btn primary" id="mainBtn"><span class="mb-lbl">Start</span></button>
             <button class="btn" id="skipBtn">Skip</button>
           </div>
+          <div class="qs-row hidden" id="quickStart" aria-label="Quick start a preset"></div>
           <div class="sub-check hidden" id="subCheck" aria-label="Subtasks">
             <div class="sc-head"><span class="sc-n" id="subN"></span><span class="sc-bar"><i id="subBar"></i></span><button class="sc-add" id="subCheckAdd" title="Add a subtask (T)" aria-label="Add a subtask">+</button></div>
             <ul id="subCheckList"></ul>
             <div class="sc-quick hidden" id="subQuick"><input type="text" id="subQuickInput" maxlength="80" placeholder="Add a subtask… (Enter)" aria-label="New subtask" autocomplete="off"></div>
           </div>
-          <div class="after-row hidden" id="noteRow">
+          <div class="after-row hidden" id="noteRow" aria-label="Session complete">
+            <div class="sum-head" id="sumHead"></div>
+            <div class="energy hidden" id="energyRow" aria-live="polite"></div>
             <div class="sub-sum hidden" id="subSum"></div>
             <div class="note-row">
               <input type="text" id="noteInput" maxlength="120" placeholder="Add a note? e.g. finished ch. 5 problems" aria-label="Note for the session you just finished">
@@ -1695,7 +1787,7 @@ a.btn { color: var(--text); text-decoration: none; display: inline-flex; align-i
           <div class="sub-ed hidden" id="subEd">
             <ul class="sub-ed-list" id="subEdList"></ul>
             <div class="sub-add"><input type="text" id="subInput" maxlength="80" autocomplete="off" aria-label="New subtask"><button class="btn" id="subAddBtn">Add</button></div>
-            <div class="sub-hint">Drag ⋮⋮ to reorder · tap to edit · ✕ or swipe left to delete · +1 coin per finished subtask (up to 10 a day)</div>
+            <div class="sub-hint">Drag ⋮⋮ to reorder · tap to edit · ✕ or swipe left to delete<span class="coin-hint"> · +1 coin per finished subtask (up to 10 a day)</span></div>
             <div class="sub-tpls" id="subTpls"></div>
             <div class="tpl-save hidden" id="tplSave"><input type="text" id="tplName" maxlength="40" placeholder="Template name, e.g. Daily maths routine" aria-label="Template name"><button class="btn" id="tplSaveBtn">Save</button></div>
           </div>
@@ -1782,6 +1874,7 @@ a.btn { color: var(--text); text-decoration: none; display: inline-flex; align-i
     <div class="tiles" id="tiles"></div>
     <div id="statsBody"></div>
     <div id="subStatSlot" style="margin-top:16px"></div>
+    <div id="energySlot" style="margin-top:16px"></div>
     <div id="gardenSlot" style="margin-top:16px"></div>
   </section>
 
@@ -1844,9 +1937,9 @@ a.btn { color: var(--text); text-decoration: none; display: inline-flex; align-i
           <div><div>Tip of the day</div><div class="desc">A short study tip on the Timer screen</div></div>
           <input type="checkbox" id="setTip" aria-label="Tip of the day">
         </div>
-        <div class="setting" data-k="progression xp level coins shop gamification game quests">
-          <div><div>Progression</div><div class="desc">XP, levels, coins, quests and the shop. Turn off for a plain timer (equipped items stay on).</div></div>
-          <input type="checkbox" id="setGame" aria-label="Progression">
+        <div class="setting" data-k="energy check-in focus rating feel mood insights">
+          <div><div>Energy check-in</div><div class="desc">After a focus session, tap how focused you felt. Unlocks insights in Stats.</div></div>
+          <select id="setEnergy" aria-label="Energy check-in"><option value="always">Always</option><option value="sometimes">Sometimes (every 3rd)</option><option value="off">Off</option></select>
         </div>
       </div>
 
@@ -1889,6 +1982,14 @@ a.btn { color: var(--text); text-decoration: none; display: inline-flex; align-i
 
       <div class="card set-sec" id="sec-appearance">
         <h2>Appearance</h2>
+        <div class="setting" data-k="true minimalist minimal simple plain clean progression xp level coins shop gamification game quests rewards badges">
+          <div><div>True Minimalist</div><div class="desc">Just the timer, your plans and stats — no levels, coins, shop, quests, badges or rewards. Nothing is deleted; switch back anytime.</div></div>
+          <input type="checkbox" id="setMinimal" aria-label="True Minimalist">
+        </div>
+        <div class="setting hidden" id="minPomeoRow" data-k="pomeo minimalist keep mascot">
+          <div><div>Keep Pomeo in True Minimalist</div><div class="desc">He stays on the Timer but talks less</div></div>
+          <input type="checkbox" id="setMinPomeo" aria-label="Keep Pomeo in True Minimalist">
+        </div>
         <div class="setting" data-k="theme dark light mode system colour color">
           <div><div>Theme</div><div class="desc">Light, dark or follow your device</div></div>
           <select id="setTheme" aria-label="Theme"><option value="auto">System</option><option value="light">Light</option><option value="dark">Dark</option></select>
@@ -1905,9 +2006,13 @@ a.btn { color: var(--text); text-decoration: none; display: inline-flex; align-i
           <div><div>Show Pomeo</div><div class="desc">Your tomato buddy on the Timer screen</div></div>
           <input type="checkbox" id="setPomeo" aria-label="Show Pomeo">
         </div>
-        <div class="setting" data-k="tour welcome help intro">
-          <div><div>Welcome tour</div><div class="desc">A quick look at each section of the app</div></div>
-          <button class="btn small" id="replayTour">Replay tour</button>
+        <div class="setting" data-k="tutorial tour welcome help intro onboarding replay">
+          <div><div>Tutorial</div><div class="desc">Pomeo’s one-minute introduction to the app</div></div>
+          <button class="btn small" id="replayTour">Replay tutorial</button>
+        </div>
+        <div class="setting" data-k="tips hints help reset">
+          <div><div>Tips</div><div class="desc">Show the one-time tip on each screen again</div></div>
+          <button class="btn small" id="resetTips">Reset tips</button>
         </div>
       </div>
 
@@ -1989,12 +2094,16 @@ a.btn { color: var(--text); text-decoration: none; display: inline-flex; align-i
           <div><div>About Pomodorolist</div><div class="desc">Privacy, credits and the full changelog</div></div>
           <button class="btn small" data-go-about>Open</button>
         </div>
-        <div class="setting" data-k="feedback bug report issue github">
-          <div><div>Send feedback</div><div class="desc">Report a bug or suggest an idea on GitHub</div></div>
+        <div class="setting" data-k="feedback bug report issue github suggest feature idea">
+          <div><div>Report a bug / suggest a feature</div><div class="desc">Opens the Pomodorolist issues page on GitHub</div></div>
           <a class="btn small" href="https://github.com/siverieg/Pomodorolist-V1.0/issues" target="_blank" rel="noopener">Open GitHub</a>
         </div>
+        <div class="setting" data-k="contact email mail support help">
+          <div><div>Contact</div><div class="desc"><a class="mail" href="mailto:siverieg.p@gmail.com">siverieg.p@gmail.com</a></div></div>
+          <a class="btn small" href="mailto:siverieg.p@gmail.com">Email</a>
+        </div>
       </div>
-      <footer class="app-foot">© 2026 Pomodorolist · Made by <a href="https://github.com/siverieg" target="_blank" rel="noopener">siverieg</a></footer>
+      <footer class="app-foot">© 2026 Pomodorolist · Made by <a href="https://github.com/siverieg" target="_blank" rel="noopener">siverieg</a><span class="sep">·</span>Contact: <a href="mailto:siverieg.p@gmail.com">siverieg.p@gmail.com</a></footer>
     </div>
   </section>
 
@@ -2011,15 +2120,16 @@ a.btn { color: var(--text); text-decoration: none; display: inline-flex; align-i
         <ul class="about-list">
           <li>Your sessions, settings and notes are stored in your own account (or only on this device if you don’t log in).</li>
           <li>Friends only see what you allow in Settings → Friends &amp; privacy: your badge, streak, focus minutes and, if you choose, session names.</li>
-          <li>No ads and no tracking. Sounds, animations, the inbox and the welcome tour are saved on this device only.</li>
+          <li>No ads and no tracking. Sounds, animations, the inbox and tips are saved on this device only. Focus check-ins stay in your own account.</li>
         </ul></div>
       <div class="card"><h2>Credits</h2>
         <ul class="about-list">
           <li>Designed and built by <a href="https://github.com/siverieg" target="_blank" rel="noopener">siverieg</a>.</li>
           <li>Cloud sync by Firebase. Icons in the style of Lucide. Every sound is generated live with the Web Audio API.</li>
         </ul>
-        <div class="btn-row" style="margin-top:12px"><a class="btn" href="https://github.com/siverieg/Pomodorolist-V1.0/issues" target="_blank" rel="noopener">Send feedback</a></div></div>
-      <footer class="app-foot">© 2026 Pomodorolist · Made by <a href="https://github.com/siverieg" target="_blank" rel="noopener">siverieg</a></footer>
+        <div class="btn-row" style="margin-top:12px"><a class="btn" href="https://github.com/siverieg/Pomodorolist-V1.0/issues" target="_blank" rel="noopener">Report a bug / suggest a feature</a></div>
+        <p class="muted" style="margin:12px 0 0;font-size:14px">Contact: <a class="mail" href="mailto:siverieg.p@gmail.com">siverieg.p@gmail.com</a></p></div>
+      <footer class="app-foot">© 2026 Pomodorolist · Made by <a href="https://github.com/siverieg" target="_blank" rel="noopener">siverieg</a><span class="sep">·</span>Contact: <a href="mailto:siverieg.p@gmail.com">siverieg.p@gmail.com</a></footer>
     </div>
   </section>
 </main>
@@ -2208,9 +2318,17 @@ a.btn { color: var(--text); text-decoration: none; display: inline-flex; align-i
 <canvas id="starCanvas" class="hidden" aria-hidden="true"></canvas>
 <canvas id="fxCanvas" class="hidden" aria-hidden="true"></canvas>
 <div class="toasts" id="toast" role="status" aria-live="polite"></div>
-<div class="tour hidden" id="tour" role="dialog" aria-modal="true" aria-label="Welcome tour">
+<dialog class="tut" id="tutDlg" aria-labelledby="tutTitle">
+  <div class="tut-top"><div class="tut-pomeo" id="tutPomeo" aria-hidden="true"></div>
+    <div class="tut-bubble"><div class="tut-step" id="tutStep"></div><h3 id="tutTitle"></h3></div></div>
+  <div class="tut-body" id="tutBody"></div>
+  <div class="tut-foot"><button class="linkbtn" id="tutSkip">Skip tutorial</button><span class="tut-dots" id="tutDots" aria-hidden="true"></span><button class="btn primary" id="tutNext" autofocus>Next</button></div>
+</dialog>
+<div class="tip-pop hidden" id="tipPop" role="status"><span class="pomeo-pic" aria-hidden="true"></span><div><p></p><button class="btn small" id="tipOk">Got it</button></div></div>
+<div class="tour hidden" id="tour" role="dialog" aria-modal="true" aria-label="A quick look around">
   <div class="tour-spot"></div>
   <div class="tour-tip">
+    <span class="tour-pomeo" id="tourPomeo" aria-hidden="true"></span>
     <div class="tour-step" id="tourStep"></div>
     <div class="tour-text" id="tourText"></div>
     <div class="tour-btns"><button class="linkbtn" id="tourSkip">Skip</button><button class="btn primary" id="tourNext">Next</button></div>
@@ -2333,7 +2451,9 @@ const MOTION_KEY = 'pomodorolist-motion';
 const motion = () => document.documentElement.dataset.motion || 'full';
 function applyMotion() {
   const pref = localStorage.getItem(MOTION_KEY);
-  document.documentElement.dataset.motion = pref || (matchMedia('(prefers-reduced-motion: reduce)').matches ? 'reduced' : 'full');
+  // True Minimalist defaults to subtle animations ("reduced"); an explicit choice in Settings still wins
+  const calm = matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.hasAttribute('data-minimal');
+  document.documentElement.dataset.motion = pref || (calm ? 'reduced' : 'full');
 }
 applyMotion();
 matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', applyMotion);
@@ -2688,7 +2808,8 @@ function defaultState() {
     settings: { goalMin: 60, weekStart: 1, sound: true, notify: true, theme: 'auto', autoStart: false, gamification: true, ambientVolume: 0.5,
                 shareActivity: true, shareNames: true, globalBoard: false,
                 pomeo: true, pomeoTalk: 'sometimes', waterNudge: true, dailyTip: true,
-                bossMode: 'solo', shortcuts: true, revIntervals: [1, 3, 7, 21, 45] },
+                bossMode: 'solo', shortcuts: true, revIntervals: [1, 3, 7, 21, 45],
+                minPomeo: true, energy: 'always', useCase: '' },
     presets: [
       { id: 'p-classic', name: 'Classic 25/5',    focus: 25, short: 5,  long: 15, rounds: 4 },
       { id: 'p-deep',    name: 'Deep Work 50/10', focus: 50, short: 10, long: 20, rounds: 3 },
@@ -2700,6 +2821,8 @@ function defaultState() {
     pinned: [],     // { name, presetId }
     reminders: [],  // see REMINDERS
     notes: {},      // sessionId -> one-line note
+    energy: {},     // sessionId -> focus check-in 1 (low) … 4 (locked in)
+    onboarded: false,  // finished or skipped the tutorial (synced, so it shows once per account)
     revisions: [],  // spaced-revision topics (see SPACED REVISION)
     exams: [],      // { id, name, date, added }
     parked: [],     // distraction parking lot, last 50
@@ -2725,6 +2848,7 @@ function hydrate(obj) {
   for (const k of ['sessions', 'recent', 'pinned', 'pendingSessions', 'reminders', 'revisions', 'exams', 'parked', 'abandoned', 'squad', 'subTemplates']) if (!Array.isArray(out[k])) out[k] = [];
   if (!Array.isArray(out.timer.subtasks)) out.timer.subtasks = [];
   if (!out.notes || typeof out.notes !== 'object' || Array.isArray(out.notes)) out.notes = {};
+  if (!out.energy || typeof out.energy !== 'object' || Array.isArray(out.energy)) out.energy = {};
   if (!out.names || typeof out.names !== 'object' || Array.isArray(out.names)) out.names = {};
   out.game = normalizeGame(obj.game);
   return out;
@@ -2815,6 +2939,8 @@ function profileFromState() {
     game: S.game,
     reminders: S.reminders,
     notes: recentNotes(),
+    energy: recentEnergy(),
+    onboarded: !!S.onboarded,
     revisions: S.revisions,
     exams: S.exams,
     parked: S.parked.slice(-50),
@@ -2913,6 +3039,8 @@ function applyProfile(d) {
   S.game = normalizeGame(d.game);
   if (Array.isArray(d.reminders)) S.reminders = d.reminders.filter(r => r && r.id && r.time && r.date);
   if (d.notes && typeof d.notes === 'object') S.notes = { ...d.notes };
+  if (d.energy && typeof d.energy === 'object' && !Array.isArray(d.energy)) S.energy = { ...d.energy };
+  S.onboarded = !!(d.onboarded || S.onboarded);
   for (const k of ['revisions', 'exams', 'parked', 'abandoned', 'squad', 'subTemplates']) if (Array.isArray(d[k])) S[k] = d[k].filter(x => x && typeof x === 'object');
   S.timer.round = Math.min(S.timer.round, activePreset().rounds);
   lastProfileJSON = JSON.stringify(profileFromState());
@@ -2977,6 +3105,7 @@ function afterFirstLoad() {
 function showView(id) {
   if (id !== 'bootView') setTimeout(hideSplash, 0);
   for (const v of ['bootView', 'authView', 'appView']) $('#' + v).classList.toggle('hidden', v !== id);
+  if (id !== 'appView' && document.documentElement.hasAttribute('data-minimal')) { delete document.documentElement.dataset.minimal; applyMotion(); }
 }
 
 /** Enter the app for a signed-in user (cloud = Firebase available) or guest. */
@@ -3200,6 +3329,7 @@ function mergeData(obj) {
   for (const [k, v] of Object.entries(sg.equipped)) if (!(k in g.equipped)) g.equipped[k] = v;
   for (const r of src.reminders) if (r && r.id && r.time && r.date && !S.reminders.some(x => x.id === r.id)) S.reminders.push(r);
   for (const [k, v] of Object.entries(src.notes)) if (!S.notes[k]) S.notes[k] = v;
+  for (const [k, v] of Object.entries(src.energy)) if (!S.energy[k] && v >= 1 && v <= 4) S.energy[k] = Math.round(v);
   for (const k of ['revisions', 'exams', 'parked', 'abandoned', 'subTemplates']) for (const x of src[k]) if (x && x.id && !S[k].some(y => y.id === x.id)) S[k].push(x);
   for (const [k, v] of Object.entries(sg.trophies)) if (!g.trophies[k]) g.trophies[k] = v;
   save();
@@ -3276,7 +3406,8 @@ function startTimer() {
   const t = S.timer, now = Date.now();
   if (recentGesture()) { uiClaim(); haptic(15); if (!(t.status === 'idle' && t.phase === 'focus' && extraOn('x_startcue'))) uiSound('start', { always: true }); }
   if (t.status === 'idle') {
-    t.planned = phaseMs(t.phase);
+    t.planned = (t.phase === 'focus' && t.oneOff) || phaseMs(t.phase);   // oneOff: the tutorial's 1-minute demo
+    t.oneOff = 0;
     t.remaining = t.planned;
     if (t.phase === 'focus') {
       t.focusStartedAt = now;
@@ -3380,6 +3511,7 @@ function logSession(focusedMs, end) {
   };
   const subRec = takeSubtasks();
   if (subRec) s.subtasks = subRec;
+  if (t.demo) { t.demo = false; t.demoDone = true; }
   const subDay = dayKey(new Date(end)), subBefore = Math.min(SUB_COIN_DAY, subtaskCoinsByDay()[subDay] || 0);
   const levelBefore = rewardsReady() ? game().lv.level : 0;
   const idxBefore = buildIndex(), pomeoBefore = { mins: (idxBefore[dayKey(new Date())] || {}).total || 0, streak: computeStreaks(idxBefore).cur };
@@ -3761,6 +3893,7 @@ function topList(top, total) {
 
 function renderStats() {
   renderSubStat();
+  renderEnergyCard();
   renderWrappedBanner();
   renderGarden();
   const view = S.ui.statsView;
@@ -3813,7 +3946,7 @@ function renderStats() {
       ? `<ul class="sesslist">${daySessions.slice().reverse().map(s => `
           <li><span class="t">${fmtTime(s.start)}–${fmtTime(s.end)}</span>
             <span class="dot" style="background:${esc(colorFor(s.name))}"></span>
-            <span class="nm" title="${esc(s.preset || '')}">${esc(s.name)}${S.notes[s.id] ? `<span class="note">“${esc(S.notes[s.id])}”</span>` : ''}${s.subtasks && s.subtasks.length ? `<details class="subdet"><summary>${s.subtasks.filter(x => x.d).length}/${s.subtasks.length} subtasks</summary><ul>${s.subtasks.map(x => `<li class="${x.d ? 'ok' : 'no'}">${esc(x.t)}</li>`).join('')}</ul></details>` : ''}</span>
+            <span class="nm" title="${esc(s.preset || '')}">${esc(s.name)}${S.energy[s.id] ? `<span class="en" title="Focus: ${ENERGY[S.energy[s.id]].t}">${ENERGY[S.energy[s.id]].e}</span>` : ''}${S.notes[s.id] ? `<span class="note">“${esc(S.notes[s.id])}”</span>` : ''}${s.subtasks && s.subtasks.length ? `<details class="subdet"><summary>${s.subtasks.filter(x => x.d).length}/${s.subtasks.length} subtasks</summary><ul>${s.subtasks.map(x => `<li class="${x.d ? 'ok' : 'no'}">${esc(x.t)}</li>`).join('')}</ul></details>` : ''}</span>
             <span class="d">${fmtMin(s.duration / 60000)}</span>
             <button class="linkbtn" data-del="${esc(s.id)}" title="Delete this session" aria-label="Delete">✕</button></li>`).join('')}</ul>`
       : '<div class="empty" style="margin-top:12px">No focus blocks on this day.</div>';
@@ -3871,7 +4004,10 @@ function renderSettings() {
   $('#setSound').checked = st.sound;
   $('#setNotify').checked = st.notify;
   $('#setAuto').checked = st.autoStart;
-  $('#setGame').checked = st.gamification;
+  $('#setMinimal').checked = minimal();
+  $('#setMinPomeo').checked = st.minPomeo !== false;
+  $('#minPomeoRow').classList.toggle('hidden', !minimal());
+  $('#setEnergy').value = st.energy || 'always';
   $('#setMotion').value = motion();
   $('#setGlass').value = glass();
   $('#setGlass').disabled = !glassSupported();
@@ -4799,10 +4935,10 @@ function renderHeaderChip() {
   $('#coinPill').classList.toggle('hidden', !on);
   $('#avatarBtn').classList.toggle('hidden', on);
   $('#avatarBtn').innerHTML = hasAvatar(myAvatar()) ? avatarSVG(myAvatar(), 26) : USER_SVG;
-  $('#boardTabBtn').classList.toggle('hidden', !on);
+  $('#boardTabBtn').classList.remove('hidden');   // leaderboards stay in True Minimalist, shown plainly
   $('#shopTabBtn').classList.toggle('hidden', !on);
   $('#questTabBtn').classList.toggle('hidden', !on);
-  if (!on) { updateLoginDot(); if (S.ui.tab === 'board' || S.ui.tab === 'shop' || S.ui.tab === 'quests') showTab('timer'); return; }
+  if (!on) { updateLoginDot(); if (S.ui.tab === 'shop' || S.ui.tab === 'quests') showTab('timer'); return; }
   const g = game(), col = NAME_COLORS[equippedId('color')];
   const goalPct = Math.min(100, Math.round(((g.idx[dayKey(new Date())] || {}).total || 0) / S.settings.goalMin * 100));
   const fromPct = lastGoalPct ?? goalPct;
@@ -5533,7 +5669,7 @@ function renderFriends(fromLoad) {
 
 function personRow(uid, name, prof, extra = '') {
   const t = prof && !prof.denied ? tierById(prof.tier) : null;
-  const col = prof && NAME_COLORS[prof.color];
+  const col = prof && !minimal() && NAME_COLORS[prof.color];
   const av = prof && !prof.denied && AVATAR_ART[prof.avatar] ? prof.avatar : 'av_default';
   const badge = t && S.settings.gamification ? withAura(badgeSVG(t, { size: 30, frame: prof.frame, avatar: av }), profStreak(prof))
     : hasAvatar(av) ? avatarSVG(av, 30) : `<span class="avatar">${esc(name[0] || '?').toUpperCase()}</span>`;
@@ -5662,9 +5798,9 @@ async function renderBoard(fromLoad) {
   const rowSel = '#boardBody .lb:not(.pinned) li[data-uid]';
   const before = $('#boardBody .lb li[data-uid]') ? flipCapture(rowSel) : SOC.flipFrom;
   const row = r => {
-    const t = tierById(r.tier), col = NAME_COLORS[r.color], me = r.uid === USER.uid;
+    const t = tierById(r.tier), plain = minimal(), col = !plain && NAME_COLORS[r.color], me = r.uid === USER.uid;
     return `<li class="${me ? 'me' : ''}${r.rank <= 3 ? ' top' + r.rank : ''}" data-uid="${r.uid}"${!me && scope === 'friends' ? ` data-open="${r.uid}"` : ''}>
-      <span class="rk">${r.rank}</span>${withAura(badgeSVG(t, { size: 26, frame: r.frame, avatar: me ? myAvatar() : (AVATAR_ART[r.avatar] ? r.avatar : '') }), me ? myStreak() : profStreak(cached('publicProfiles', r.uid)))}
+      <span class="rk">${r.rank}</span>${plain ? `<span class="avatar">${esc((r.username || '?')[0].toUpperCase())}</span>` : withAura(badgeSVG(t, { size: 26, frame: r.frame, avatar: me ? myAvatar() : (AVATAR_ART[r.avatar] ? r.avatar : '') }), me ? myStreak() : profStreak(cached('publicProfiles', r.uid)))}
       <span class="nm"${col ? ` style="color:${col}"` : ''}>@${esc(r.username)}${me ? ' <span class="lbl">(you)</span>' : ''}</span>
       <span class="v">${fmtMin(r.minutes)}</span></li>`;
   };
@@ -5748,7 +5884,7 @@ function renderFriendProfile() {
   const back = '<button class="linkbtn back" id="friendBack">‹ Friends</button>';
   if (prof === undefined) { $('#friendsBody').innerHTML = back + `<div class="card">${skelRows(1)}</div><div class="card" style="margin-top:16px"><span class="skel block"></span></div>`; return; }
   if (!prof || prof.denied) { $('#friendsBody').innerHTML = back + '<div class="card"><div class="empty">This profile isn’t available.</div></div>'; return; }
-  const t = tierById(prof.tier), col = NAME_COLORS[prof.color], gameOn = S.settings.gamification;
+  const t = tierById(prof.tier), gameOn = S.settings.gamification, col = gameOn && NAME_COLORS[prof.color];
   const isFriend = f && f.status === 'accepted';
   const shared = act && !act.denied && act.visible;
   const fs = isFriend ? friendStreak(act) : 0;
@@ -5851,7 +5987,8 @@ function renderPrivacy() {
    ========================================================================== */
 const scrollMem = {};
 function showTab(tab) {
-  if ((tab === 'board' || tab === 'shop' || tab === 'quests') && !S.settings.gamification) tab = 'timer';
+  if ((tab === 'shop' || tab === 'quests') && !S.settings.gamification) tab = 'timer';
+  hideTip();
   if (!$('#tab-' + tab)) tab = 'timer';
   if (S.ui.tab !== tab && recentGesture(800)) { uiClaim(); uiSound('swoosh'); }
   if (S.ui.tab !== tab && $('#tab-' + S.ui.tab) && $('#tab-' + S.ui.tab).classList.contains('active')) scrollMem[S.ui.tab] = window.scrollY;
@@ -5875,6 +6012,7 @@ function showTab(tab) {
   if (tab === 'timer') ensureRingLoop();
   saveLocal();
   animateIn($('#tab-' + tab));
+  maybeTip(tab);
 }
 /* ==========================================================================
    POMEO — the tomato buddy
@@ -5914,7 +6052,7 @@ function pomeoSVG({ state = 'idle', hat = 'hat_none', acc = 'acc_none', id = '',
     <g class="spark" fill="#f2c14e"><path d="M3 6l1 2.4L6.4 9.4 4 10.4 3 12.8 2 10.4-.4 9.4 2 8.4Z" transform="scale(.8)"/><path d="M38 4l.8 1.8 1.8.8-1.8.8-.8 1.8-.8-1.8-1.8-.8 1.8-.8Z"/></g>
   </svg>`;
 }
-const pomeoOn = () => S.settings.pomeo !== false;
+const pomeoOn = () => S.settings.pomeo !== false && (S.settings.gamification !== false || S.settings.minPomeo !== false);
 const pomeoOutfit = () => ({ hat: equippedId('pomhat'), acc: equippedId('pomacc') });
 const POMEO_MOOD_TEXT = { idle: 'Ready when you are', focus: 'Focused with you', sleep: 'Resting on your break', sleepy: 'A bit sleepy 🌙', celebrate: 'Celebrating!', happy: 'Happy — goal done today', excited: 'Excited about your streak!' };
 let pomeoExcitedUntil = 0;
@@ -5948,7 +6086,8 @@ const PB = { q: [], cur: null, timer: 0, lastEvent: 0 };
  *       'nudge' (water/stretch: its own setting; falls back to a toast).
  */
 function pomeoSay(text, { kind = 'event', ms = 5200, actions = null, closable = false, onClose = null } = {}) {
-  const talk = S.settings.pomeoTalk || 'sometimes';
+  let talk = S.settings.pomeoTalk || 'sometimes';
+  if (kind === 'event' && minimal()) talk = talk === 'chatty' ? 'sometimes' : 'quiet';   // quieter in True Minimalist
   const visible = pomeoOn() && S.ui.tab === 'timer' && !document.body.classList.contains('zen');
   if (kind === 'nudge' && !visible) { toast(text, 4200); return; }
   if (!pomeoOn()) return;
@@ -6619,12 +6758,15 @@ function offerNote(sessionId) {
   $('#revSchedule').textContent = `🔁 Schedule revision of “${revFor}”`;
   $('#noteRow .after-acts').classList.toggle('hidden', !revFor);
   renderSubSum();
+  sumFor = sessionId;
+  renderSumHead();
+  renderEnergyRow(sessionId);
   $('#noteRow').classList.remove('hidden');
 }
-function hideNote() { noteFor = null; subSum = null; $('#noteRow').classList.add('hidden'); }
+function hideNote() { noteFor = null; subSum = null; sumFor = null; energyFor = null; clearTimeout(energyT); $('#noteRow').classList.add('hidden'); }
 /** Close the after-session row once nothing in it is waiting for an answer. */
 function maybeHideAfter() {
-  if ($('#noteRow .note-row').classList.contains('hidden') && (!revFor || $('#revSchedule').disabled) && !(subSum && subSum.left.length)) hideNote();
+  if ($('#noteRow .note-row').classList.contains('hidden') && (!revFor || $('#revSchedule').disabled) && !(subSum && subSum.left.length) && !energyFor) hideNote();
 }
 function saveNote() {
   const v = $('#noteInput').value.trim().slice(0, 120);
@@ -7233,6 +7375,7 @@ let gardenNewest = 0;
 function renderGarden() {
   const el = $('#gardenSlot');
   if (!el || !USER) return;
+  if (minimal()) { el.innerHTML = ''; return; }
   const view = S.ui.gardenView === 'month' ? 'month' : 'week';
   const now = new Date(), today = startOfDay(now);
   const from = view === 'week' ? weekStartOf(now, S.settings.weekStart) : new Date(now.getFullYear(), now.getMonth(), 1);
@@ -7350,22 +7493,26 @@ function openWrapped(i) {
   const d = wrappedData(p), maxTop = d.top.length ? d.top[0][1] : 1, maxH = Math.max(...d.hours, 1);
   const ix = n => `class="wr-in" style="--i:${n}"`;
   W.p = p; W.d = d;
+  const plain = minimal(), er = p.sessions.filter(s => S.energy[s.id]), byHr = {};
+  for (const s of er) (byHr[new Date(s.start).getHours()] ||= []).push(S.energy[s.id]);
+  const locked = er.length >= 3 ? Object.entries(byHr).sort((a, b) => avg(b[1]) - avg(a[1]) || b[1].length - a[1].length)[0] : null;
+  d.locked = locked && +locked[0];
   W.slides = [
     `<div ${ix(0)} class="wr-in wr-k">${p.kind === 'year' ? 'Year' : 'Month'} in focus</div><div ${ix(1)} class="wr-in wr-h">Your ${esc(p.label)}<br>Wrapped ✨</div><div ${ix(2)} class="wr-in wr-p">Tap to see how it went.</div>`,
     `<div class="wr-in wr-k" style="--i:0">You focused for</div><div class="wr-in wr-big" style="--i:1">${(d.mins / 60).toFixed(1)}<small>hours</small></div><div class="wr-in wr-p" style="--i:2">across <b>${d.n}</b> session${d.n === 1 ? '' : 's'} on <b>${d.active}</b> day${d.active === 1 ? '' : 's'}.</div>`,
     `<div class="wr-in wr-k" style="--i:0">Your top subjects</div><div class="wr-in wr-bars2" style="--i:1">${d.top.map(([n, m]) => `<div class="r"><span>${esc(n)}</span><span>${fmtMin(m)}</span><i style="transform:scaleX(${(m / maxTop).toFixed(3)})"></i></div>`).join('')}</div>`,
     `<div class="wr-in wr-k" style="--i:0">Best day</div><div class="wr-in wr-h" style="--i:1">${d.best ? parseDay(d.best[0]).toLocaleDateString([], { weekday: 'long', day: 'numeric', month: 'long' }) : '—'}</div><div class="wr-in wr-p" style="--i:2">${d.best ? fmtMin(d.best[1]) + ' of focus in one day.' : ''}</div>
      <div class="wr-in wr-k" style="--i:3;margin-top:22px">Longest streak</div><div class="wr-in wr-big" style="--i:4">${d.longest}<small>day${d.longest === 1 ? '' : 's'} in a row</small></div>`,
-    `<div class="wr-in wr-k" style="--i:0">Most productive time</div><div class="wr-in wr-h" style="--i:1">The ${d.bestPart} · around ${fmtHr(d.peakPart)}</div><div class="wr-in wr-hours" style="--i:2">${d.hours.map(m => `<i style="height:${Math.max(2, m / maxH * 100).toFixed(1)}%"></i>`).join('')}</div><div class="wr-in wr-p" style="--i:3;display:flex;justify-content:space-between;font-size:12px"><span>12 AM</span><span>12 PM</span><span>11 PM</span></div>`,
-    `<div class="wr-in wr-k" style="--i:0">Bosses & garden</div><div class="wr-in wr-h" style="--i:1">${d.bosses.length ? `${d.bosses.length} boss${d.bosses.length === 1 ? '' : 'es'} defeated ⚔️` : 'The bosses got away this time'}</div>
+    `<div class="wr-in wr-k" style="--i:0">Most productive time</div><div class="wr-in wr-h" style="--i:1">The ${d.bestPart} · around ${fmtHr(d.peakPart)}</div><div class="wr-in wr-hours" style="--i:2">${d.hours.map(m => `<i style="height:${Math.max(2, m / maxH * 100).toFixed(1)}%"></i>`).join('')}</div><div class="wr-in wr-p" style="--i:3;display:flex;justify-content:space-between;font-size:12px"><span>12 AM</span><span>12 PM</span><span>11 PM</span></div>${locked ? `<div class="wr-in wr-p" style="--i:4;margin-top:14px">🔥 Most locked-in hour: <b>${fmtHr(+locked[0])}</b> · ${energyWord(avg(locked[1]))}</div>` : ''}`,
+    !plain && `<div class="wr-in wr-k" style="--i:0">Bosses & garden</div><div class="wr-in wr-h" style="--i:1">${d.bosses.length ? `${d.bosses.length} boss${d.bosses.length === 1 ? '' : 'es'} defeated ⚔️` : 'The bosses got away this time'}</div>
      <div class="wr-in wr-p" style="--i:2">Your garden grew <b>${d.garden.grown}</b> plant${d.garden.grown === 1 ? '' : 's'}${d.garden.golden ? `, including <b>${d.garden.golden}</b> golden tomato plant${d.garden.golden === 1 ? '' : 's'}` : ''}${d.garden.wilted ? ` (${d.garden.wilted} wilted)` : ''}.</div>
      <div class="wr-in wr-garden" style="--i:3">${d.gItems.slice(-40).map(it => plantSVG(plantKind(it))).join('')}</div>`,
     `<div class="wr-in wr-k" style="--i:0">Your focus personality</div><div class="wr-in wr-emoji" style="--i:1">${d.persona.e}</div><div class="wr-in wr-h" style="--i:2">${d.persona.t}</div><div class="wr-in wr-p" style="--i:3">${d.persona.d}</div>`,
     `<div class="wr-in wr-k" style="--i:0">${esc(p.label)} · Wrapped</div><div class="wr-in wr-h" style="--i:1">${d.persona.e} ${d.persona.t}</div>
-     <div class="wr-in wr-sum" style="--i:2"><div><b>${(d.mins / 60).toFixed(1)}h</b><span>focused</span></div><div><b>${d.n}</b><span>sessions</span></div><div><b>${d.longest}</b><span>day streak</span></div><div><b>${d.garden.grown}</b><span>plants grown</span></div>
+     <div class="wr-in wr-sum" style="--i:2"><div><b>${(d.mins / 60).toFixed(1)}h</b><span>focused</span></div><div><b>${d.n}</b><span>sessions</span></div><div><b>${d.longest}</b><span>day streak</span></div>${plain ? `<div><b>${d.active}</b><span>active days</span></div>` : `<div><b>${d.garden.grown}</b><span>plants grown</span></div>`}
      <div style="grid-column:1/-1"><b style="font-size:17px">${d.top[0] ? esc(d.top[0][0]) : '—'}</b><span>top subject</span></div></div>
      <button class="wr-in wr-share" style="--i:3" id="wrShare">Share</button>`,
-  ];
+  ].filter(Boolean);
   const story = $('#wrapped .wr-story');
   const cs = getComputedStyle(document.documentElement);
   story.style.setProperty('--wr-a', cs.getPropertyValue('--accent').trim() || '#2f8f83');
@@ -7431,7 +7578,7 @@ function wrappedImage() {
     x.font = font(500, 30); x.globalAlpha = .75; x.fillText(small, tx + 36, ty + 160); x.globalAlpha = 1;
   };
   tile(80, 400, (d.mins / 60).toFixed(1) + 'h', 'focused'); tile(560, 400, String(d.n), 'sessions');
-  tile(80, 640, String(d.longest), 'day streak'); tile(560, 640, String(d.garden.grown), 'plants grown');
+  tile(80, 640, String(d.longest), 'day streak'); if (minimal()) tile(560, 640, String(d.active), 'active days'); else tile(560, 640, String(d.garden.grown), 'plants grown');
   x.fillStyle = '#fff'; x.font = font(500, 32); x.globalAlpha = .75; x.fillText('Top subjects', 80, 930); x.globalAlpha = 1;
   d.top.slice(0, 3).forEach(([n, m], i) => { x.font = font(700, 40); x.fillText(`${i + 1}. ${n}`, 80, 990 + i * 60, 700); x.font = font(500, 34); x.textAlign = 'right'; x.fillText(fmtMin(m), w - 80, 990 + i * 60); x.textAlign = 'left'; });
   x.fillStyle = 'rgba(255,255,255,.18)'; x.fillRect(80, h - 150, w - 160, 2);
@@ -8036,9 +8183,10 @@ addEventListener('resize', () => $$('.catrow').forEach(updateFades));
    command palette, offline banner, pull to refresh, tab swipes, haptics.
    Everything here is stored on this device (localStorage); no new cloud data.
    ========================================================================== */
-const APP_VERSION = '1.7';
+const APP_VERSION = '1.8';
 const VER_KEY = 'pomodorolist-seen-version';
 const CHANGELOG = [
+  { v: '1.8', t: 'True Minimalist & Pomeo’s tutorial', d: 'True Minimalist mode for a clean, calm timer; a short tutorial with Pomeo and one-time tips; focus check-ins with insights in Stats; a session-complete summary; quick-start chips for your favourite presets; and a contact email.' },
   { v: '1.7', t: 'Polish update', d: 'Inbox for everything that happens, command palette (Ctrl/⌘ K), tidier searchable Settings, Undo instead of “Are you sure?”, offline banner, pull to refresh and swipes on phones.' },
   { v: '1.6.2', t: 'Sounds & feel', d: 'Soft interface sounds in four packs, quiet during focus, plus cursor glow, tilt and magnetic buttons.' },
   { v: '1.6.1', t: 'Subtasks', d: 'An optional checklist for each session, with templates, carry-over and history.' },
@@ -8050,7 +8198,7 @@ const CHANGELOG = [
   { v: '1.1', t: 'Accounts & sync', d: 'Log in and keep your sessions in sync on every device, even offline.' },
   { v: '1.0', t: 'Focus timer', d: 'Pomodoro timer with named sessions, presets, streaks and stats.' },
 ];
-const NEWS = ['🔔 An inbox for requests, reminders and rewards', '⌘ Command palette — press Ctrl/⌘ K or tap 🔍', '⚙️ Settings in clear sections, with search', '↩️ Undo instead of “Are you sure?”'];
+const NEWS = ['🧘 True Minimalist mode — just the timer, plans and stats (Settings → Appearance)', '🍅 A short tutorial with Pomeo — replay it anytime', '⚡ “How focused did you feel?” check-ins unlock insights in Stats', '✓ A session summary card and quick-start chips for your top presets'];
 
 /* ---------- Haptics ---------- */
 const HAPTIC_KEY = 'pomodorolist-haptics';
@@ -8211,18 +8359,20 @@ function renderAbout() {
 }
 function newsCheck() {
   const seen = localStorage.getItem(VER_KEY);
-  if (!seen && !tourDone()) { writeLS(VER_KEY, APP_VERSION); return; }   // brand-new user: the welcome tour is enough
+  if (!seen && !tourDone()) { writeLS(VER_KEY, APP_VERSION); return; }   // brand-new user: the tutorial is enough
   if (seen === APP_VERSION) { $('#newsSlot').innerHTML = ''; return; }
   $('#newsSlot').innerHTML = `<div class="card news-card" role="region" aria-label="What's new">
     <span class="pomeo-pic" style="width:44px;height:44px;flex:none">${pomeoOn() ? pomeoSVG({ state: 'excited', ...pomeoOutfit() }).replace('class="mascot"', 'class="mascot" style="position:static;width:44px;height:44px"') : '✨'}</span>
     <div class="nc-main"><h3>What’s new in v${APP_VERSION}</h3><ul>${NEWS.map(n => `<li>${esc(n)}</li>`).join('')}</ul>
-      <button class="btn small" data-go-about>See all changes</button></div>
+      <div class="btn-row"><button class="btn small primary" data-news-tut>Take the tutorial</button><button class="btn small" data-news-min>${minimal() ? 'True Minimalist is on' : 'Try True Minimalist'}</button><button class="btn small" data-go-about>See all changes</button></div></div>
     <button class="nc-x" id="newsClose" aria-label="Dismiss what's new">✕</button></div>`;
 }
 function newsDone() { writeLS(VER_KEY, APP_VERSION); $('#newsSlot').innerHTML = ''; }
 document.addEventListener('click', e => {
   if (e.target.closest('[data-go-about]')) { if (e.target.closest('#newsSlot')) newsDone(); showTab('about'); }
   if (e.target.closest('#newsClose')) newsDone();
+  if (e.target.closest('[data-news-tut]')) { newsDone(); startTutorial(); }
+  if (e.target.closest('[data-news-min]')) { newsDone(); if (!minimal()) setMinimal(true); goSetting($('#setMinimal').closest('.setting')); }
 });
 $('#aboutBack').addEventListener('click', () => showTab('settings'));
 $('#privacyLogin').addEventListener('click', () => logout());
@@ -8264,7 +8414,7 @@ function goSetting(row) {
 function cmdList(q) {
   const L = [], add = (ic, t, g, run, k = '') => L.push({ ic, t, g, run, k });
   const tabs = [['timer', '⏱️', 'Timer'], ['reminders', '🔔', 'Reminders'], ['quests', '⚔️', 'Quests'], ['stats', '📊', 'Stats'], ['board', '🏆', 'Leaderboard'], ['shop', '🛍️', 'Shop'], ['friends', '👥', 'Friends'], ['profile', '👤', 'Profile'], ['settings', '⚙️', 'Settings'], ['about', 'ℹ️', 'About']];
-  for (const [id, ic, n] of tabs) if (!(['quests', 'board', 'shop'].includes(id) && !S.settings.gamification)) add(ic, n, 'Go to', () => showTab(id), id === 'board' ? 'ranks leaderboard' : '');
+  for (const [id, ic, n] of tabs) if (!(['quests', 'shop'].includes(id) && !S.settings.gamification)) add(ic, n, 'Go to', () => showTab(id), id === 'board' ? 'ranks leaderboard' : '');
   add('📥', 'Inbox', 'Open', openInbox, 'notifications messages');
   const t = S.timer;
   add(t.status === 'running' ? '⏸️' : '▶️', t.status === 'running' ? 'Pause timer' : t.status === 'paused' ? 'Resume timer' : 'Start timer', 'Timer', () => { showTab('timer'); $('#mainBtn').click(); }, 'start pause resume focus');
@@ -8286,7 +8436,10 @@ function cmdList(q) {
   if (loginOn() && !loginToday().claimed) add('🎁', 'Claim daily reward', 'Rewards', () => { showTab('profile'); openLoginDlg(); }, 'login daily');
   add('📅', 'Manage exams', 'Timer', openExams, 'exam countdown');
   add('⌨️', 'Keyboard shortcuts', 'Help', () => $('#keysDlg').showModal(), 'keys help');
-  add('🧭', 'Replay welcome tour', 'Help', () => $('#replayTour').click(), 'tour help');
+  add('🧘', minimal() ? 'Turn off True Minimalist' : 'Turn on True Minimalist', 'Settings', () => { setMinimal(!minimal()); toast(minimal() ? 'True Minimalist on' : 'True Minimalist off', 2000, true); }, 'true minimalist minimal simple plain gamification progression');
+  add('🧭', 'Replay tutorial', 'Help', startTutorial, 'tour tutorial welcome help pomeo');
+  add('💡', 'Reset tips', 'Help', () => $('#resetTips').click(), 'tips hints');
+  add('✉️', 'Contact (email)', 'Help', openContact, 'contact email mail support');
   add('✨', 'What’s new', 'Help', () => showTab('about'), 'changelog version');
   add('💾', 'Export data (JSON)', 'Data', () => $('#exportBtn').click(), 'backup download');
   add('💬', 'Send feedback', 'Help', openFeedback, 'report an issue bug idea github contact');
@@ -8569,7 +8722,7 @@ const AVATAR_ART = {
 };
 /** The avatar art for use inside another SVG (expects the 24×24 grid). */
 const avatarArt = id => { const a = AVATAR_ART[id]; return a ? `<g clip-path="url(#avClip)"${a.anim ? ' class="av-anim"' : ''}><circle cx="12" cy="12" r="12" fill="${a.bg}"/>${a.art}</g>` : ''; };
-const hasAvatar = id => !!id && id !== 'av_default' && !!AVATAR_ART[id];
+const hasAvatar = id => !!id && id !== 'av_default' && !!AVATAR_ART[id] && !minimal();   // True Minimalist: plain initials
 /** A plain round avatar. */
 const avatarSVG = (id, size = 32) => `<svg class="av" viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true">${avatarArt(id)}</svg>`;
 const myAvatar = () => equippedId('avatar');
@@ -8586,7 +8739,302 @@ function miniPic(uid, name, size = 22) {
   return hasAvatar(id) ? `<span class="mini-av">${avatarSVG(id, size)}</span>` : `<span class="avatar mini" style="width:${size}px;height:${size}px;font-size:${Math.round(size * .45)}px">${esc((name || '?')[0]).toUpperCase()}</span>`;
 }
 
-/* ---------- First-time welcome tour (once per device) ---------- */
+/* ==========================================================================
+   TRUE MINIMALIST — one switch (the old "Progression" setting, inverted).
+   Hides XP, coins, shop, badges, aura, rewards, Quests, garden and the
+   gamified Wrapped slide. Nothing is deleted: coins and XP keep counting
+   quietly and everything is back exactly as it was when you switch it off.
+   ========================================================================== */
+const minimal = () => !!S && S.settings && S.settings.gamification === false;
+function applyMinimal() {
+  const on = !!USER && minimal();
+  if (on) document.documentElement.dataset.minimal = ''; else delete document.documentElement.dataset.minimal;
+  applyMotion();
+  sheenLoop();
+}
+function setMinimal(on) {
+  S.settings.gamification = !on;
+  save();
+  applyMinimal();
+  renderAll();
+  if (S.ui.tab === 'settings') renderSettings();
+  if (S.ui.tab === 'profile') renderProfile();
+  if (S.ui.tab === 'stats') renderStats();
+}
+
+/* ==========================================================================
+   CONTACT
+   ========================================================================== */
+const CONTACT_EMAIL = 'siverieg.p@gmail.com';
+const openContact = () => { location.href = 'mailto:' + CONTACT_EMAIL + '?subject=' + encodeURIComponent('Pomodorolist'); };
+
+/* ==========================================================================
+   ONBOARDING TUTORIAL WITH POMEO (replaces the old spotlight tour)
+   Done-state: S.onboarded (users/{uid}) + localStorage on this device.
+   ========================================================================== */
+const TUT = { i: 0, use: '', goal: 0, fromTour: false };
+const TUT_STEPS = 6;
+const USE_CASES = {
+  exam: { t: 'Exam prep', s: '50/10 blocks + countdown', goal: 120 },
+  school: { t: 'School', s: 'Homework and revision', goal: 60 },
+  work: { t: 'Work', s: 'Classic 25/5 focus', goal: 120 },
+  personal: { t: 'Personal projects', s: 'Reading, hobbies, side projects', goal: 60 },
+};
+function startTutorial() {
+  TUT.i = 0; TUT.use = S.settings.useCase || ''; TUT.goal = 0;
+  if (!$('#tutDlg').open) $('#tutDlg').showModal();
+  renderTut();
+}
+function renderTut() {
+  const i = TUT.i, on = !minimal();
+  $('#tutPomeo').innerHTML = pomeoSVG({ state: i === 5 ? 'excited' : 'happy', ...pomeoOutfit() });
+  $('#tutStep').textContent = `Step ${i + 1} of ${TUT_STEPS}`;
+  $('#tutDots').innerHTML = Array.from({ length: TUT_STEPS }, (_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join('');
+  $('#tutNext').classList.toggle('hidden', i === 5);
+  $('#tutNext').textContent = i === 3 ? 'Show me' : 'Next';
+  const body = $('#tutBody');
+  if (i === 0) {
+    $('#tutTitle').textContent = 'Hi, I’m Pomeo! I’ll help you focus. 🍅';
+    body.innerHTML = '<p>Pomodorolist is a calm focus timer: short focused blocks, gentle breaks, reminders and friends to keep you going. This takes less than a minute.</p>';
+  } else if (i === 1) {
+    $('#tutTitle').textContent = 'What are you using it for?';
+    body.innerHTML = `<p>I’ll set sensible defaults. You can change anything later.</p><div class="tut-opts">${Object.entries(USE_CASES).map(([k, u]) => `<button class="tut-opt${TUT.use === k ? ' on' : ''}" data-use="${k}" aria-pressed="${TUT.use === k}"><b>${u.t}</b><small>${u.s}</small></button>`).join('')}</div>
+      <div class="tut-row${TUT.use === 'exam' ? '' : ' hidden'}" id="tutExamRow"><input type="text" id="tutExamName" maxlength="60" placeholder="Exam name (optional)" aria-label="Exam name"><input type="date" id="tutExamDate" aria-label="Exam date" min="${dayKey(new Date())}"></div>`;
+  } else if (i === 2) {
+    $('#tutTitle').textContent = 'Pick a daily goal';
+    const def = TUT.goal || (USE_CASES[TUT.use] || {}).goal || S.settings.goalMin || 60;
+    TUT.goal = def;
+    body.innerHTML = `<p>A day counts toward your streak when you reach it.</p><div class="tut-opts">${[60, 120, 240].map(m => `<button class="tut-opt${def === m ? ' on' : ''}" data-goal="${m}"><b>${m / 60} hour${m > 60 ? 's' : ''}</b><small>${m} minutes</small></button>`).join('')}
+      <label class="tut-opt${[60, 120, 240].includes(def) ? '' : ' on'}"><b>Custom</b><input type="number" id="tutGoal" min="5" max="1440" step="5" value="${[60, 120, 240].includes(def) ? '' : def}" placeholder="minutes" aria-label="Custom daily goal in minutes"></label></div>`;
+  } else if (i === 3) {
+    $('#tutTitle').textContent = 'A quick look around';
+    body.innerHTML = `<p>I’ll point at each main tab with one line about it: Timer, Stats, Reminders, Leaderboard${on ? ', Shop' : ''}, Friends${on ? ' and Quests' : ''}.</p>`;
+  } else if (i === 4) {
+    $('#tutTitle').textContent = 'Prefer it simple?';
+    body.innerHTML = `<p>True Minimalist hides levels, coins, the shop and quests for a clean, calm timer. Nothing is lost.</p>
+      <label class="tut-switch"><span><b>True Minimalist</b><br><small class="muted">You can change this anytime in Settings.</small></span><input type="checkbox" id="tutMinimal"${minimal() ? ' checked' : ''} aria-label="True Minimalist"></label>`;
+  } else {
+    $('#tutTitle').textContent = 'Ready?';
+    body.innerHTML = `<p>Start your first focus block, or try a 1-minute demo to see how a session finishes${minimal() ? '' : ' (with rewards)'} and the quick check-in.</p>
+      <div class="tut-big"><button class="btn primary" id="tutStart">Start my first session</button><button class="btn" id="tutDemo">Try a 1-minute demo session</button></div>`;
+  }
+}
+function applyTutStep() {
+  if (TUT.i === 1 && TUT.use) {
+    S.settings.useCase = TUT.use;
+    const want = TUT.use === 'exam' ? 50 : 25;
+    let p = S.presets.find(x => x.focus === want && x.short === (want === 50 ? 10 : 5));
+    if (!p) { p = want === 50 ? { id: 'p-' + uid(), name: 'Exam focus 50/10', focus: 50, short: 10, long: 20, rounds: 3 } : { id: 'p-' + uid(), name: 'Classic 25/5', focus: 25, short: 5, long: 15, rounds: 4 }; S.presets.push(p); }
+    if (S.timer.status === 'idle') S.activePresetId = p.id;
+    const n = ($('#tutExamName') || {}).value, d = ($('#tutExamDate') || {}).value;
+    if (TUT.use === 'exam' && d && daysUntil(d) >= 0) S.exams.push({ id: 'x' + uid(), name: (n || 'My exam').trim().slice(0, 60), date: d, added: Date.now() });
+    save(); renderAll();
+  }
+  if (TUT.i === 2) {
+    const custom = +(($('#tutGoal') || {}).value || 0);
+    S.settings.goalMin = clamp(Math.round(custom || TUT.goal || 60), 5, 1440);
+    save(); renderAll();
+  }
+}
+function tutNext() {
+  applyTutStep();
+  if (TUT.i === 3) { $('#tutDlg').close(); TUT.fromTour = true; setTimeout(() => startTour(), 220); return; }
+  if (TUT.i < TUT_STEPS - 1) { TUT.i++; renderTut(); }
+}
+function finishTutorial() {
+  S.onboarded = true; save(); setTourDone();
+  if ($('#tutDlg').open) $('#tutDlg').close();
+  setTimeout(maybeShowLogin, 500);
+}
+$('#tutNext').addEventListener('click', tutNext);
+$('#tutSkip').addEventListener('click', () => { applyTutStep(); finishTutorial(); });
+$('#tutDlg').addEventListener('cancel', e => { e.preventDefault(); finishTutorial(); });
+$('#tutBody').addEventListener('click', e => {
+  const u = e.target.closest('[data-use]'), g = e.target.closest('[data-goal]');
+  if (u) { TUT.use = u.dataset.use; renderTut(); }
+  if (g) { TUT.goal = +g.dataset.goal; if ($('#tutGoal')) $('#tutGoal').value = ''; renderTut(); }
+  if (e.target.closest('#tutStart')) {
+    finishTutorial();
+    showTab('timer');
+    setTimeout(() => { if (S.timer.status === 'idle') { S.timer.phase = 'focus'; UIS.gesture = performance.now(); startTimer(); } }, 300);
+  }
+  if (e.target.closest('#tutDemo')) {
+    finishTutorial();
+    showTab('timer');
+    setTimeout(() => {
+      if (S.timer.status !== 'idle') return;
+      $('#nameInput').value = 'Demo session'; onNameChange();
+      S.timer.phase = 'focus'; S.timer.oneOff = 60000; S.timer.demo = true;
+      UIS.gesture = performance.now(); startTimer();
+      pomeoSay('One minute! Watch what happens when it ends ⏱️', { kind: 'tap', ms: 4000 });
+    }, 300);
+  }
+});
+$('#tutBody').addEventListener('input', e => { if (e.target.id === 'tutGoal' && +e.target.value) { TUT.goal = +e.target.value; } });
+$('#tutBody').addEventListener('change', e => { if (e.target.id === 'tutMinimal') setMinimal(e.target.checked); });
+
+/* ---------- One-time tips, the first time a screen is opened ---------- */
+const TIPS_KEY = 'pomodorolist-tips-seen';
+const TIPS = {
+  stats: () => minimal() ? 'Your stats live here. Pick Day, Week, Month or Year, and check in after sessions to unlock focus insights.' : 'Your stats live here, plus the Tomato Garden and focus insights from your check-ins.',
+  reminders: () => 'Plan study blocks here. I’ll pop up when it’s time — and you can add them to your phone’s calendar.',
+  quests: () => 'A new boss every week! Every focus minute you finish is 1 damage. Team up with friends for a bigger one.',
+  shop: () => 'Spend coins on themes, sounds, profile pictures and outfits for me 🍅',
+  friends: () => 'Add friends by username, send kudos and see who’s focusing right now.',
+  board: () => 'See how your focus minutes compare with friends — or everyone, if you opt in.',
+  profile: () => minimal() ? 'Your account and Pomeo live here. Settings are one tap away.' : 'Your level, badges, daily rewards and trophies. Settings are one tap away.',
+  settings: () => 'Tip: search settings at the top, or press Ctrl/⌘ K anywhere to jump straight to one.',
+};
+const tipsSeen = () => new Set(readJSON(TIPS_KEY, []));
+let tipT = 0;
+function maybeTip(tab) {
+  if (!USER || !TIPS[tab] || !S.onboarded || !tourDone() || $('#tutDlg').open || !$('#tour').classList.contains('hidden')) return;
+  const seen = tipsSeen();
+  if (seen.has(tab)) return;
+  clearTimeout(tipT);
+  tipT = setTimeout(() => {
+    if (S.ui.tab !== tab || document.querySelector('dialog[open]')) return;
+    seen.add(tab); writeLS(TIPS_KEY, [...seen]);
+    const el = $('#tipPop');
+    el.querySelector('.pomeo-pic').innerHTML = pomeoOn() ? pomeoSVG({ state: 'happy', ...pomeoOutfit() }) : '';
+    el.querySelector('p').textContent = TIPS[tab]();
+    el.classList.remove('hidden', 'show'); void el.offsetWidth; el.classList.add('show');
+  }, 450);
+}
+const hideTip = () => $('#tipPop').classList.add('hidden');
+$('#tipOk').addEventListener('click', hideTip);
+$('#resetTips').addEventListener('click', () => { writeLS(TIPS_KEY, []); toast('Tips will show again as you explore', 2200, true); });
+
+/* ==========================================================================
+   ENERGY CHECK-IN — "How focused did you feel?" after a session.
+   S.energy { sessionId: 1–4 } in users/{uid} (like session notes).
+   ========================================================================== */
+const ENERGY = [null, { e: '😴', t: 'Low' }, { e: '😐', t: 'Okay' }, { e: '🙂', t: 'Good' }, { e: '🔥', t: 'Locked in' }];
+let energyFor = null, energyT = 0;
+function shouldCheckIn() {
+  const m = S.settings.energy || 'always';
+  return m === 'always' || (m === 'sometimes' && S.sessions.length % 3 === 0) || (S.timer.demoDone && m !== 'off');
+}
+function renderEnergyRow(sessionId) {
+  const el = $('#energyRow');
+  clearTimeout(energyT);
+  energyFor = sessionId && shouldCheckIn() ? sessionId : null;
+  S.timer.demoDone = false;
+  el.classList.toggle('hidden', !energyFor);
+  if (!energyFor) return;
+  el.classList.remove('done');
+  el.innerHTML = `<div class="eq"><span>How focused did you feel?</span><button class="linkbtn" data-eskip>Skip</button></div>
+    <div class="opts">${[1, 2, 3, 4].map(n => `<button data-energy="${n}" aria-label="${ENERGY[n].t}"><span aria-hidden="true">${ENERGY[n].e}</span>${ENERGY[n].t}</button>`).join('')}</div>
+    <div class="bar"><i style="--edur:14s"></i></div>`;
+  energyT = setTimeout(() => skipEnergy(), 14000);   // ignored → quietly goes away
+}
+function rateEnergy(n) {
+  if (!energyFor) return;
+  clearTimeout(energyT);
+  S.energy[energyFor] = n;
+  save();
+  uiClaim(); uiSound('tick'); haptic(8);
+  const el = $('#energyRow');
+  el.classList.add('done');
+  el.innerHTML = `<div class="eq"><span>${ENERGY[n].e} ${ENERGY[n].t} — thanks!</span></div>`;
+  energyFor = null;
+  renderSumHead();
+  if (S.ui.tab === 'stats') renderStats();
+  setTimeout(() => { el.classList.add('hidden'); maybeHideAfter(); }, 1600);
+  setTimeout(pomeoInsight, 2600);
+}
+function skipEnergy() { clearTimeout(energyT); energyFor = null; $('#energyRow').classList.add('hidden'); maybeHideAfter(); }
+$('#energyRow').addEventListener('click', e => {
+  const b = e.target.closest('[data-energy]');
+  if (b) rateEnergy(+b.dataset.energy);
+  if (e.target.closest('[data-eskip]')) skipEnergy();
+});
+/** Recent ratings only (keeps the profile document small). */
+function recentEnergy() {
+  const keep = new Set(S.sessions.slice(-400).map(s => s.id)), out = {};
+  for (const [id, v] of Object.entries(S.energy || {})) if (keep.has(id) && v >= 1 && v <= 4) out[id] = v;
+  return out;
+}
+
+/* ---------- The session-complete summary card ---------- */
+let sumFor = null;
+function renderSumHead() {
+  const el = $('#sumHead'), s = sumFor && S.sessions.find(x => x.id === sumFor);
+  if (!s) { el.innerHTML = ''; return; }
+  const parked = S.parked.filter(p => p.at >= s.start && p.at <= s.end + 1000).length;
+  const sub = s.subtasks ? `${s.subtasks.filter(x => x.d).length}/${s.subtasks.length} subtasks` : '';
+  const en = S.energy[s.id] ? `${ENERGY[S.energy[s.id]].e} ${ENERGY[S.energy[s.id]].t}` : '';
+  el.innerHTML = `<b>✓ Session complete · ${fmtMin(s.duration / 60000)}</b><span>${[esc(s.name), sub, en, parked ? `${parked} parked thought${parked === 1 ? '' : 's'}` : ''].filter(Boolean).join(' · ')}</span>`;
+}
+
+/* ---------- Insights from check-ins (Stats) ---------- */
+const avg = a => a.reduce((x, y) => x + y, 0) / a.length;
+const energyWord = v => (v >= 3.5 ? 'Locked in 🔥' : v >= 2.75 ? 'Good 🙂' : v >= 2 ? 'Okay 😐' : 'Low 😴');
+function rated(from = 0, to = Infinity) { return S.sessions.filter(s => S.energy[s.id] && s.start >= from && s.start < to).map(s => ({ s, e: S.energy[s.id] })); }
+function energyInsights() {
+  const R = rated();
+  if (R.length < 10) return { n: R.length };
+  const group = (key) => { const g = {}; for (const r of R) { const k = key(r.s); if (k === null) continue; (g[k] ||= []).push(r.e); } return Object.entries(g).filter(([, v]) => v.length >= 2).map(([k, v]) => ({ k, a: avg(v), n: v.length })).sort((x, y) => y.a - x.a || y.n - x.n); };
+  const part = h => (h >= 5 && h < 12 ? 'Morning' : h >= 12 && h < 17 ? 'Afternoon' : h >= 17 && h < 21 ? 'Evening' : 'Night');
+  const time = group(s => part(new Date(s.start).getHours()));
+  const hour = time[0] ? group(s => { const h = new Date(s.start).getHours(); return part(h) === time[0].k ? h : null; }) : [];
+  const len = group(s => { const m = s.duration / 60000; return m < 30 ? 0 : m < 60 ? 30 : m < 90 ? 60 : 90; });
+  const days = group(s => new Date(s.start).getDay());
+  const subj = group(s => s.name === 'Untitled' ? null : s.name);
+  const LEN = { 0: 'under 30 min', 30: '30–59 min', 60: '60–89 min', 90: '90 min or more' };
+  let lenNote = len[0] ? `Best: ${LEN[len[0].k]} (${energyWord(len[0].a)})` : '';
+  const short = R.filter(r => r.s.duration < 3.6e6).map(r => r.e), long = R.filter(r => r.s.duration >= 3.6e6).map(r => r.e);
+  if (short.length >= 3 && long.length >= 2 && avg(short) - avg(long) >= 0.4) lenNote = 'Your focus drops after 60 min — try shorter blocks';
+  const weeks = Array.from({ length: 4 }, (_, i) => { const from = addDays(weekStartOf(new Date(), 1), -7 * (3 - i)); const r = rated(from.getTime(), addDays(from, 7).getTime()).map(x => x.e); return { label: i === 3 ? 'This wk' : `${3 - i}w ago`, a: r.length ? avg(r) : 0, n: r.length }; });
+  return { n: R.length, time: time[0], hour: hour[0], len: len[0], lenNote, days: days.slice(0, 2), subjTop: subj[0], subjLow: subj.length > 1 ? subj[subj.length - 1] : null, weeks };
+}
+function renderEnergyCard() {
+  const el = $('#energySlot');
+  if (!el || !USER) return;
+  if ((S.settings.energy || 'always') === 'off' && !Object.keys(S.energy).length) { el.innerHTML = ''; return; }
+  const I = energyInsights();
+  if (I.n < 10) {
+    el.innerHTML = `<div class="card"><h2>⚡ Focus insights</h2><p class="muted" style="margin:0;font-size:14px">Keep checking in after sessions to unlock insights — ${I.n}/10 so far.</p><div class="ins-progress"><i style="width:${I.n * 10}%"></i></div></div>`;
+    return;
+  }
+  const D = ['Sundays', 'Mondays', 'Tuesdays', 'Wednesdays', 'Thursdays', 'Fridays', 'Saturdays'];
+  const box = (k, v, s = '') => `<div class="ins"><div class="k">${k}</div><div class="v">${v}</div>${s ? `<div class="s">${s}</div>` : ''}</div>`;
+  el.innerHTML = `<div class="card"><div class="row between" style="margin-bottom:8px"><h2 style="margin:0">⚡ Focus insights</h2><span class="lbl">${I.n} check-ins</span></div>
+    <div class="ins-grid">
+      ${I.time ? box('Best time of day', I.time.k, `${energyWord(I.time.a)}${I.hour ? ` · peak around ${fmtHr(+I.hour.k)}` : ''}`) : ''}
+      ${I.lenNote ? box('Session length', I.lenNote) : ''}
+      ${I.days.length ? box('Best days', I.days.map(d => D[d.k]).join(' & '), energyWord(I.days[0].a)) : ''}
+      ${I.subjTop ? box('By subject', esc(I.subjTop.k) + ' feels best', I.subjLow && I.subjLow.k !== I.subjTop.k ? `${esc(I.subjLow.k)} is the toughest` : '') : ''}
+    </div>
+    <div class="lbl" style="margin-top:14px">Average focus · last 4 weeks</div>
+    <div class="ins-chart" role="img" aria-label="Average focus rating for the last 4 weeks">${I.weeks.map(w => `<div><i style="height:${w.n ? Math.max(6, (w.a / 4) * 64) : 2}px;${w.n ? '' : 'opacity:.25'}" title="${w.n ? energyWord(w.a) + ' · ' + w.n + ' check-ins' : 'No check-ins'}"></i>${w.label}</div>`).join('')}</div></div>`;
+}
+/** Pomeo shares one insight, at most once a day. */
+const INSIGHT_DAY_KEY = 'pomodorolist-insight-day';
+function pomeoInsight() {
+  const I = energyInsights();
+  if (I.n < 10 || !pomeoOn() || localStorage.getItem(INSIGHT_DAY_KEY) === dayKey(new Date()) || Math.random() < .5) return;
+  const lines = [I.time && `Fun fact: you focus best in the ${I.time.k.toLowerCase()} ✨`, I.lenNote && I.lenNote.startsWith('Your focus drops') && 'Your focus dips after an hour — shorter blocks might feel better.', I.days[0] && `Your best focus days are ${['Sundays', 'Mondays', 'Tuesdays', 'Wednesdays', 'Thursdays', 'Fridays', 'Saturdays'][I.days[0].k]} 📅`].filter(Boolean);
+  if (!lines.length) return;
+  writeLS(INSIGHT_DAY_KEY, dayKey(new Date()));
+  pomeoSay(pick(lines), { kind: 'care', ms: 6500 });
+}
+
+/* ---------- Quick-start chips: your 3 most-used presets ---------- */
+function renderQuickStart() {
+  const el = $('#quickStart');
+  if (!el || !USER) return;
+  const t = S.timer, show = t.status === 'idle' && t.phase === 'focus' && S.presets.length > 1;
+  el.classList.toggle('hidden', !show);
+  if (!show) return;
+  const use = {};
+  for (const s of S.sessions.slice(-300)) use[s.preset] = (use[s.preset] || 0) + 1;
+  const top = S.presets.slice().sort((a, b) => (use[b.name] || 0) - (use[a.name] || 0)).slice(0, 3);
+  el.innerHTML = `<span class="lbl">Quick start</span>${top.map(p => `<button data-qs="${esc(p.id)}" title="Start ${esc(p.name)}">${esc(p.name)}</button>`).join('')}`;
+}
+$('#quickStart').addEventListener('click', e => { const b = e.target.closest('[data-qs]'); if (b) { const p = S.presets.find(x => x.id === b.dataset.qs); if (p) cmdStartPreset(p); } });
+
+/* ---------- Spotlight "quick look around" (step 4 of the tutorial) ---------- */
 const TOUR_KEY = 'pomodorolist-tour-done';
 const TOUR = { i: 0, steps: [] };
 const tourDone = () => { try { return localStorage.getItem(TOUR_KEY) === '1'; } catch { return true; } };
@@ -8595,20 +9043,25 @@ function maybeStartTour(cloud, tries = 0) {
   if (tourDone()) return;
   // wait for a signed-in user's history so returning users on a new device aren't toured
   if (cloud && !firstLoadDone && tries < 20) { setTimeout(() => maybeStartTour(cloud, tries + 1), 500); return; }
-  if (S.sessions.length >= 3) { setTourDone(); return; }
-  setTimeout(() => { if (!document.querySelector('dialog[open]') && $('#appView').offsetParent !== null) startTour(); else setTourDone(); }, 700);
+  if (S.onboarded || S.sessions.length >= 3) { setTourDone(); return; }
+  setTimeout(() => {
+    if (tourDone() || !USER) return;
+    if ($('#appView').offsetParent === null) return;
+    if (document.querySelector('dialog[open]')) { if (tries < 40) setTimeout(() => maybeStartTour(cloud, tries + 1), 1500); return; }
+    startTutorial();
+  }, 700);
 }
 function tourSteps() {
   const on = S.settings.gamification;
   const visible = sel => [...$$(sel)].find(el => el.getClientRects().length && el.offsetWidth);
   const steps = [
-    { sel: '#tabs [data-tab="timer"]', text: 'Start a focus session here — pick a preset, name it, hit Start. Tap Pomeo to say hi!' },
-    { sel: '#tabs [data-tab="reminders"]', text: 'Plan study blocks — Pomeo pops up when it’s time.' },
-    on && { sel: '#tabs [data-tab="quests"]', text: 'A new boss every week — every focus minute is a hit. Team up with friends!' },
-    { sel: '#tabs [data-tab="stats"]', text: 'Stats, your Tomato Garden and monthly Wrapped.' },
-    on && { sel: '#tabs [data-tab="shop"], #coinPill', text: 'Spend the coins you earn on themes, sounds and outfits for Pomeo.' },
-    { sel: '#tabs [data-tab="friends"]', text: on ? 'Add friends and climb the leaderboards. Your profile and settings live behind your level badge.' : 'Add friends, send kudos and join challenges.' },
-    !on && { sel: '#tabs [data-tab="profile"], #avatarBtn', text: 'Your profile and settings are here.' },
+    { sel: '#tabs [data-tab="timer"]', text: 'Timer: pick a preset, name your session and press Start.' },
+    { sel: '#tabs [data-tab="stats"]', text: on ? 'Stats: your streak, charts, garden and monthly Wrapped.' : 'Stats: your streak, charts and monthly Wrapped.' },
+    { sel: '#tabs [data-tab="reminders"]', text: 'Reminders: plan study blocks — I’ll pop up when it’s time.' },
+    { sel: '#tabs [data-tab="board"]', text: 'Leaderboard: see how your focus compares with friends.' },
+    on && { sel: '#tabs [data-tab="shop"], #coinPill', text: 'Shop: spend coins on themes, sounds and outfits for me.' },
+    { sel: '#tabs [data-tab="friends"]', text: 'Friends: add friends, send kudos, see who’s focusing.' },
+    on && { sel: '#tabs [data-tab="quests"]', text: 'Quests: a new boss every week — every focus minute is a hit.' },
   ].filter(Boolean);
   return steps.map(st => ({ ...st, el: () => visible(st.sel) })).filter(st => st.el());
 }
@@ -8635,6 +9088,7 @@ function placeTour() {
   spot.style.height = r.height + pad * 2 + 'px';
   spot.style.transform = `translate(${r.left - pad}px, ${r.top - pad}px)`;
   $('#tourStep').textContent = `${TOUR.i + 1} of ${TOUR.steps.length}`;
+  $('#tourPomeo').innerHTML = pomeoOn() ? pomeoSVG({ state: 'happy', ...pomeoOutfit() }) : '';
   $('#tourText').textContent = st.text;
   $('#tourNext').textContent = TOUR.i === TOUR.steps.length - 1 ? 'Got it' : 'Next';
   const tw = tip.offsetWidth, th = tip.offsetHeight, vw = innerWidth, vh = innerHeight;
@@ -8642,15 +9096,20 @@ function placeTour() {
   const y = r.top + r.height / 2 < vh / 2 ? r.bottom + pad + 14 : r.top - pad - 14 - th;
   tip.style.transform = `translate(${x}px, ${Math.max(12, y)}px)`;
 }
-function endTour() { setTourDone(); $('#tour').classList.add('hidden'); setTimeout(maybeShowLogin, 400); }
+function endTour() {
+  $('#tour').classList.add('hidden');
+  if (TUT.fromTour) { TUT.fromTour = false; TUT.i = 4; $('#tutDlg').showModal(); renderTut(); return; }   // back to the tutorial
+  setTourDone(); setTimeout(maybeShowLogin, 400);
+}
 $('#tourNext').addEventListener('click', () => { if (++TOUR.i >= TOUR.steps.length) endTour(); else placeTour(); });
 $('#tourSkip').addEventListener('click', endTour);
 $('#tour').addEventListener('keydown', e => { if (e.key === 'Escape') endTour(); });
 addEventListener('resize', () => { if (!$('#tour').classList.contains('hidden')) placeTour(); });
-$('#replayTour').addEventListener('click', () => { try { localStorage.removeItem(TOUR_KEY); } catch {} showTab('timer'); window.scrollTo(0, 0); setTimeout(startTour, 250); });
+$('#replayTour').addEventListener('click', () => { showTab('timer'); window.scrollTo(0, 0); setTimeout(startTutorial, 250); });
 
 function renderAll() {
   if (!USER) return;
+  if (document.documentElement.hasAttribute('data-minimal') !== minimal()) applyMinimal();
   renderSessionInputs();
   renderTimer();
   renderChips();
@@ -8661,6 +9120,7 @@ function renderAll() {
   renderTip();
   renderExamCard();
   renderSubtasks();
+  renderQuickStart();
   updateLoginDot();
   if (S.ui.tab === 'quests') renderQuests();
   if (S.ui.tab === 'stats') renderStats();
@@ -8832,11 +9292,9 @@ $('#setMotion').addEventListener('change', e => {
   renderTimer();
   toast(`Animations: ${e.target.selectedOptions[0].textContent}`, 2000, true);
 });
-$('#setGame').addEventListener('change', e => {
-  S.settings.gamification = e.target.checked;
-  save();
-  renderAll();
-});
+$('#setMinimal').addEventListener('change', e => { setMinimal(e.target.checked); toast(e.target.checked ? 'True Minimalist on — nothing was deleted' : 'True Minimalist off — everything is back', 2400, true); });
+$('#setMinPomeo').addEventListener('change', e => { S.settings.minPomeo = e.target.checked; save(); renderAll(); });
+$('#setEnergy').addEventListener('change', e => { S.settings.energy = e.target.value; save(); if (S.ui.tab === 'stats') renderStats(); });
 
 // Friends tab
 $('#tab-friends').addEventListener('click', e => {
