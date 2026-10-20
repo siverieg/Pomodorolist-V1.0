@@ -1232,6 +1232,92 @@ body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .s
 .keys { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; align-items: center; }
 kbd { display: inline-block; min-width: 26px; padding: 3px 7px; border-radius: 7px; border: 1px solid var(--line); border-bottom-width: 2px; background: var(--bg); font: 600 12.5px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; text-align: center; color: var(--text); }
 
+/* ==========================================================================
+   SUBTASKS — optional checklist for a focus session
+   ========================================================================== */
+.sub-toggle { margin-top: 10px; font-size: 13.5px; color: var(--accent); background: none; border: 0; padding: 2px 0; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+.sub-toggle .cnt { color: var(--muted); }
+.sub-last { margin-top: 8px; font-size: 13px; color: var(--muted); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.sub-last .btn { padding: 4px 11px; font-size: 12.5px; min-width: 0; }
+.sub-ed { margin-top: 8px; }
+.sub-ed-list { list-style: none; margin: 0; padding: 0; }
+.sub-ed-list li { position: relative; display: flex; align-items: center; gap: 6px; padding: 5px 0; border-top: 1px solid var(--line); background: var(--surface); touch-action: pan-y; }
+:root[data-glass] .sub-ed-list li { background: transparent; }
+.sub-ed-list li:first-child { border-top: 0; }
+.sub-ed-list li.dragging { z-index: 3; box-shadow: 0 10px 22px -12px rgba(0, 0, 0, .45); border-radius: 10px; opacity: .96; }
+.sub-ed-list li.done .tx { text-decoration: line-through; color: var(--muted); }
+.sub-ed-list .grip { cursor: grab; touch-action: none; color: var(--muted); border: 0; background: none; padding: 4px 2px; font-size: 14px; line-height: 1; letter-spacing: -2px; border-radius: 6px; }
+.sub-ed-list .grip:focus-visible { outline: 2px solid var(--accent); }
+.sub-ed-list .tx { flex: 1; min-width: 0; font-size: 14px; cursor: text; padding: 4px 2px; overflow-wrap: anywhere; border-radius: 6px; }
+.sub-ed-list .tx:hover { background: var(--accent-soft); }
+.sub-ed-list input.tx { cursor: auto; padding: 4px 8px; }
+.sub-ed-list .x { border: 0; background: none; color: var(--muted); cursor: pointer; font-size: 16px; padding: 2px 6px; border-radius: 6px; }
+.sub-ed-list .x:hover { color: var(--danger); }
+.sub-add { display: flex; gap: 6px; margin-top: 6px; }
+.sub-add input { flex: 1; min-width: 0; }
+.sub-add .btn { padding: 8px 14px; min-width: 0; }
+.sub-hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+.sub-tpls { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-top: 10px; }
+.sub-tpls .chip-t { border: 1px solid var(--line); background: var(--surface); color: var(--text); border-radius: 999px; padding: 4px 11px; font-size: 12.5px; cursor: pointer; }
+.sub-tpls .chip-t:hover { border-color: var(--accent); }
+.sub-tpls .linkbtn { font-size: 12.5px; text-transform: none; letter-spacing: 0; }
+.tpl-save { display: flex; gap: 6px; margin-top: 8px; }
+.tpl-save input { flex: 1; min-width: 0; }
+.tpl-save .btn { padding: 7px 12px; min-width: 0; font-size: 13px; }
+
+/* the compact checklist under the timer */
+.sub-check { margin: 14px auto 0; max-width: 360px; text-align: left; opacity: .92; }
+.sub-check .sc-head { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.sub-check .sc-bar { flex: 1; height: 4px; border-radius: 4px; background: var(--heat0); overflow: hidden; }
+.sub-check .sc-bar i { display: block; height: 100%; background: var(--accent); border-radius: inherit; transform-origin: 0 50%; transition: transform .5s var(--ease); }
+.sub-check .sc-n { font-variant-numeric: tabular-nums; font-weight: 600; }
+.sub-check .sc-add { border: 0; background: none; color: var(--accent); cursor: pointer; font-size: 16px; line-height: 1; padding: 0 4px; }
+.sub-check ul { list-style: none; margin: 0; padding: 0; }
+.sub-check li { display: flex; align-items: center; gap: 8px; padding: 3px 0; font-size: 14px; }
+.sub-check li .k { font-size: 10.5px; color: var(--muted); min-width: 10px; font-variant-numeric: tabular-nums; display: none; }
+@media (hover: hover) and (pointer: fine) { .sub-check li .k { display: inline; } }
+.sub-check li label { display: flex; align-items: center; gap: 8px; cursor: pointer; flex: 1; min-width: 0; }
+.sub-check li .tx { flex: 1; min-width: 0; overflow-wrap: anywhere; transition: color .3s; }
+.sub-check li.done .tx { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--muted); }
+.sub-box { width: 18px; height: 18px; border-radius: 6px; border: 1.6px solid var(--muted); display: grid; place-items: center; flex: none; color: var(--on-accent, #fff); transition: background .2s, border-color .2s; }
+.sub-check li.done .sub-box { background: var(--accent); border-color: var(--accent); }
+.sub-box .ok-check { width: 13px; height: 13px; stroke-width: 3.2; }
+.sub-check input[type="checkbox"] { position: absolute; opacity: 0; pointer-events: none; }
+.sub-check input:focus-visible + .sub-box { outline: 2px solid var(--accent); outline-offset: 2px; }
+:root[data-motion="full"] .sub-check li.fresh .sub-box { animation: subPop .45s var(--spring) both; }
+@keyframes subPop { 40% { transform: scale(1.3); } }
+.sub-check .sc-quick { display: flex; gap: 6px; margin-top: 6px; }
+.sub-check .sc-quick input { flex: 1; min-width: 0; padding: 6px 10px; font-size: 13.5px; }
+.sub-check.all-done .sc-n { color: var(--accent); }
+:root[data-motion="full"] .sub-check.cheer { animation: subCheer .7s var(--spring) both; }
+@keyframes subCheer { 35% { transform: scale(1.04); } }
+
+/* after the session */
+.sub-sum { margin-bottom: 10px; padding: 10px 12px; border-radius: 12px; background: var(--accent-soft); text-align: left; }
+.sub-sum h3 { margin: 0 0 6px; font-size: 13.5px; display: flex; justify-content: space-between; gap: 8px; }
+.sub-sum h3 span { font-weight: 500; color: var(--muted); }
+.sub-sum ul { list-style: none; margin: 0; padding: 0; font-size: 13.5px; }
+.sub-sum li { display: flex; align-items: center; gap: 6px; padding: 2px 0; }
+.sub-sum li.ok { color: var(--muted); }
+.sub-sum li .tx { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.sub-sum li .iconbtn { width: 28px; height: 28px; }
+.sub-sum li .iconbtn svg { width: 14px; height: 14px; }
+.sub-sum .acts { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.sub-sum .acts .btn { padding: 5px 11px; font-size: 12.5px; min-width: 0; }
+.subdet { display: block; font-size: 12px; color: var(--muted); }
+.subdet summary { cursor: pointer; list-style: none; display: inline; }
+.subdet summary::-webkit-details-marker { display: none; }
+.subdet summary::after { content: " ▾"; font-size: 10px; }
+.subdet[open] summary::after { content: " ▴"; }
+.subdet ul { list-style: none; margin: 2px 0 0; padding: 0; }
+.subdet li.ok::before { content: "✓ "; color: var(--accent); }
+.subdet li.no::before { content: "○ "; }
+.tpl-list { list-style: none; margin: 0 0 12px; padding: 0; }
+.tpl-list li { display: flex; align-items: center; gap: 8px; padding: 9px 0; border-top: 1px solid var(--line); }
+.tpl-list li:first-child { border-top: 0; }
+.tpl-list .nm { flex: 1; min-width: 0; }
+.tpl-list .nm small { display: block; color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
 .tabs .ls { display: none; }
 @media (max-width: 400px) { .tabs .lf { display: none; } .tabs .ls { display: inline; } .tabs button { font-size: 10px; } }
 </style>
@@ -1339,7 +1425,13 @@ kbd { display: inline-block; min-width: 26px; padding: 3px 7px; border-radius: 7
             <button class="btn primary" id="mainBtn"><span class="mb-lbl">Start</span></button>
             <button class="btn" id="skipBtn">Skip</button>
           </div>
+          <div class="sub-check hidden" id="subCheck" aria-label="Subtasks">
+            <div class="sc-head"><span class="sc-n" id="subN"></span><span class="sc-bar"><i id="subBar"></i></span><button class="sc-add" id="subCheckAdd" title="Add a subtask (T)" aria-label="Add a subtask">+</button></div>
+            <ul id="subCheckList"></ul>
+            <div class="sc-quick hidden" id="subQuick"><input type="text" id="subQuickInput" maxlength="80" placeholder="Add a subtask… (Enter)" aria-label="New subtask" autocomplete="off"></div>
+          </div>
           <div class="after-row hidden" id="noteRow">
+            <div class="sub-sum hidden" id="subSum"></div>
             <div class="note-row">
               <input type="text" id="noteInput" maxlength="120" placeholder="Add a note? e.g. finished ch. 5 problems" aria-label="Note for the session you just finished">
               <button class="btn" id="noteSave">Save</button>
@@ -1358,6 +1450,15 @@ kbd { display: inline-block; min-width: 26px; padding: 3px 7px; border-radius: 7
             <input type="color" id="nameColor" title="Colour for this name">
           </div>
           <datalist id="nameList"></datalist>
+          <button class="sub-toggle" id="subToggle" aria-expanded="false" aria-controls="subEd">+ Add subtasks</button>
+          <div class="sub-last hidden" id="subLast"></div>
+          <div class="sub-ed hidden" id="subEd">
+            <ul class="sub-ed-list" id="subEdList"></ul>
+            <div class="sub-add"><input type="text" id="subInput" maxlength="80" autocomplete="off" aria-label="New subtask"><button class="btn" id="subAddBtn">Add</button></div>
+            <div class="sub-hint">Drag ⋮⋮ to reorder · tap to edit · ✕ or swipe left to delete · +1 coin per finished subtask (up to 10 a day)</div>
+            <div class="sub-tpls" id="subTpls"></div>
+            <div class="tpl-save hidden" id="tplSave"><input type="text" id="tplName" maxlength="40" placeholder="Template name, e.g. Daily maths routine" aria-label="Template name"><button class="btn" id="tplSaveBtn">Save</button></div>
+          </div>
           <div class="sub-row">
             <div>
               <label class="field" for="nameTag">Tag (optional)</label>
@@ -1440,6 +1541,7 @@ kbd { display: inline-block; min-width: 26px; padding: 3px 7px; border-radius: 7
     <div id="wrappedSlot"></div>
     <div class="tiles" id="tiles"></div>
     <div id="statsBody"></div>
+    <div id="subStatSlot" style="margin-top:16px"></div>
     <div id="gardenSlot" style="margin-top:16px"></div>
   </section>
 
@@ -1690,6 +1792,13 @@ kbd { display: inline-block; min-width: 26px; padding: 3px 7px; border-radius: 7
   <div class="btn-row" style="justify-content:flex-end;margin-top:12px"><button class="btn" id="examClose">Done</button></div>
 </dialog>
 
+<!-- Subtask templates -->
+<dialog id="tplDlg">
+  <h2 style="margin:0 0 10px">Subtask templates</h2>
+  <ul class="tpl-list" id="tplList"></ul>
+  <div class="btn-row" style="justify-content:flex-end"><button class="btn" id="tplClose">Done</button></div>
+</dialog>
+
 <!-- Keyboard shortcuts -->
 <dialog id="keysDlg">
   <h2 style="margin:0 0 14px">Keyboard shortcuts</h2>
@@ -1699,7 +1808,9 @@ kbd { display: inline-block; min-width: 26px; padding: 3px 7px; border-radius: 7
     <kbd>S</kbd><span>Skip to the next phase</span>
     <kbd>P</kbd><span>Park a distracting thought (during focus)</span>
     <kbd>N</kbd><span>Type the session name</span>
-    <span><kbd>1</kbd>–<kbd>8</kbd></span><span>Timer · Reminders · Quests · Stats · Leaderboard · Shop · Friends · Profile</span>
+    <kbd>T</kbd><span>Add a subtask</span>
+    <span><kbd>1</kbd>–<kbd>9</kbd></span><span>On the Timer with a checklist: tick that subtask. Otherwise 1–8 switch tabs.</span>
+    <span><kbd>Shift</kbd>+<kbd>1</kbd>–<kbd>8</kbd></span><span>Always switch tabs: Timer · Reminders · Quests · Stats · Leaderboard · Shop · Friends · Profile</span>
     <kbd>?</kbd><span>Show this sheet</span>
   </div>
   <p class="lbl" style="margin:14px 0 0">Shortcuts are paused while you type. Turn them off in Settings.</p>
@@ -2251,7 +2362,8 @@ function defaultState() {
     squad: [],      // boss squad: [{ uid, name }], up to 5 friends
     game: normalizeGame(null),  // purchases, equipped items, claimed rewards, used streak freezes
     // Device-only fields (never uploaded):
-    timer: { phase: 'focus', round: 1, status: 'idle', endAt: 0, remaining: 0, planned: 0, focusStartedAt: 0, name: '' },
+    timer: { phase: 'focus', round: 1, status: 'idle', endAt: 0, remaining: 0, planned: 0, focusStartedAt: 0, name: '', subtasks: [] },
+    subTemplates: [],  // saved subtask lists { id, name, items, used }
     ui: { tab: 'timer', statsView: 'week', gardenView: 'week', shopCat: 'sound', friendsView: 'friends', lbScope: 'friends', lbPeriod: 'week' },
     pendingSessions: [],  // logged while the sync service could not load at all; uploaded next time
     profileDirty: false,  // profile edited in that same situation
@@ -2265,7 +2377,8 @@ function hydrate(obj) {
   const out = { ...def, ...obj };
   for (const k of ['settings', 'timer', 'ui']) out[k] = { ...def[k], ...(obj[k] || {}) };
   if (!Array.isArray(out.presets) || !out.presets.length) out.presets = def.presets;
-  for (const k of ['sessions', 'recent', 'pinned', 'pendingSessions', 'reminders', 'revisions', 'exams', 'parked', 'abandoned', 'squad']) if (!Array.isArray(out[k])) out[k] = [];
+  for (const k of ['sessions', 'recent', 'pinned', 'pendingSessions', 'reminders', 'revisions', 'exams', 'parked', 'abandoned', 'squad', 'subTemplates']) if (!Array.isArray(out[k])) out[k] = [];
+  if (!Array.isArray(out.timer.subtasks)) out.timer.subtasks = [];
   if (!out.notes || typeof out.notes !== 'object' || Array.isArray(out.notes)) out.notes = {};
   if (!out.names || typeof out.names !== 'object' || Array.isArray(out.names)) out.names = {};
   out.game = normalizeGame(obj.game);
@@ -2362,6 +2475,7 @@ function profileFromState() {
     parked: S.parked.slice(-50),
     abandoned: S.abandoned.slice(-300),
     squad: S.squad.slice(0, 5),
+    subTemplates: S.subTemplates.slice(0, 20),
     // Stored for reference only; the app always recalculates streaks from the session log.
     streak: { current: cur, longest, goalMin: S.settings.goalMin, today: dayKey(new Date()) },
   });
@@ -2453,7 +2567,7 @@ function applyProfile(d) {
   S.game = normalizeGame(d.game);
   if (Array.isArray(d.reminders)) S.reminders = d.reminders.filter(r => r && r.id && r.time && r.date);
   if (d.notes && typeof d.notes === 'object') S.notes = { ...d.notes };
-  for (const k of ['revisions', 'exams', 'parked', 'abandoned', 'squad']) if (Array.isArray(d[k])) S[k] = d[k].filter(x => x && typeof x === 'object');
+  for (const k of ['revisions', 'exams', 'parked', 'abandoned', 'squad', 'subTemplates']) if (Array.isArray(d[k])) S[k] = d[k].filter(x => x && typeof x === 'object');
   S.timer.round = Math.min(S.timer.round, activePreset().rounds);
   lastProfileJSON = JSON.stringify(profileFromState());
   saveLocal();
@@ -2708,6 +2822,7 @@ function mergeData(obj) {
       id, name: String(s.name || 'Untitled'), start: +s.start, end: +s.end,
       duration: Math.round(+s.duration || (+s.end - +s.start)), planned: Math.round(+s.planned || +s.duration || 0),
       preset: String(s.preset || ''),
+      ...(Array.isArray(s.subtasks) && s.subtasks.length ? { subtasks: s.subtasks.slice(0, 10).map(x => ({ t: String(x.t || '').slice(0, 80), d: !!x.d })) } : {}),
     });
   }
   S.sessions.push(...add);
@@ -2736,7 +2851,7 @@ function mergeData(obj) {
   for (const [k, v] of Object.entries(sg.equipped)) if (!(k in g.equipped)) g.equipped[k] = v;
   for (const r of src.reminders) if (r && r.id && r.time && r.date && !S.reminders.some(x => x.id === r.id)) S.reminders.push(r);
   for (const [k, v] of Object.entries(src.notes)) if (!S.notes[k]) S.notes[k] = v;
-  for (const k of ['revisions', 'exams', 'parked', 'abandoned']) for (const x of src[k]) if (x && x.id && !S[k].some(y => y.id === x.id)) S[k].push(x);
+  for (const k of ['revisions', 'exams', 'parked', 'abandoned', 'subTemplates']) for (const x of src[k]) if (x && x.id && !S[k].some(y => y.id === x.id)) S[k].push(x);
   for (const [k, v] of Object.entries(sg.trophies)) if (!g.trophies[k]) g.trophies[k] = v;
   save();
   applyCosmetics();
@@ -2912,9 +3027,14 @@ function logSession(focusedMs, end) {
     planned: t.planned,
     preset: activePreset().name,
   };
+  const subRec = takeSubtasks();
+  if (subRec) s.subtasks = subRec;
+  const subDay = dayKey(new Date(end)), subBefore = Math.min(SUB_COIN_DAY, subtaskCoinsByDay()[subDay] || 0);
   const levelBefore = rewardsReady() ? game().lv.level : 0;
   const idxBefore = buildIndex(), pomeoBefore = { mins: (idxBefore[dayKey(new Date())] || {}).total || 0, streak: computeStreaks(idxBefore).cur };
   S.sessions.push(s);
+  const subCoins = Math.min(SUB_COIN_DAY, subtaskCoinsByDay()[subDay] || 0) - subBefore;
+  subSum = subRec ? { items: subRec, left: subRec.filter(x => !x.d).map(x => x.t), coins: S.settings.gamification ? subCoins : 0 } : null;
   setTimeout(() => { pomeoAfterSession(pomeoBefore); offerNote(s.id); }, 400);
   revisionAfterSession(name);
   setTimeout(checkBoss, 600);
@@ -2924,8 +3044,8 @@ function logSession(focusedMs, end) {
   const news = reconcileRewards('collect');
   if (!S.settings.gamification) { toast(`Logged ${fmtMin(focusedMs / 60000)} · ${name}`); socialAfterSession(); return; }
   const goalDays = news.filter(n => n.type === 'goal').length;
-  toast(`+${xpForSession(s)} XP · +${COINS_PER_SESSION + GOAL_BONUS * goalDays} coins${goalDays ? ' · daily goal reached' : ''}`);
-  floatUp([[`+${xpForSession(s)} XP`], [`+${COINS_PER_SESSION + GOAL_BONUS * goalDays} coins`, 'coin'], ...(S.game.claims.bosses[dayKey(weekMonday())] ? [] : [[`⚔️ −${Math.round(focusedMs / 60000)} HP`]])]);
+  toast(`+${xpForSession(s)} XP · +${COINS_PER_SESSION + GOAL_BONUS * goalDays + subCoins} coins${goalDays ? ' · daily goal reached' : ''}`);
+  floatUp([[`+${xpForSession(s)} XP`], [`+${COINS_PER_SESSION + GOAL_BONUS * goalDays + subCoins} coins`, 'coin'], ...(S.game.claims.bosses[dayKey(weekMonday())] ? [] : [[`⚔️ −${Math.round(focusedMs / 60000)} HP`]])]);
   announce(news, 'loud');
   socialAfterSession();
   const levelAfter = game().lv.level;
@@ -3288,6 +3408,7 @@ function topList(top, total) {
 }
 
 function renderStats() {
+  renderSubStat();
   renderWrappedBanner();
   renderGarden();
   const view = S.ui.statsView;
@@ -3340,7 +3461,7 @@ function renderStats() {
       ? `<ul class="sesslist">${daySessions.slice().reverse().map(s => `
           <li><span class="t">${fmtTime(s.start)}–${fmtTime(s.end)}</span>
             <span class="dot" style="background:${esc(colorFor(s.name))}"></span>
-            <span class="nm" title="${esc(s.preset || '')}">${esc(s.name)}${S.notes[s.id] ? `<span class="note">“${esc(S.notes[s.id])}”</span>` : ''}</span>
+            <span class="nm" title="${esc(s.preset || '')}">${esc(s.name)}${S.notes[s.id] ? `<span class="note">“${esc(S.notes[s.id])}”</span>` : ''}${s.subtasks && s.subtasks.length ? `<details class="subdet"><summary>${s.subtasks.filter(x => x.d).length}/${s.subtasks.length} subtasks</summary><ul>${s.subtasks.map(x => `<li class="${x.d ? 'ok' : 'no'}">${esc(x.t)}</li>`).join('')}</ul></details>` : ''}</span>
             <span class="d">${fmtMin(s.duration / 60000)}</span>
             <button class="linkbtn" data-del="${esc(s.id)}" title="Delete this session" aria-label="Delete">✕</button></li>`).join('')}</ul>`
       : '<div class="empty" style="margin-top:12px">No focus blocks on this day.</div>';
@@ -3681,6 +3802,7 @@ function earnedAt(t) {
     if (perWeek[wk] <= SOCIAL_COIN_WEEKLY_MAX) c += SOCIAL_COIN;
   }
   for (const [cid, ts] of Object.entries(cl.challenges)) if (ts <= t) c += (CHALLENGES[cid.split('_')[1]] || {}).coins || 0;
+  for (const v of Object.values(subtaskCoinsByDay(t))) c += Math.min(SUB_COIN_DAY, v);   // +1 per finished subtask, max 10 a day
   const lc = loginCycle();
   for (const [k, ts] of Object.entries(cl.login)) if (ts <= t) c += LOGIN_COINS[(lc[k] || 1) - 1];
   for (const [wk, ts] of Object.entries(cl.bosses)) if (ts <= t) c += Math.min(120, Math.max(0, +((S.game.trophies[wk] || {}).coins) || 0));
@@ -6086,20 +6208,25 @@ function offerNote(sessionId) {
   $('#revSchedule').disabled = false;
   $('#revSchedule').textContent = `🔁 Schedule revision of “${revFor}”`;
   $('#noteRow .after-acts').classList.toggle('hidden', !revFor);
+  renderSubSum();
   $('#noteRow').classList.remove('hidden');
 }
-function hideNote() { noteFor = null; $('#noteRow').classList.add('hidden'); }
+function hideNote() { noteFor = null; subSum = null; $('#noteRow').classList.add('hidden'); }
+/** Close the after-session row once nothing in it is waiting for an answer. */
+function maybeHideAfter() {
+  if ($('#noteRow .note-row').classList.contains('hidden') && (!revFor || $('#revSchedule').disabled) && !(subSum && subSum.left.length)) hideNote();
+}
 function saveNote() {
   const v = $('#noteInput').value.trim().slice(0, 120);
   if (noteFor && v) { S.notes[noteFor] = v; save(); toast('Note saved', 1800, true); if (S.ui.tab === 'stats') renderStats(); }
   $('#noteRow .note-row').classList.add('hidden');
-  if (!revFor || $('#revSchedule').disabled) hideNote();
+  maybeHideAfter();
 }
 $('#revSchedule').addEventListener('click', () => {
   if (!revFor || !addRevision(revFor)) return;
   $('#revSchedule').disabled = true;
   $('#revSchedule').textContent = 'Revision planned ✓';
-  if ($('#noteRow .note-row').classList.contains('hidden')) setTimeout(hideNote, 1400);
+  setTimeout(maybeHideAfter, 1400);
 });
 $('#noteSave').addEventListener('click', saveNote);
 $('#noteSkip').addEventListener('click', hideNote);
@@ -6923,11 +7050,15 @@ document.addEventListener('keydown', e => {
   if (S.settings.shortcuts === false) return;
   const k = e.key.toLowerCase();
   if (e.key === '?') { e.preventDefault(); $('#keysDlg').showModal(); return; }
-  if (/^[1-8]$/.test(k)) {
-    const tab = TAB_KEYS[+k - 1], btn = $(`#tabs [data-tab="${tab}"]`);
+  if (/^Digit[1-9]$/.test(e.code)) {
+    const n = +e.code.slice(5);
+    // On the Timer with a checklist, 1–9 tick subtasks; Shift+1–8 always switches tabs.
+    if (!e.shiftKey && S.ui.tab === 'timer' && subs().length) { e.preventDefault(); const x = subOrder()[n - 1]; if (x) toggleSub(x.id); return; }
+    const tab = TAB_KEYS[n - 1], btn = tab && $(`#tabs [data-tab="${tab}"]`);
     if (btn && !btn.classList.contains('hidden')) { e.preventDefault(); showTab(tab); }
     return;
   }
+  if (k === 't') { e.preventDefault(); focusSubAdd(); return; }
   if (k === 'n') { e.preventDefault(); showTab('timer'); setTimeout(() => $('#nameInput').focus(), 30); return; }
   if (S.ui.tab !== 'timer') return;
   if (k === 'r') { e.preventDefault(); $('#resetBtn').click(); }
@@ -6935,6 +7066,328 @@ document.addEventListener('keydown', e => {
   else if (k === 'p') { e.preventDefault(); openPark(); }
 });
 $('#keysClose').addEventListener('click', () => $('#keysDlg').close());
+/* ==========================================================================
+   SUBTASKS — an optional checklist for the current focus session.
+   Draft: S.timer.subtasks [{ id, t, d, at }] (this device, like the timer).
+   When a session is logged it keeps { t, d } pairs in its own record
+   (users/{uid}/months/…), so history and coins come from the session log.
+   Templates: S.subTemplates [{ id, name, items, used }] in users/{uid}.
+   ========================================================================== */
+const SUB_MAX = 10, SUB_COIN_DAY = 10;
+const subs = () => (S.timer.subtasks ||= []);
+/** Checklist order: open items first (your order), then done ones in the order you ticked them. */
+const subOrder = () => [...subs().filter(x => !x.d), ...subs().filter(x => x.d).sort((a, b) => a.at - b.at)];
+let subOpen = false, subSum = null, subLastOffer = '';
+/** Coins: +1 per completed subtask in logged sessions, at most 10 per day. */
+function subtaskCoinsByDay(t = Infinity) {
+  const by = {};
+  for (const s of S.sessions) if (s.subtasks && s.end <= t) { const k = dayKey(new Date(s.end)); by[k] = (by[k] || 0) + s.subtasks.filter(x => x.d).length; }
+  return by;
+}
+function subChanged() { saveLocal(); renderSubtasks(); }
+function addSub(text) {
+  text = String(text || '').trim().slice(0, 80);
+  if (!text) return false;
+  if (subs().length >= SUB_MAX) { toast(`Up to ${SUB_MAX} subtasks per session`); return false; }
+  subs().push({ id: 'k' + uid(), t: text, d: false, at: 0 });
+  subChanged();
+  return true;
+}
+function playTick() {
+  if (!S.settings.sound) return;
+  const c = getCtx();
+  if (!c) return;
+  tone(c, c.destination, { f: 1568, peak: 0.045, a: 0.003, d: 0.09 });
+  tone(c, c.destination, { f: 2093, t: 0.05, peak: 0.03, a: 0.003, d: 0.12 });
+}
+let subFresh = null;
+function toggleSub(id) {
+  const x = subs().find(s => s.id === id);
+  if (!x) return;
+  const first = flipCapture('#subCheck li[data-uid]');
+  x.d = !x.d;
+  x.at = x.d ? Date.now() : 0;
+  if (x.d) { subFresh = id; playTick(); }
+  subChanged();
+  flipPlay(first, '#subCheck li[data-uid]');
+  const all = subs().length && subs().every(s => s.d);
+  if (x.d && all) {
+    restartClass($('#subCheck'), 'cheer', 800);
+    if (motion() !== 'off') burstParticles($('#subCheck'), 14);
+    pomeoSay(pick(['All done! 🎉', 'Every subtask ticked! 🎉 Keep the focus going.', 'Checklist cleared! 🎉']), { kind: 'tap', ms: 3600 });
+    if (!pomeoOn() || S.ui.tab !== 'timer') toast('All subtasks done 🎉', 2400, true);
+  }
+}
+function removeSub(id) { S.timer.subtasks = subs().filter(x => x.id !== id); subChanged(); }
+function renderSubtasks() {
+  if (!USER) return;
+  const list = subs(), done = list.filter(x => x.d).length;
+  // Session card: toggle link, "load last time" offer, editor
+  $('#subToggle').innerHTML = subOpen ? 'Hide subtasks' : list.length ? `Subtasks <span class="cnt">${done}/${list.length}</span>` : '+ Add subtasks';
+  $('#subToggle').setAttribute('aria-expanded', subOpen);
+  $('#subEd').classList.toggle('hidden', !subOpen);
+  renderSubLast();
+  if (subOpen) {
+    const editing = document.activeElement && document.activeElement.closest && document.activeElement.closest('#subEdList input');
+    if (!editing) {
+      $('#subEdList').innerHTML = list.map((x, i) => `<li data-sid="${esc(x.id)}" class="${x.d ? 'done' : ''}">
+        <button class="grip" data-grip aria-label="Move “${esc(x.t)}” (arrow keys)" title="Drag to reorder">⋮⋮</button>
+        <span class="tx" data-edit tabindex="0" role="button" aria-label="Edit “${esc(x.t)}”">${esc(x.t)}</span>
+        <button class="x" data-del aria-label="Delete “${esc(x.t)}”">✕</button></li>`).join('');
+    }
+    $('#subInput').disabled = list.length >= SUB_MAX;
+    $('#subInput').placeholder = list.length >= SUB_MAX ? `That’s ${SUB_MAX} — the most for one session` : list.length ? 'Next subtask… (Enter)' : 'e.g. Read ch. 5 notes (Enter adds the next)';
+    const tpls = (S.subTemplates || []).slice().sort((a, b) => (b.used || 0) - (a.used || 0));
+    $('#subTpls').innerHTML = (tpls.length ? tpls.slice(0, 4).map(t => `<button class="chip-t" data-tpl="${esc(t.id)}" title="${esc(t.items.join(' · '))}">${esc(t.name)}</button>`).join('') : '')
+      + (list.length ? '<button class="linkbtn" id="tplSaveOpen">Save as template</button>' : '')
+      + (tpls.length ? '<button class="linkbtn" id="tplManage">All templates</button>' : '');
+  }
+  // Timer card: compact checklist
+  const box = $('#subCheck');
+  box.classList.toggle('hidden', !list.length);
+  if (list.length) {
+    const quickOpen = !$('#subQuick').classList.contains('hidden') && box.contains($('#subQuick'));
+    box.classList.toggle('all-done', done === list.length);
+    $('#subCheckList').innerHTML = subOrder().map((x, i) => `<li data-uid="${esc(x.id)}" class="${x.d ? 'done' : ''}${x.id === subFresh ? ' fresh' : ''}">
+      <span class="k" aria-hidden="true">${i < 9 ? i + 1 : ''}</span>
+      <label><input type="checkbox" data-tick="${esc(x.id)}"${x.d ? ' checked' : ''}><span class="sub-box">${x.d ? (x.id === subFresh ? CHECK_SVG : CHECK_SVG.replace('<path ', '<path style="animation:none" ')) : ''}</span><span class="tx">${esc(x.t)}</span></label></li>`).join('');
+    $('#subN').textContent = `${done} / ${list.length}`;
+    $('#subBar').style.transform = `scaleX(${(done / list.length).toFixed(3)})`;
+    $('#subQuick').classList.toggle('hidden', !quickOpen);
+    subFresh = null;
+  }
+}
+/** Reusing a session name: offer the subtasks used with it last time. */
+function renderSubLast() {
+  const el = $('#subLast'), name = $('#nameInput').value.trim();
+  if (!name || subs().length || S.timer.status !== 'idle' || subLastOffer === name + '|x') { el.classList.add('hidden'); return; }
+  const last = [...S.sessions].reverse().find(s => s.name === name && s.subtasks && s.subtasks.length);
+  if (!last) { el.classList.add('hidden'); return; }
+  el.classList.remove('hidden');
+  el.innerHTML = `<span>Last time with “${esc(name)}”: ${last.subtasks.length} subtask${last.subtasks.length === 1 ? '' : 's'}</span><button class="btn small" id="subLoadLast">Load them</button><button class="linkbtn" id="subLastNo" style="text-transform:none;letter-spacing:0">No thanks</button>`;
+  el.dataset.sid = last.id;
+}
+function loadItems(items) {
+  S.timer.subtasks = items.slice(0, SUB_MAX).map(t => ({ id: 'k' + uid(), t, d: false, at: 0 }));
+  subOpen = true;
+  subChanged();
+}
+$('#subToggle').addEventListener('click', () => { subOpen = !subOpen; renderSubtasks(); if (subOpen) setTimeout(() => $('#subInput').focus(), 30); });
+$('#subLast').addEventListener('click', e => {
+  if (e.target.closest('#subLoadLast')) { const s = S.sessions.find(x => x.id === $('#subLast').dataset.sid); if (s) { loadItems(s.subtasks.map(x => x.t)); toast('Subtasks loaded', 1600, true); } }
+  if (e.target.closest('#subLastNo')) { subLastOffer = $('#nameInput').value.trim() + '|x'; renderSubLast(); }
+});
+$('#subInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); if (addSub(e.target.value)) { e.target.value = ''; e.target.focus(); } }
+  if (e.key === 'Escape') e.target.blur();
+});
+$('#subAddBtn').addEventListener('click', () => { if (addSub($('#subInput').value)) { $('#subInput').value = ''; $('#subInput').focus(); } });
+// Edit by tapping, delete with ✕
+function editSub(li) {
+  const x = subs().find(s => s.id === li.dataset.sid);
+  if (!x) return;
+  const tx = li.querySelector('.tx');
+  const inp = document.createElement('input');
+  inp.type = 'text'; inp.className = 'tx'; inp.value = x.t; inp.maxLength = 80; inp.setAttribute('aria-label', 'Edit subtask');
+  tx.replaceWith(inp);
+  inp.focus(); inp.select();
+  let done = false;
+  const commit = keep => {
+    if (done) return; done = true;
+    const v = inp.value.trim();
+    if (keep && v) x.t = v.slice(0, 80);
+    else if (keep && !v) S.timer.subtasks = subs().filter(s => s !== x);
+    inp.blur();
+    subChanged();
+  };
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); commit(true); } if (e.key === 'Escape') { e.preventDefault(); commit(false); } });
+  inp.addEventListener('blur', () => commit(true));
+}
+$('#subEdList').addEventListener('click', e => {
+  const li = e.target.closest('li');
+  if (!li) return;
+  if (e.target.closest('[data-del]')) { removeSub(li.dataset.sid); return; }
+  if (e.target.closest('[data-edit]') && !li.dataset.swiped) editSub(li);
+});
+$('#subEdList').addEventListener('keydown', e => {
+  const li = e.target.closest('li');
+  if (!li) return;
+  if (e.target.matches('[data-edit]') && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); editSub(li); return; }
+  if (e.target.matches('[data-grip]') && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+    e.preventDefault();
+    const arr = subs(), i = arr.findIndex(x => x.id === li.dataset.sid), j = i + (e.key === 'ArrowUp' ? -1 : 1);
+    if (j < 0 || j >= arr.length) return;
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+    subChanged();
+    const g = $(`#subEdList li[data-sid="${arr[j].id}"] [data-grip]`);
+    if (g) g.focus();
+  }
+});
+// Drag to reorder (mouse, pen or touch) by the grip; swipe left on a phone to delete
+(() => {
+  let dr = null, sw = null;
+  const list = $('#subEdList');
+  list.addEventListener('pointerdown', e => {
+    const li = e.target.closest('li');
+    if (!li) return;
+    if (e.target.closest('[data-grip]')) {
+      e.preventDefault();
+      li.setPointerCapture(e.pointerId);
+      dr = { li, y: e.clientY, h: li.getBoundingClientRect().height };
+      li.classList.add('dragging');
+      return;
+    }
+    if (e.pointerType !== 'mouse' && !e.target.closest('button')) sw = { li, x: e.clientX, y: e.clientY, on: false };
+  });
+  list.addEventListener('pointermove', e => {
+    if (dr) {
+      let dy = e.clientY - dr.y;
+      const sib = dy > 0 ? dr.li.nextElementSibling : dr.li.previousElementSibling;
+      if (sib && Math.abs(dy) > sib.getBoundingClientRect().height / 2) {
+        if (dy > 0) sib.after(dr.li); else sib.before(dr.li);
+        dr.y += (dy > 0 ? 1 : -1) * sib.getBoundingClientRect().height;
+        dy = e.clientY - dr.y;
+      }
+      dr.li.style.transform = `translateY(${dy}px)`;
+      return;
+    }
+    if (!sw) return;
+    const dx = e.clientX - sw.x, dy = e.clientY - sw.y;
+    if (!sw.on) { if (Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx)) { sw = null; return; } if (Math.abs(dx) < 12) return; sw.on = true; }
+    sw.dx = dx;
+    sw.li.style.transform = `translateX(${Math.min(0, Math.max(-140, dx))}px)`;
+    sw.li.style.opacity = String(1 + Math.min(0, dx) / 220);
+  });
+  const end = () => {
+    if (dr) {
+      const order = $$('#subEdList li').map(li => li.dataset.sid);
+      S.timer.subtasks = order.map(id => subs().find(x => x.id === id)).filter(Boolean);
+      dr.li.classList.remove('dragging'); dr.li.style.transform = '';
+      dr = null;
+      subChanged();
+      return;
+    }
+    if (!sw) return;
+    const { li, on, dx } = sw;
+    sw = null;
+    li.style.transform = ''; li.style.opacity = '';
+    if (!on) return;
+    li.dataset.swiped = '1';
+    setTimeout(() => { delete li.dataset.swiped; }, 60);
+    if (dx < -90) removeSub(li.dataset.sid);
+  };
+  list.addEventListener('pointerup', end);
+  list.addEventListener('pointercancel', end);
+})();
+// Checklist under the timer: tick, quick add
+$('#subCheck').addEventListener('change', e => { const c = e.target.closest('[data-tick]'); if (c) toggleSub(c.dataset.tick); });
+$('#subCheckAdd').addEventListener('click', () => { $('#subQuick').classList.toggle('hidden'); if (!$('#subQuick').classList.contains('hidden')) $('#subQuickInput').focus(); });
+$('#subQuickInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); if (addSub(e.target.value)) { e.target.value = ''; $('#subQuick').classList.remove('hidden'); e.target.focus(); } }
+  if (e.key === 'Escape') { e.preventDefault(); $('#subQuick').classList.add('hidden'); }
+});
+/** T: add a subtask — in the checklist if one is showing, otherwise in the Session card. */
+function focusSubAdd() {
+  showTab('timer');
+  if (subs().length) { $('#subQuick').classList.remove('hidden'); setTimeout(() => $('#subQuickInput').focus(), 30); return; }
+  subOpen = true;
+  renderSubtasks();
+  setTimeout(() => { $('#subInput').scrollIntoView({ block: 'center', behavior: motion() === 'full' ? 'smooth' : 'auto' }); $('#subInput').focus(); }, 30);
+}
+
+/* ---------- Templates ---------- */
+$('#subTpls').addEventListener('click', e => {
+  const t = e.target.closest('[data-tpl]');
+  if (t) {
+    const tp = S.subTemplates.find(x => x.id === t.dataset.tpl);
+    if (!tp) return;
+    if (subs().some(x => !x.d) && !confirm(`Replace the current subtasks with “${tp.name}”?`)) return;
+    tp.used = Date.now(); save();
+    loadItems(tp.items);
+    toast(`Loaded “${tp.name}”`, 1600, true);
+    return;
+  }
+  if (e.target.closest('#tplSaveOpen')) { $('#tplSave').classList.toggle('hidden'); if (!$('#tplSave').classList.contains('hidden')) $('#tplName').focus(); }
+  if (e.target.closest('#tplManage')) openTemplates();
+});
+function saveTemplate() {
+  const name = $('#tplName').value.trim().slice(0, 40);
+  if (!name) { shake($('#tplSave')); return; }
+  S.subTemplates ||= [];
+  const old = S.subTemplates.find(x => x.name.toLowerCase() === name.toLowerCase());
+  const items = subs().map(x => x.t);
+  if (old) Object.assign(old, { items, used: Date.now() });
+  else S.subTemplates.push({ id: 't' + uid(), name, items, used: Date.now() });
+  if (S.subTemplates.length > 20) S.subTemplates = S.subTemplates.sort((a, b) => (b.used || 0) - (a.used || 0)).slice(0, 20);
+  save();
+  $('#tplName').value = '';
+  $('#tplSave').classList.add('hidden');
+  toast(`Template “${name}” saved`, 2000, true);
+  renderSubtasks();
+}
+$('#tplSaveBtn').addEventListener('click', saveTemplate);
+$('#tplName').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); saveTemplate(); } });
+function openTemplates() {
+  const list = (S.subTemplates || []).slice().sort((a, b) => (b.used || 0) - (a.used || 0));
+  $('#tplList').innerHTML = list.length ? list.map(t => `<li><span class="nm"><b>${esc(t.name)}</b><small>${esc(t.items.join(' · '))}</small></span>
+      <button class="btn small" data-tload="${esc(t.id)}">Load</button><button class="iconbtn" data-tdel="${esc(t.id)}" aria-label="Delete ${esc(t.name)}">${TRASH_SVG}</button></li>`).join('')
+    : '<li class="empty">No templates yet.</li>';
+  if (!$('#tplDlg').open) $('#tplDlg').showModal();
+}
+$('#tplList').addEventListener('click', e => {
+  const l = e.target.closest('[data-tload]'), d = e.target.closest('[data-tdel]');
+  if (l) { const tp = S.subTemplates.find(x => x.id === l.dataset.tload); if (tp) { tp.used = Date.now(); save(); loadItems(tp.items); $('#tplDlg').close(); } }
+  if (d) { S.subTemplates = S.subTemplates.filter(x => x.id !== d.dataset.tdel); save(); openTemplates(); renderSubtasks(); }
+});
+$('#tplClose').addEventListener('click', () => $('#tplDlg').close());
+
+/* ---------- After the session ---------- */
+/** Called when a session is logged: the checklist moves into the session record. */
+function takeSubtasks() {
+  const list = subs();
+  if (!list.length) return null;
+  const rec = subOrder().map(x => ({ t: x.t, d: !!x.d }));
+  S.timer.subtasks = [];
+  subOpen = false;
+  return rec;
+}
+function renderSubSum() {
+  const el = $('#subSum');
+  if (!subSum || !subSum.items.length) { el.classList.add('hidden'); return; }
+  const done = subSum.items.filter(x => x.d), left = subSum.left;
+  el.classList.remove('hidden');
+  el.innerHTML = `<h3>Subtasks · ${done.length}/${subSum.items.length} done${subSum.coins ? `<span>+${subSum.coins} coin${subSum.coins === 1 ? '' : 's'}</span>` : ''}</h3>
+    <ul>${done.map(x => `<li class="ok">✓ <span class="tx">${esc(x.t)}</span></li>`).join('')}
+    ${left.map((x, i) => `<li>○ <span class="tx">${esc(x)}</span><button class="iconbtn" data-sleft-rem="${i}" title="Turn into a reminder" aria-label="Turn “${esc(x)}” into a reminder">${BELL_SVG}</button></li>`).join('')}</ul>
+    ${left.length ? `<div class="acts"><button class="btn primary" data-sleft="carry">Carry over to next session</button><button class="btn" data-sleft="discard">Discard</button></div>` : ''}`;
+}
+$('#subSum').addEventListener('click', e => {
+  if (!subSum) return;
+  const r = e.target.closest('[data-sleft-rem]'), a = e.target.closest('[data-sleft]');
+  if (r) { const t = subSum.left.splice(+r.dataset.sleftRem, 1)[0]; renderSubSum(); openRemForm({ title: t }); return; }
+  if (!a) return;
+  if (a.dataset.sleft === 'carry') {
+    const room = SUB_MAX - subs().length;
+    subs().push(...subSum.left.slice(0, room).map(t => ({ id: 'k' + uid(), t, d: false, at: 0 })));
+    toast(`${Math.min(room, subSum.left.length)} subtask${subSum.left.length === 1 ? '' : 's'} carried over`, 2000, true);
+    subChanged();
+  }
+  subSum.left = [];
+  renderSubSum();
+  maybeHideAfter();
+});
+/** Subtasks completed this week (Stats tab). */
+function renderSubStat() {
+  const el = $('#subStatSlot');
+  if (!el) return;
+  const has = S.sessions.some(s => s.subtasks && s.subtasks.length);
+  if (!has) { el.innerHTML = ''; return; }
+  const from = weekStartOf(new Date(), S.settings.weekStart).getTime();
+  let done = 0, all = 0;
+  for (const s of S.sessions) if (s.start >= from && s.subtasks) { all += s.subtasks.length; done += s.subtasks.filter(x => x.d).length; }
+  el.innerHTML = `<div class="tile" style="display:flex;align-items:center;gap:14px"><div class="v">✓ ${done}</div><div class="s">subtask${done === 1 ? '' : 's'} completed this week${all ? ` · ${Math.round(done / all * 100)}% of ${all} planned` : ''}</div></div>`;
+}
+
 
 /* ---------- First-time welcome tour (once per device) ---------- */
 const TOUR_KEY = 'pomodorolist-tour-done';
@@ -7010,6 +7463,7 @@ function renderAll() {
   renderPomeo();
   renderTip();
   renderExamCard();
+  renderSubtasks();
   updateLoginDot();
   if (S.ui.tab === 'quests') renderQuests();
   if (S.ui.tab === 'stats') renderStats();
@@ -7039,6 +7493,7 @@ $('#logoutBtn').addEventListener('click', logout);
 // Name / colour / tag
 function syncNameInputs() {
   const name = $('#nameInput').value.trim();
+  if (USER) renderSubLast();
   $('#nameColor').value = colorFor(name || 'Untitled');
   $('#nameTag').value = tagFor(name);
 }
