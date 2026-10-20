@@ -1318,6 +1318,49 @@ kbd { display: inline-block; min-width: 26px; padding: 3px 7px; border-radius: 7
 .tpl-list .nm { flex: 1; min-width: 0; }
 .tpl-list .nm small { display: block; color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
+/* ==========================================================================
+   POLISH — cursor glow, tilt, magnetic buttons, focus rings, fades, sparkles
+   Pointer effects run only with a mouse and Full animations (see FX in JS).
+   ========================================================================== */
+/* Cursor glow: a soft spotlight under the content of the hovered card */
+.card.fx-glow:not(.wrapped-banner):not(.exam-card.near), .item.fx-glow {
+  background-image: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, var(--accent) 10%, transparent), transparent 70%);
+  border-color: color-mix(in srgb, var(--accent) 32%, var(--line));
+}
+:root[data-glass] .card.fx-glow:not(.wrapped-banner), :root[data-glass] .item.fx-glow {
+  background-image: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, var(--accent) 14%, transparent), transparent 70%),
+    linear-gradient(115deg, transparent calc(var(--sx) - 22%), rgba(255, 255, 255, var(--sheen-a)) var(--sx), transparent calc(var(--sx) + 22%));
+}
+.card, .item { transition: border-color .25s var(--ease); }
+/* Tilt: shop items, badges, trophies and the Wrapped summary lean toward the cursor */
+.trophy, .tier, .wr-sum { transition: transform .35s var(--spring-soft); }
+.item.fx-tilt, .trophy.fx-tilt, .tier.fx-tilt, .wr-sum.fx-tilt { transition: transform .12s linear, border-color .25s var(--ease); will-change: transform; }
+/* Magnetic primary buttons (the pull itself is the separate `translate` property, so hover/press transforms still work) */
+:root[data-motion="full"] .btn.primary { transition: translate .35s var(--spring-soft), transform .22s var(--spring), box-shadow .22s var(--ease), border-color .15s, background-color .15s, color .15s; }
+/* Soft, visible focus rings for keyboard users */
+:where(button, a[href], [role="button"], summary, .plant):focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+:root:not([data-motion="off"]) :where(button, a[href], [role="button"], summary):focus-visible { box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 18%, transparent); }
+:where(input[type="text"], input[type="number"], input[type="date"], input[type="time"], input:not([type]), select):focus-visible { outline: 2px solid color-mix(in srgb, var(--accent) 55%, transparent); outline-offset: 1px; }
+/* Gentle fade at the edges of sideways-scrolling rows */
+.catrow { scroll-behavior: smooth; }
+:root[data-motion="off"] .catrow { scroll-behavior: auto; }
+.catrow.fade-r { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent); }
+.catrow.fade-l { -webkit-mask-image: linear-gradient(90deg, transparent, #000 36px); mask-image: linear-gradient(90deg, transparent, #000 36px); }
+.catrow.fade-l.fade-r { -webkit-mask-image: linear-gradient(90deg, transparent, #000 36px, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(90deg, transparent, #000 36px, #000 calc(100% - 36px), transparent); }
+/* A breathing accent glow behind the active tab's icon */
+.tabs button::before { content: ""; position: absolute; z-index: -1; left: 7px; top: 50%; width: 28px; height: 28px; margin-top: -14px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 38%, transparent), transparent); opacity: 0; transition: opacity .3s var(--ease); }
+.tabs button.active::before { opacity: .45; }
+:root[data-motion="full"] .tabs button.active::before { animation: tabBreath 3.4s ease-in-out infinite; }
+@keyframes tabBreath { 0%, 100% { opacity: .25; transform: scale(.85); } 50% { opacity: .7; transform: scale(1.12); } }
+@media (max-width: 1300px) { .tabs button::before { left: 50%; top: 0; margin: 0 0 0 -15px; width: 30px; height: 30px; } }
+@media (max-width: 640px) { .tabs button::before { top: 0; } }
+/* Small sparkle for small wins (much smaller than the big celebrations) */
+.mini-spark { position: fixed; z-index: 95; width: 5px; height: 5px; margin: -2.5px 0 0 -2.5px; border-radius: 50%; pointer-events: none; animation: miniSpark .6s var(--ease) forwards; }
+@keyframes miniSpark { from { transform: translate(0, 0) scale(1); opacity: 1; } to { transform: translate(var(--dx), var(--dy)) scale(.2); opacity: 0; } }
+/* Settings: pack preview row */
+.uis-row { display: flex; gap: 6px; align-items: center; }
+
 .tabs .ls { display: none; }
 @media (max-width: 400px) { .tabs .lf { display: none; } .tabs .ls { display: inline; } .tabs button { font-size: 10px; } }
 </style>
@@ -1642,6 +1685,30 @@ kbd { display: inline-block; min-width: 26px; padding: 3px 7px; border-radius: 7
           <div class="setting">
             <div><div>Animations</div><div class="desc">Full, reduced (simple fades) or off. Saved on this device.</div></div>
             <select id="setMotion"><option value="full">Full</option><option value="reduced">Reduced</option><option value="off">Off</option></select>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Interface sounds</h2>
+          <div class="setting">
+            <div><div>Interface sounds</div><div class="desc">Soft taps, ticks and chimes. Saved on this device.</div></div>
+            <input type="checkbox" id="uisOn">
+          </div>
+          <div class="setting">
+            <div><div>Volume</div><div class="desc">Kept well below the timer sounds</div></div>
+            <input type="range" id="uisVol" min="0" max="1" step="0.05" aria-label="Interface sound volume">
+          </div>
+          <div class="setting" id="uisHoverRow">
+            <div><div>Hover sounds</div><div class="desc">A tiny blip when the mouse moves over buttons</div></div>
+            <input type="checkbox" id="uisHover">
+          </div>
+          <div class="setting">
+            <div><div>Sound pack</div></div>
+            <div class="uis-row"><select id="uisPack"><option value="soft">Soft</option><option value="crisp">Crisp</option><option value="wood">Wood</option><option value="bubbles">Bubbles</option></select>
+              <button class="iconbtn" id="uisTry" title="Play a sample" aria-label="Play a sample"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l10-6.5Z"/></svg></button></div>
+          </div>
+          <div class="setting">
+            <div><div>Quiet during focus</div><div class="desc">Much quieter while a focus block runs. Timer and reminder sounds are unaffected.</div></div>
+            <input type="checkbox" id="uisQuiet">
           </div>
         </div>
         <div class="card">
@@ -2070,6 +2137,7 @@ window.addEventListener('resize', () => requestAnimationFrame(syncSegs));
 /* ---------- Small helpers used across the app ---------- */
 const CHECK_SVG = '<svg class="ok-check" viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 function shake(el) {
+  uiClaim(); uiSound('error');
   if (!el || motion() !== 'full') return;
   el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake');
   setTimeout(() => el.classList.remove('shake'), 450);
@@ -2272,6 +2340,7 @@ function nextAch() {
   achBusy = true;
   el.innerHTML = `<div class="ac-ic">${iconSVG(ICONS[a.icon], 20)}</div><div><div class="ac-k">Achievement unlocked</div><div class="ac-n">${esc(a.name)}</div></div><div class="ac-c">${COIN_SVG} +${a.coins}</div>`;
   restartClass(el, 'show');
+  uiSound('arp', { always: true });
   setTimeout(() => { el.classList.remove('show'); setTimeout(nextAch, 450); }, 3300);
 }
 function burstParticles(host, n) {
@@ -2288,6 +2357,7 @@ function burstParticles(host, n) {
   }
 }
 function playCoin() {
+  if (UIS.prefs.on) { if (performance.now() - (UIS.last.reward || 0) > 700) uiSound('coin', { always: true }); return; }
   const c = getCtx();
   if (!c || !S.settings.sound) return;
   tone(c, c.destination, { f: 1568, peak: 0.05, a: 0.003, d: 0.18 });
@@ -2925,6 +2995,7 @@ function startTimer() {
   ensureAudio();
   askNotifyPermission();
   const t = S.timer, now = Date.now();
+  if (recentGesture()) { uiClaim(); if (!(t.status === 'idle' && t.phase === 'focus' && extraOn('x_startcue'))) uiSound('start', { always: true }); }
   if (t.status === 'idle') {
     t.planned = phaseMs(t.phase);
     t.remaining = t.planned;
@@ -2946,6 +3017,7 @@ function startTimer() {
 
 function pauseTimer() {
   const t = S.timer;
+  if (recentGesture()) { uiClaim(); uiSound('pause', { always: true }); }
   t.remaining = Math.max(0, t.endAt - Date.now());
   t.status = 'paused';
   saveLocal();
@@ -3045,6 +3117,7 @@ function logSession(focusedMs, end) {
   if (!S.settings.gamification) { toast(`Logged ${fmtMin(focusedMs / 60000)} · ${name}`); socialAfterSession(); return; }
   const goalDays = news.filter(n => n.type === 'goal').length;
   toast(`+${xpForSession(s)} XP · +${COINS_PER_SESSION + GOAL_BONUS * goalDays + subCoins} coins${goalDays ? ' · daily goal reached' : ''}`);
+  setTimeout(() => uiSound('coin'), 900);
   floatUp([[`+${xpForSession(s)} XP`], [`+${COINS_PER_SESSION + GOAL_BONUS * goalDays + subCoins} coins`, 'coin'], ...(S.game.claims.bosses[dayKey(weekMonday())] ? [] : [[`⚔️ −${Math.round(focusedMs / 60000)} HP`]])]);
   announce(news, 'loud');
   socialAfterSession();
@@ -3529,6 +3602,7 @@ function renderSettings() {
   $('#setWater').checked = st.waterNudge !== false;
   $('#setTip').checked = st.dailyTip !== false;
   $('#setKeys').checked = st.shortcuts !== false;
+  renderUisSettings();
   $('#setRevInt').value = revIntervals().join(', ');
   renderPrivacy();
   $('#setAmbVol').value = st.ambientVolume;
@@ -4588,6 +4662,7 @@ function renderShop() {
     ${cat === 'ambient' ? `<div class="card amb-vol"><label class="row between"><span>Ambient volume</span><input type="range" id="shopAmbVol" min="0" max="1" step="0.05" value="${S.settings.ambientVolume}"></label><div class="lbl">Plays only while a focus block is running. The mute button silences it too.</div></div>` : ''}
     <div class="shopgrid">${items.map(it => itemCard(it, g)).join('')}</div>`;
   animateCounts($('#shopView'));
+  updateFades($('#shopCats'));
 }
 function previewItem(id) {
   const it = ITEM_BY_ID[id];
@@ -4615,7 +4690,7 @@ function showLevelUp(from, to) {
   $('#lvSub').textContent = tierUp ? `You reached level ${to}. Your new badge is in your profile.`
     : `${t.name} · ${next ? `${next.name} at level ${next.min}` : 'the highest tier'}`;
   if (!dlg.open) dlg.showModal();
-  if (tierUp) playTierChord();
+  if (tierUp) playTierChord(); else uiSound('arp', { always: true });
 }
 
 /* ==========================================================================
@@ -5450,6 +5525,7 @@ const scrollMem = {};
 function showTab(tab) {
   if ((tab === 'board' || tab === 'shop' || tab === 'quests') && !S.settings.gamification) tab = 'timer';
   if (!$('#tab-' + tab)) tab = 'timer';
+  if (S.ui.tab !== tab && recentGesture(800)) { uiClaim(); uiSound('swoosh'); }
   if (S.ui.tab !== tab && $('#tab-' + S.ui.tab) && $('#tab-' + S.ui.tab).classList.contains('active')) scrollMem[S.ui.tab] = window.scrollY;
   S.ui.tab = tab;
   const navTab = tab === 'settings' ? 'profile' : tab;   // Settings is part of Profile
@@ -6064,6 +6140,8 @@ $('#tab-reminders').addEventListener('click', e => {
   if (!r) return;
   if (t.closest('[data-rdone]')) {
     const on = !remDone(r, day);
+    uiClaim(); uiSound(on ? 'tick' : 'off');
+    if (on) miniBurst(t.closest('[data-rdone]'));
     markRemDone(r, day, on);
     saveReminders();
   } else if (t.closest('[data-redit]') || (t.closest('.rem-main') && !t.closest('button'))) openRemForm(r);
@@ -6356,7 +6434,7 @@ function renderQuests() {
             <div class="boss-name">${esc(b.name)}</div>
             <p class="boss-desc">${esc(b.desc)}</p>
             <div class="hpbar" role="progressbar" aria-label="Boss health" aria-valuemin="0" aria-valuemax="${st.hp}" aria-valuenow="${st.hp - st.dmg}"><b style="transform:scaleX(${(1 - lastSeen / st.hp).toFixed(4)})"></b><i style="transform:scaleX(${(1 - lastSeen / st.hp).toFixed(4)})"></i></div>
-            <div class="hp-row"><span><strong>${fmtNum(st.hp - st.dmg)}</strong> / ${fmtNum(st.hp)} HP</span><span>${st.done ? 'Week complete' : weekLeftText()}</span></div>
+            <div class="hp-row"><span><strong data-count="boss-hp" data-val="${st.hp - st.dmg}">${fmtNum(st.hp - st.dmg)}</strong> / ${fmtNum(st.hp)} HP</span><span>${st.done ? 'Week complete' : weekLeftText()}</span></div>
           </div>
         </div>
         <div class="boss-meta">
@@ -6373,6 +6451,7 @@ function renderQuests() {
       </div>
     </div>`;
   animateIn(el);
+  animateCounts(el);
   writeLS(BOSS_SEEN_KEY, { wk: st.wk, dmg: st.dmg });
   // HP drains from what you last saw to now, with a hit and floating damage.
   requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -6563,6 +6642,7 @@ async function claimLogin() {
   save();
   applyCosmetics();
   const coins = LOGIN_COINS[info.day - 1];
+  uiClaim(); uiSound('reward', { always: true });
   toast(`Day ${info.day}: +${coins} coins${gift ? ` · 🎁 ${gift.name}!` : ''}`, 3600, true);
   coinDrop($('#loginClaim'));
   if (gift) pomeoSay(`A gift for you: ${gift.name}! 🎁`, { kind: 'care' });
@@ -6624,6 +6704,7 @@ function markRevised(v, how = 'ok') {
     if (v.step < revIntervals().length) v.next = dayKey(addDays(today, how === 'easy' ? Math.round(revGap(v.step) * 1.5) : revGap(v.step)));
   }
   v.log = [...(v.log || []), { at: Date.now(), how }].slice(-12);
+  uiClaim(); uiSound('tick');
   v.done = {}; v.snooze = {};
   save();
   renderReminderBits();
@@ -6777,7 +6858,7 @@ function onParkClick(e) {
   if (b.dataset.pk === 'clear') { S.parked = S.parked.filter(p => !p.done); save(); renderReminderBits(); return true; }
   const p = S.parked.find(x => x.id === b.closest('[data-pid]').dataset.pid);
   if (!p) return true;
-  if (b.dataset.pk === 'done') p.done = !p.done;
+  if (b.dataset.pk === 'done') { p.done = !p.done; uiClaim(); uiSound(p.done ? 'tick' : 'off'); if (p.done) miniBurst(b); }
   else if (b.dataset.pk === 'del') S.parked = S.parked.filter(x => x !== p);
   else if (b.dataset.pk === 'rem') { openRemForm({ title: p.text.slice(0, 80) }); p.done = true; }
   save();
@@ -6841,9 +6922,11 @@ function renderGarden() {
   }
   el.innerHTML = `<div class="card"><div class="row between" style="margin-bottom:6px;flex-wrap:wrap;gap:8px"><h2 style="margin:0">🍅 Tomato garden</h2>
       <div class="seg" id="gardenSeg"><button data-gview="week" class="${view === 'week' ? 'active' : ''}">This week</button><button data-gview="month" class="${view === 'month' ? 'active' : ''}">This month</button></div></div>
-    <div class="garden-stats"><span><b>${st.grown}</b> plants grown</span><span><b>${st.golden}</b> golden</span><span><b>${st.ripe}</b> ripe</span><span><b>${st.wilted}</b> wilted</span></div>
+    <div class="garden-stats"><span><b data-count="g-grown" data-val="${st.grown}">${st.grown}</b> plants grown</span><span><b data-count="g-golden" data-val="${st.golden}">${st.golden}</b> golden</span><span><b data-count="g-ripe" data-val="${st.ripe}">${st.ripe}</b> ripe</span><span><b data-count="g-wilted" data-val="${st.wilted}">${st.wilted}</b> wilted</span></div>
     <div class="garden" id="garden">${beds}</div>
     <div class="garden-legend">${['sprout', 'leafy', 'ripe', 'golden', 'wilted'].map(k => `<span>${plantSVG(k)}${PLANT_NAMES[k]}${{ sprout: ' <20m', leafy: ' 20–44m', ripe: ' 45–89m', golden: ' 90m+', wilted: ' stopped early' }[k]}</span>`).join('')}</div></div>`;
+  animateCounts(el);
+  if (el.querySelector('.plant.new')) uiSound('grow');
   writeLS('pomodorolist-garden-seen', String(Date.now()));
 }
 const sameDay = (a, b) => dayKey(a) === dayKey(b);
@@ -7094,6 +7177,7 @@ function addSub(text) {
   return true;
 }
 function playTick() {
+  if (UIS.prefs.on) { uiSound('tick'); return; }
   if (!S.settings.sound) return;
   const c = getCtx();
   if (!c) return;
@@ -7107,9 +7191,11 @@ function toggleSub(id) {
   const first = flipCapture('#subCheck li[data-uid]');
   x.d = !x.d;
   x.at = x.d ? Date.now() : 0;
-  if (x.d) { subFresh = id; playTick(); }
+  uiClaim();
+  if (x.d) { subFresh = id; playTick(); } else uiSound('off');
   subChanged();
   flipPlay(first, '#subCheck li[data-uid]');
+  if (x.d) miniBurst($(`#subCheckList li[data-uid="${id}"] .sub-box`), 6);
   const all = subs().length && subs().every(s => s.d);
   if (x.d && all) {
     restartClass($('#subCheck'), 'cheer', 800);
@@ -7388,6 +7474,217 @@ function renderSubStat() {
   el.innerHTML = `<div class="tile" style="display:flex;align-items:center;gap:14px"><div class="v">✓ ${done}</div><div class="s">subtask${done === 1 ? '' : 's'} completed this week${all ? ` · ${Math.round(done / all * 100)}% of ${all} planned` : ''}</div></div>`;
 }
 
+
+/* ==========================================================================
+   INTERFACE SOUNDS — small, soft UI sounds, all made with Web Audio.
+   A per-device preference (localStorage). They go through their own quiet
+   bus (about a quarter of the timer-sound level), respect the mute button,
+   stay silent in a hidden tab, and are hushed during focus if you like.
+   The AudioContext is the app's one shared context, created on the first
+   tap or key press (browser autoplay rules).
+   ========================================================================== */
+const UIS_KEY = 'pomodorolist-uisound';
+const UIS = { prefs: { on: true, vol: 0.6, hover: true, pack: 'soft', quietFocus: true, ...readJSON(UIS_KEY, {}) }, bus: null, voices: 0, last: {}, claim: 0, gesture: 0, hoverEl: null, recent: [] };
+const uisSave = () => writeLS(UIS_KEY, UIS.prefs);
+const finePointer = matchMedia('(hover: hover) and (pointer: fine)');
+// Notes: [frequency Hz, start s, peak 0–1, length s]. Each pack decides how a note sounds.
+const UI_NOTES = {
+  hover:  [[1800, 0, .1, .03]],
+  click:  [[620, 0, .45, .07]],
+  on:     [[880, 0, .4, .05], [1320, .045, .35, .06]],
+  off:    [[1320, 0, .35, .05], [880, .045, .4, .06]],
+  open:   [[523, 0, .3, .1], [784, .06, .3, .14]],
+  close:  [[784, 0, .28, .08], [523, .05, .26, .12]],
+  tick:   [[1760, 0, .35, .04], [2637, .035, .3, .14]],
+  start:  [[523, 0, .45, .3], [784, .16, .42, .45]],
+  pause:  [[392, 0, .42, .28]],
+  coin:   [[1568, 0, .3, .1], [2349, .05, .28, .2], [3136, .1, .14, .18]],
+  arp:    [[523, 0, .4, .3], [659, .07, .38, .3], [784, .14, .36, .32], [1047, .21, .34, .45]],
+  error:  [[220, 0, .5, .14], [165, .06, .45, .16]],
+  reward: [[784, 0, .38, .16], [988, .07, .36, .16], [1319, .14, .34, .28]],
+  grow:   [[440, 0, .3, .12], [660, .08, .3, .14], [990, .16, .22, .2]],
+};
+const UI_PACKS = {
+  soft: (c, o, f, t, p, d) => tone(c, o, { f, t, peak: p, a: Math.min(.012, d / 4), d }),
+  crisp: (c, o, f, t, p, d) => { tone(c, o, { f: f * 1.5, t, type: 'triangle', peak: p * .55, a: .002, d: d * .6 }); noiseHit(c, o, { t, freq: 5200, q: 1.2, peak: p * .35, d: .014, type: 'highpass' }); },
+  wood: (c, o, f, t, p, d) => { noiseHit(c, o, { t, freq: Math.min(2600, f * 1.4), q: 8, peak: p * .9, d: Math.min(.06, d) }); tone(c, o, { f: f * .5, t, peak: p * .45, a: .002, d: Math.min(.09, d) }); },
+  bubbles: (c, o, f, t, p, d) => tone(c, o, { f: f * .7, f2: f * 1.45, fd: Math.max(.03, d * .6), t, peak: p * .9, a: .004, d }),
+};
+const UI_GAP = { hover: 60, click: 45, swoosh: 120, coin: 120 };
+const focusRunning = () => !!USER && S.timer.status === 'running' && S.timer.phase === 'focus';
+/** Mark that a specific sound handled this interaction, so the generic click pop stays quiet. */
+const uiClaim = () => { UIS.claim = performance.now(); };
+const recentGesture = (ms = 1000) => performance.now() - UIS.gesture < ms;
+function uiSound(name, opt = {}) {
+  const p = UIS.prefs;
+  if (!p.on || !S.settings.sound || document.hidden || !audioCtx || audioCtx.state !== 'running') return false;
+  if (name === 'hover' && (!p.hover || !finePointer.matches)) return false;
+  let vol = p.vol;
+  if (p.quietFocus && focusRunning() && !opt.always) { if (name === 'hover') return false; vol *= 0.25; }
+  if (vol <= 0) return false;
+  const now = performance.now();
+  if (now - (UIS.last[name] || 0) < (UI_GAP[name] || 35)) return false;
+  if (UIS.voices >= (name === 'hover' ? 1 : 4)) return false;      // never a pile-up of sounds
+  UIS.last[name] = now;
+  const c = audioCtx;
+  if (!UIS.bus) { UIS.bus = c.createGain(); UIS.bus.gain.value = 0.12; UIS.bus.connect(c.destination); }
+  const out = c.createGain();
+  out.gain.value = vol;
+  out.connect(UIS.bus);
+  let len = 0.1;
+  if (name === 'swoosh') len = uiSwoosh(c, out);
+  else {
+    const play = UI_PACKS[p.pack] || UI_PACKS.soft;
+    for (const [f, t, pk, d] of UI_NOTES[name] || []) { play(c, out, f, t, pk, d); len = Math.max(len, t + d); }
+  }
+  UIS.voices++;
+  setTimeout(() => { UIS.voices = Math.max(0, UIS.voices - 1); try { out.disconnect(); } catch (e) {} }, len * 1000 + 120);
+  UIS.recent.push(name); if (UIS.recent.length > 30) UIS.recent.shift();
+  return true;
+}
+/** A gentle swoosh: soft noise through a band-pass that glides upward. */
+function uiSwoosh(c, out) {
+  const now = c.currentTime, s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+  const pack = UIS.prefs.pack, lo = pack === 'wood' ? 380 : pack === 'crisp' ? 1400 : pack === 'bubbles' ? 700 : 520, hi = lo * 4;
+  s.buffer = noiseBuffer('pink');
+  f.type = 'bandpass'; f.Q.value = 1.4;
+  f.frequency.setValueAtTime(lo, now); f.frequency.exponentialRampToValueAtTime(hi, now + 0.16);
+  g.gain.setValueAtTime(0.0001, now); g.gain.linearRampToValueAtTime(0.5, now + 0.05); g.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
+  s.connect(f).connect(g).connect(out);
+  s.start(now, Math.random() * 2); s.stop(now + 0.22);
+  return 0.22;
+}
+// First tap or key press creates/resumes the shared AudioContext.
+const onGesture = () => { UIS.gesture = performance.now(); if (UIS.prefs.on && S.settings.sound) ensureAudio(); };
+addEventListener('pointerdown', onGesture, true);
+addEventListener('keydown', onGesture, true);
+// Generic taps: a soft pop (unless a more specific sound already played for this tap).
+const UI_CLICKABLE = 'button, [role="button"], .chip, summary, a.btn';
+document.addEventListener('click', e => {
+  const el = e.target.closest && e.target.closest(UI_CLICKABLE);
+  if (!el || el.disabled) return;
+  // checked a moment later, so a sound from the action itself (e.g. a form error) takes its place
+  setTimeout(() => { if (performance.now() - UIS.claim > 80) uiSound('click'); }, 0);
+});
+// Switches and checkboxes: up for on, down for off.
+document.addEventListener('change', e => {
+  const el = e.target;
+  if (el.type !== 'checkbox' || el.dataset.tick !== undefined) return;
+  uiClaim();
+  uiSound(el.checked ? 'on' : 'off');
+});
+// Hover: a tiny blip, mouse only, at most every 60 ms and once per element until you leave it.
+const UI_HOVER = '.btn, .iconbtn, .tabs button, .chip, .chip-t, .catrow button, .seg button, .item, .exam-card, .trophy, .plant, .coinpill, .lvchip, .rem-check, .sub-toggle, .linkbtn, .wr-share';
+document.addEventListener('pointerover', e => {
+  if (e.pointerType !== 'mouse') return;
+  const el = e.target.closest && e.target.closest(UI_HOVER);
+  if (!el || el === UIS.hoverEl || el.disabled) return;
+  UIS.hoverEl = el;
+  uiSound('hover');
+});
+document.addEventListener('pointerout', e => {
+  if (UIS.hoverEl && (!e.relatedTarget || !UIS.hoverEl.contains(e.relatedTarget))) UIS.hoverEl = null;
+});
+// Dialogs: a soft rising tone opening, a falling one closing.
+(() => {
+  const P = HTMLDialogElement.prototype, show = P.showModal, close = P.close;
+  P.showModal = function () { const was = this.open; const r = show.call(this); if (!was) { uiClaim(); uiSound('open'); } return r; };
+  P.close = function (v) { if (this.open && !this.classList.contains('closing')) { uiClaim(); uiSound('close'); } return close.call(this, v); };
+})();
+function renderUisSettings() {
+  const p = UIS.prefs;
+  $('#uisOn').checked = p.on;
+  $('#uisVol').value = p.vol;
+  $('#uisHover').checked = p.hover;
+  $('#uisPack').value = p.pack;
+  $('#uisQuiet').checked = p.quietFocus;
+  $('#uisHoverRow').classList.toggle('hidden', !finePointer.matches);
+  for (const id of ['#uisVol', '#uisHover', '#uisPack', '#uisQuiet', '#uisTry']) $(id).disabled = !p.on;
+}
+$('#uisOn').addEventListener('change', e => { UIS.prefs.on = e.target.checked; uisSave(); if (UIS.prefs.on) ensureAudio(); renderUisSettings(); });
+$('#uisVol').addEventListener('input', e => { UIS.prefs.vol = +e.target.value; uisSave(); });
+$('#uisVol').addEventListener('change', () => { UIS.last.click = 0; uiSound('click'); });
+$('#uisHover').addEventListener('change', e => { UIS.prefs.hover = e.target.checked; uisSave(); });
+$('#uisQuiet').addEventListener('change', e => { UIS.prefs.quietFocus = e.target.checked; uisSave(); });
+$('#uisPack').addEventListener('change', e => { UIS.prefs.pack = e.target.value; uisSave(); uiPreview(); });
+$('#uisTry').addEventListener('click', () => { uiClaim(); uiPreview(); });
+function uiPreview() {
+  ['click', 'on', 'tick', 'coin'].forEach((n, i) => setTimeout(() => { UIS.last[n] = 0; uiSound(n, { always: true }); }, i * 260));
+}
+
+/* ==========================================================================
+   VISUAL POLISH — cursor glow, tilt and magnetic buttons (mouse + Full
+   animations only; touch and Reduced/Off never see them), small sparkles,
+   and soft fades on sideways-scrolling rows.
+   ========================================================================== */
+const FX = { raf: 0, x: 0, y: 0, t: null, glow: null, tilt: null, mag: new Set() };
+const fxOn = () => motion() === 'full' && finePointer.matches;
+document.addEventListener('pointermove', e => {
+  if (e.pointerType !== 'mouse') return;
+  if (!fxOn()) { if (FX.glow || FX.tilt || FX.mag.size) fxReset(); return; }
+  FX.x = e.clientX; FX.y = e.clientY; FX.t = e.target;
+  if (!FX.raf) FX.raf = requestAnimationFrame(fxFrame);
+}, { passive: true });
+document.addEventListener('pointerleave', fxReset);
+addEventListener('blur', fxReset);
+function fxReset() {
+  if (FX.glow) FX.glow.classList.remove('fx-glow');
+  if (FX.tilt) { FX.tilt.classList.remove('fx-tilt'); FX.tilt.style.transform = ''; }
+  for (const b of FX.mag) b.style.translate = '';
+  FX.glow = FX.tilt = null; FX.mag.clear();
+}
+function fxFrame() {
+  FX.raf = 0;
+  const t = FX.t instanceof Element ? FX.t : null;
+  // Cursor glow on the card or shop item under the pointer
+  const g = t && t.closest('.card, .item');
+  if (g !== FX.glow) { if (FX.glow) FX.glow.classList.remove('fx-glow'); FX.glow = g; if (g) g.classList.add('fx-glow'); }
+  if (g) { const r = g.getBoundingClientRect(); g.style.setProperty('--mx', (FX.x - r.left).toFixed(0) + 'px'); g.style.setProperty('--my', (FX.y - r.top).toFixed(0) + 'px'); }
+  // A slight 3D tilt toward the cursor
+  const k = t && t.closest('.item, .trophy, .tier, .wr-sum');
+  if (k !== FX.tilt) { if (FX.tilt) { FX.tilt.classList.remove('fx-tilt'); FX.tilt.style.transform = ''; } FX.tilt = k; if (k) k.classList.add('fx-tilt'); }
+  if (k) {
+    const r = k.getBoundingClientRect(), dx = (FX.x - r.left) / r.width - 0.5, dy = (FX.y - r.top) / r.height - 0.5, m = k.classList.contains('wr-sum') ? 4 : 7;
+    k.style.transform = `perspective(700px) rotateX(${(-dy * m).toFixed(2)}deg) rotateY(${(dx * m).toFixed(2)}deg) translateY(-2px)`;
+  }
+  // Magnetic primary buttons: lean a few pixels toward a nearby cursor
+  const near = new Set();
+  for (const b of document.querySelectorAll('.tab.active .btn.primary, dialog[open] .btn.primary')) {
+    if (b.disabled || !b.offsetWidth) continue;
+    const r = b.getBoundingClientRect();
+    const ox = Math.max(r.left - FX.x, 0, FX.x - r.right), oy = Math.max(r.top - FX.y, 0, FX.y - r.bottom), d = Math.hypot(ox, oy);
+    if (d > 56) continue;
+    const s = 1 - d / 56, cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    const tx = clamp((FX.x - cx) / (r.width / 2), -1.4, 1.4) * 4 * s, ty = clamp((FX.y - cy) / (r.height / 2), -1.4, 1.4) * 3 * s;
+    b.style.translate = `${tx.toFixed(2)}px ${ty.toFixed(2)}px`;
+    near.add(b);
+  }
+  for (const b of FX.mag) if (!near.has(b)) b.style.translate = '';
+  FX.mag = near;
+}
+/** A tiny sparkle for small wins. */
+function miniBurst(el, n = 7) {
+  if (!el || motion() !== 'full' || document.hidden) return;
+  const r = el.getBoundingClientRect();
+  if (!r.width) return;
+  const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+  const cols = ['var(--accent)', '#f2c14e', 'var(--accent)', '#ff9d8c'];
+  for (let i = 0; i < n; i++) {
+    const s = document.createElement('i'), a = (i / n) * Math.PI * 2 + Math.random() * 0.5, dist = 12 + Math.random() * 10;
+    s.className = 'mini-spark';
+    s.style.cssText = `left:${cx}px;top:${cy}px;background:${cols[i % cols.length]};--dx:${(Math.cos(a) * dist).toFixed(1)}px;--dy:${(Math.sin(a) * dist).toFixed(1)}px`;
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 700);
+  }
+}
+/** Fade the edges of a sideways-scrolling row only where there is more to see. */
+function updateFades(el) {
+  if (!el) return;
+  el.classList.toggle('fade-l', el.scrollLeft > 2);
+  el.classList.toggle('fade-r', el.scrollLeft + el.clientWidth < el.scrollWidth - 2);
+}
+document.addEventListener('scroll', e => { if (e.target.classList && e.target.classList.contains('catrow')) updateFades(e.target); }, true);
+addEventListener('resize', () => $$('.catrow').forEach(updateFades));
 
 /* ---------- First-time welcome tour (once per device) ---------- */
 const TOUR_KEY = 'pomodorolist-tour-done';
