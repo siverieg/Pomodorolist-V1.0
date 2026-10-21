@@ -1980,6 +1980,13 @@ body.sp-handoff #mascot { opacity: 0; }
 :root[data-motion="full"] .pscene .ps-page { animation: psPage 4s ease-in-out infinite; transform-box: fill-box; transform-origin: 0 50%; }
 @keyframes psPage { 0%, 70%, 100% { transform: none; } 80% { transform: scaleX(-1); opacity: .6; } 90% { transform: scaleX(-1); opacity: 0; } }
 
+/* ---------- First load on a new device: placeholders instead of 0 coins / Level 1 / 0 days ---------- */
+body.first-load :is(#coinPill [data-count], #lvChip .lvn, #lvChip .uname, #curStreak, #bestStreak, #todayText, #todayPct) { color: transparent !important; background: var(--heat0); border-radius: 7px; }
+body.first-load :is(#curStreak, #bestStreak) > * { visibility: hidden; }
+body.first-load :is(#todayExtra, #chips, #examCard) { visibility: hidden; }
+body.first-load #todayBar { opacity: 0; }
+:root:not([data-motion="off"]) body.first-load :is(#coinPill [data-count], #lvChip .lvn, #lvChip .uname, #curStreak, #bestStreak, #todayText, #todayPct) { animation: skPulse 1.1s ease-in-out infinite alternate; }
+@keyframes skPulse { from { opacity: .55; } to { opacity: 1; } }
 .tabs .ls { display: none; }
 @media (max-width: 400px) { .tabs .lf { display: none; } .tabs .ls { display: inline; } .tabs button { font-size: 10px; } }
 </style>
@@ -2442,6 +2449,10 @@ body.sp-handoff #mascot { opacity: 0; }
         <div class="setting" data-k="quiet focus mute distraction">
           <div><div>Quiet during focus</div><div class="desc">Interface sounds much quieter while a focus block runs</div></div>
           <input type="checkbox" id="uisQuiet" aria-label="Quiet during focus">
+        </div>
+        <div class="setting" data-k="test sounds check audio not working problem">
+          <div><div>Test sounds</div><div class="desc" id="sndTestOut">Plays one sound of each type, so you can check they all work</div></div>
+          <button class="btn small" id="sndTest">Test sounds</button>
         </div>
         <div class="setting" data-k="haptics vibration vibrate phone buzz">
           <div><div>Vibration</div><div class="desc">Light haptics on key actions, on phones that support it. Saved on this device.</div></div>
@@ -3046,12 +3057,15 @@ const shownCounts = {};
 function animateCounts(root) {
   if (!root) return;
   root.querySelectorAll('[data-count]').forEach(el => {
-    const key = el.dataset.count, to = +el.dataset.val, from = shownCounts[key] ?? 0;
+    const key = el.dataset.count, to = +el.dataset.val, from = shownCounts[key];
     shownCounts[key] = to;
-    if (from === to || motion() === 'off') { el.textContent = fmtNum(to); return; }
+    const run = el.__count = (el.__count || 0) + 1;   // a newer value cancels a count still running
+    // the first time a number is shown it appears as it is: nothing counts up from 0
+    if (from === undefined || from === to || motion() === 'off') { el.textContent = fmtNum(to); return; }
     const t0 = performance.now(), dur = Math.min(1000, 380 + Math.abs(to - from) * 3);
     el.textContent = fmtNum(from);
     const step = t => {
+      if (el.__count !== run) return;
       const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3);
       el.textContent = fmtNum(from + (to - from) * e);
       if (k < 1 && el.isConnected) requestAnimationFrame(step);
@@ -3238,10 +3252,11 @@ function burstParticles(host, n) {
 }
 function playCoin() {
   if (UIS.prefs.on) { if (performance.now() - (UIS.last.reward || 0) > 700) uiSound('coin', { always: true }); return; }
-  const c = getCtx();
-  if (!c || !S.settings.sound) return;
-  tone(c, c.destination, { f: 1568, peak: 0.05, a: 0.003, d: 0.18 });
-  tone(c, c.destination, { f: 2093, t: 0.07, peak: 0.045, a: 0.003, d: 0.3 });
+  if (!S.settings.sound) return;
+  withAudio(c => {
+    tone(c, c.destination, { f: 1568, peak: 0.05, a: 0.003, d: 0.18 });
+    tone(c, c.destination, { f: 2093, t: 0.07, peak: 0.045, a: 0.003, d: 0.3 });
+  });
 }
 /** Coins drop from the balance into the item you just bought. */
 function coinDrop(target) {
@@ -3307,6 +3322,8 @@ function defaultState() {
     reminders: [],  // see REMINDERS
     notes: {},      // sessionId -> one-line note
     energy: {},     // sessionId -> focus check-in 1 (low) … 4 (locked in)
+    tomb: {},       // 'reminders:<id>' -> when it was deleted (see SYNC MERGE)
+    remFired: {},   // '<reminderId>@<day>@<time>' -> when it rang (on any device)
     onboarded: false,  // finished or skipped the tutorial (synced, so it shows once per account)
     revisions: [],  // spaced-revision topics (see SPACED REVISION)
     exams: [],      // { id, name, date, added }
@@ -3342,6 +3359,7 @@ function hydrate(obj) {
   out.reminders = out.reminders.filter(r => r && r.id && typeof r.date === 'string' && typeof r.time === 'string');
   if (!out.notes || typeof out.notes !== 'object' || Array.isArray(out.notes)) out.notes = {};
   if (!out.energy || typeof out.energy !== 'object' || Array.isArray(out.energy)) out.energy = {};
+  for (const k of ['tomb', 'remFired']) if (!out[k] || typeof out[k] !== 'object' || Array.isArray(out[k])) out[k] = {};
   if (!out.names || typeof out.names !== 'object' || Array.isArray(out.names)) out.names = {};
   out.game = normalizeGame(obj.game);
   return out;
@@ -3353,6 +3371,7 @@ let localOnly = false;    // true when the Firebase SDK could not load (offline 
 
 /** Save to this device (localStorage) and, if signed in, schedule a cloud upload. */
 function save() {
+  stampLists();
   saveLocal();
   scheduleProfilePush();
 }
@@ -3377,6 +3396,7 @@ let unsubs = [];              // Firestore listeners to detach on logout
 let profileLoaded = false;    // first profile snapshot applied (until then, never upload)
 let sessionsLoaded = false;
 let firstLoadDone = false;
+let firstLoadAt = 0;
 let lastProfileJSON = '';     // what the cloud already has, to skip redundant writes
 let monthOf = {};             // session id -> month doc id (needed to delete a session)
 let monthDocIds = [];
@@ -3434,6 +3454,8 @@ function profileFromState() {
     notes: recentNotes(),
     energy: recentEnergy(),
     onboarded: !!S.onboarded,
+    tomb: pruneMap(S.tomb, 120 * DAY_MS),
+    remFired: pruneMap(S.remFired, 3 * DAY_MS),
     revisions: S.revisions,
     exams: S.exams,
     parked: S.parked.slice(-50),
@@ -3464,12 +3486,13 @@ function scheduleProfilePush() {
 function pushProfile(force) {
   if (!USER || USER.guest) return;
   localEditPending = false;
-  if (localOnly) { S.profileDirty = true; saveLocal(); return; }
+  if (localOnly || (!FB.db && !USER.preview)) { S.profileDirty = true; saveLocal(); return; }
   if (!cloudReady() || (!profileLoaded && !force)) return;
   const p = profileFromState();
   const json = JSON.stringify(p);
   if (!force && json === lastProfileJSON) return;
   lastProfileJSON = json;
+  if (SYNC.stale.length && FB.deleteField) { for (const [f, k] of SYNC.stale) p[f][k] = FB.deleteField(); SYNC.stale = []; }
   trackWrite(FB.setDoc(userRef(), { ...p, updatedAt: FB.serverTimestamp() }, { merge: true }));
 }
 
@@ -3499,6 +3522,7 @@ function onSyncError(err) {
   if (quietRetry(err)) { console.warn('Sync hiccup — retrying quietly', err); return; }
   console.error('Sync error', err);
   syncError = true;
+  document.body.classList.remove('first-load');   // stop the placeholders: show what this device has
   renderSync();
   if (err && err.code === 'permission-denied') toast('Cloud sync was refused — check the Firestore security rules', 5000);
   else toast('Sync problem: ' + (err && err.message ? err.message : err), 4000);
@@ -3523,21 +3547,18 @@ window.addEventListener('offline', renderSync);
 function applyProfile(d) {
   const def = defaultState();
   S.settings = { ...def.settings, ...(d.settings || {}) };
-  if (Array.isArray(d.presets) && d.presets.length) S.presets = d.presets;
-  S.activePresetId = S.presets.some(p => p.id === d.activePresetId) ? d.activePresetId : S.presets[0].id;
+  const ahead = mergeSyncFrom(d);   // reminders, revisions, exams, parked, presets, templates: item by item
+  S.activePresetId = S.presets.some(p => p.id === d.activePresetId) ? d.activePresetId : S.activePresetId;
   S.names = {};
   for (const n of d.names || []) if (n && n.name) S.names[n.name] = { color: n.color || hashColor(n.name), tag: n.tag || '' };
   S.recent = Array.isArray(d.recent) ? d.recent : [];
   S.pinned = Array.isArray(d.pinned) ? d.pinned : [];
   S.game = normalizeGame(d.game);
-  if (Array.isArray(d.reminders)) S.reminders = d.reminders.filter(r => r && r.id && r.time && r.date);
-  if (d.notes && typeof d.notes === 'object') S.notes = { ...d.notes };
-  if (d.energy && typeof d.energy === 'object' && !Array.isArray(d.energy)) S.energy = { ...d.energy };
   S.onboarded = !!(d.onboarded || S.onboarded);
-  for (const k of ['revisions', 'exams', 'parked', 'abandoned', 'squad', 'subTemplates']) if (Array.isArray(d[k])) S[k] = d[k].filter(x => x && typeof x === 'object');
-  S.revisions = cleanRevisions(S.revisions);
+  for (const k of ['abandoned', 'squad']) if (Array.isArray(d[k])) S[k] = d[k].filter(x => x && typeof x === 'object');
   S.timer.round = Math.min(S.timer.round, activePreset().rounds);
   lastProfileJSON = JSON.stringify(profileFromState());
+  if (ahead) { lastProfileJSON = ''; scheduleProfilePush(); }   // the cloud is missing some of ours: upload the merged copy
   saveLocal();
   applyCosmetics();
   syncNameInputs();
@@ -3553,7 +3574,12 @@ function attachListeners() {
       if (!profileLoaded) { profileLoaded = true; pushProfile(true); afterFirstLoad(); }  // brand-new account
       return;
     }
-    if (profileLoaded && (snap.metadata.hasPendingWrites || localEditPending)) { renderSync(); return; }  // our own edit is newer
+    if (profileLoaded && (snap.metadata.hasPendingWrites || localEditPending)) {
+      // our own edit is on its way (it wins for settings), but another device's list changes are merged now, not lost
+      if (!snap.metadata.hasPendingWrites) { mergeSyncFrom(snap.data()); if (SYNC.changed) { saveLocal(); renderAll(); } }
+      renderSync();
+      return;
+    }
     applyProfile(snap.data());
     profileLoaded = true;
     renderSync();
@@ -3589,6 +3615,8 @@ function attachListeners() {
 function afterFirstLoad() {
   if (firstLoadDone || !profileLoaded || !sessionsLoaded) return;
   firstLoadDone = true;
+  firstLoadAt = performance.now();
+  document.body.classList.remove('first-load');
   reconcileRewards('initial');  // first load of this version also awards XP/coins for all past sessions
   maybeOfferMigration();
   initSocial();
@@ -3604,14 +3632,20 @@ function showView(id) {
 }
 
 /** Enter the app for a signed-in user (cloud = Firebase available) or guest. */
-function startSession(user, cloud) {
-  if (USER && !USER.guest && user.uid && USER.uid === user.uid) return;
+let cloudStarted = false;
+/**
+ * Show the app for this user. cloud = Firebase is ready; early = started from this device's copy
+ * while Firebase is still loading (startCloud() attaches the cloud as soon as it's ready).
+ */
+function startSession(user, cloud, early = false) {
+  if (USER && !USER.guest && user.uid && USER.uid === user.uid) { if (cloud && !cloudStarted) startCloud(); return; }
   USER = user;
   if (!user.preview) applyGlass();   // the welcome page's look preview is not kept
   if (!user.guest) writeLS(LAST_USER, user);
   const stored = readJSON(user.guest ? LEGACY_KEY : cacheKey(user.uid), null);
   firstUseHere = !stored;   // nothing saved on this device yet for this user
   S = hydrate(stored);
+  snapLists();
   initInputs();
   applyCosmetics();
   showView('appView');
@@ -3620,24 +3654,34 @@ function startSession(user, cloud) {
   renderAccount();
   renderSync();
   tick();  // finishes any phase that ended while the page was closed
-  if (!cloud) reconcileRewards('initial');
-
-  if (cloud) {
-    // Upload anything recorded during an earlier start when Firebase could not load.
-    if (S.profileDirty) {
-      trackWrite(FB.setDoc(userRef(), { ...profileFromState(), updatedAt: FB.serverTimestamp() }, { merge: true }));
-      S.profileDirty = false;
-    }
-    if (S.pendingSessions.length) { cloudAddSessions(S.pendingSessions); S.pendingSessions = []; }
-    saveLocal();
-    attachListeners();
-    trackWrite(FB.waitForPendingWrites(FB.db));  // shows "Syncing" until earlier offline writes land
-  }
-  maybeStartTour(cloud);
+  if (!cloud && !early) reconcileRewards('initial');
+  // A device without a copy of this account: soft placeholders (not 0 coins / Level 1) until the data arrives.
+  document.body.classList.toggle('first-load', !!cloud && !stored && !user.preview);
+  if (cloud) startCloud();
+  else if (!early) maybeStartTour(false);
   ibLoad(); renderInboxBadge(); newsCheck();
-  setTimeout(() => { if (USER === user) ibRefresh(); }, cloud ? 3000 : 900);
-  setTimeout(() => { if (USER === user && $('#tour').classList.contains('hidden') && !document.querySelector('dialog[open]')) pomeoHello(); pomeoNightCheck(); checkReminders(); examDayCheck(); }, cloud ? 2500 : 1200);
-  setTimeout(() => { if (USER === user) { maybeShowLogin(); checkBoss(); } }, cloud ? 3200 : 1800);
+  const later = cloud || early;
+  setTimeout(() => { if (USER === user) ibRefresh(); }, later ? 3000 : 900);
+  setTimeout(() => { if (USER === user && $('#tour').classList.contains('hidden') && !document.querySelector('dialog[open]')) pomeoHello(); pomeoNightCheck(); checkReminders(); examDayCheck(); }, later ? 2500 : 1200);
+  setTimeout(() => { if (USER === user) { maybeShowLogin(); checkBoss(); } }, later ? 3200 : 1800);
+}
+/** Connect this session to the cloud: live listeners for the profile and the session history (both at once). */
+function startCloud() {
+  cloudStarted = true;
+  // Upload anything recorded during an earlier start when Firebase could not load. Lists are left out:
+  // they're merged item by item with the cloud copy when it arrives (uploading them now would drop other devices' items).
+  if (S.profileDirty) {
+    const prof = profileFromState();
+    for (const f of SYNC_LISTS) delete prof[f];
+    trackWrite(FB.setDoc(userRef(), { ...prof, updatedAt: FB.serverTimestamp() }, { merge: true }));
+    S.profileDirty = false;
+  }
+  if (S.pendingSessions.length) { cloudAddSessions(S.pendingSessions); S.pendingSessions = []; }
+  saveLocal();
+  attachListeners();
+  trackWrite(FB.waitForPendingWrites(FB.db));  // shows "Syncing" until earlier offline writes land
+  renderSync();
+  maybeStartTour(true);
 }
 
 let authMode = 'login';
@@ -3811,7 +3855,7 @@ function mergeData(obj) {
   }
   S.sessions.push(...add);
   S.sessions.sort((a, b) => a.start - b.start);
-  if (cloudReady()) cloudAddSessions(add);
+  if (cloudReady()) cloudAddSessions(add);   // imported list items are stamped as new on the next save
   else if (USER && !USER.guest) S.pendingSessions.push(...add);
 
   for (const p of src.presets) {
@@ -3867,13 +3911,64 @@ const currentName = () => ($('#nameInput').value.trim() || S.timer.name || 'Unti
    SOUND + NOTIFICATIONS
    ========================================================================== */
 let audioCtx = null;
-/** Must be created/resumed from a user gesture (Start click) on most browsers. */
+/* One shared AudioContext for every sound. Browsers only let it start after a tap or key press, and
+   Safari (sometimes Chrome too) suspends it — Safari calls it "interrupted" — after the tab was hidden,
+   the Mac slept or the audio output changed (e.g. headphones). So every sound goes through withAudio(),
+   which checks the state and resumes it first, and taps / coming back to the tab revive it as well. */
+const AUDIO = { activated: false, retry: 0 };
+const audioAllowed = () => AUDIO.activated || !!(navigator.userActivation && navigator.userActivation.hasBeenActive);
 function ensureAudio() {
   try {
-    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-  } catch (e) { /* audio unsupported */ }
+    if (!audioCtx || audioCtx.state === 'closed') {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC || !audioAllowed()) return null;   // before the first tap it couldn't play anyway (and Chrome would log a warning)
+      audioCtx = new AC();
+      audioCtx.onstatechange = onAudioState;
+      resetAudioGraph();
+    }
+    if (audioCtx.state !== 'running') audioCtx.resume().catch(() => {});
+  } catch (e) { return null; }
+  return audioCtx;
 }
+/** Play now if the context runs; otherwise resume it and play as soon as it does (or skip if that takes too long). */
+function withAudio(play, maxLate = 1500) {
+  const c = ensureAudio();
+  if (!c) return false;
+  const go = () => { try { play(c); } catch (e) { console.warn('sound', e); } };
+  if (c.state === 'running') { go(); return true; }
+  const asked = performance.now();
+  c.resume().then(() => { if (c.state === 'running' && performance.now() - asked < maxLate) go(); }).catch(() => {});
+  return true;
+}
+function onAudioState() {
+  const c = audioCtx;
+  if (!c) return;
+  if (c.state === 'running') { syncTimerAudio(); return; }
+  if (c.state !== 'closed' && !document.hidden) setTimeout(() => { if (audioCtx === c && c.state !== 'running' && !document.hidden) c.resume().catch(() => {}); }, 300);
+}
+/** A tap or key press: create/resume the context. If Safari leaves it stuck after an interruption, start a fresh one. */
+function kickAudio() {
+  AUDIO.activated = true;
+  const c = ensureAudio();
+  if (!c || c.state === 'running') return;
+  clearTimeout(AUDIO.retry);
+  AUDIO.retry = setTimeout(() => {
+    if (audioCtx !== c || c.state === 'running' || document.hidden) return;
+    try { c.close(); } catch (e) { /* already closed */ }
+    audioCtx = null;
+    ensureAudio();
+  }, 1500);
+}
+/** Nodes and buffers belong to one context: forget them when a new context is made. */
+function resetAudioGraph() {
+  if (typeof UIS !== 'undefined') UIS.bus = null;
+  if (typeof NOISE !== 'undefined') for (const k of Object.keys(NOISE)) delete NOISE[k];
+  if (typeof amb !== 'undefined') amb = null;
+  if (typeof ENDS !== 'undefined') { ENDS.bus = null; ENDS.endAt = 0; }
+  if (typeof PREVIEW !== 'undefined') PREVIEW.bus = null;
+}
+addEventListener('visibilitychange', () => { if (!document.hidden && audioCtx && audioCtx.state !== 'running') audioCtx.resume().catch(() => {}); if (!document.hidden && USER) syncTimerAudio(); });
+addEventListener('pageshow', () => { if (audioCtx && audioCtx.state !== 'running') audioCtx.resume().catch(() => {}); });
 function askNotifyPermission() {
   if (S.settings.notify && 'Notification' in window && Notification.permission === 'default') {
     Notification.requestPermission().then(renderSettings);
@@ -3958,7 +4053,7 @@ function advancePhase() {
  */
 function finishPhase(reason) {
   const t = S.timer;
-  const wasFocus = t.phase === 'focus';
+  const wasFocus = t.phase === 'focus', endedAt = t.endAt;
   if (reason === 'complete') motionComplete(wasFocus);
 
   if (wasFocus && t.status !== 'idle') {
@@ -3992,7 +4087,7 @@ function finishPhase(reason) {
 
   if (reason === 'complete' && wasFocus) setTimeout(pomeoBreakStart, 5600);
   if (reason === 'complete') {
-    playEndSound();
+    if (!endSoundRang(endedAt)) playEndSound();   // the booked chime may have rung already (on time, in a background tab)
     if (wasFocus) notify('Focus complete', `Nice work on “${t.name || 'Untitled'}”. Time for a break.`);
     else notify('Break over', 'Ready for the next focus block?');
     if (S.settings.autoStart) { startTimer(); return; }
@@ -4169,7 +4264,7 @@ function renderTimer() {
   setMascot();
   renderPark();
   if (t.status === 'running') ensureRingLoop();
-  updateAmbient();
+  syncTimerAudio();
   publishPresence();
   renderClock();
 }
@@ -5036,7 +5131,7 @@ function toggleExtra(id) {
 /* ==========================================================================
    AUDIO — end sounds, start cue and ambient sound, all generated with Web Audio
    ========================================================================== */
-const getCtx = () => { ensureAudio(); return audioCtx; };
+const getCtx = () => ensureAudio();
 function envelope(g, t, peak, attack, decay) {
   g.gain.setValueAtTime(0.0001, t);
   g.gain.linearRampToValueAtTime(peak, t + attack);
@@ -5075,36 +5170,89 @@ const END_SOUNDS = {
     [[1, 1, 1.9], [2, 0.4, 1.2], [3, 0.2, 0.8], [4, 0.08, 0.5]].forEach(([m, k, d]) => tone(c, o, { f: f * m, t, peak: p * k, a: 0.004, d }))),
   snd_rain: (c, o) => [0, 0.2, 0.47].forEach((t, i) => tone(c, o, { f: 1700 - i * 150, f2: 520, fd: 0.07, t, peak: 0.16, a: 0.003, d: 0.16 })),
 };
-/** Play the equipped end sound (or a specific one for previews, which ignore mute). */
-function playEndSound(id = equippedId('sound'), force = false) {
-  if (!force && !S.settings.sound) return;
-  const c = getCtx();
-  if (c) (END_SOUNDS[id] || END_SOUNDS.snd_chime)(c, c.destination);
+/** Play the equipped end sound now (respects the master Sound switch). */
+function playEndSound(id = equippedId('sound')) {
+  if (!S.settings.sound) return false;
+  return withAudio(c => (END_SOUNDS[id] || END_SOUNDS.snd_chime)(c, c.destination));
 }
 function playStartCue() {
-  const c = getCtx();
-  if (!c || !S.settings.sound) return;
-  tone(c, c.destination, { f: 392, peak: 0.05, a: 0.08, d: 0.9 });
-  tone(c, c.destination, { f: 587.33, t: 0.12, peak: 0.035, a: 0.08, d: 0.9 });
+  if (!S.settings.sound) return false;
+  return withAudio(c => {
+    tone(c, c.destination, { f: 392, peak: 0.05, a: 0.08, d: 0.9 });
+    tone(c, c.destination, { f: 587.33, t: 0.12, peak: 0.035, a: 0.08, d: 0.9 });
+  });
 }
 function playTierChord() {
-  const c = getCtx();
-  if (!c || !S.settings.sound) return;
-  [[392, 0], [493.88, 0.12], [587.33, 0.24], [783.99, 0.36]].forEach(([f, t]) => tone(c, c.destination, { f, t, peak: 0.07, a: 0.02, d: 1.6 }));
+  if (!S.settings.sound) return false;
+  return withAudio(c => [[392, 0], [493.88, 0.12], [587.33, 0.24], [783.99, 0.36]].forEach(([f, t]) => tone(c, c.destination, { f, t, peak: 0.07, a: 0.02, d: 1.6 })));
+}
+
+/* ---------- The end sound, scheduled on the audio clock ----------
+   Browsers slow down timers in background tabs (Chrome: about once a minute after 5 minutes), which made
+   the end chime — and the ambient fade-out — late. The audio clock keeps exact time, so the chime is booked
+   for the exact end when a block starts or resumes, re-aligned after sleep, and not played twice. */
+const ENDS = { bus: null, endAt: 0, at: 0, id: '' };
+const shiftedCtx = (c, d) => ({ currentTime: c.currentTime + d, sampleRate: c.sampleRate, createOscillator: () => c.createOscillator(),
+  createGain: () => c.createGain(), createBufferSource: () => c.createBufferSource(), createBiquadFilter: () => c.createBiquadFilter() });
+function cancelEndSound() {
+  const b = ENDS.bus;
+  if (!b) return;
+  if (audioCtx && audioCtx.currentTime < ENDS.at - 0.05) { try { b.disconnect(); } catch (e) {} }
+  else setTimeout(() => { try { b.disconnect(); } catch (e) {} }, 7000);   // already ringing: let it finish
+  ENDS.bus = null; ENDS.endAt = 0;
+}
+function scheduleEndSound() {
+  const t = S.timer, id = USER ? equippedId('sound') : '';
+  const left = (t.endAt - Date.now()) / 1000;
+  const want = !!USER && S.settings.sound && t.status === 'running' && !!audioCtx && audioCtx.state === 'running' && left > 0.3 && left < 6 * 3600;
+  if (want && ENDS.bus && ENDS.endAt === t.endAt && ENDS.id === id && Math.abs(ENDS.at - audioCtx.currentTime - left) < 1.5) return;   // already lined up
+  cancelEndSound();
+  if (!want) return;
+  const c = audioCtx, bus = c.createGain();
+  bus.connect(c.destination);
+  (END_SOUNDS[id] || END_SOUNDS.snd_chime)(shiftedCtx(c, left), bus);
+  Object.assign(ENDS, { bus, endAt: t.endAt, at: c.currentTime + left, id });
+}
+/** Did the booked chime for this block already ring (so finishing it shouldn't ring again)? */
+const endSoundRang = endAt => !!(endAt && ENDS.endAt === endAt && audioCtx && audioCtx.state === 'running' && audioCtx.currentTime >= ENDS.at - 0.3);
+/** Keep ambient and the booked chime in step with the timer, the settings and the audio state. */
+function syncTimerAudio() { if (!USER) return; updateAmbient(); scheduleEndSound(); }
+
+/* ---------- Shop previews: one at a time, each stops the one before ---------- */
+const PREVIEW = { bus: null };
+function stopPreview() {
+  const b = PREVIEW.bus;
+  PREVIEW.bus = null;
+  if (b && audioCtx) { try { b.gain.setTargetAtTime(0, audioCtx.currentTime, 0.02); } catch (e) {} setTimeout(() => { try { b.disconnect(); } catch (e) {} }, 150); }
+  if (ambPreviewTimer) { clearTimeout(ambPreviewTimer); ambPreviewTimer = null; stopAmbient(); updateAmbient(); }
+}
+function previewSound(id) {
+  if (!S.settings.sound) { toast('Sound is off — turn it on (🔊 on the Timer) to hear previews', 2600); return; }
+  stopPreview();
+  withAudio(c => {
+    const bus = PREVIEW.bus = c.createGain();
+    bus.connect(c.destination);
+    (END_SOUNDS[id] || END_SOUNDS.snd_chime)(c, bus);
+  });
 }
 
 // Ambient sound: looped noise buffers shaped with filters and slow LFOs.
 const NOISE = {};
+/** 4 s of noise that loops seamlessly: the tail is cross-faded into the start, so there is no click or gap at the seam. */
 function noiseBuffer(kind) {
   if (NOISE[kind]) return NOISE[kind];
-  const c = audioCtx, len = c.sampleRate * 4, b = c.createBuffer(1, len, c.sampleRate), d = b.getChannelData(0);
+  const c = audioCtx, len = c.sampleRate * 4, fade = Math.round(c.sampleRate * 0.25), raw = new Float32Array(len + fade);
   let last = 0, b0 = 0, b1 = 0, b2 = 0;
-  for (let i = 0; i < len; i++) {
+  for (let i = 0; i < raw.length; i++) {
     const w = Math.random() * 2 - 1;
-    if (kind === 'brown') { last = (last + 0.02 * w) / 1.02; d[i] = last * 3.5; }
-    else if (kind === 'pink') { b0 = 0.99765 * b0 + w * 0.099046; b1 = 0.963 * b1 + w * 0.2965164; b2 = 0.57 * b2 + w * 1.0526913; d[i] = (b0 + b1 + b2 + w * 0.1848) * 0.11; }
-    else d[i] = w;
+    if (kind === 'brown') { last = (last + 0.02 * w) / 1.02; raw[i] = last * 3.5; }
+    else if (kind === 'pink') { b0 = 0.99765 * b0 + w * 0.099046; b1 = 0.963 * b1 + w * 0.2965164; b2 = 0.57 * b2 + w * 1.0526913; raw[i] = (b0 + b1 + b2 + w * 0.1848) * 0.11; }
+    else raw[i] = w;
   }
+  const b = c.createBuffer(1, len, c.sampleRate), d = b.getChannelData(0);
+  d.set(raw.subarray(0, len));
+  // equal-power cross-fade: the buffer's start blends from the samples that follow its end
+  for (let i = 0; i < fade; i++) { const x = i / fade; d[i] = raw[i] * Math.sin(x * Math.PI / 2) + raw[len + i] * Math.cos(x * Math.PI / 2); }
   return (NOISE[kind] = b);
 }
 function loopNoise(kind) { const s = audioCtx.createBufferSource(); s.buffer = noiseBuffer(kind); s.loop = true; s.start(0, Math.random() * 3); return s; }
@@ -5159,43 +5307,57 @@ const AMBIENTS = {
 let amb = null, ambPreviewTimer = null;
 const ambVol = () => Math.pow(S.settings.ambientVolume ?? 0.5, 1.5) * 0.6;
 function startAmbient(id) {
-  const master = gainNode(0);
-  master.connect(audioCtx.destination);
+  const c = audioCtx, master = gainNode(0);
+  master.connect(c.destination);
   const parts = AMBIENTS[id](master);
-  master.gain.setTargetAtTime(ambVol(), audioCtx.currentTime, 0.6);
-  return { id, master, parts };
+  master.gain.setValueAtTime(0, c.currentTime);
+  master.gain.setTargetAtTime(ambVol(), c.currentTime, 0.6);   // fade in
+  return { id, master, parts, ctx: c, endAt: 0 };
 }
-function stopAmbient() {
+function stopAmbient(fast) {
   if (!amb) return;
   const a = amb;
   amb = null;
-  a.master.gain.setTargetAtTime(0, audioCtx.currentTime, 0.2);
-  setTimeout(() => { a.parts.forEach(p => { try { p.stop(); } catch (e) { /* already stopped */ } }); a.master.disconnect(); }, 900);
+  try { a.master.gain.cancelScheduledValues(a.ctx.currentTime); a.master.gain.setTargetAtTime(0, a.ctx.currentTime, fast ? 0.05 : 0.25); } catch (e) {}   // fade out
+  setTimeout(() => { a.parts.forEach(p => { try { p.stop(); } catch (e) { /* already stopped */ } }); try { a.master.disconnect(); } catch (e) {} }, fast ? 300 : 1200);
 }
-/** Ambient plays only while a focus block is running (and sound isn't muted). */
+/** Book the ambient fade-out for the exact end of the block (on time even in a background tab). */
+function ambientEndFade(a) {
+  const t = S.timer;
+  if (!a || a.endAt === t.endAt) return;
+  a.endAt = t.endAt;
+  const g = a.master.gain, now = a.ctx.currentTime, left = Math.max(0, (t.endAt - Date.now()) / 1000);
+  try {
+    if (g.cancelAndHoldAtTime) g.cancelAndHoldAtTime(now); else { g.cancelScheduledValues(now); g.setValueAtTime(g.value, now); }
+    g.setTargetAtTime(ambVol(), now, 0.6);
+    g.setTargetAtTime(0, now + left, 0.35);
+  } catch (e) {}
+}
+/** Ambient plays only while a focus block is running (and Sound is on). */
 function updateAmbient() {
   if (ambPreviewTimer) return;
   let want = 'amb_none';
   if (USER && audioCtx && S.settings.sound && S.timer.status === 'running' && S.timer.phase === 'focus') want = equippedId('ambient');
   if (!AMBIENTS[want]) { stopAmbient(); return; }
-  if (amb && amb.id === want) { amb.master.gain.setTargetAtTime(ambVol(), audioCtx.currentTime, 0.2); return; }
+  if (amb && amb.id === want && amb.ctx === audioCtx) { ambientEndFade(amb); return; }
   stopAmbient();
   amb = startAmbient(want);
+  ambientEndFade(amb);
 }
 function previewAmbient(id) {
-  if (!getCtx()) return;
-  clearTimeout(ambPreviewTimer);
-  stopAmbient();
-  amb = startAmbient(id);
-  ambPreviewTimer = setTimeout(() => { ambPreviewTimer = null; stopAmbient(); updateAmbient(); }, 6000);
+  if (!S.settings.sound) { toast('Sound is off — turn it on (🔊 on the Timer) to hear previews', 2600); return; }
+  stopPreview();
+  withAudio(() => {
+    stopAmbient(true);
+    amb = startAmbient(id);
+    ambPreviewTimer = setTimeout(() => { ambPreviewTimer = null; stopAmbient(); updateAmbient(); }, 6000);
+  });
 }
 function setAmbientVolume(v) {
   S.settings.ambientVolume = clamp(+v || 0, 0, 1);
-  if (amb) amb.master.gain.setTargetAtTime(ambVol(), audioCtx.currentTime, 0.1);
+  if (amb) { try { amb.master.gain.setTargetAtTime(ambVol(), amb.ctx.currentTime, 0.1); amb.endAt = 0; ambientEndFade(amb); } catch (e) {} }
   save();
 }
-// After a reload, audio can only start after the next tap or click.
-document.addEventListener('pointerdown', () => { if (USER && !audioCtx) { ensureAudio(); updateAmbient(); } });
 
 /* ==========================================================================
    VISUAL COSMETICS — themes, ring styles, fonts, effects, live tab icon
@@ -5434,7 +5596,7 @@ function applyCosmetics() {
   applyTheme();
   applyRingStyle();
   applyFont();
-  updateAmbient();
+  syncTimerAudio();
   renderHeaderChip();
   renderPomeo();
 }
@@ -5466,8 +5628,11 @@ function renderHeaderChip() {
   lastGoalPct = goalPct;
   const pill = $('#coinPill');
   if (!pill.firstChild) pill.innerHTML = `${COIN_SVG}<span data-count="hdrcoins" data-val="0">0</span>`;
-  pill.querySelector('[data-count]').dataset.val = g.balance;
-  animateCounts(pill);
+  const cnt = pill.querySelector('[data-count]');
+  cnt.dataset.val = g.balance;
+  // Only a coin gain while you use the app counts up; loading (or catching up after a sync) shows the number at once.
+  const live = shownCounts.hdrcoins !== undefined && g.balance > shownCounts.hdrcoins && (USER.guest || localOnly || (firstLoadDone && performance.now() - firstLoadAt > 2000));
+  if (live) animateCounts(pill); else { shownCounts.hdrcoins = g.balance; cnt.__count = (cnt.__count || 0) + 1; cnt.textContent = fmtNum(g.balance); }
 }
 
 const GEAR_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>';
@@ -5626,7 +5791,7 @@ function renderShop() {
 function previewItem(id) {
   const it = ITEM_BY_ID[id];
   if (!it) return;
-  if (it.cat === 'sound') playEndSound(id, true);
+  if (it.cat === 'sound') previewSound(id);
   else if (it.cat === 'ambient') previewAmbient(id);
   else if (it.cat === 'effect') {
     if (REDUCED()) { toast('Effects are off because your device prefers reduced motion'); return; }
@@ -5733,9 +5898,8 @@ async function initSocial() {
     e => console.warn('inbox', e)));
   try {
     // Make sure the username can be found, and learn what the server already has for my stats.
-    const reg = await FB.getDoc(FB.doc(FB.db, 'usernames', USER.username));
+    const [reg, st] = await Promise.all([FB.getDoc(FB.doc(FB.db, 'usernames', USER.username)), FB.getDoc(FB.doc(FB.db, 'publicStats', uid))]);
     if (!reg.exists()) await FB.setDoc(FB.doc(FB.db, 'usernames', USER.username), { uid });
-    const st = await FB.getDoc(FB.doc(FB.db, 'publicStats', uid));
     SOC.myStats = st.exists() ? { ...st.data(), at: st.data().updatedAt ? st.data().updatedAt.toMillis() : 0 } : null;
   } catch (e) { console.warn('social init', e); }
   publishPublic(true);
@@ -6819,20 +6983,20 @@ function checkReminders() {
       const alertAt = snoozed || at - (r.before || 0) * 60000;
       if (now < alertAt || now > at + 60 * 60000) continue;    // too early, or more than an hour late (shown as missed)
       const key = `${r.id}@${k}@${alertAt}`;
-      if (remFired.has(key)) continue;
+      if (remFired.has(key) || (S.remFired || {})[key]) continue;   // rang here, or on another device
       remFired.add(key);
       writeLS(REM_FIRED_KEY, [...remFired].slice(-200));
-      fireReminder(r, k, at);
+      fireWhenClaimed(r, k, at, key);
       return;   // one at a time
     }
   }
 }
 function playReminderChime() {
-  if (!S.settings.sound) return;
-  const c = getCtx();
-  if (!c) return;
-  tone(c, c.destination, { f: 659.25, peak: 0.07, a: 0.04, d: 1.2 });
-  tone(c, c.destination, { f: 987.77, t: 0.22, peak: 0.05, a: 0.04, d: 1.4 });
+  if (!S.settings.sound) return false;
+  return withAudio(c => {
+    tone(c, c.destination, { f: 659.25, peak: 0.07, a: 0.04, d: 1.2 });
+    tone(c, c.destination, { f: 987.77, t: 0.22, peak: 0.05, a: 0.04, d: 1.4 });
+  });
 }
 function fireReminder(r, day, at) {
   const mins = Math.round((at - Date.now()) / 60000);
@@ -8199,10 +8363,10 @@ function addSub(text) {
 function playTick() {
   if (UIS.prefs.on) { uiSound('tick'); return; }
   if (!S.settings.sound) return;
-  const c = getCtx();
-  if (!c) return;
-  tone(c, c.destination, { f: 1568, peak: 0.045, a: 0.003, d: 0.09 });
-  tone(c, c.destination, { f: 2093, t: 0.05, peak: 0.03, a: 0.003, d: 0.12 });
+  withAudio(c => {
+    tone(c, c.destination, { f: 1568, peak: 0.045, a: 0.003, d: 0.09 });
+    tone(c, c.destination, { f: 2093, t: 0.05, peak: 0.03, a: 0.003, d: 0.12 });
+  });
 }
 let subFresh = null;
 function toggleSub(id) {
@@ -8546,7 +8710,7 @@ const uiClaim = () => { UIS.claim = performance.now(); };
 const recentGesture = (ms = 1000) => performance.now() - UIS.gesture < ms;
 function uiSound(name, opt = {}) {
   const p = UIS.prefs;
-  if (!p.on || !S.settings.sound || document.hidden || !audioCtx || audioCtx.state !== 'running') return false;
+  if (!p.on || !S.settings.sound || document.hidden) return false;
   if (name === 'hover' && (!p.hover || !finePointer.matches)) return false;
   let vol = p.vol;
   if (p.quietFocus && focusRunning() && !opt.always) { if (name === 'hover') return false; vol *= 0.25; }
@@ -8554,22 +8718,25 @@ function uiSound(name, opt = {}) {
   const now = performance.now();
   if (now - (UIS.last[name] || 0) < (UI_GAP[name] || 35)) return false;
   if (UIS.voices >= (name === 'hover' ? 1 : 4)) return false;      // never a pile-up of sounds
+  if (!ensureAudio()) return false;
   UIS.last[name] = now;
-  const c = audioCtx;
-  if (!UIS.bus) { UIS.bus = c.createGain(); UIS.bus.gain.value = 0.12; UIS.bus.connect(c.destination); }
-  const out = c.createGain();
-  out.gain.value = vol;
-  out.connect(UIS.bus);
+  UIS.voices++;   // counted from now, so a burst while the context resumes can't pile up
   let len = 0.1;
-  if (name === 'swoosh') len = uiSwoosh(c, out);
-  else {
-    const play = UI_PACKS[p.pack] || UI_PACKS.soft;
-    for (const [f, t, pk, d] of UI_NOTES[name] || []) { play(c, out, f, t, pk, d); len = Math.max(len, t + d); }
-  }
-  UIS.voices++;
-  setTimeout(() => { UIS.voices = Math.max(0, UIS.voices - 1); try { out.disconnect(); } catch (e) {} }, len * 1000 + 120);
-  UIS.recent.push(name); if (UIS.recent.length > 30) UIS.recent.shift();
-  return true;
+  const ok = withAudio(c => {
+    if (!UIS.bus || UIS.bus.context !== c) { UIS.bus = c.createGain(); UIS.bus.gain.value = 0.12; UIS.bus.connect(c.destination); }
+    const out = c.createGain();
+    out.gain.value = vol;
+    out.connect(UIS.bus);
+    if (name === 'swoosh') len = uiSwoosh(c, out);
+    else {
+      const play = UI_PACKS[p.pack] || UI_PACKS.soft;
+      for (const [f, t, pk, d] of UI_NOTES[name] || []) { play(c, out, f, t, pk, d); len = Math.max(len, t + d); }
+    }
+    setTimeout(() => { try { out.disconnect(); } catch (e) {} }, len * 1000 + 120);
+    UIS.recent.push(name); if (UIS.recent.length > 30) UIS.recent.shift();
+  }, 600);
+  setTimeout(() => { UIS.voices = Math.max(0, UIS.voices - 1); }, 700);
+  return ok;
 }
 /** A gentle swoosh: soft noise through a band-pass that glides upward. */
 function uiSwoosh(c, out) {
@@ -8584,9 +8751,11 @@ function uiSwoosh(c, out) {
   return 0.22;
 }
 // First tap or key press creates/resumes the shared AudioContext.
-const onGesture = () => { UIS.gesture = performance.now(); if (UIS.prefs.on && S.settings.sound) ensureAudio(); };
+// Always — whatever the interface-sound setting — so the timer chime, reminders and ambient can recover too.
+const onGesture = () => { UIS.gesture = performance.now(); kickAudio(); };
 addEventListener('pointerdown', onGesture, true);
 addEventListener('keydown', onGesture, true);
+addEventListener('touchend', onGesture, true);   // iOS/iPadOS Safari unlock audio on touchend
 // Generic taps: a soft pop (unless a more specific sound already played for this tap).
 const UI_CLICKABLE = 'button, [role="button"], .chip, summary, a.btn';
 document.addEventListener('click', e => {
@@ -8637,6 +8806,31 @@ $('#uisHover').addEventListener('change', e => { UIS.prefs.hover = e.target.chec
 $('#uisQuiet').addEventListener('change', e => { UIS.prefs.quietFocus = e.target.checked; uisSave(); });
 $('#uisPack').addEventListener('change', e => { UIS.prefs.pack = e.target.value; uisSave(); uiPreview(); });
 $('#uisTry').addEventListener('click', () => { uiClaim(); uiPreview(); });
+/** Settings → Sounds → Test sounds: one of each type, one after another, with a line saying what played. */
+function testSounds() {
+  uiClaim();
+  kickAudio();
+  const out = $('#sndTestOut'), p = UIS.prefs, on = S.settings.sound;
+  const ambId = equippedId('ambient'), ambName = AMBIENTS[ambId] ? ITEM_BY_ID[ambId].name : '';
+  const steps = [
+    ['Interface', !on ? 'Sound is off' : !p.on ? 'interface sounds are off' : '', () => { UIS.last.click = 0; uiSound('click', { always: true }); }],
+    ['Timer start', !on ? 'Sound is off' : !p.on ? 'interface sounds are off' : '', () => { UIS.last.start = 0; uiSound('start', { always: true }); }],
+    ['Timer end', !on ? 'Sound is off' : '', () => playEndSound()],
+    ['Reward', !on ? 'Sound is off' : !p.on ? 'interface sounds are off' : '', () => { UIS.last.coin = 0; uiSound('coin', { always: true }); }],
+    ['Reminder', !on ? 'Sound is off' : '', () => playReminderChime()],
+    ['Ambient' + (ambName ? ` (${ambName})` : ''), !on ? 'Sound is off' : !ambName ? 'none equipped — get one in the Shop' : (S.settings.ambientVolume ?? .5) <= 0 ? 'volume is at 0' : '', () => {
+      stopPreview(); withAudio(() => { stopAmbient(true); amb = startAmbient(ambId); ambPreviewTimer = setTimeout(() => { ambPreviewTimer = null; stopAmbient(); updateAmbient(); }, 2500); });
+    }],
+  ];
+  const done = [];
+  const state = () => (audioCtx ? audioCtx.state : 'not started');
+  steps.forEach(([label, why, play], i) => setTimeout(() => {
+    if (!why) play();
+    done.push(why ? `– ${label}: ${why}` : `✓ ${label}`);
+    out.textContent = done.join(' · ') + ` · audio ${state()}`;
+  }, i * 900));
+}
+$('#sndTest').addEventListener('click', testSounds);
 function uiPreview() {
   ['click', 'on', 'tick', 'coin'].forEach((n, i) => setTimeout(() => { UIS.last[n] = 0; uiSound(n, { always: true }); }, i * 260));
 }
@@ -8720,9 +8914,10 @@ addEventListener('resize', () => $$('.catrow').forEach(updateFades));
    command palette, offline banner, pull to refresh, tab swipes, haptics.
    Everything here is stored on this device (localStorage); no new cloud data.
    ========================================================================== */
-const APP_VERSION = '1.10';
+const APP_VERSION = '1.11';
 const VER_KEY = 'pomodorolist-seen-version';
 const CHANGELOG = [
+  { v: '1.11', t: 'Bug fixes, faster loading and better sync', d: 'Opens straight from your last visit while it syncs (no more numbers counting up from 0), reminders, revision plans and exams sync item by item on every device (deleted stays deleted, a reminder rings on one device only), sounds work reliably on Safari and Chrome with a Test sounds button, and a fresh cast of demo friends.' },
   { v: '1.10', t: 'Pomeo wakes up', d: 'A new loading screen (Pomeo stretches, yawns and hops into the timer, with a growing tomato vine and a study quote), a Focus atmosphere background that deepens as you focus, a timer ring that ripens from green to red, and Pomeo in the empty garden, stats and friends screens.' },
   { v: '1.9', t: 'A new welcome page & polish', d: 'A welcome page with a read-only demo account to look around before signing up, a clearer sign-up card (live username check, password strength, stay logged in), and a polish pass across the whole app: bigger touch targets, fixed tutorial and tablet layouts, calmer Timer screen and many small fixes.' },
   { v: '1.8.1', t: 'Glossed Interface', d: 'Liquid Glass is now called Glossed Interface, and its Lite level is the default look (your own choice is kept). It switches to a solid style when your device asks for reduced transparency. The tutorial’s new “Pick your style” step sets it alongside True Minimalist.' },
@@ -8738,7 +8933,7 @@ const CHANGELOG = [
   { v: '1.1', t: 'Accounts & sync', d: 'Log in and keep your sessions in sync on every device, even offline.' },
   { v: '1.0', t: 'Focus timer', d: 'Pomodoro timer with named sessions, presets, streaks and stats.' },
 ];
-const NEWS = ['🍅 Pomeo wakes up with you: a new loading screen with study quotes', '🌅 Focus atmosphere: the Timer background deepens as you focus (Settings → Appearance)', '🔴 The timer ring now ripens from green to tomato red', '🪴 Pomeo keeps you company on empty screens'];
+const NEWS = ['🛠️ Bug fixes, faster loading and better sync', '⚡ Opens instantly from your last visit while it syncs in the background', '🔁 Reminders, revisions and exams sync on all your devices — deleted stays deleted', '🔊 Sounds fixed on Safari and Chrome, plus Settings → Sounds → Test sounds'];
 
 /* ---------- Haptics ---------- */
 const HAPTIC_KEY = 'pomodorolist-haptics';
@@ -9775,10 +9970,11 @@ function demoSessions() {
   return out;
 }
 const DEMO_FRIENDS = [
-  { uid: 'demo_f1', name: 'riya_k', tier: 'focused', level: 14, streak: 31, color: 'col_teal', frame: 'frame_orbit', avatar: 'av_fox', week: .42, life: 9800 },
-  { uid: 'demo_f2', name: 'arjun_codes', tier: 'scholar', level: 11, streak: 9, color: '', frame: 'frame_ring', avatar: 'av_robot', week: .27, life: 6100 },
-  { uid: 'demo_f3', name: 'meera_reads', tier: 'apprentice', level: 7, streak: 4, color: '', frame: '', avatar: 'av_owl', week: .18, life: 2900 },
-  { uid: 'demo_f4', name: 'sana_studies', tier: 'disciplined', level: 18, streak: 52, color: 'col_rose', frame: 'frame_hex', avatar: 'av_panda', week: .55, life: 15400 },
+  { uid: 'demo_f1', name: 'James', tier: 'focused', level: 14, streak: 31, color: 'col_teal', frame: 'frame_orbit', avatar: 'av_fox', life: 9800 },
+  { uid: 'demo_f2', name: 'siverieg', tier: 'scholar', level: 11, streak: 9, color: '', frame: 'frame_ring', avatar: 'av_robot', life: 6100 },
+  { uid: 'demo_f3', name: 'Justin', tier: 'apprentice', level: 7, streak: 4, color: '', frame: '', avatar: 'av_owl', life: 2900 },
+  { uid: 'demo_f4', name: 'Princess_cupcake', tier: 'disciplined', level: 18, streak: 52, color: 'col_rose', frame: 'frame_hex', avatar: 'av_panda', life: 15400 },
+  { uid: 'demo_f5', name: 'lenvixty', tier: 'scholar', level: 12, streak: 16, color: 'col_violet', frame: 'frame_double', avatar: 'av_cat', life: 7300 },
 ];
 /** Builds the demo account's documents (called when the preview starts, so dates are always current). */
 function demoDocs() {
@@ -9810,7 +10006,7 @@ function demoDocs() {
     notes: Object.fromEntries(sessions.slice(-3).map((s, i) => [s.id, ['Finished all 15 HC Verma problems', 'Need to redo Q7 tomorrow', 'Great flow today'][i]])),
     revisions: [{ id: 'demo_v1', topic: 'Chemistry', presetId: 'p-classic', time: '18:00', step: 1, next: dayKey(now), created: Date.now() - 3 * 864e5, log: [], done: {}, snooze: {} }],
     exams: [{ id: 'demo_x1', name: 'JEE Main', date: dayKey(addDays(now, 74)), added: Date.now() - 40 * 864e5 }],
-    parked: [{ id: 'demo_p1', text: 'Ask Riya for the organic chemistry notes', at: Date.now() - 5400e3, done: false }],
+    parked: [{ id: 'demo_p1', text: 'Ask James for the organic chemistry notes', at: Date.now() - 5400e3, done: false }],
     squad: DEMO_FRIENDS.slice(0, 2).map(f => ({ uid: f.uid, name: f.name })),
     subTemplates: [], energy,
   };
@@ -9821,7 +10017,7 @@ function demoDocs() {
   const wk = dayKey(mon), wkSun = dayKey(weekStartOf(now, 0));
   // Squad boss HP is 2.6 × (5 × the 120-minute goal) = 1,560: the squad (me + the first two friends) sits at about 62%.
   const squadLeft = Math.max(60, Math.round(1560 * .62 - myWeek));
-  const weekOf = [Math.round(squadLeft * .55), Math.round(squadLeft * .45), Math.round(myWeek * .6 + 30), Math.round(myWeek + 95)];
+  const weekOf = [Math.round(squadLeft * .55), Math.round(squadLeft * .45), Math.round(myWeek * .6 + 30), Math.round(myWeek + 95), Math.round(myWeek * .85 + 20)];
   DEMO_FRIENDS.forEach((f, i) => {
     const weekMin = Math.max(30, weekOf[i]), dayMin = Math.round(Math.min(weekMin, 35 + i * 20));
     const pub = { username: f.name, level: f.level, tier: f.tier, frame: ITEM_BY_ID[f.frame] ? f.frame : 'frame_none', color: ITEM_BY_ID[f.color] ? f.color : 'col_default', avatar: f.avatar };
@@ -9834,9 +10030,9 @@ function demoDocs() {
     docs['presence/' + f.uid] = i === 0 ? { visible: true, now: { status: 'running', phase: 'focus', name: 'Organic chemistry', endAt: Date.now() + 17 * 6e4 }, updatedAt: ts(Date.now()) } : { visible: true, now: null, updatedAt: ts(Date.now() - 3600e3) };
     docs['friendships/demo_' + f.uid] = { users: ['demo', f.uid], from: f.uid, to: 'demo', status: 'accepted', fromName: f.name, toName: 'demo_scholar', createdAt: ts(Date.now() - (40 + i) * 864e5) };
   });
-  docs['friendships/demo_kabir'] = { users: ['demo', 'demo_f5'], from: 'demo_f5', to: 'demo', status: 'pending', fromName: 'kabir_22', toName: 'demo_scholar', createdAt: ts(Date.now() - 3600e3) };
-  docs['inbox/demo/items/k1'] = { from: 'demo_f1', fromName: 'riya_k', type: 'kudos', emoji: '🔥', target: 'st_' + dayKey(now), createdAt: ts(Date.now() - 1800e3) };
-  docs['challenges/demo_c1'] = { preset: 'h10', weekKey: wk, creator: 'demo_f4', members: ['demo_f4', 'demo', 'demo_f1'], invited: ['demo'], names: { demo_f4: 'sana_studies', demo: 'demo_scholar', demo_f1: 'riya_k' },
+  docs['friendships/demo_req'] = { users: ['demo', 'demo_f6'], from: 'demo_f6', to: 'demo', status: 'pending', fromName: 'mochi_naps', toName: 'demo_scholar', createdAt: ts(Date.now() - 3600e3) };
+  docs['inbox/demo/items/k1'] = { from: 'demo_f1', fromName: 'James', type: 'kudos', emoji: '🔥', target: 'st_' + dayKey(now), createdAt: ts(Date.now() - 1800e3) };
+  docs['challenges/demo_c1'] = { preset: 'h10', weekKey: wk, creator: 'demo_f4', members: ['demo_f4', 'demo', 'demo_f1'], invited: ['demo'], names: { demo_f4: 'Princess_cupcake', demo: 'demo_scholar', demo_f1: 'James' },
     progress: { demo_f4: 410, demo: Math.round(myWeek), demo_f1: 280 }, createdAt: ts(Date.now() - 2 * 864e5) };
   return docs;
 }
@@ -9999,6 +10195,120 @@ function paintRipe(p) {
   if (!on) return;
   const c = ripeColor(p);
   if (c !== lastRipeC) { lastRipeC = c; ring.style.setProperty('--ripe', c); }
+}
+
+/* ==========================================================================
+   SYNC MERGE — lists of items (reminders, revision plans, exams, parked thoughts,
+   presets, subtask templates) are merged item by item, by id: the newest change
+   wins (item.u = when it last changed). Deleting leaves a tombstone
+   (S.tomb['reminders:<id>'] = time) that syncs too, so a device with an old copy
+   can't bring a deleted item back. Tombstones and fired-reminder marks are maps,
+   which Firestore merges key by key on write — two devices never overwrite each other.
+   Nothing here needs new security rules: it all lives in users/{uid}.
+   ========================================================================== */
+const SYNC_LISTS = ['reminders', 'revisions', 'exams', 'parked', 'presets', 'subTemplates'];
+const syncSnap = {};   // field -> Map(id -> the item as last saved or merged)
+const itemJSON = x => { const { u, ...rest } = x; return JSON.stringify(rest); };
+function snapLists() {
+  for (const f of SYNC_LISTS) syncSnap[f] = new Map((S[f] || []).filter(x => x && x.id).map(x => [x.id, itemJSON(x)]));
+}
+/** On save: stamp new or changed items, and leave a tombstone for removed ones. Catches every edit, wherever it was made. */
+function stampLists() {
+  if (!syncSnap.reminders) return;
+  const now = Date.now();
+  for (const f of SYNC_LISTS) {
+    const prev = syncSnap[f], cur = new Map();
+    for (const x of S[f] || []) {
+      if (!x || !x.id) continue;
+      const j = itemJSON(x);
+      cur.set(x.id, j);
+      if (prev.get(x.id) !== j) x.u = now;
+    }
+    for (const id of prev.keys()) if (!cur.has(id)) S.tomb[f + ':' + id] = now;
+    syncSnap[f] = cur;
+  }
+}
+const DAY_MS = 864e5;
+function pruneMap(m, maxAgeMs) { const o = {}, min = Date.now() - maxAgeMs; for (const [k, v] of Object.entries(m || {})) if (+v >= min) o[k] = +v; return o; }
+function mergeMaps(a, b) { const o = { ...(a || {}) }; for (const [k, v] of Object.entries(b || {})) if (!(k in o) || +v > +o[k]) o[k] = +v; return o; }
+function mergeList(f, local, remote, tomb) {
+  const dead = x => { const t = tomb[f + ':' + x.id]; return !!t && t >= (x.u || 0); };
+  const out = new Map();
+  for (const x of remote || []) if (x && typeof x === 'object' && x.id && !dead(x)) out.set(x.id, x);
+  for (const x of local || []) {
+    if (!x || !x.id || dead(x)) continue;
+    const r = out.get(x.id);
+    if (r ? (x.u || 0) > (r.u || 0) : !!x.u) out.set(x.id, x);   // a local-only item without a stamp was deleted elsewhere by an older version
+  }
+  return [...out.values()];
+}
+/** Merge the cloud's copy into ours. Returns true when ours has something the cloud doesn't yet (so we upload). */
+function mergeSyncFrom(d) {
+  const before = SYNC_LISTS.map(f => JSON.stringify(S[f]));
+  S.tomb = pruneMap(mergeMaps(S.tomb, d.tomb), 120 * DAY_MS);
+  S.remFired = pruneMap(mergeMaps(S.remFired, d.remFired), 3 * DAY_MS);
+  // expired keys stay in the cloud copy (Firestore map merges never remove keys): delete them on the next upload
+  SYNC.stale = [...Object.keys(d.tomb || {}).filter(k => !(k in S.tomb)).map(k => ['tomb', k]), ...Object.keys(d.remFired || {}).filter(k => !(k in S.remFired)).map(k => ['remFired', k])];
+  let ahead = SYNC.stale.length > 0 || Object.keys(S.tomb).some(k => !(d.tomb || {})[k]) || Object.keys(S.remFired).some(k => !(d.remFired || {})[k]);
+  for (const f of SYNC_LISTS) {
+    const remote = Array.isArray(d[f]) ? d[f] : [];
+    if (f === 'presets' && !remote.length) { ahead = true; continue; }   // presets are never empty
+    const merged = mergeList(f, S[f], remote, S.tomb);
+    if (f === 'presets' && !merged.length) continue;
+    if (JSON.stringify(merged) !== JSON.stringify(remote)) ahead = true;
+    S[f] = merged;
+  }
+  S.revisions = cleanRevisions(S.revisions);
+  S.reminders = S.reminders.filter(r => r && r.id && typeof r.time === 'string' && typeof r.date === 'string');
+  if (!S.presets.some(p => p.id === S.activePresetId)) S.activePresetId = S.presets[0].id;
+  // notes and focus check-ins are keyed by session: keep both sides
+  if (d.notes && typeof d.notes === 'object') S.notes = { ...S.notes, ...d.notes };
+  if (d.energy && typeof d.energy === 'object' && !Array.isArray(d.energy)) S.energy = { ...S.energy, ...d.energy };
+  snapLists();
+  SYNC.changed = SYNC_LISTS.some((f, i) => JSON.stringify(S[f]) !== before[i]);
+  return ahead;
+}
+const SYNC = { changed: false, stale: [] };
+/** Coming back to the tab: ask the server directly (the live listener may have been paused while hidden). */
+function pullProfile() {
+  if (!cloudReady() || !profileLoaded) return;
+  FB.getDocFromServer(userRef()).then(snap => {
+    if (!snap.exists()) return;
+    const ahead = mergeSyncFrom(snap.data());
+    if (SYNC.changed) { saveLocal(); renderAll(); }
+    if (ahead) scheduleProfilePush();
+  }).catch(() => {});
+}
+addEventListener('visibilitychange', () => { if (!document.hidden) pullProfile(); });
+
+/* ---------- Reminders ring on one device only ----------
+   When a reminder is due, the device you're using goes first (others wait a few seconds), and it
+   claims the occurrence in a Firestore transaction: whichever device claims it rings, the others skip. */
+async function claimReminder(key) {
+  if ((S.remFired || {})[key]) return false;
+  if (!cloudReady()) return true;   // "this device only", or offline: nothing to share
+  try {
+    const won = await Promise.race([
+      FB.runTransaction(FB.db, async tx => {
+        const snap = await tx.get(userRef());
+        if (snap.exists() && (snap.data().remFired || {})[key]) return false;
+        tx.set(userRef(), { remFired: { [key]: Date.now() } }, { merge: true });
+        return true;
+      }),
+      new Promise(r => setTimeout(() => r('timeout'), 5000)),
+    ]);
+    return won === 'timeout' ? !(S.remFired || {})[key] : won;
+  } catch (e) { return !(S.remFired || {})[key]; }   // offline: ring here
+}
+function fireWhenClaimed(r, day, at, key) {
+  const wait = (document.hasFocus() ? 0 : document.hidden ? 6000 : 2500) + Math.random() * 600;
+  setTimeout(async () => {
+    if (!USER || (S.remFired || {})[key]) return;   // another device took it meanwhile
+    if (!(await claimReminder(key))) return;
+    S.remFired[key] = Date.now();
+    fireReminder(r, day, at);
+    save();
+  }, wait);
 }
 
 /* ---------- Spotlight "quick look around" (step 4 of the tutorial) ---------- */
@@ -10165,7 +10475,7 @@ $('#skipBtn').addEventListener('click', () => finishPhase('skip'));
 $('#resetBtn').addEventListener('click', () => finishPhase('reset'));
 $('#muteBtn').addEventListener('click', () => {
   S.settings.sound = !S.settings.sound;
-  if (S.settings.sound) { ensureAudio(); playEndSound(); }
+  if (S.settings.sound) { kickAudio(); playEndSound(); } else stopPreview();
   save();
   renderTimer();
   toast(S.settings.sound ? 'Sound on' : 'Muted');
@@ -10251,7 +10561,7 @@ $('#setGoal').addEventListener('change', e => {
 });
 $('#setWeek').addEventListener('change', e => { S.settings.weekStart = +e.target.value; save(); });
 $('#setTheme').addEventListener('change', e => { S.settings.theme = e.target.value; applyTheme(); save(); });
-$('#setSound').addEventListener('change', e => { S.settings.sound = e.target.checked; save(); renderTimer(); });
+$('#setSound').addEventListener('change', e => { S.settings.sound = e.target.checked; if (e.target.checked) kickAudio(); else stopPreview(); save(); renderTimer(); });
 $('#setAuto').addEventListener('change', e => { S.settings.autoStart = e.target.checked; save(); });
 $('#setAmbVol').addEventListener('input', e => setAmbientVolume(e.target.value));
 $$('.setting').forEach(row => {
@@ -10526,6 +10836,11 @@ async function boot() {
     if (guest) startSession({ guest: true }, false); else showAuth();
     return;
   }
+  // Returning to this browser: open the last account straight from its copy on this device while Firebase
+  // loads (it is confirmed — or the login screen shown — the moment Firebase knows who is signed in).
+  const last = readJSON(LAST_USER, null);
+  let early = null;
+  if (!guest && last && last.uid && last.username && localStorage.getItem(cacheKey(last.uid))) { early = last; startSession(last, false, true); }
   try {
     await loadFirebase();
     if (window.__spSet) window.__spSet(.75);
@@ -10533,11 +10848,10 @@ async function boot() {
     // Firebase could not load (usually: opened while offline). Fall back to this device's cache.
     console.warn('Firebase failed to load', err);
     fbLoadError = 'Could not reach the sync service. Check your internet connection and reload.';
-    const last = readJSON(LAST_USER, null);
     if (guest) startSession({ guest: true }, false);
     else if (last && last.uid) {
       localOnly = true;
-      startSession(last, false);
+      if (!early) startSession(last, false);
       toast(navigator.onLine
         ? 'Could not start cloud sync (' + (err.code || err.message || 'unknown error') + '). Working offline for now.'
         : 'Offline — your changes will sync next time you open the app online', 5000);
@@ -10548,7 +10862,13 @@ async function boot() {
     if (isPreview()) return;   // the demo account runs without Firebase
     if (user) {
       localStorage.removeItem(GUEST_FLAG);
-      startSession({ uid: user.uid, username: usernameOf(user) }, true);
+      startSession({ uid: user.uid, username: usernameOf(user) }, true);   // an early start is upgraded in place
+    } else if (early && USER && !USER.guest && USER.uid === early.uid && !cloudStarted) {
+      // signed out elsewhere, or the login expired: don't keep showing this account
+      early = null;
+      localStorage.removeItem(LAST_USER);
+      USER = null;
+      showAuth();
     } else if (USER && !USER.guest) {
       location.reload();  // signed out (e.g. in another tab)
     } else if (guest) {
