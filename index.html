@@ -952,7 +952,9 @@ body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .s
 @media (max-width: 640px) { .rem-acts .hide-sm { display: none; } }
 
 /* ==========================================================================
-   LIQUID GLASS (Settings → Appearance). <html data-glass="full | lite">
+   GLOSSED INTERFACE (Settings → Appearance). <html data-glass="full | lite">
+   Lite is the default look. <html data-glass-solid> (no backdrop-filter, or the
+   device asks for reduced transparency) swaps the blur for a solid surface.
    Frosted translucent surfaces over a soft colourful backdrop built from the
    current theme's accent. Needs color-mix(); without backdrop-filter it falls
    back to a solid, slightly translucent surface.
@@ -963,7 +965,9 @@ body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .s
   :root { --gb-a: 42%; --glass-fill: 58%; --glass-blur: 22px; --glass-sat: 175%; --glass-edge: rgba(255, 255, 255, .55); --glass-hi: rgba(255, 255, 255, .7); --glass-glow: rgba(255, 255, 255, .25); --glass-shadow: 0 12px 32px -16px rgba(20, 30, 40, .28); --sheen-a: .22; --sx: 35%; }
   :root[data-theme="dark"] { --gb-a: 30%; --glass-fill: 55%; --glass-edge: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .16); --glass-glow: rgba(255, 255, 255, .05); --glass-shadow: 0 14px 34px -14px rgba(0, 0, 0, .7); --sheen-a: .07; }
   @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --gb-a: 30%; --glass-fill: 55%; --glass-edge: rgba(255, 255, 255, .13); --glass-hi: rgba(255, 255, 255, .16); --glass-glow: rgba(255, 255, 255, .05); --glass-shadow: 0 14px 34px -14px rgba(0, 0, 0, .7); --sheen-a: .07; } }
-  :root[data-glass="lite"] { --glass-blur: 9px; --glass-sat: 135%; --glass-fill: 72%; --sheen-a: 0; }
+  :root[data-glass="lite"] { --glass-blur: 10px; --glass-sat: 130%; --glass-fill: 80%; --sheen-a: 0; }   /* the default: readable over every theme */
+  /* True Minimalist: the gloss stays extra subtle — fainter colour, more solid cards, no sheen */
+  :root[data-minimal][data-glass] { --gb-a: 16%; --glass-fill: 82%; --glass-blur: 8px; --glass-sat: 115%; --sheen-a: 0; --glass-glow: transparent; }
 
   :root[data-glass] #glassBg { display: block; }
   :root[data-glass] #glassBg .g1 { left: -25vmax; top: -30vmax; background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) var(--gb-a), transparent), transparent); }
@@ -1008,6 +1012,11 @@ body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .s
   @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     :root[data-glass] :is(.card, .tile, .item, dialog, .seg, .tabs, .pomeo-bubble, .pomeo-pop .pp-card, .tour-tip), :root[data-glass] .top::before { background-color: color-mix(in srgb, var(--surface) 93%, transparent); }
   }
+  /* reduced transparency asked for (or no blur support): solid, barely translucent surfaces and no colour wash */
+  :root[data-glass][data-glass-solid] :is(.card, .tile, .item, dialog, .seg, .tabs, .pomeo-bubble, .pomeo-pop .pp-card, .tour-tip, .tip-pop), :root[data-glass][data-glass-solid] .top::before {
+    background-color: color-mix(in srgb, var(--surface) 95%, transparent); background-image: none; -webkit-backdrop-filter: none; backdrop-filter: none;
+  }
+  :root[data-glass][data-glass-solid="rt"] #glassBg { display: none; }
 }
 
 /* ==========================================================================
@@ -1640,6 +1649,30 @@ dialog.tut { width: min(460px, calc(100vw - 24px)); padding: 22px 22px 16px; }
 .sesslist .en { font-size: 14px; margin-left: 4px; }
 .app-foot .sep { opacity: .6; margin: 0 4px; }
 
+/* ---------- Tutorial: "Pick your style" (True Minimalist + Glossed Interface side by side) ---------- */
+.style-pick { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+@media (max-width: 360px) { .style-pick { grid-template-columns: 1fr; } }
+.sp-card { border: 1px solid var(--line); border-radius: var(--r-md); padding: 12px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.sp-card b { font-size: 14px; }
+.sp-card small { color: var(--muted); font-size: 12px; line-height: 1.4; }
+.sp-card .sp-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.sp-card .sp-row b { min-width: 0; }
+.sp-card .sp-row input[type="checkbox"] { flex: none; margin: 0; }
+.sp-say { font-size: 12.5px; font-style: italic; color: var(--text); }
+.gl-prev { position: relative; height: 62px; border-radius: 12px; overflow: hidden; background: var(--bg); border: 1px solid var(--line); }
+.gl-prev i { position: absolute; width: 70px; height: 70px; border-radius: 50%; filter: blur(2px); }
+.gl-prev .b1 { left: -14px; top: -22px; background: color-mix(in srgb, var(--accent) 70%, transparent); }
+.gl-prev .b2 { right: -10px; bottom: -30px; background: color-mix(in srgb, color-mix(in srgb, var(--accent) 45%, #ff7aa8) 70%, transparent); }
+.gl-prev .b3 { left: 45%; top: 20px; width: 46px; height: 46px; background: color-mix(in srgb, color-mix(in srgb, var(--accent) 40%, #ffc65c) 70%, transparent); }
+.gl-prev .pc { position: absolute; inset: 12px 14px; border-radius: 9px; border: 1px solid var(--line); background: var(--surface); display: grid; place-items: center; font-size: 11px; color: var(--muted); }
+.gl-prev[data-l="off"] i { display: none; }
+.gl-prev[data-l="lite"] .pc { background: color-mix(in srgb, var(--surface) 72%, transparent); -webkit-backdrop-filter: blur(6px) saturate(135%); backdrop-filter: blur(6px) saturate(135%); border-color: rgba(255, 255, 255, .45); }
+.gl-prev[data-l="full"] .pc { background: color-mix(in srgb, var(--surface) 50%, transparent); -webkit-backdrop-filter: blur(12px) saturate(175%); backdrop-filter: blur(12px) saturate(175%); border-color: rgba(255, 255, 255, .6); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .7); }
+.gl-prev[data-solid][data-l]:not([data-l="off"]) .pc { background: color-mix(in srgb, var(--surface) 95%, transparent); -webkit-backdrop-filter: none; backdrop-filter: none; }
+.gl-seg { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.gl-seg button { border: 0; background: transparent; color: var(--text); font: inherit; font-size: 12px; padding: 6px 2px; cursor: pointer; }
+.gl-seg button + button { border-left: 1px solid var(--line); }
+.gl-seg button.on { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
 .tabs .ls { display: none; }
 @media (max-width: 400px) { .tabs .lf { display: none; } .tabs .ls { display: inline; } .tabs button { font-size: 10px; } }
 </style>
@@ -1994,9 +2027,9 @@ dialog.tut { width: min(460px, calc(100vw - 24px)); padding: 22px 22px 16px; }
           <div><div>Theme</div><div class="desc">Light, dark or follow your device</div></div>
           <select id="setTheme" aria-label="Theme"><option value="auto">System</option><option value="light">Light</option><option value="dark">Dark</option></select>
         </div>
-        <div class="setting" data-k="liquid glass blur frosted translucent">
-          <div><div>Liquid Glass</div><div class="desc" id="glassDesc">Frosted, translucent cards over soft colour. Lite uses less blur for older phones. Saved on this device.</div></div>
-          <select id="setGlass" aria-label="Liquid Glass"><option value="off">Off</option><option value="full">Full</option><option value="lite">Lite</option></select>
+        <div class="setting" data-k="glossed interface glass gloss blur frosted translucent transparency">
+          <div><div>Glossed Interface</div><div class="desc" id="glassDesc">Frosted, translucent cards over soft colour. Lite (the default) is gentle and easy on older phones; Full adds more blur and shine. Saved on this device.</div></div>
+          <select id="setGlass" aria-label="Glossed Interface"><option value="off">Glossed Interface: Off</option><option value="lite">Glossed Interface: Lite</option><option value="full">Glossed Interface: Full</option></select>
         </div>
         <div class="setting" data-k="animations motion reduce effects">
           <div><div>Animations</div><div class="desc">Full, reduced (simple fades) or off. Saved on this device.</div></div>
@@ -4013,7 +4046,10 @@ function renderSettings() {
   $('#setMotion').value = motion();
   $('#setGlass').value = glass();
   $('#setGlass').disabled = !glassSupported();
-  if (!glassSupported()) $('#glassDesc').textContent = 'Needs a newer browser — this one can’t draw the glass effect.';
+  if (!glassSupported()) $('#glassDesc').textContent = 'Needs a newer browser — this one can’t draw the glossed look.';
+  else if (glassSolid()) $('#glassDesc').textContent = glassSolid() === 'rt'
+    ? 'Your device asks for reduced transparency, so a solid style is used instead of the frosted blur. Saved on this device.'
+    : 'This browser can’t blur, so a solid, slightly translucent style is used. Saved on this device.';
   $('#setPomeo').checked = st.pomeo !== false;
   $('#setPomeoTalk').value = st.pomeoTalk || 'sometimes';
   $('#setWater').checked = st.waterNudge !== false;
@@ -6663,18 +6699,38 @@ setInterval(checkReminders, 15000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) { checkReminders(); if (S.ui.tab === 'reminders') renderReminders(); } });
 
 /* ==========================================================================
-   LIQUID GLASS — a per-device look (like Animations): off | full | lite
+   GLOSSED INTERFACE — a per-device look (like Animations): off | lite | full
+   Lite is the default for anyone who hasn't picked a level themselves
+   (nothing stored); a stored choice is always kept.
    ========================================================================== */
 const GLASS_KEY = 'pomodorolist-glass';
+const GLASS_DEFAULT = 'lite';
+const GLASS_NAMES = { off: 'Off', lite: 'Lite', full: 'Full' };
 const glassSupported = () => !!(window.CSS && CSS.supports('color', 'color-mix(in srgb, red 50%, blue)'));
+const blurSupported = () => !!(window.CSS && (CSS.supports('backdrop-filter', 'blur(1px)') || CSS.supports('-webkit-backdrop-filter', 'blur(1px)')));
+const RT_MQ = matchMedia('(prefers-reduced-transparency: reduce)');
+/** '' = the real frosted look; 'rt' = reduced transparency asked for; 'nb' = no blur support. */
+const glassSolid = () => (RT_MQ.matches ? 'rt' : !blurSupported() ? 'nb' : '');
 const glass = () => document.documentElement.dataset.glass || 'off';
+function glassPref() {
+  let v = null;
+  try { v = localStorage.getItem(GLASS_KEY); } catch (e) {}
+  return GLASS_NAMES[v] ? v : GLASS_DEFAULT;
+}
+function setGlass(v) {
+  writeLS(GLASS_KEY, v);
+  applyGlass();
+  if ($('#setGlass')) $('#setGlass').value = glass();
+}
 function applyGlass() {
-  let v = 'off';
-  try { v = localStorage.getItem(GLASS_KEY) || 'off'; } catch (e) {}
-  if (v === 'off' || !glassSupported()) delete document.documentElement.dataset.glass;
-  else document.documentElement.dataset.glass = v;
+  const v = glassPref(), root = document.documentElement;
+  if (v === 'off' || !glassSupported()) delete root.dataset.glass;
+  else root.dataset.glass = v;
+  const solid = glassSolid();
+  if (solid) root.dataset.glassSolid = solid; else delete root.dataset.glassSolid;
   sheenLoop();
 }
+RT_MQ.addEventListener && RT_MQ.addEventListener('change', () => { applyGlass(); if (S && S.ui && S.ui.tab === 'settings') renderSettings(); });
 /* The light reflection drifts a little with the pointer and with scrolling (Full glass + Full animations only). */
 let sheenQueued = false, sheenX = 0.5, sheenScroll = 0, sheenOn = false;
 function paintSheen() {
@@ -6684,7 +6740,7 @@ function paintSheen() {
 }
 function queueSheen() { if (sheenOn && !sheenQueued) { sheenQueued = true; requestAnimationFrame(paintSheen); } }
 function sheenLoop() {
-  sheenOn = glass() === 'full' && motion() === 'full';
+  sheenOn = glass() === 'full' && motion() === 'full' && !glassSolid();
   if (!sheenOn) document.documentElement.style.removeProperty('--sx');
 }
 addEventListener('pointermove', e => { if (sheenOn && e.pointerType === 'mouse') { sheenX = e.clientX / innerWidth; queueSheen(); } }, { passive: true });
@@ -8185,22 +8241,23 @@ addEventListener('resize', () => $$('.catrow').forEach(updateFades));
    command palette, offline banner, pull to refresh, tab swipes, haptics.
    Everything here is stored on this device (localStorage); no new cloud data.
    ========================================================================== */
-const APP_VERSION = '1.8';
+const APP_VERSION = '1.8.1';
 const VER_KEY = 'pomodorolist-seen-version';
 const CHANGELOG = [
+  { v: '1.8.1', t: 'Glossed Interface', d: 'Liquid Glass is now called Glossed Interface, and its Lite level is the default look (your own choice is kept). It switches to a solid style when your device asks for reduced transparency. The tutorial’s new “Pick your style” step sets it alongside True Minimalist.' },
   { v: '1.8', t: 'True Minimalist & Pomeo’s tutorial', d: 'True Minimalist mode for a clean, calm timer; a short tutorial with Pomeo and one-time tips; focus check-ins with insights in Stats; a session-complete summary; quick-start chips for your favourite presets; and a contact email.' },
   { v: '1.7', t: 'Polish update', d: 'Inbox for everything that happens, command palette (Ctrl/⌘ K), tidier searchable Settings, Undo instead of “Are you sure?”, offline banner, pull to refresh and swipes on phones.' },
   { v: '1.6.2', t: 'Sounds & feel', d: 'Soft interface sounds in four packs, quiet during focus, plus cursor glow, tilt and magnetic buttons.' },
   { v: '1.6.1', t: 'Subtasks', d: 'An optional checklist for each session, with templates, carry-over and history.' },
   { v: '1.6', t: 'Quests, garden & Wrapped', d: 'Weekly boss battles (solo or squad), the Tomato Garden, monthly Wrapped, spaced revision, exam countdown, parking lot, aura and daily rewards.' },
-  { v: '1.5', t: 'Pomeo & reminders', d: 'Pomeo the tomato, the Reminders tab with calendar export, Liquid Glass, tips and session notes.' },
+  { v: '1.5', t: 'Pomeo & reminders', d: 'Pomeo the tomato, the Reminders tab with calendar export, Glossed Interface (then called Liquid Glass), tips and session notes.' },
   { v: '1.4', t: 'Animations & navigation', d: 'Smooth animations everywhere, a phone tab bar and a welcome tour.' },
   { v: '1.3', t: 'Friends & leaderboards', d: 'Friends, kudos, nudges, weekly challenges and leaderboards.' },
   { v: '1.2', t: 'Levels & shop', d: 'XP, levels, achievements, coins and a cosmetic shop.' },
   { v: '1.1', t: 'Accounts & sync', d: 'Log in and keep your sessions in sync on every device, even offline.' },
   { v: '1.0', t: 'Focus timer', d: 'Pomodoro timer with named sessions, presets, streaks and stats.' },
 ];
-const NEWS = ['🧘 True Minimalist mode — just the timer, plans and stats (Settings → Appearance)', '🍅 A short tutorial with Pomeo — replay it anytime', '⚡ “How focused did you feel?” check-ins unlock insights in Stats', '✓ A session summary card and quick-start chips for your top presets'];
+const NEWS = ['✨ Liquid Glass is now Glossed Interface — Lite is the new default look (Settings → Appearance)', '🧘 True Minimalist mode — just the timer, plans and stats (Settings → Appearance)', '🍅 A short tutorial with Pomeo — replay it anytime', '⚡ “How focused did you feel?” check-ins unlock insights in Stats', '✓ A session summary card and quick-start chips for your top presets'];
 
 /* ---------- Haptics ---------- */
 const HAPTIC_KEY = 'pomodorolist-haptics';
@@ -8429,7 +8486,7 @@ function cmdList(q) {
   add('☑️', 'Add subtask', 'Timer', focusSubAdd, 'new subtask checklist');
   if (focusActive()) add('🅿️', 'Park a thought', 'Timer', () => { showTab('timer'); openPark(); });
   add('🌓', 'Toggle dark mode', 'Appearance', cmdToggleDark, 'theme dark light night');
-  add('🧊', `Liquid Glass: ${glass() === 'off' ? 'turn on' : 'turn off'}`, 'Appearance', () => { writeLS(GLASS_KEY, glass() === 'off' ? 'full' : 'off'); applyGlass(); toast(`Liquid Glass ${glass() === 'off' ? 'off' : 'on'}`, 1800, true); }, 'glass blur');
+  for (const lv of ['off', 'lite', 'full']) if (lv !== glass()) add('✨', `Glossed Interface: ${GLASS_NAMES[lv]}`, 'Appearance', () => { setGlass(lv); toast(`Glossed Interface: ${GLASS_NAMES[lv]}`, 1800, true); }, 'glossed interface glass gloss blur frosted');
   add(S.settings.sound ? '🔇' : '🔊', S.settings.sound ? 'Mute all sounds' : 'Turn sounds on', 'Sounds', () => $('#muteBtn').click(), 'sound mute audio');
   add('🎚️', `Interface sounds: ${UIS.prefs.on ? 'off' : 'on'}`, 'Sounds', () => { UIS.prefs.on = !UIS.prefs.on; uisSave(); if (UIS.prefs.on) ensureAudio(); toast(`Interface sounds ${UIS.prefs.on ? 'on' : 'off'}`, 1800, true); }, 'ui sounds clicks');
   for (const mo of ['full', 'reduced', 'off']) if (mo !== motion()) add('✨', `Animations: ${mo[0].toUpperCase() + mo.slice(1)}`, 'Appearance', () => { localStorage.setItem(MOTION_KEY, mo); applyMotion(); sheenLoop(); renderTimer(); toast(`Animations: ${mo}`, 1800, true); }, 'motion');
@@ -8812,9 +8869,18 @@ function renderTut() {
     $('#tutTitle').textContent = 'A quick look around';
     body.innerHTML = `<p>I’ll point at each main tab with one line about it: Timer, Stats, Reminders, Leaderboard${on ? ', Shop' : ''}, Friends${on ? ' and Quests' : ''}.</p>`;
   } else if (i === 4) {
-    $('#tutTitle').textContent = 'Prefer it simple?';
-    body.innerHTML = `<p>True Minimalist hides levels, coins, the shop and quests for a clean, calm timer. Nothing is lost.</p>
-      <label class="tut-switch"><span><b>True Minimalist</b><br><small class="muted">You can change this anytime in Settings.</small></span><input type="checkbox" id="tutMinimal"${minimal() ? ' checked' : ''} aria-label="True Minimalist"></label>`;
+    $('#tutTitle').textContent = 'Pick your style';
+    const g = glass(), solid = glassSolid();
+    body.innerHTML = `<div class="style-pick">
+        <div class="sp-card"><div class="sp-row"><b>True Minimalist</b><input type="checkbox" id="tutMinimal"${minimal() ? ' checked' : ''} aria-label="True Minimalist"></div>
+          <small>Hides levels, coins, the shop and quests for a clean, calm timer. Nothing is lost.</small></div>
+        <div class="sp-card"><b>Glossed Interface</b>
+          <span class="sp-say">“Like the glassy look? This is Glossed Interface.”</span>
+          <div class="gl-prev" data-l="${g}"${solid ? ' data-solid' : ''} aria-hidden="true"><i class="b1"></i><i class="b2"></i><i class="b3"></i><span class="pc">Preview</span></div>
+          <div class="gl-seg" role="radiogroup" aria-label="Glossed Interface">${['off', 'lite', 'full'].map(v => `<button role="radio" data-gl="${v}" class="${g === v ? 'on' : ''}" aria-checked="${g === v}">${GLASS_NAMES[v]}${v === GLASS_DEFAULT ? ' <small>(default)</small>' : ''}</button>`).join('')}</div>
+          ${solid === 'rt' ? '<small>Your device prefers less transparency, so a solid style is used.</small>' : ''}</div>
+      </div>
+      <p style="font-size:13px">You can change this anytime in Settings → Appearance.</p>`;
   } else {
     $('#tutTitle').textContent = 'Ready?';
     body.innerHTML = `<p>Start your first focus block, or try a 1-minute demo to see how a session finishes${minimal() ? '' : ' (with rewards)'} and the quick check-in.</p>
@@ -8855,6 +8921,8 @@ $('#tutBody').addEventListener('click', e => {
   const u = e.target.closest('[data-use]'), g = e.target.closest('[data-goal]');
   if (u) { TUT.use = u.dataset.use; renderTut(); }
   if (g) { TUT.goal = +g.dataset.goal; if ($('#tutGoal')) $('#tutGoal').value = ''; renderTut(); }
+  const gl = e.target.closest('[data-gl]');
+  if (gl) { setGlass(gl.dataset.gl); renderTut(); }
   if (e.target.closest('#tutStart')) {
     finishTutorial();
     showTab('timer');
@@ -9288,7 +9356,7 @@ $('#setTheme').addEventListener('change', e => { S.settings.theme = e.target.val
 $('#setSound').addEventListener('change', e => { S.settings.sound = e.target.checked; save(); renderTimer(); });
 $('#setAuto').addEventListener('change', e => { S.settings.autoStart = e.target.checked; save(); });
 $('#setAmbVol').addEventListener('input', e => setAmbientVolume(e.target.value));
-$('#setGlass').addEventListener('change', e => { writeLS(GLASS_KEY, e.target.value); applyGlass(); });
+$('#setGlass').addEventListener('change', e => { setGlass(e.target.value); toast(`Glossed Interface: ${GLASS_NAMES[glass()]}`, 1800, true); });
 $('#setPomeo').addEventListener('change', e => { S.settings.pomeo = e.target.checked; save(); renderPomeo(); if (!e.target.checked) hideBubble(); });
 $('#setPomeoTalk').addEventListener('change', e => { S.settings.pomeoTalk = e.target.value; save(); });
 $('#setWater').addEventListener('change', e => { S.settings.waterNudge = e.target.checked; save(); });
