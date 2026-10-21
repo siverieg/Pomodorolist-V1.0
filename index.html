@@ -89,7 +89,9 @@ h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacin
   .tabs > .seg-ind { border-radius: 14px; }
   .lvchip .uname { display: none; }
 }
-@media (min-width: 641px) and (max-width: 720px) { .tabs button { padding: 5px 7px; } .top { gap: 8px; padding-left: 12px; padding-right: 12px; } }
+@media (min-width: 641px) and (max-width: 860px) { .tabs button[data-tab="shop"] { display: none; }   /* the coin pill opens the Shop, as on phones */
+  .tabs button { padding: 5px 7px; } .top { gap: 8px; padding-left: 12px; padding-right: 12px; } }
+@media (min-width: 641px) { .tabs { min-width: 0; } .tabs button { min-width: 0; } .tabs button span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; } .hdr-right { flex: none; } }
 /* Phones: fixed bottom tab bar (icon + label), Profile/Settings behind the header badge */
 @media (max-width: 640px) {
   .tabs {
@@ -162,9 +164,6 @@ input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent);
 .auth-card { width: min(400px, 100%); padding: 28px 24px 22px; }
 .auth-brand { font-size: 22px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
 .auth-brand i { width: 12px; height: 12px; border-radius: 50%; background: var(--accent); display: inline-block; }
-.auth-card .lead { color: var(--muted); font-size: 14px; margin: 6px 0 20px; }
-.auth-card .seg { display: flex; width: 100%; margin-bottom: 18px; }
-.auth-card .seg button { flex: 1; }
 .auth-form label.field { margin-top: 12px; }
 .hint { font-size: 12px; color: var(--muted); margin-top: 5px; }
 .pw { position: relative; }
@@ -203,12 +202,15 @@ input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent);
 .time { font-family: var(--timer-font, inherit); font-size: clamp(52px, 15vw, 74px); font-weight: 300; font-variant-numeric: tabular-nums; letter-spacing: -.02em; line-height: 1; }
 .ring-sub { color: var(--muted); font-size: 13px; margin-top: 10px; max-width: 70%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .controls { display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; }
+@media (max-width: 400px) { .controls { gap: 8px; } .controls .btn { padding-left: 16px; padding-right: 16px; } .controls .btn.primary { min-width: 112px; padding-left: 24px; padding-right: 24px; } }
 
 /* Session name row */
 .name-row { display: flex; gap: 8px; }
 .name-row input[type="text"] { flex: 1; min-width: 0; }
-.sub-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
-.preset-row { display: flex; gap: 8px; }
+.sub-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+@media (max-width: 420px) { .sub-row { grid-template-columns: minmax(0, 1fr); } }   /* small phones: the preset menu gets a full row */
+.preset-row { display: flex; gap: 8px; min-width: 0; }
+.preset-row select { flex: 1; min-width: 0; text-overflow: ellipsis; }
 
 /* Chips */
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -269,7 +271,8 @@ input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent);
 .toplist .bar { height: 6px; background: var(--heat0); border-radius: 999px; overflow: hidden; }
 .toplist .bar i { display: block; height: 100%; border-radius: 999px; }
 .toplist .v { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 13px; text-align: right; }
-.sesslist { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 6px; }
+.sesslist { list-style: none; margin: 12px 0 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
+.sesslist li { min-width: 0; }
 .sesslist li { display: flex; align-items: center; gap: 10px; font-size: 14px; padding: 6px 0; border-top: 1px solid var(--line); }
 .sesslist .t { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 13px; min-width: 104px; }
 .sesslist .nm { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -1318,7 +1321,8 @@ kbd { display: inline-block; min-width: 26px; padding: 3px 7px; border-radius: 7
 .subdet summary::-webkit-details-marker { display: none; }
 .subdet summary::after { content: " ▾"; font-size: 10px; }
 .subdet[open] summary::after { content: " ▴"; }
-.subdet ul { list-style: none; margin: 2px 0 0; padding: 0; }
+.subdet ul { list-style: none; margin: 2px 0 0; padding: 0; white-space: normal; }
+.subdet li { overflow-wrap: anywhere; }
 .subdet li.ok::before { content: "✓ "; color: var(--accent); }
 .subdet li.no::before { content: "○ "; }
 .tpl-list { list-style: none; margin: 0 0 12px; padding: 0; }
@@ -1421,6 +1425,7 @@ h1 { font-size: var(--fs-xl); font-weight: 650; letter-spacing: -.01em; }
 :root[data-motion="full"] .hdr-count:not(.hidden) { animation: dotPop .4s var(--spring) both; }
 @media (max-width: 640px) { .hdr-right { gap: 6px; } .hdr-right #cmdBtn { display: inline-grid; } }
 @media (max-width: 380px) { .brand span { display: none; } }
+@media (max-width: 480px) { .lvchip .lvn { display: none; } .coinpill { padding-left: 7px; padding-right: 9px; } }
 /* Tablets: keep the header on one line next to the tab bar */
 @media (min-width: 641px) and (max-width: 1000px) { .brand span, .lvchip .lvn { display: none; } .hdr-right { gap: 6px; } }
 @media (min-width: 641px) and (max-width: 760px) { #coinPill { display: none !important; } .top { gap: 8px; } }
@@ -1531,6 +1536,12 @@ a.btn { color: var(--text); text-decoration: none; display: inline-flex; align-i
 .news-card .nc-main { flex: 1; min-width: 0; }
 .news-card h3 { margin: 0 0 6px; font-size: var(--fs-md); }
 .news-card ul { margin: 0 0 10px; padding-left: 18px; font-size: var(--fs-sm); display: grid; gap: 3px; }
+.news-card .nc-acts { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; }
+@media (max-width: 640px) {
+  .news-card { gap: var(--sp-3); }
+  .news-card > .pomeo-pic { display: none; }
+  .news-card li:nth-child(n+3) { display: none; }   /* phones: two highlights, the rest is one tap away */
+}
 .news-card .nc-x { border: 0; background: none; color: var(--muted); font-size: 18px; cursor: pointer; padding: 0 4px; line-height: 1; }
 
 /* ---------- Splash ---------- */
@@ -1577,25 +1588,31 @@ a.btn { color: var(--text); text-decoration: none; display: inline-flex; align-i
 /* ==========================================================================
    TUTORIAL WITH POMEO + one-time tips
    ========================================================================== */
-dialog.tut { width: min(460px, calc(100vw - 24px)); padding: 22px 22px 16px; }
-.tut-top { display: flex; gap: 14px; align-items: flex-start; }
+dialog.tut:focus { outline: none; }
+dialog.tut { width: min(460px, calc(100vw - 24px)); padding: 20px; box-sizing: border-box; overflow-x: hidden; }
+.tut-top { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 14px; align-items: center; }
 .tut-pomeo { width: 64px; height: 64px; flex: none; display: grid; place-items: center; border-radius: 20px; background: var(--accent-soft); }
 .tut-pomeo .mascot { position: static; width: 56px; height: 56px; }
 .tut-bubble { flex: 1; min-width: 0; }
 .tut-step { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
-.tut-bubble h3 { margin: 4px 0 6px; font-size: 19px; line-height: 1.3; }
+.tut-bubble h3 { margin: 4px 0 0; font-size: 19px; line-height: 1.3; overflow-wrap: anywhere; }
+.tut-body { min-width: 0; }
 .tut-body p { margin: 12px 0 4px; color: var(--muted); font-size: 14.5px; line-height: 1.5; }
 .tut-switch input[type="checkbox"] { flex: none; }
-.tut-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0 4px; }
-.tut-opt { border: 1px solid var(--line); background: var(--surface); color: var(--text); border-radius: var(--r-md); padding: 12px 10px; cursor: pointer; text-align: left; font: inherit; font-size: 14px; display: grid; gap: 2px; }
+.tut-opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 12px 0 4px; }
+.tut-opt { border: 1px solid var(--line); background: var(--surface); color: var(--text); border-radius: var(--r-md); padding: 12px; cursor: pointer; text-align: left; font: inherit; font-size: 14px; display: grid; gap: 4px; align-content: start; min-width: 0; min-height: 64px; box-sizing: border-box; }
+.tut-opt b, .tut-opt small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tut-opt input { width: 100%; min-width: 0; max-width: 100%; box-sizing: border-box; padding: 6px 10px; }
 .tut-opt small { color: var(--muted); font-size: 12px; }
 .tut-opt:hover { border-color: var(--accent); }
 .tut-opt.on { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
 .tut-row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; align-items: center; }
-.tut-row input { flex: 1; min-width: 120px; }
-.tut-foot { display: flex; align-items: center; gap: 10px; margin-top: 18px; }
-.tut-foot .tut-dots { flex: 1; display: flex; justify-content: center; gap: 5px; }
-.tut-dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--line); }
+.tut-row input { flex: 1 1 140px; min-width: 0; }
+.tut-foot { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px; margin-top: 18px; }
+.tut-foot .linkbtn { white-space: nowrap; min-height: 44px; padding: 0 4px; }
+.tut-foot #tutNext { min-width: 0; padding-inline: 26px; }
+.tut-foot .tut-dots { display: flex; justify-content: center; gap: 5px; min-width: 0; overflow: hidden; }
+.tut-dots i { flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--line); }
 .tut-dots i.on { background: var(--accent); width: 16px; border-radius: 3px; }
 .tut-switch { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border: 1px solid var(--line); border-radius: var(--r-md); margin-top: 10px; }
 .tut-big { display: grid; gap: 8px; margin-top: 12px; }
@@ -1633,7 +1650,10 @@ dialog.tut { width: min(460px, calc(100vw - 24px)); padding: 22px 22px 16px; }
 .energy.done .eq { color: var(--accent); }
 .qs-row { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-top: 12px; }
 .qs-row .lbl { align-self: center; }
-.qs-row button { border: 1px solid var(--line); background: var(--surface); color: var(--text); border-radius: 999px; padding: 5px 12px; font-size: 13px; cursor: pointer; }
+.qs-row button { border: 1px solid var(--line); background: var(--surface); color: var(--text); border-radius: 999px; padding: 5px 12px; font-size: 13px; cursor: pointer;
+  max-width: 100%; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.qs-row { color: var(--muted); }
+@media (max-width: 420px) { .qs-row button { max-width: calc(50% - 4px); } .qs-row .lbl { flex-basis: 100%; text-align: center; } }
 .qs-row button:hover { border-color: var(--accent); color: var(--accent); }
 .ins-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; margin-top: 4px; }
 .ins { padding: 12px 14px; border-radius: var(--r-md); background: var(--bg); border: 1px solid var(--line); }
@@ -1673,6 +1693,204 @@ dialog.tut { width: min(460px, calc(100vw - 24px)); padding: 22px 22px 16px; }
 .gl-seg button { border: 0; background: transparent; color: var(--text); font: inherit; font-size: 12px; padding: 6px 2px; cursor: pointer; }
 .gl-seg button + button { border-left: 1px solid var(--line); }
 .gl-seg button.on { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+/* ==========================================================================
+   TOUCH TARGETS — on touch screens every control is at least 44 × 44 px.
+   Text links inside sentences get a larger invisible hit area instead.
+   ========================================================================== */
+@media (pointer: coarse) {
+  button:not(.plant):not(.rem-check), select, a.btn, .chip, summary, [role="button"] { min-height: 44px; }
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]) { min-height: 44px; }
+  input[type="color"] { min-width: 44px; min-height: 44px; }
+  .iconbtn, .iconbtn.sm, .hdr-right .iconbtn, .nc-x, .ib-item .ib-x, .chip .pin, .wr-close, .linkbtn, .pb-x { min-width: 44px; }
+  .iconbtn.sm { width: 44px; height: 44px; }
+  /* header: compact visuals, full-size invisible hit areas (keeps the top bar from overflowing on phones) */
+  .hdr-right { gap: 8px; }
+  .top .hdr-right :is(.iconbtn, .lvchip, .coinpill) { position: relative; min-width: 36px; min-height: 36px; }
+  .top .hdr-right .iconbtn { width: 36px; height: 36px; }
+  .hdr-right :is(.iconbtn, .lvchip, .coinpill)::after { content: ""; position: absolute; left: 50%; top: 50%; width: max(100%, 44px); height: 44px; transform: translate(-50%, -50%); }
+  .btn.small { padding-top: 0; padding-bottom: 0; }
+  a.btn { align-items: center; }
+  .subdet summary { display: inline-flex; align-items: center; }
+  .sub-toggle { margin-top: 4px; }
+  .chip { padding-top: 0; padding-bottom: 0; }
+  .chip .pin { align-self: stretch; }
+  .tabs button { min-width: 44px; }
+  .rem-check { position: relative; }
+  .rem-check::after { content: ""; position: absolute; left: 50%; top: 50%; width: 44px; height: 44px; transform: translate(-50%, -50%); }   /* invisible 44px hit area */
+  .plant { width: 44px; padding: 0 7px; margin-left: -7px; margin-right: -7px; }   /* same spacing, bigger target */
+  .app-foot a, a.mail, .about-list a { padding: 15px 4px; margin: -15px -4px; }
+}
+[data-row-toggle] { cursor: pointer; }
+/* ==========================================================================
+   WELCOME PAGE — pitch + sign-up card, then features, comparison and FAQ.
+   Every animation is transform/opacity only and runs only with Animations: Full.
+   ========================================================================== */
+.auth.lp { display: block; padding: 0; min-height: 100vh; min-height: 100dvh; }
+.lp-top { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; justify-content: center; padding: max(32px, env(safe-area-inset-top)) 20px 16px; }
+.lp-wrap { width: 100%; max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; align-items: center; }
+@media (min-width: 900px) { .lp-wrap { grid-template-columns: minmax(0, 1.1fr) minmax(340px, 410px); gap: 56px; } }
+.lp-hero { min-width: 0; }
+.lp-greet { display: flex; align-items: center; gap: 10px; margin: 22px 0 10px; }
+.lp-pomeo { width: 56px; height: 56px; flex: none; display: grid; place-items: center; border-radius: 18px; background: var(--accent-soft); }
+.lp-pomeo .mascot { position: static; width: 48px; height: 48px; }
+.lp-wave { font-size: 22px; display: inline-block; transform-origin: 70% 80%; }
+.lp-hi { font-size: 14px; color: var(--muted); }
+.lp-h1 { font-size: clamp(34px, 6.2vw, 56px); line-height: 1.06; letter-spacing: -.025em; font-weight: 700; margin: 4px 0 12px; max-width: 14ch; }
+.lp-sub { font-size: clamp(16px, 2.2vw, 19px); line-height: 1.5; color: var(--muted); margin: 0 0 18px; max-width: 36ch; }
+.lp-badges { list-style: none; padding: 0; margin: 0 0 24px; display: flex; flex-wrap: wrap; gap: 8px; }
+.lp-badges li { display: inline-flex; align-items: center; gap: 6px; padding: 6px 13px 6px 9px; border-radius: 999px; background: var(--accent-soft); font-size: 13.5px; font-weight: 600; }
+.lp-badges svg { width: 16px; height: 16px; fill: none; stroke: var(--accent); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.lp-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-bottom: 24px; }
+.lp-preview { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; padding: 11px 20px; }
+.lp-preview svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.lp-cta-note { font-size: 13px; color: var(--muted); }
+.lp-look { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; }
+.lp-swatches { display: flex; gap: 8px; }
+.lp-swatches button { width: 30px; height: 30px; min-height: 0; border-radius: 50%; border: 3px solid var(--surface); box-shadow: 0 0 0 1px var(--line); cursor: pointer; padding: 0; position: relative; }
+.lp-swatches button::after { content: ""; position: absolute; left: 50%; top: 50%; width: 44px; height: 44px; transform: translate(-50%, -50%); }
+.lp-swatches button.on { box-shadow: 0 0 0 2px var(--text); }
+.lp-gl button { font-size: 13px; padding: 6px 12px; }
+.lp-more-link { align-self: center; margin-top: 28px; color: var(--muted); font-size: 14px; text-decoration: none; padding: 12px 14px; border-radius: 999px; }
+.lp-more-link:hover { color: var(--text); }
+
+/* Sign-up / log-in card */
+.auth-card { width: 100%; max-width: 420px; justify-self: center; padding: 22px 22px 20px; }
+.auth-tabs { display: flex; width: 100%; margin-bottom: 4px; }
+.auth-tabs button { flex: 1; font-weight: 600; }
+.auth-card .lead { color: var(--muted); font-size: 14px; margin: 12px 0 4px; }
+.hint.ok { color: var(--accent); }
+.hint.bad { color: var(--danger); }
+.pw-meter { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; margin-top: 8px; }
+.pw-meter i { height: 4px; border-radius: 4px; background: var(--line); transition: background-color .25s; }
+.pw-meter[data-s="1"] i:nth-child(1) { background: var(--danger); }
+.pw-meter[data-s="2"] i:nth-child(-n+2) { background: var(--warn, #d08a2c); }
+.pw-meter[data-s="3"] i:nth-child(-n+3) { background: var(--accent); }
+.pw-meter[data-s="4"] i { background: var(--accent); }
+.pw-warn { display: flex; gap: 8px; align-items: flex-start; font-size: 12.5px; line-height: 1.45; background: color-mix(in srgb, var(--warn, #d08a2c) 13%, transparent); border-radius: 10px; padding: 9px 11px; margin: 14px 0 0; }
+.pw-warn svg { width: 16px; height: 16px; flex: none; margin-top: 1px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.stay { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; font-size: 14px; cursor: pointer; min-height: 44px; }
+.stay input { order: 2; }
+.auth-error { margin: 8px 0 10px; }
+.btn .spin { display: inline-block; width: 15px; height: 15px; margin: -2px 8px -2px 0; vertical-align: middle; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; }
+:root:not([data-motion="off"]) .btn .spin { animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.auth-or { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 12px; margin: 16px 0 12px; }
+.auth-or::before, .auth-or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.auth-foot { text-align: center; margin-top: 0; }
+.auth-foot .btn { width: 100%; }
+.auth-foot .hint { margin-top: 8px; line-height: 1.45; }
+
+/* Below the fold */
+.lp-below { max-width: 1080px; margin: 0 auto; padding: 8px 20px 24px; }
+.lp-sec { margin: 64px 0; scroll-margin-top: 24px; }
+.lp-h2 { font-size: clamp(23px, 3.4vw, 32px); font-weight: 700; letter-spacing: -.015em; text-transform: none; color: var(--text); text-align: center; margin: 0 auto 10px; max-width: 24ch; line-height: 1.2; }
+.lp-p { text-align: center; color: var(--muted); margin: 0 auto 22px; max-width: 56ch; line-height: 1.55; }
+.lp-feats { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); margin-top: 26px; }
+.lp-feat { display: grid; gap: 10px; align-content: start; }
+.lp-feat h3 { margin: 6px 0 0; font-size: 16.5px; }
+.lp-feat p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
+.lp-fx { height: 104px; border-radius: 14px; background: var(--bg); border: 1px solid var(--line); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; gap: 4px; }
+.lp-cmp { max-width: 720px; margin: 0 auto; padding: 6px 18px; }
+.lp-cmp-row { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr); gap: 10px; align-items: center; padding: 12px 0; border-top: 1px solid var(--line); font-size: 14.5px; }
+.lp-cmp-row:first-child, .lp-cmp-head + div .lp-cmp-row:first-child { border-top: 0; }
+.lp-cmp-head { font-size: 11.5px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+.lp-cmp-row > span:not(:first-child) { text-align: center; }
+.lp-cmp .yes { color: var(--accent); font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
+.lp-cmp .yes svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.lp-cmp .meh { color: var(--muted); font-size: 13.5px; }
+.lp-faq { max-width: 720px; margin: 22px auto 0; display: grid; gap: 8px; }
+.lp-faq details { border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+.lp-faq summary { cursor: pointer; padding: 12px 48px 12px 16px; font-weight: 600; list-style: none; position: relative; min-height: 48px; display: flex; align-items: center; }
+.lp-faq summary::-webkit-details-marker { display: none; }
+.lp-faq summary::after { content: "+"; position: absolute; right: 18px; top: 50%; transform: translateY(-50%); font-size: 22px; font-weight: 400; color: var(--muted); transition: transform .25s var(--ease); }
+.lp-faq details[open] summary::after { transform: translateY(-50%) rotate(45deg); }
+.lp-faq details p { margin: 0; padding: 0 16px 16px; color: var(--muted); line-height: 1.6; }
+.lp-final { text-align: center; }
+.lp-final-btns { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.lp-foot { padding: 8px 0 28px; line-height: 2.2; }
+:root[data-glass] .lp-faq details { background-color: color-mix(in srgb, var(--surface) var(--glass-fill), transparent); border-color: var(--glass-edge); }
+:root[data-glass] .lp-fx { background-color: color-mix(in srgb, var(--bg) 60%, transparent); }
+
+/* Feature card mini-animations */
+.fx-ring { width: 76px; height: 76px; position: relative; }
+.fx-ring svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.fx-ring .arc { transform-origin: 50% 50%; }
+.fx-ring b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.fx-list { display: grid; gap: 6px; margin-left: 16px; font-size: 12px; }
+.fx-list span { display: flex; align-items: center; gap: 6px; }
+.fx-list i { width: 13px; height: 13px; border-radius: 4px; border: 1.6px solid var(--muted); display: grid; place-items: center; position: relative; }
+.fx-list i::after { content: ""; position: absolute; inset: -1.6px; border-radius: 4px; background: var(--accent); opacity: 0; }
+.fx-bars { display: flex; align-items: flex-end; gap: 7px; height: 70px; }
+.fx-bars i { width: 16px; border-radius: 5px 5px 2px 2px; background: var(--accent); transform-origin: 50% 100%; opacity: .85; }
+.fx-garden { display: flex; align-items: flex-end; gap: 4px; height: 70px; }
+.fx-garden svg { width: 38px; height: 56px; transform-origin: 50% 100%; }
+.fx-boss { display: grid; justify-items: center; gap: 8px; }
+.fx-boss .bsv { width: 56px; height: 56px; }
+.fx-boss .bsv svg { width: 100%; height: 100%; }
+.fx-hp { width: 120px; height: 8px; border-radius: 6px; background: var(--line); overflow: hidden; }
+.fx-hp i { display: block; height: 100%; background: var(--danger); transform-origin: 0 50%; transform: scaleX(.62); }
+.fx-pomeo { display: flex; align-items: center; gap: 8px; }
+.fx-pomeo .mascot { position: static; width: 52px; height: 52px; }
+.fx-bub { background: var(--surface); border: 1px solid var(--line); border-radius: 12px 12px 12px 4px; padding: 7px 10px; font-size: 12px; box-shadow: 0 6px 14px -10px rgba(0, 0, 0, .3); }
+.fx-min { position: relative; width: 150px; height: 74px; }
+.fx-min > div { position: absolute; inset: 0; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); display: grid; place-items: center; font-weight: 600; font-variant-numeric: tabular-nums; }
+.fx-min .busy { gap: 2px; font-size: 10px; align-content: center; }
+.fx-min .busy b { font-size: 18px; }
+.fx-min .busy span { color: var(--accent); }
+.fx-min .calm { font-size: 22px; font-weight: 300; opacity: 0; }
+
+:root[data-motion="full"] .lp-pomeo .mascot { animation: lpBob 3.6s ease-in-out infinite; }
+:root[data-motion="full"] .lp-wave { animation: lpWave 1.9s ease-in-out .6s 2 both; }
+@keyframes lpBob { 50% { transform: translateY(-3px) rotate(-3deg); } }
+@keyframes lpWave { 0%, 100% { transform: rotate(0); } 15% { transform: rotate(18deg); } 30% { transform: rotate(-10deg); } 45% { transform: rotate(16deg); } 60% { transform: rotate(-6deg); } 75% { transform: rotate(10deg); } }
+:root:not([data-motion="off"]) .lp-hero > *, :root:not([data-motion="off"]) .auth-card { animation: lpIn .6s var(--ease) both; }
+:root:not([data-motion="off"]) .lp-hero > :nth-child(2) { animation-delay: .05s; }
+:root:not([data-motion="off"]) .lp-hero > :nth-child(3) { animation-delay: .1s; }
+:root:not([data-motion="off"]) .lp-hero > :nth-child(4) { animation-delay: .15s; }
+:root:not([data-motion="off"]) .lp-hero > :nth-child(n+5) { animation-delay: .2s; }
+:root:not([data-motion="off"]) .auth-card { animation-delay: .12s; }
+:root[data-motion="reduced"] .lp-hero > *, :root[data-motion="reduced"] .auth-card { animation-name: fadeIn; }
+@keyframes lpIn { from { opacity: 0; transform: translateY(14px); } }
+:root[data-motion="full"] .fx-ring .arc { animation: spin 4s linear infinite; }
+:root[data-motion="full"] .fx-list span:nth-child(1) i::after { animation: fxTick 4.5s infinite; }
+:root[data-motion="full"] .fx-list span:nth-child(2) i::after { animation: fxTick 4.5s .9s infinite; }
+:root[data-motion="full"] .fx-list span:nth-child(3) i::after { animation: fxTick 4.5s 1.8s infinite; }
+@keyframes fxTick { 0%, 12% { opacity: 0; } 20%, 85% { opacity: 1; } 100% { opacity: 0; } }
+:root[data-motion="full"] .fx-bars i { animation: fxGrow 3.6s var(--ease) infinite; }
+@keyframes fxGrow { 0% { transform: scaleY(.15); } 30%, 80% { transform: scaleY(1); } 100% { transform: scaleY(.15); } }
+:root[data-motion="full"] .fx-garden svg { animation: fxSprout 4.8s var(--spring, ease) infinite; }
+@keyframes fxSprout { 0%, 6% { transform: scale(0); opacity: 0; } 22%, 86% { transform: scale(1); opacity: 1; } 100% { transform: scale(1); opacity: 0; } }
+:root[data-motion="full"] .fx-boss .bsv { animation: fxHit 2.4s ease-in-out infinite; }
+:root[data-motion="full"] .fx-hp i { animation: fxHp 7.2s ease-in-out infinite; }
+@keyframes fxHit { 0%, 70%, 100% { transform: none; } 76% { transform: translateX(-4px) rotate(-4deg); } 82% { transform: translateX(4px) rotate(3deg); } 88% { transform: translateX(-2px); } }
+@keyframes fxHp { 0% { transform: scaleX(.9); } 33% { transform: scaleX(.74); } 66% { transform: scaleX(.55); } 92% { transform: scaleX(.4); } 100% { transform: scaleX(.9); } }
+:root[data-motion="full"] .fx-pomeo .mascot { animation: lpBob 3s ease-in-out infinite; }
+:root[data-motion="full"] .fx-bub { animation: fxBub 4.4s ease-in-out infinite; transform-origin: 0 100%; }
+@keyframes fxBub { 0%, 8% { opacity: 0; transform: scale(.8); } 18%, 78% { opacity: 1; transform: scale(1); } 90%, 100% { opacity: 0; transform: scale(.9); } }
+:root[data-motion="full"] .fx-min .busy { animation: fxFade 6s ease-in-out infinite; }
+:root[data-motion="full"] .fx-min .calm { animation: fxFade 6s ease-in-out -3s infinite; }
+:root:not([data-motion="full"]) .fx-min .busy { opacity: 0; }
+:root:not([data-motion="full"]) .fx-min .calm { opacity: 1; }
+@keyframes fxFade { 0%, 40% { opacity: 1; } 50%, 90% { opacity: 0; } 100% { opacity: 1; } }
+
+/* ==========================================================================
+   PREVIEW MODE — the demo account banner and the "create an account" prompt
+   ========================================================================== */
+.pv-banner { position: sticky; top: 0; z-index: 41; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px 12px;
+  padding: 8px 16px; padding-top: max(8px, env(safe-area-inset-top)); background: var(--accent); color: var(--on-accent, #fff); font-size: 13.5px; text-align: center; }
+.pv-banner b { font-weight: 600; }
+.pv-banner .btn { padding: 5px 14px; font-size: 13px; min-width: 0; border-color: transparent; }
+.pv-banner .pv-go { background: var(--on-accent, #fff); color: var(--accent); font-weight: 600; }
+.pv-banner .pv-exit { background: transparent; color: inherit; border-color: color-mix(in srgb, currentColor 45%, transparent); }
+body.previewing .top { top: var(--pv-h, 0px); }
+@media (max-width: 640px) { .pv-banner { font-size: 12.5px; gap: 4px 8px; padding: 6px 10px; padding-top: max(6px, env(safe-area-inset-top)); } .pv-banner .pv-long { display: none; } .pv-banner .btn { padding: 0 10px; font-size: 12.5px; } }
+body.previewing .set-search { top: calc(var(--pv-h, 0px) + 72px); }
+dialog.pv-dlg { width: min(380px, calc(100vw - 32px)); text-align: center; }
+.pv-dlg .tut-pomeo { margin: 0 auto 10px; }
+.pv-dlg h3 { margin: 0 0 6px; font-size: 18px; }
+.pv-dlg p { margin: 0 0 16px; color: var(--muted); font-size: 14.5px; line-height: 1.5; }
+.pv-dlg .btn-row { justify-content: center; }
+
 .tabs .ls { display: none; }
 @media (max-width: 400px) { .tabs .lf { display: none; } .tabs .ls { display: inline; } .tabs button { font-size: 10px; } }
 </style>
@@ -1687,46 +1905,117 @@ dialog.tut { width: min(460px, calc(100vw - 24px)); padding: 22px 22px 16px; }
 <div class="boot" id="bootView"><div class="boot-in"><span class="boot-dot"></span><span>Loading…</span></div></div>
 
 <!-- ================================ LOGIN / SIGN UP ================================ -->
-<section class="auth hidden" id="authView">
-  <div class="card auth-card">
-    <div class="auth-brand"><i></i>Pomodorolist</div>
-    <p class="lead">Log in to keep your focus sessions, streaks and stats in sync on every device.</p>
-    <div class="seg" id="authSeg" role="tablist">
-      <button type="button" data-mode="login" class="active">Log in</button>
-      <button type="button" data-mode="signup">Sign up</button>
-    </div>
-    <form class="auth-form" id="authForm" novalidate>
-      <label class="field" for="authUser" style="margin-top:0">Username</label>
-      <input type="text" id="authUser" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="20" required>
-      <div class="hint">3–20 characters: letters, numbers or _ (not case-sensitive)</div>
-
-      <label class="field" for="authPass">Password</label>
-      <div class="pw">
-        <input type="password" id="authPass" autocomplete="current-password" minlength="6" required>
-        <button type="button" data-toggle="authPass">Show</button>
-      </div>
-
-      <div id="confirmWrap" class="hidden">
-        <label class="field" for="authPass2">Confirm password</label>
-        <div class="pw">
-          <input type="password" id="authPass2" autocomplete="new-password" minlength="6">
-          <button type="button" data-toggle="authPass2">Show</button>
+<section class="auth lp hidden" id="authView">
+  <div class="lp-top">
+    <div class="lp-wrap">
+      <div class="lp-hero">
+        <div class="auth-brand"><i></i>Pomodorolist</div>
+        <div class="lp-greet" aria-hidden="true"><span class="lp-pomeo" id="lpPomeo"></span><span class="lp-wave">👋</span><span class="lp-hi">Hi, I’m Pomeo!</span></div>
+        <h1 class="lp-h1">Focus that feels like progress.</h1>
+        <p class="lp-sub">Create a free account: no ads, no tracking, no subscription.</p>
+        <ul class="lp-badges" aria-label="What you get">
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17 19 7.5"/></svg>Free forever</li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17 19 7.5"/></svg>No ads</li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17 19 7.5"/></svg>No tracking</li>
+        </ul>
+        <div class="lp-cta">
+          <button type="button" class="btn lp-preview" id="previewBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5 12 5s9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z"/><circle cx="12" cy="12" r="3"/></svg>Preview the app</button>
+          <span class="lp-cta-note">Look around a demo account first. Nothing is saved.</span>
+        </div>
+        <div class="lp-look" aria-label="Try a look">
+          <span class="lbl">Try a look</span>
+          <div class="lp-swatches" id="lpSwatches" role="radiogroup" aria-label="Theme"></div>
+          <div class="seg lp-gl" id="lpGlass" role="radiogroup" aria-label="Glossed Interface">
+            <button type="button" data-lpgl="off">Plain</button><button type="button" data-lpgl="lite">Glossed</button><button type="button" data-lpgl="full">Extra glossy</button>
+          </div>
         </div>
       </div>
 
-      <div class="auth-error" id="authError" role="alert" aria-live="polite"></div>
-      <button type="submit" class="btn primary" id="authSubmit">Log in</button>
-    </form>
-    <div class="auth-foot"><button class="linkbtn" id="guestBtn" type="button">Use on this device only (no sync)</button></div>
-    <div class="auth-warn hidden" id="configWarn">
-      <b>Firebase isn’t set up yet.</b> Paste your <code>firebaseConfig</code> into the
-      “FIREBASE CONFIG” section near the top of the script in <code>index.html</code>.
+      <div class="card auth-card" id="authCard">
+        <div class="seg auth-tabs" id="authSeg" role="tablist" aria-label="Sign up or log in">
+          <button type="button" role="tab" data-mode="signup">Sign up</button>
+          <button type="button" role="tab" data-mode="login">Log in</button>
+        </div>
+        <p class="lead" id="authLead">Keep your sessions, streaks and stats in sync on every device.</p>
+        <form class="auth-form" id="authForm" novalidate>
+          <label class="field" for="authUser">Username</label>
+          <input type="text" id="authUser" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="20" required aria-describedby="userHint">
+          <div class="hint" id="userHint" aria-live="polite">3–20 characters: letters, numbers or _ (not case-sensitive)</div>
+
+          <label class="field" for="authPass">Password</label>
+          <div class="pw">
+            <input type="password" id="authPass" autocomplete="current-password" minlength="6" required aria-describedby="pwHint">
+            <button type="button" data-toggle="authPass" aria-label="Show password">Show</button>
+          </div>
+          <div class="pw-meter hidden" id="pwMeter" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+          <div class="hint" id="pwHint" aria-live="polite"></div>
+
+          <div id="confirmWrap" class="hidden">
+            <label class="field" for="authPass2">Confirm password</label>
+            <div class="pw">
+              <input type="password" id="authPass2" autocomplete="new-password" minlength="6" aria-describedby="pw2Hint">
+              <button type="button" data-toggle="authPass2" aria-label="Show password">Show</button>
+            </div>
+            <div class="hint" id="pw2Hint" aria-live="polite"></div>
+            <p class="pw-warn" id="pwWarn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20Z"/><path d="M12 10v4M12 17h.01"/></svg>There’s no password reset yet, so pick one you’ll remember.</p>
+          </div>
+
+          <label class="stay"><input type="checkbox" id="authStay" checked> Stay logged in on this device</label>
+          <div class="auth-error" id="authError" role="alert" aria-live="polite"></div>
+          <button type="submit" class="btn primary" id="authSubmit">Log in</button>
+        </form>
+        <div class="auth-or"><span>or</span></div>
+        <div class="auth-foot">
+          <button class="btn" id="guestBtn" type="button">Continue without an account</button>
+          <p class="hint">Saved only on this device: no sync, friends or leaderboards. You can create an account later and bring your sessions along.</p>
+        </div>
+        <div class="auth-warn hidden" id="configWarn">
+          <b>Firebase isn’t set up yet.</b> Paste your <code>firebaseConfig</code> into the
+          “FIREBASE CONFIG” section near the top of the script in <code>index.html</code>.
+        </div>
+      </div>
     </div>
+    <a class="lp-more-link" href="#lpFeatures">See what’s inside <span aria-hidden="true">↓</span></a>
+  </div>
+
+  <div class="lp-below">
+    <section class="lp-sec" id="lpFeatures" aria-labelledby="lpFeatTitle">
+      <h2 class="lp-h2" id="lpFeatTitle">Everything you need to study and work in focused blocks</h2>
+      <div class="lp-feats" id="lpFeats"></div>
+    </section>
+
+    <section class="lp-sec" aria-labelledby="lpCmpTitle">
+      <h2 class="lp-h2" id="lpCmpTitle">Free, not “free trial”</h2>
+      <p class="lp-p">What’s included at no cost, compared with what many paid focus apps keep behind a subscription.</p>
+      <div class="card lp-cmp" role="table" aria-label="What's included">
+        <div class="lp-cmp-row lp-cmp-head" role="row"><span role="columnheader"></span><span role="columnheader">Pomodorolist</span><span role="columnheader">Typical paid apps</span></div>
+        <div id="lpCmpRows"></div>
+      </div>
+    </section>
+
+    <section class="lp-sec" aria-labelledby="lpFaqTitle">
+      <h2 class="lp-h2" id="lpFaqTitle">Questions</h2>
+      <div class="lp-faq" id="lpFaq">
+        <details><summary>Is it really free?</summary><p>Yes. There are no ads, no subscription and no paid extras. Coins in the shop are earned by focusing, never bought.</p></details>
+        <details><summary>Do I need to install anything?</summary><p>No. Pomodorolist runs in your browser on phones, tablets and computers. You can add it to your home screen from your browser’s menu if you like.</p></details>
+        <details id="lpPrivacy"><summary>What data is stored?</summary><p>Your username (no email address), and in your own account: your sessions, settings, notes, reminders and progress. Passwords are handled by Firebase Authentication and are never visible to anyone. Friends only see what you allow in Settings. There are no ads and no tracking or analytics.</p></details>
+        <details><summary>Can I use it without an account?</summary><p>Yes. Choose “Continue without an account” and everything is saved on this device only. You won’t get sync, friends or leaderboards, and you can create an account later and move your sessions into it.</p></details>
+        <details><summary>What if I forget my password?</summary><p>There’s no password reset yet, because accounts don’t use an email address. Use a password manager or pick a password you’ll remember. If you get stuck, email <a class="mail" href="mailto:siverieg.p@gmail.com">siverieg.p@gmail.com</a>.</p></details>
+      </div>
+    </section>
+
+    <section class="lp-sec lp-final">
+      <h2 class="lp-h2">Ready to focus?</h2>
+      <div class="lp-final-btns"><button type="button" class="btn primary" data-lp-signup>Create a free account</button><button type="button" class="btn" data-lp-preview>Preview the app</button></div>
+    </section>
+
+    <footer class="app-foot lp-foot">© 2026 Pomodorolist<span class="sep">·</span>Made by <a href="https://github.com/siverieg" target="_blank" rel="noopener">siverieg</a><span class="sep">·</span>Contact: <a href="mailto:siverieg.p@gmail.com">siverieg.p@gmail.com</a><span class="sep">·</span><a href="https://github.com/siverieg/Pomodorolist-V1.0/issues" target="_blank" rel="noopener">Report a bug</a><span class="sep">·</span><a href="#lpPrivacy" data-lp-privacy>Privacy</a></footer>
   </div>
 </section>
 
 <!-- ================================ APP ================================ -->
 <div id="appView" class="hidden">
+<div class="pv-banner hidden" id="pvBanner" role="region" aria-label="Preview mode"><span><b>You’re previewing a demo account.</b><span class="pv-long"> Create your own: all free, no ads, no tracking.</span></span><span class="btn-row" style="gap:8px;flex-wrap:nowrap"><button type="button" class="btn pv-go">Create account</button><button type="button" class="btn pv-exit">Exit preview</button></span></div>
 <header class="top">
   <div class="row" style="gap:4px">
     <div class="brand"><i></i><span>Pomodorolist</span></div>
@@ -2351,11 +2640,17 @@ dialog.tut { width: min(460px, calc(100vw - 24px)); padding: 22px 22px 16px; }
 <canvas id="starCanvas" class="hidden" aria-hidden="true"></canvas>
 <canvas id="fxCanvas" class="hidden" aria-hidden="true"></canvas>
 <div class="toasts" id="toast" role="status" aria-live="polite"></div>
-<dialog class="tut" id="tutDlg" aria-labelledby="tutTitle">
+<dialog class="pv-dlg" id="pvDlg" aria-labelledby="pvTitle">
+  <div class="tut-pomeo" id="pvPomeo" aria-hidden="true"></div>
+  <h3 id="pvTitle">Make it yours</h3>
+  <p id="pvWhy"></p>
+  <div class="btn-row"><button type="button" class="btn primary" data-pv-go>Create free account</button><button type="button" class="btn" data-pv-stay>Keep exploring</button></div>
+</dialog>
+<dialog class="tut" id="tutDlg" aria-labelledby="tutTitle" autofocus>
   <div class="tut-top"><div class="tut-pomeo" id="tutPomeo" aria-hidden="true"></div>
     <div class="tut-bubble"><div class="tut-step" id="tutStep"></div><h3 id="tutTitle"></h3></div></div>
   <div class="tut-body" id="tutBody"></div>
-  <div class="tut-foot"><button class="linkbtn" id="tutSkip">Skip tutorial</button><span class="tut-dots" id="tutDots" aria-hidden="true"></span><button class="btn primary" id="tutNext" autofocus>Next</button></div>
+  <div class="tut-foot"><button class="linkbtn" id="tutSkip">Skip tutorial</button><span class="tut-dots" id="tutDots" aria-hidden="true"></span><button class="btn primary" id="tutNext">Next</button></div>
 </dialog>
 <div class="tip-pop hidden" id="tipPop" role="status"><span class="pomeo-pic" aria-hidden="true"></span><div><p></p><button class="btn small" id="tipOk">Got it</button></div></div>
 <div class="tour hidden" id="tour" role="dialog" aria-modal="true" aria-label="A quick look around">
@@ -2872,6 +3167,12 @@ function defaultState() {
 }
 
 /** Merge stored data over defaults so new fields added later get sane values. */
+/** Keep only well-formed revision plans, filling in fields older versions didn't have. */
+const DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
+function cleanRevisions(list) {
+  return (Array.isArray(list) ? list : []).filter(r => r && typeof r.topic === 'string' && DAY_RE.test(r.next || ''))
+    .map(r => ({ log: [], done: {}, snooze: {}, time: '18:00', step: 0, presetId: '', ...r }));
+}
 function hydrate(obj) {
   const def = defaultState();
   obj = obj && typeof obj === 'object' ? obj : {};
@@ -2880,6 +3181,8 @@ function hydrate(obj) {
   if (!Array.isArray(out.presets) || !out.presets.length) out.presets = def.presets;
   for (const k of ['sessions', 'recent', 'pinned', 'pendingSessions', 'reminders', 'revisions', 'exams', 'parked', 'abandoned', 'squad', 'subTemplates']) if (!Array.isArray(out[k])) out[k] = [];
   if (!Array.isArray(out.timer.subtasks)) out.timer.subtasks = [];
+  out.revisions = cleanRevisions(out.revisions);
+  out.reminders = out.reminders.filter(r => r && r.id && typeof r.date === 'string' && typeof r.time === 'string');
   if (!out.notes || typeof out.notes !== 'object' || Array.isArray(out.notes)) out.notes = {};
   if (!out.energy || typeof out.energy !== 'object' || Array.isArray(out.energy)) out.energy = {};
   if (!out.names || typeof out.names !== 'object' || Array.isArray(out.names)) out.names = {};
@@ -3075,6 +3378,7 @@ function applyProfile(d) {
   if (d.energy && typeof d.energy === 'object' && !Array.isArray(d.energy)) S.energy = { ...d.energy };
   S.onboarded = !!(d.onboarded || S.onboarded);
   for (const k of ['revisions', 'exams', 'parked', 'abandoned', 'squad', 'subTemplates']) if (Array.isArray(d[k])) S[k] = d[k].filter(x => x && typeof x === 'object');
+  S.revisions = cleanRevisions(S.revisions);
   S.timer.round = Math.min(S.timer.round, activePreset().rounds);
   lastProfileJSON = JSON.stringify(profileFromState());
   saveLocal();
@@ -3116,6 +3420,7 @@ function attachListeners() {
     sessionsLoaded = true;
     saveLocal();
     renderToday();
+    renderExamCard();   // "focused since you added it" needs the session history
     if (S.ui.tab === 'stats') renderStats();
     scheduleProfilePush();  // keeps the stored streak summary current
     if (firstLoadDone) reconcileRewards('quiet');
@@ -3145,6 +3450,7 @@ function showView(id) {
 function startSession(user, cloud) {
   if (USER && !USER.guest && user.uid && USER.uid === user.uid) return;
   USER = user;
+  if (!user.preview) applyGlass();   // the welcome page's look preview is not kept
   if (!user.guest) writeLS(LAST_USER, user);
   const stored = readJSON(user.guest ? LEGACY_KEY : cacheKey(user.uid), null);
   firstUseHere = !stored;   // nothing saved on this device yet for this user
@@ -3180,17 +3486,21 @@ function startSession(user, cloud) {
 let authMode = 'login';
 function showAuth() {
   showView('authView');
+  initLanding();
+  if (!lpModeSet) { lpModeSet = true; const fromLink = /^#(signup|login)$/.test(location.hash); authMode = defaultAuthMode(); if (fromLink && authMode === 'signup') setTimeout(lpGoSignup, 400); }
   setAuthMode(authMode);
   $('#configWarn').classList.toggle('hidden', firebaseConfigured());
   if (fbLoadError) authErr(fbLoadError);
 }
 function setAuthMode(mode) {
   authMode = mode;
-  $$('#authSeg button').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  $$('#authSeg button').forEach(b => { const on = b.dataset.mode === mode; b.classList.toggle('active', on); b.setAttribute('aria-selected', on); });
   $('#confirmWrap').classList.toggle('hidden', mode !== 'signup');
-  $('#authSubmit').textContent = mode === 'signup' ? 'Create account' : 'Log in';
+  $('#authLead').textContent = mode === 'signup' ? 'Free, no ads, no tracking. Your sessions sync on every device.' : 'Welcome back! Log in to pick up where you left off.';
+  setAuthBusy(false);
   $('#authPass').autocomplete = mode === 'signup' ? 'new-password' : 'current-password';
   authErr('');
+  checkUser(); checkPass(); checkPass2();
 }
 function authErr(msg) { $('#authError').textContent = msg; if (msg) shake($('#authForm')); }
 
@@ -3221,20 +3531,23 @@ async function onAuthSubmit(e) {
   e.preventDefault();
   const username = $('#authUser').value.trim().toLowerCase();
   const pass = $('#authPass').value;
-  if (!/^[a-z0-9_]{3,20}$/.test(username)) return authErr('Username must be 3–20 characters: letters, numbers or underscores.');
-  if (pass.length < 6) return authErr('Password must be at least 6 characters.');
-  if (authMode === 'signup' && pass !== $('#authPass2').value) return authErr('Passwords don’t match.');
+  if (!username) { $('#authUser').focus(); return authErr('Please choose a username.'); }
+  if (/[^a-z0-9_]/.test(username)) return authErr('Usernames can only use letters, numbers and _ (no spaces).');
+  if (username.length < 3) return authErr('Usernames need at least 3 characters.');
+  if (!pass) { $('#authPass').focus(); return authErr('Please enter your password.'); }
+  if (pass.length < 6) return authErr('Passwords need at least 6 characters.');
+  if (authMode === 'signup' && pass !== $('#authPass2').value) { $('#authPass2').focus(); return authErr('The two passwords don’t match yet.'); }
   if (authMode === 'signup' && isOffensiveName(username)) return authErr('That username isn’t allowed. Please choose another.');
   if (!firebaseConfigured()) return authErr('Firebase isn’t set up yet — see the note below.');
   if (!navigator.onLine) return authErr('No internet connection. Connect and try again.');
   if (!FB.auth) return authErr(fbLoadError || 'Still loading — try again in a moment.');
 
   const email = `${username}@${USERNAME_DOMAIN}`;
-  const btn = $('#authSubmit');
-  btn.disabled = true;
-  btn.textContent = authMode === 'signup' ? 'Creating account…' : 'Logging in…';
+  setAuthBusy(true);
   authErr('');
   try {
+    // "Stay logged in" off: the session ends when this browser closes.
+    await FB.setPersistence(FB.auth, $('#authStay').checked ? FB.browserLocalPersistence : FB.browserSessionPersistence).catch(() => {});
     if (authMode === 'signup') await FB.createUserWithEmailAndPassword(FB.auth, email, pass);
     else await FB.signInWithEmailAndPassword(FB.auth, email, pass);
     $('#authPass').value = $('#authPass2').value = '';
@@ -3243,13 +3556,13 @@ async function onAuthSubmit(e) {
     console.warn(err);
     authErr(friendlyAuthError(err));
   } finally {
-    btn.disabled = false;
-    btn.textContent = authMode === 'signup' ? 'Create account' : 'Log in';
+    setAuthBusy(false);
   }
 }
 
 async function logout() {
   if (!USER) return;
+  if (isPreview()) { exitPreview(false); return; }
   if (USER.guest) {
     localStorage.removeItem(GUEST_FLAG);
     location.reload();
@@ -3295,6 +3608,7 @@ function legacyData() {
 }
 
 function maybeOfferMigration() {
+  if (isPreview()) return;
   const legacy = legacyData();
   const handled = readJSON(HANDLED_KEY, []);
   if (!legacy || handled.includes(USER.uid)) return;
@@ -3310,7 +3624,7 @@ function maybeOfferMigration() {
   };
   $('#migrateYes').onclick = () => done(true);
   $('#migrateNo').onclick = () => done(false);
-  dlg.addEventListener('cancel', () => done(false), { once: true });
+  dlg.oncancel = () => done(false);   // one handler, replaced each time (no stale listeners)
   dlg.showModal();
 }
 
@@ -3671,7 +3985,8 @@ function renderClock() {
   updateFavicon(clamp(progress, 0, 1));
   const t = S.timer;
   const label = t.phase === 'focus' ? 'Focus' : t.phase === 'short' ? 'Break' : 'Long break';
-  document.title = t.status === 'idle' ? 'Pomodorolist' : `${fmtClock(rem)} · ${label}${t.status === 'paused' ? ' (paused)' : ''}`;
+  const title = t.status === 'idle' ? 'Pomodorolist' : `${fmtClock(rem)} · ${label}${t.status === 'paused' ? ' (paused)' : ''}`;
+  if (document.title !== title) document.title = title;
 }
 
 function renderTimer() {
@@ -4069,6 +4384,7 @@ function renderSettings() {
     : perm === 'unsupported' ? 'Not supported in this browser'
     : 'You will be asked when you first start a timer';
   renderAccount();
+  previewLockSettings();
 }
 
 /* ==========================================================================
@@ -4479,7 +4795,7 @@ function reconcileRewards(mode = 'quiet') {
 }
 
 function announce(news, mode) {
-  if (!news.length || !S.settings.gamification) return;
+  if (!news.length || !S.settings.gamification || isPreview()) return;
   if (mode === 'initial') {
     const key = 'pomodorolist-intro:' + (USER.guest ? 'guest' : USER.uid);
     if (!localStorage.getItem(key) && S.sessions.length) {
@@ -4774,6 +5090,7 @@ const systemDark = () => matchMedia('(prefers-color-scheme: dark)').matches;
 
 /** Light/dark/system setting + the equipped theme. Shop themes set CSS variables inline. */
 let themeReady = false, themeFadeTimer;
+let landingSkin = '';
 function applyTheme(themeArg) {
   const root = document.documentElement;
   // Colours crossfade instead of snapping (skipped on the very first paint).
@@ -4784,7 +5101,7 @@ function applyTheme(themeArg) {
   }
   themeReady = true;
   const theme = themeArg || (USER ? S.settings.theme : 'auto');
-  const skinId = USER ? equippedId('theme') : 'th_default';
+  const skinId = USER ? equippedId('theme') : (landingSkin || 'th_default');   // the welcome page can preview a theme
   const skin = SKINS[skinId];
   for (const v of SKIN_VARS) root.style.removeProperty('--' + v);
   if (skin) {
@@ -5395,7 +5712,7 @@ function onFriendshipsChanged() {
   if (gained) {
     G = null;
     save();
-    if (S.settings.gamification && game().earned > before) toast(`New friend · +${game().earned - before} coins`, 2600, false, { type: 'friendNew', go: { tab: 'friends' } });
+    if (S.settings.gamification && !isPreview() && game().earned > before) toast(`New friend · +${game().earned - before} coins`, 2600, false, { type: 'friendNew', go: { tab: 'friends' } });
   }
   ibRefresh();
   if (S.ui.tab === 'friends') renderFriends();
@@ -5462,6 +5779,7 @@ function captureInvite() {
   history.replaceState(null, '', location.pathname + location.search.replace(/[?&]invite=[^&]*/, '').replace(/^&/, '?') + location.hash);
 }
 function handleInvite() {
+  if (isPreview()) return;
   const name = sessionStorage.getItem('pomodorolist-invite');
   if (!name) return;
   sessionStorage.removeItem('pomodorolist-invite');
@@ -7128,6 +7446,7 @@ function updateLoginDot() {
   if (chipDot) chipDot.classList.toggle('hidden', !show);
 }
 function maybeShowLogin() {
+  if (isPreview()) return;
   if (!loginOn() || loginToday().claimed) return;
   if (localStorage.getItem(LOGIN_LATER_KEY) === dayKey(new Date())) return;
   if (document.querySelector('dialog[open]') || !$('#tour').classList.contains('hidden')) return;
@@ -8241,9 +8560,10 @@ addEventListener('resize', () => $$('.catrow').forEach(updateFades));
    command palette, offline banner, pull to refresh, tab swipes, haptics.
    Everything here is stored on this device (localStorage); no new cloud data.
    ========================================================================== */
-const APP_VERSION = '1.8.1';
+const APP_VERSION = '1.9';
 const VER_KEY = 'pomodorolist-seen-version';
 const CHANGELOG = [
+  { v: '1.9', t: 'A new welcome page & polish', d: 'A welcome page with a read-only demo account to look around before signing up, a clearer sign-up card (live username check, password strength, stay logged in), and a polish pass across the whole app: bigger touch targets, fixed tutorial and tablet layouts, calmer Timer screen and many small fixes.' },
   { v: '1.8.1', t: 'Glossed Interface', d: 'Liquid Glass is now called Glossed Interface, and its Lite level is the default look (your own choice is kept). It switches to a solid style when your device asks for reduced transparency. The tutorial’s new “Pick your style” step sets it alongside True Minimalist.' },
   { v: '1.8', t: 'True Minimalist & Pomeo’s tutorial', d: 'True Minimalist mode for a clean, calm timer; a short tutorial with Pomeo and one-time tips; focus check-ins with insights in Stats; a session-complete summary; quick-start chips for your favourite presets; and a contact email.' },
   { v: '1.7', t: 'Polish update', d: 'Inbox for everything that happens, command palette (Ctrl/⌘ K), tidier searchable Settings, Undo instead of “Are you sure?”, offline banner, pull to refresh and swipes on phones.' },
@@ -8257,7 +8577,7 @@ const CHANGELOG = [
   { v: '1.1', t: 'Accounts & sync', d: 'Log in and keep your sessions in sync on every device, even offline.' },
   { v: '1.0', t: 'Focus timer', d: 'Pomodoro timer with named sessions, presets, streaks and stats.' },
 ];
-const NEWS = ['✨ Liquid Glass is now Glossed Interface — Lite is the new default look (Settings → Appearance)', '🧘 True Minimalist mode — just the timer, plans and stats (Settings → Appearance)', '🍅 A short tutorial with Pomeo — replay it anytime', '⚡ “How focused did you feel?” check-ins unlock insights in Stats', '✓ A session summary card and quick-start chips for your top presets'];
+const NEWS = ['👀 A new welcome page where friends can preview a demo account before signing up', '👆 Easier to tap: every button is at least 44 px on phones and tablets', '🧭 Fixed tutorial and tablet layouts, and a calmer Timer screen', '✨ Liquid Glass is now Glossed Interface — Lite is the default look'];
 
 /* ---------- Haptics ---------- */
 const HAPTIC_KEY = 'pomodorolist-haptics';
@@ -8417,13 +8737,14 @@ function renderAbout() {
   $('#aboutPomeo').innerHTML = pomeoSVG({ state: 'happy', ...pomeoOutfit() });
 }
 function newsCheck() {
+  if (isPreview()) { $('#newsSlot').innerHTML = ''; return; }
   const seen = localStorage.getItem(VER_KEY);
   if (!seen && !tourDone()) { writeLS(VER_KEY, APP_VERSION); return; }   // brand-new user: the tutorial is enough
   if (seen === APP_VERSION) { $('#newsSlot').innerHTML = ''; return; }
   $('#newsSlot').innerHTML = `<div class="card news-card" role="region" aria-label="What's new">
     <span class="pomeo-pic" style="width:44px;height:44px;flex:none">${pomeoOn() ? pomeoSVG({ state: 'excited', ...pomeoOutfit() }).replace('class="mascot"', 'class="mascot" style="position:static;width:44px;height:44px"') : '✨'}</span>
-    <div class="nc-main"><h3>What’s new in v${APP_VERSION}</h3><ul>${NEWS.map(n => `<li>${esc(n)}</li>`).join('')}</ul>
-      <div class="btn-row"><button class="btn small primary" data-news-tut>Take the tutorial</button><button class="btn small" data-news-min>${minimal() ? 'True Minimalist is on' : 'Try True Minimalist'}</button><button class="btn small" data-go-about>See all changes</button></div></div>
+    <div class="nc-main"><h3>What’s new in v${APP_VERSION}</h3><ul>${NEWS.slice(0, 4).map(n => `<li>${esc(n)}</li>`).join('')}</ul>
+      <div class="nc-acts"><button class="btn small" data-news-tut>Take the tutorial</button>${minimal() ? '' : '<button class="btn small" data-news-min>Try True Minimalist</button>'}<button class="linkbtn" data-go-about>See all changes</button></div></div>
     <button class="nc-x" id="newsClose" aria-label="Dismiss what's new">✕</button></div>`;
 }
 function newsDone() { writeLS(VER_KEY, APP_VERSION); $('#newsSlot').innerHTML = ''; }
@@ -8958,7 +9279,7 @@ const TIPS = {
 const tipsSeen = () => new Set(readJSON(TIPS_KEY, []));
 let tipT = 0;
 function maybeTip(tab) {
-  if (!USER || !TIPS[tab] || !S.onboarded || $('#tutDlg').open || !$('#tour').classList.contains('hidden')) return;
+  if (!USER || isPreview() || !TIPS[tab] || !S.onboarded || $('#tutDlg').open || !$('#tour').classList.contains('hidden')) return;
   const seen = tipsSeen();
   if (seen.has(tab)) return;
   clearTimeout(tipT);
@@ -9104,6 +9425,320 @@ function renderQuickStart() {
 }
 $('#quickStart').addEventListener('click', e => { const b = e.target.closest('[data-qs]'); if (b) { const p = S.presets.find(x => x.id === b.dataset.qs); if (p) cmdStartPreset(p); } });
 
+/* ==========================================================================
+   WELCOME PAGE — pitch, sign-up/log-in card, features, comparison, FAQ.
+   The look switcher only previews themes; nothing is saved until you sign up.
+   ========================================================================== */
+const LP_THEMES = [['th_default', '#2f8f83', 'Default'], ['th_ocean', '#2a7ab0', 'Ocean'], ['th_sunset', '#cf5f3a', 'Sunset'], ['th_sakura', '#c25480', 'Sakura'], ['th_forest', '#4a7c4e', 'Forest'], ['th_midnight', '#8c9aff', 'Midnight']];
+const LP_CHECK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17 19 7.5"/></svg>';
+let lpReady = false, lpModeSet = false;
+function initLanding() {
+  if (lpReady) return;
+  lpReady = true;
+  $('#lpPomeo').innerHTML = pomeoSVG({ state: 'happy' });
+  $('#lpSwatches').innerHTML = LP_THEMES.map(([id, c, n]) => `<button type="button" role="radio" data-lpth="${id}" aria-label="${n} theme" title="${n}" style="background:${c}"></button>`).join('');
+  const plants = ['sprout', 'leafy', 'ripe', 'golden'].filter(k => PLANT_NAMES[k]);
+  const boss = BOSSES[2] || BOSSES[0];
+  const feats = [
+    ['Focus timer & subtasks', 'Classic 25/5 or your own presets, named sessions and a checklist for each block. Park stray thoughts without losing focus.',
+      `<div class="fx-ring"><svg viewBox="0 0 76 76" aria-hidden="true"><circle cx="38" cy="38" r="31" fill="none" stroke="var(--line)" stroke-width="6"/><circle class="arc" cx="38" cy="38" r="31" fill="none" stroke="var(--accent)" stroke-width="6" stroke-linecap="round" stroke-dasharray="70 200"/></svg><b>24:59</b></div>
+       <div class="fx-list"><span><i></i>Read ch. 7</span><span><i></i>Problems 1–10</span><span><i></i>Summary notes</span></div>`],
+    ['Stats & streaks', 'Daily, weekly, monthly and yearly charts, a heatmap, streaks with freezes and a monthly Wrapped of your focus story.',
+      `<div class="fx-bars">${[38, 62, 45, 80, 54, 92, 70].map((h, i) => `<i style="height:${h}%;animation-delay:${i * .12}s"></i>`).join('')}</div>`],
+    ['Tomato garden', 'Every session you finish grows a plant. Long, deep blocks grow golden tomatoes; stopped sessions wilt.',
+      `<div class="fx-garden">${plants.map((k, i) => `<span style="display:contents">${plantSVG(k).replace('<svg', `<svg style="animation-delay:${i * .5}s"`)}</span>`).join('')}</div>`],
+    ['Boss battles with friends', 'A new boss every week. Every focus minute is a hit — fight solo or team up in a squad with friends.',
+      `<div class="fx-boss"><div class="bsv">${bossSVG(boss.id)}</div><div class="fx-hp"><i></i></div></div>`],
+    ['Pomeo & reminders', 'Pomeo cheers you on and pops up when it’s time for your next study block. Add reminders to your calendar too.',
+      `<div class="fx-pomeo">${pomeoSVG({ state: 'happy' })}<span class="fx-bub">Physics at 6 PM? ⏰</span></div>`],
+    ['True Minimalist mode', 'Prefer it plain? One switch hides levels, coins, the shop and quests for a calm, clean timer. Nothing is lost.',
+      `<div class="fx-min"><div class="busy"><span>Lv 12 · +25 XP</span><b>25:00</b><span>🔥 23 days</span></div><div class="calm">25:00</div></div>`],
+  ];
+  $('#lpFeats').innerHTML = feats.map(([t, d, fx]) => `<article class="card lp-feat"><div class="lp-fx" aria-hidden="true">${fx}</div><h3>${t}</h3><p>${d}</p></article>`).join('');
+  const rows = [
+    ['Focus timer with your own presets', 'yes', 'Usually included'],
+    ['Full stats history and streaks', 'yes', 'Often a paid extra'],
+    ['Themes, sounds and customisation', 'yes', 'Often a paid extra'],
+    ['Sync across your devices', 'yes', 'Often a paid extra'],
+    ['Friends, leaderboards and squads', 'yes', 'Often a paid extra'],
+    ['No ads', 'yes', 'Varies'],
+    ['No tracking or analytics', 'yes', 'Varies'],
+    ['Price', 'Free', 'Subscription'],
+  ];
+  $('#lpCmpRows').innerHTML = rows.map(([l, a, b]) => `<div class="lp-cmp-row" role="row"><span role="cell">${l}</span><span role="cell">${a === 'yes' ? `<span class="yes">${LP_CHECK}Included</span>` : `<b>${a}</b>`}</span><span role="cell" class="meh">${b}</span></div>`).join('');
+  lpMarkLook();
+}
+function lpMarkLook() {
+  const th = landingSkin || 'th_default', gl = glass();
+  $$('#lpSwatches [data-lpth]').forEach(b => { const on = b.dataset.lpth === th; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); });
+  $$('#lpGlass [data-lpgl]').forEach(b => b.classList.toggle('active', b.dataset.lpgl === gl));
+}
+/** Sign up for first-time visitors, Log in when this browser has been used before (or a link asks for one). */
+function defaultAuthMode() {
+  const h = location.hash;
+  if (h === '#signup' || h === '#login') { history.replaceState(null, '', location.pathname + location.search); return h.slice(1); }
+  return readJSON(LAST_USER, null) || localStorage.getItem(TOUR_KEY) ? 'login' : 'signup';
+}
+function lpGoSignup() {
+  setAuthMode('signup');
+  $('#authCard').scrollIntoView({ block: 'center', behavior: motion() === 'full' ? 'smooth' : 'auto' });
+  setTimeout(() => $('#authUser').focus({ preventScroll: true }), motion() === 'full' ? 400 : 0);
+}
+$('#authView').addEventListener('click', e => {
+  const th = e.target.closest('[data-lpth]'), gl = e.target.closest('[data-lpgl]');
+  if (th) { landingSkin = th.dataset.lpth === 'th_default' ? '' : th.dataset.lpth; applyTheme(readJSON(THEME_KEY, 'auto')); lpMarkLook(); }
+  if (gl) {
+    const v = gl.dataset.lpgl, root = document.documentElement;
+    if (v === 'off' || !glassSupported()) delete root.dataset.glass; else root.dataset.glass = v;   // a preview only: the saved choice is untouched
+    sheenLoop(); lpMarkLook();
+  }
+  if (e.target.closest('#previewBtn, [data-lp-preview]')) startPreview();
+  if (e.target.closest('[data-lp-signup]')) lpGoSignup();
+  if (e.target.closest('[data-lp-privacy]')) { e.preventDefault(); const d = $('#lpPrivacy'); d.open = true; d.scrollIntoView({ block: 'center', behavior: motion() === 'full' ? 'smooth' : 'auto' }); }
+  if (e.target.closest('.lp-more-link')) { e.preventDefault(); $('#lpFeatures').scrollIntoView({ behavior: motion() === 'full' ? 'smooth' : 'auto' }); }
+});
+
+/* ---------- Live checks on the sign-up card ---------- */
+function setHint(el, text, cls = '') { el.textContent = text; el.className = 'hint' + (cls ? ' ' + cls : ''); }
+function checkUser() {
+  const v = $('#authUser').value.trim(), low = v.toLowerCase(), h = $('#userHint');
+  if (!v) return setHint(h, '3–20 characters: letters, numbers or _ (not case-sensitive)');
+  if (/[^a-zA-Z0-9_]/.test(v)) return setHint(h, `Only letters, numbers and _ — “${v.match(/[^a-zA-Z0-9_]/)[0] === ' ' ? 'space' : v.match(/[^a-zA-Z0-9_]/)[0]}” can’t be used`, 'bad');
+  if (low.length < 3) return setHint(h, `At least 3 characters (${low.length}/3)`, 'bad');
+  if (authMode !== 'signup') return setHint(h, low === v ? '' : `You’ll log in as @${low}`);
+  if (isOffensiveName(low)) return setHint(h, 'That username isn’t allowed — please choose another', 'bad');
+  setHint(h, `✓ @${low} looks good. If it’s already taken, you’ll find out when you create the account.`, 'ok');
+}
+function pwScore(p) {
+  if (p.length < 6) return 1;
+  let s = 0;
+  if (p.length >= 8) s++;
+  if (p.length >= 12) s++;
+  if (/[a-z]/.test(p) && /[A-Z]/.test(p)) s++;
+  if (/\d/.test(p)) s++;
+  if (/[^A-Za-z0-9]/.test(p)) s++;
+  if (/^(.)\1+$/.test(p) || /^(123456|password|qwerty)/i.test(p)) s = 0;
+  return s <= 1 ? 2 : s <= 3 ? 3 : 4;
+}
+function checkPass() {
+  const p = $('#authPass').value, m = $('#pwMeter'), h = $('#pwHint');
+  const signup = authMode === 'signup';
+  m.classList.toggle('hidden', !signup || !p);
+  if (!signup) return setHint(h, '');
+  if (!p) return setHint(h, 'At least 6 characters');
+  const s = pwScore(p);
+  m.dataset.s = s;
+  setHint(h, s === 1 ? `Too short — at least 6 characters (${p.length}/6)` : s === 2 ? 'Weak — try a longer password or a few words' : s === 3 ? 'Okay — longer is even stronger' : 'Strong password ✓', s === 1 ? 'bad' : s === 4 ? 'ok' : '');
+  checkPass2();
+}
+function checkPass2() {
+  const a = $('#authPass').value, b = $('#authPass2').value, h = $('#pw2Hint');
+  if (!b) return setHint(h, '');
+  if (a === b) return setHint(h, '✓ Passwords match', 'ok');
+  setHint(h, a.startsWith(b) ? 'Keep typing…' : 'Doesn’t match yet', a.startsWith(b) ? '' : 'bad');
+}
+$('#authUser').addEventListener('input', checkUser);
+$('#authPass').addEventListener('input', checkPass);
+$('#authPass2').addEventListener('input', checkPass2);
+function setAuthBusy(on) {
+  const b = $('#authSubmit');
+  b.disabled = on;
+  b.setAttribute('aria-busy', on);
+  b.innerHTML = on ? `<span class="spin" aria-hidden="true"></span>${authMode === 'signup' ? 'Creating your account…' : 'Logging in…'}` : esc(authMode === 'signup' ? 'Create free account' : 'Log in');
+}
+
+/* ==========================================================================
+   PREVIEW — a read-only demo account ("demo_scholar") built from sample data
+   that lives only in this page. The real app runs against an in-memory stand-in
+   for Firestore: reads come from the sample data and every write is dropped.
+   Browser storage is not written at all, and leaving the preview reloads the page.
+   ========================================================================== */
+const PV = { on: false };
+const isPreview = () => PV.on;
+/** Deterministic sample history: the last 23 days all reach the 2-hour goal (today is still in progress). */
+function demoSessions() {
+  const today = startOfDay(new Date()), now = Date.now(), out = [];
+  let seed = 11;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const SUBJ = ['Physics', 'Chemistry', 'Maths', 'Biology', 'Physics', 'Maths'];
+  const TASKS = { Physics: ['Rotational motion notes', 'HC Verma Q1–15', 'Formula sheet'], Chemistry: ['Aldehydes & ketones', 'NCERT examples', 'Reaction map'], Maths: ['Integration by parts', 'PYQs 2019–2021', 'Mistake log'], Biology: ['Genetics chapter', 'Diagram practice', 'Flashcards'] };
+  for (let d = 84; d >= 0; d--) {
+    const date = addDays(today, -d);
+    const streak = d >= 1 && d <= 23, gap = d === 24;
+    if (gap || (!streak && d > 0 && rnd() < .3)) continue;
+    let mins = 0, h = 7 + Math.floor(rnd() * 3), k = 0;
+    const target = streak ? 125 + Math.floor(rnd() * 90) : d === 0 ? 75 : 40 + Math.floor(rnd() * 90);
+    while (mins < target && h < 22) {
+      const len = [25, 50, 50, 25, 45, 30][Math.floor(rnd() * 6)];
+      const st = new Date(date); st.setHours(h, Math.floor(rnd() * 40), 0, 0);
+      const end = +st + len * 6e4;
+      if (end > now - 5 * 6e4) break;
+      const name = SUBJ[Math.floor(rnd() * SUBJ.length)];
+      const s = { id: `demo${d}_${k++}`, name, start: +st, end, duration: len * 6e4, planned: len * 6e4, preset: len >= 45 ? 'Deep Work 50/10' : 'Classic 25/5' };
+      if (d < 6 && rnd() < .5) s.subtasks = TASKS[name].map((t, i) => ({ t, d: i < 2 || rnd() < .5 }));
+      out.push(s);
+      mins += len;
+      h += len >= 45 ? 2 : 1 + Math.floor(rnd() * 2);
+    }
+  }
+  return out;
+}
+const DEMO_FRIENDS = [
+  { uid: 'demo_f1', name: 'riya_k', tier: 'focused', level: 14, streak: 31, color: 'col_teal', frame: 'frame_orbit', avatar: 'av_fox', week: .42, life: 9800 },
+  { uid: 'demo_f2', name: 'arjun_codes', tier: 'scholar', level: 11, streak: 9, color: '', frame: 'frame_ring', avatar: 'av_robot', week: .27, life: 6100 },
+  { uid: 'demo_f3', name: 'meera_reads', tier: 'apprentice', level: 7, streak: 4, color: '', frame: '', avatar: 'av_owl', week: .18, life: 2900 },
+  { uid: 'demo_f4', name: 'sana_studies', tier: 'disciplined', level: 18, streak: 52, color: 'col_rose', frame: 'frame_hex', avatar: 'av_panda', week: .55, life: 15400 },
+];
+/** Builds the demo account's documents (called when the preview starts, so dates are always current). */
+function demoDocs() {
+  const now = new Date(), ts = ms => ({ toMillis: () => ms, toDate: () => new Date(ms) });
+  const sessions = demoSessions(), byMonth = {};
+  for (const s of sessions) { const m = monthKeyOf(new Date(s.start)); (byMonth[m] ||= []).push(s); }
+  const own = (cat, ids) => ids.filter(id => ITEM_BY_ID[id]).map(id => [id, ITEM_BY_ID[id]]);
+  const purchases = {}, equipped = {};
+  own('', ['th_ocean', 'ring_grad', 'frame_double', 'hat_grad', 'acc_glasses', 'snd_digital', 'av_owl', 'col_teal']).forEach(([id, it], i) => { purchases['demo' + i] = { item: id, price: it.price || 0, at: Date.now() - (30 - i) * 864e5 }; });
+  for (const [id, it] of Object.values(purchases).map(p => [p.item, ITEM_BY_ID[p.item]])) if (it.cat !== 'theme' && it.cat !== 'sound') equipped[it.cat] = id;
+  const wkPast = k => dayKey(addDays(weekStartOf(now, 1), -7 * k));
+  const trophies = {}, bosses = {};
+  [1, 2, 4].forEach((k, i) => { const wk = wkPast(k); trophies[wk] = { boss: (BOSSES[(i + 1) % BOSSES.length] || BOSSES[0]).id, mode: i ? 'solo' : 'squad', hp: i ? 600 : 1560, coins: i ? 45 : 70, size: i ? 1 : 3, at: Date.now() - k * 6 * 864e5 }; bosses[wk] = trophies[wk].at; });
+  const rec = sessions.slice(-30), energy = {};
+  rec.forEach((s, i) => { energy[s.id] = new Date(s.start).getHours() < 12 ? (i % 5 ? 4 : 3) : (i % 3 ? 3 : 2); });
+  const tomorrow = addDays(startOfDay(now), 1), soon = new Date(Date.now() + 3 * 3600e3);
+  const profile = {
+    username: 'demo_scholar', onboarded: true,
+    settings: { ...defaultState().settings, goalMin: 120, bossMode: 'squad', shareActivity: true, shareNames: true, energy: 'always' },
+    presets: defaultState().presets, activePresetId: 'p-classic',
+    names: [['Physics', '#3f9fbf', 'JEE'], ['Chemistry', '#d0843d', 'JEE'], ['Maths', '#8b6cc8', 'JEE'], ['Biology', '#4f9a5a', 'Boards']].map(([name, color, tag]) => ({ name, color, tag })),
+    recent: [{ name: 'Physics', presetId: 'p-deep', ts: Date.now() - 3600e3 }, { name: 'Maths', presetId: 'p-classic', ts: Date.now() - 7200e3 }, { name: 'Chemistry', presetId: 'p-deep', ts: Date.now() - 864e5 }],
+    pinned: [{ name: 'Physics', presetId: 'p-deep' }],
+    game: { purchases, equipped, claims: { bosses }, trophies, freezesUsed: {} },
+    reminders: [
+      { id: 'demo_r1', title: 'Physics revision', date: dayKey(soon), time: `${pad(soon.getHours())}:00`, repeat: 'none', days: [], before: 10, presetId: 'p-deep', session: 'Physics' },
+      { id: 'demo_r2', title: 'Maths mock test', date: dayKey(tomorrow), time: '09:30', repeat: 'weekly', days: [tomorrow.getDay()], before: 15, presetId: 'p-deep', session: 'Maths' },
+    ],
+    notes: Object.fromEntries(sessions.slice(-3).map((s, i) => [s.id, ['Finished all 15 HC Verma problems', 'Need to redo Q7 tomorrow', 'Great flow today'][i]])),
+    revisions: [{ id: 'demo_v1', topic: 'Chemistry', presetId: 'p-classic', time: '18:00', step: 1, next: dayKey(now), created: Date.now() - 3 * 864e5, log: [], done: {}, snooze: {} }],
+    exams: [{ id: 'demo_x1', name: 'JEE Main', date: dayKey(addDays(now, 74)), added: Date.now() - 40 * 864e5 }],
+    parked: [{ id: 'demo_p1', text: 'Ask Riya for the organic chemistry notes', at: Date.now() - 5400e3, done: false }],
+    squad: DEMO_FRIENDS.slice(0, 2).map(f => ({ uid: f.uid, name: f.name })),
+    subTemplates: [], energy,
+  };
+  // My minutes this week decide the friends' weekly numbers, so the boss is always mid-battle.
+  const mon = weekStartOf(now, 1), myWeek = sessions.filter(s => s.start >= +mon).reduce((a, s) => a + s.duration / 6e4, 0);
+  const docs = { 'users/demo': profile };
+  for (const [m, list] of Object.entries(byMonth)) docs[`users/demo/months/${m}`] = { month: m, sessions: list };
+  const wk = dayKey(mon), wkSun = dayKey(weekStartOf(now, 0));
+  // Squad boss HP is 2.6 × (5 × the 120-minute goal) = 1,560: the squad (me + the first two friends) sits at about 62%.
+  const squadLeft = Math.max(60, Math.round(1560 * .62 - myWeek));
+  const weekOf = [Math.round(squadLeft * .55), Math.round(squadLeft * .45), Math.round(myWeek * .6 + 30), Math.round(myWeek + 95)];
+  DEMO_FRIENDS.forEach((f, i) => {
+    const weekMin = Math.max(30, weekOf[i]), dayMin = Math.round(Math.min(weekMin, 35 + i * 20));
+    const pub = { username: f.name, level: f.level, tier: f.tier, frame: ITEM_BY_ID[f.frame] ? f.frame : 'frame_none', color: ITEM_BY_ID[f.color] ? f.color : 'col_default', avatar: f.avatar };
+    docs['publicProfiles/' + f.uid] = { ...pub, streak: f.streak, longest: f.streak + 6, hours: Math.round(f.life / 6) / 10, joined: Date.now() - (120 + i * 30) * 864e5, updatedAt: ts(Date.now()) };
+    docs['publicStats/' + f.uid] = { ...pub, global: true, dayKey: dayKey(now), dayMin, weekKey: wk, weekMin, weekKeySun: wkSun, weekMinSun: weekMin, monthKey: monthKeyOf(now), monthMin: weekMin * 3, lifeMin: f.life, lastWeekKey: dayKey(addDays(mon, -7)), lastWeekMin: weekMin + 40, updatedAt: ts(Date.now()) };
+    const days = {}, goalDays = [];
+    for (let k = 0; k < 28; k++) { if ((k * 7 + i) % 5 === 4) continue; const m = 60 + ((k * 37 + i * 11) % 120); days[dayKey(addDays(startOfDay(now), -k))] = m; if (m >= 120) goalDays.push(dayKey(addDays(startOfDay(now), -k))); }
+    docs['activity/' + f.uid] = { visible: true, shareNames: true, days, goalDays, streak: f.streak, longest: f.streak + 6, updatedAt: ts(Date.now()),
+      recent: ['Chemistry', 'Maths', 'Physics', 'English'].map((n, k) => ({ id: f.uid + k, t: Date.now() - (k + 1) * 5 * 3600e3, min: [50, 25, 45, 30][k], name: n })) };
+    docs['presence/' + f.uid] = i === 0 ? { visible: true, now: { status: 'running', phase: 'focus', name: 'Organic chemistry', endAt: Date.now() + 17 * 6e4 }, updatedAt: ts(Date.now()) } : { visible: true, now: null, updatedAt: ts(Date.now() - 3600e3) };
+    docs['friendships/demo_' + f.uid] = { users: ['demo', f.uid], from: f.uid, to: 'demo', status: 'accepted', fromName: f.name, toName: 'demo_scholar', createdAt: ts(Date.now() - (40 + i) * 864e5) };
+  });
+  docs['friendships/demo_kabir'] = { users: ['demo', 'demo_f5'], from: 'demo_f5', to: 'demo', status: 'pending', fromName: 'kabir_22', toName: 'demo_scholar', createdAt: ts(Date.now() - 3600e3) };
+  docs['inbox/demo/items/k1'] = { from: 'demo_f1', fromName: 'riya_k', type: 'kudos', emoji: '🔥', target: 'st_' + dayKey(now), createdAt: ts(Date.now() - 1800e3) };
+  docs['challenges/demo_c1'] = { preset: 'h10', weekKey: wk, creator: 'demo_f4', members: ['demo_f4', 'demo', 'demo_f1'], invited: ['demo'], names: { demo_f4: 'sana_studies', demo: 'demo_scholar', demo_f1: 'riya_k' },
+    progress: { demo_f4: 410, demo: Math.round(myWeek), demo_f1: 280 }, createdAt: ts(Date.now() - 2 * 864e5) };
+  return docs;
+}
+
+/* ---------- An in-memory stand-in for the Firestore API (reads only; writes are discarded) ---------- */
+function previewFirestore(docs) {
+  const ref = path => ({ path, id: path.split('/').pop() });
+  const snap = (path, data) => ({ id: path.split('/').pop(), ref: ref(path), exists: () => data !== undefined, data: () => (data === undefined ? undefined : JSON.parse(JSON.stringify(data, (k, v) => (v && v.toMillis ? { __ts: v.toMillis() } : v)), (k, v) => (v && v.__ts !== undefined ? { toMillis: () => v.__ts, toDate: () => new Date(v.__ts) } : v))),
+    metadata: { fromCache: false, hasPendingWrites: false } });
+  const get = (o, f) => f.split('.').reduce((a, k) => (a == null ? a : a[k]), o);
+  const run = q => {
+    const base = q.path, depth = base.split('/').length + 1;
+    let rows = Object.keys(docs).filter(p => p.startsWith(base + '/') && p.split('/').length === depth).map(p => [p, docs[p]]);
+    for (const c of q.cons || []) {
+      if (c.k === 'where') rows = rows.filter(([, d]) => { const v = get(d, c.f); return c.op === '==' ? v === c.v : c.op === 'array-contains' ? Array.isArray(v) && v.includes(c.v) : c.op === '>' ? v > c.v : true; });
+      if (c.k === 'order') rows.sort((a, b) => { const x = get(a[1], c.f), y = get(b[1], c.f), xv = x && x.toMillis ? x.toMillis() : x, yv = y && y.toMillis ? y.toMillis() : y; return (xv > yv ? 1 : xv < yv ? -1 : 0) * (c.dir === 'desc' ? -1 : 1); });
+      if (c.k === 'limit') rows = rows.slice(0, c.n);
+    }
+    const list = rows.map(([p, d]) => snap(p, d));
+    return { docs: list, size: list.length, empty: !list.length, forEach: fn => list.forEach(fn), metadata: { fromCache: false, hasPendingWrites: false } };
+  };
+  const read = r => (r.cons !== undefined || r.isCol ? run(r) : snap(r.path, docs[r.path]));
+  const ok = () => Promise.resolve();
+  return {
+    db: { preview: true },
+    doc: (db, ...seg) => ref(seg.join('/')),
+    collection: (db, ...seg) => ({ path: seg.join('/'), isCol: true }),
+    query: (col, ...cons) => ({ path: col.path, cons }),
+    where: (f, op, v) => ({ k: 'where', f, op, v }), orderBy: (f, dir = 'asc') => ({ k: 'order', f, dir }), limit: n => ({ k: 'limit', n }),
+    getDoc: r => Promise.resolve(read(r)), getDocFromServer: r => Promise.resolve(read(r)), getDocs: q => Promise.resolve(run(q)),
+    getCountFromServer: q => Promise.resolve({ data: () => ({ count: run(q).size }) }),
+    onSnapshot: (r, ...args) => { const fn = args.find(a => typeof a === 'function'); setTimeout(() => fn && PV.on && fn(read(r)), 30); return () => {}; },
+    setDoc: ok, updateDoc: ok, deleteDoc: ok, addDoc: () => Promise.resolve(ref('x/' + uid())), waitForPendingWrites: ok, terminate: ok, clearIndexedDbPersistence: ok,
+    writeBatch: () => ({ set() {}, update() {}, delete() {}, commit: ok }),
+    serverTimestamp: () => ({ toMillis: () => Date.now() }), arrayUnion: (...a) => a, arrayRemove: () => [], increment: n => n,
+    auth: { currentUser: { uid: 'demo', metadata: { creationTime: new Date(Date.now() - 130 * 864e5).toUTCString() } } },
+    signOut: ok, setPersistence: ok,
+  };
+}
+
+/* ---------- Starting, guarding and leaving the preview ---------- */
+function startPreview() {
+  if (PV.on) return;
+  PV.on = true;
+  // Nothing in the preview may be stored in this browser.
+  const noop = function () {};
+  Storage.prototype.setItem = noop; Storage.prototype.removeItem = noop; Storage.prototype.clear = noop;
+  Object.assign(FB, previewFirestore(demoDocs()));
+  localOnly = false;
+  document.body.classList.add('previewing');
+  $('#pvBanner').classList.remove('hidden');
+  startSession({ uid: 'demo', username: 'demo_scholar', preview: true }, true);
+  requestAnimationFrame(() => document.body.style.setProperty('--pv-h', $('#pvBanner').offsetHeight + 'px'));
+  window.scrollTo(0, 0);
+  setTimeout(() => { if (PV.on) pomeoSay('This is demo_scholar’s account. Look around — nothing here is saved!', { kind: 'tap', ms: 6000 }); }, 1600);
+}
+/** Leaving reloads the page, so nothing from the demo stays in memory. "#signup" opens the sign-up tab. */
+function exitPreview(signup) { history.replaceState(null, '', location.pathname + location.search + (signup ? '#signup' : '')); location.reload(); }
+const PV_BLOCK = ['#mainBtn', '#skipBtn', '[data-qs]', '[data-buy]', '[data-equip]', '[data-toggle-extra]', '[data-kudos]', '[data-accept]', '[data-decline]', '[data-block]', '[data-unblock]',
+  '[data-join]', '[data-start]', '[data-claimlogin]', '#loginClaim', '[data-bmode]', '[data-remadd]', '#remAdd', '[data-rdone]', '[data-rdel]', '[data-redit]', '[data-rev]', '[data-del]', '[data-delp]',
+  '[data-exdel]', '[data-tdel]', '[data-tload]', '[data-remove]', '[data-tick]', '[data-energy]', '#parkBtn', '#subToggle', '#subCheckAdd', '#managePresets', '#noteSave', '#revSchedule', '#examsBtn',
+  '#importBtn', '#exportBtn', '#wipeBtn', '#pomeoOutfit', '#replayTour', '#resetTips', '[data-news-tut]', '[data-news-min]', '#addFriendForm button', '#chips .chip', '[data-pin]', '.chip .pin',
+  '#squadBtn', '[data-squad]', '#examCard', '[data-gl]', '#tutMinimal'].join(',');
+const PV_WHY = [['[data-buy],[data-equip],[data-toggle-extra]', 'buy and equip shop items'], ['#mainBtn,[data-qs],#skipBtn', 'start your own focus sessions'], ['[data-kudos],[data-accept],[data-decline],#addFriendForm button,[data-block]', 'add friends and send kudos'],
+  ['[data-claimlogin],#loginClaim', 'collect daily rewards'], ['#remAdd,[data-remadd],[data-rdone],[data-redit],[data-rdel]', 'plan your own reminders']];
+function previewPrompt(el) {
+  const why = (PV_WHY.find(([sel]) => el && el.closest(sel)) || [, 'save your own sessions and settings'])[1];
+  $('#pvWhy').textContent = `This is a demo account, so nothing can be changed. Create your own free account to ${why}.`;
+  $('#pvPomeo').innerHTML = pomeoSVG({ state: 'happy' });
+  if (!$('#pvDlg').open) $('#pvDlg').showModal();
+  uiSound('tap');
+}
+document.addEventListener('click', e => {
+  if (!PV.on || e.target.closest('#pvDlg, #pvBanner')) return;
+  const hit = e.target.closest(PV_BLOCK);
+  if (!hit) return;
+  e.preventDefault(); e.stopImmediatePropagation();
+  previewPrompt(hit);
+}, true);
+document.addEventListener('submit', e => { if (PV.on) { e.preventDefault(); e.stopImmediatePropagation(); previewPrompt(e.target); } }, true);
+document.addEventListener('keydown', e => {
+  if (!PV.on || e.ctrlKey || e.metaKey || e.altKey || e.target.closest('input, textarea, select')) return;
+  if (e.key === ' ' || e.key.toLowerCase() === 's' || e.key.toLowerCase() === 'r' || e.key.toLowerCase() === 'p') { e.preventDefault(); e.stopImmediatePropagation(); previewPrompt($('#mainBtn')); }
+}, true);
+/** Settings are visible but read-only in the preview. */
+function previewLockSettings() {
+  if (!PV.on) return;
+  $$('#tab-settings input, #tab-settings select, #tab-settings .setting button').forEach(el => { el.disabled = true; });
+  if (!$('#pvSetNote')) $('#tab-settings .set-wrap, #tab-settings').querySelector('.card')?.insertAdjacentHTML('beforebegin', '<p class="hint" id="pvSetNote" style="margin:0 0 12px">Settings are read-only in the preview. Create an account to make it yours.</p>');
+}
+$('#pvBanner').addEventListener('click', e => { if (e.target.closest('.pv-go')) exitPreview(true); if (e.target.closest('.pv-exit')) exitPreview(false); });
+$('#pvDlg').addEventListener('click', e => { if (e.target.closest('[data-pv-go]')) exitPreview(true); if (e.target.closest('[data-pv-stay]')) $('#pvDlg').close(); });
+
 /* ---------- Spotlight "quick look around" (step 4 of the tutorial) ---------- */
 const TOUR_KEY = 'pomodorolist-tour-done';
 const TOUR = { i: 0, steps: [] };
@@ -9224,6 +9859,7 @@ $$('[data-toggle]').forEach(btn => btn.addEventListener('click', () => {
   const show = input.type === 'password';
   input.type = show ? 'text' : 'password';
   btn.textContent = show ? 'Hide' : 'Show';
+  btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
 }));
 $('#guestBtn').addEventListener('click', () => {
   writeLS(GUEST_FLAG, '1');
@@ -9356,6 +9992,16 @@ $('#setTheme').addEventListener('change', e => { S.settings.theme = e.target.val
 $('#setSound').addEventListener('change', e => { S.settings.sound = e.target.checked; save(); renderTimer(); });
 $('#setAuto').addEventListener('change', e => { S.settings.autoStart = e.target.checked; save(); });
 $('#setAmbVol').addEventListener('input', e => setAmbientVolume(e.target.value));
+$$('.setting').forEach(row => {
+  const cb = row.querySelectorAll('input[type="checkbox"]');
+  if (cb.length === 1 && !row.querySelector('select, button, a, input:not([type="checkbox"])')) row.dataset.rowToggle = '';
+});
+document.addEventListener('click', e => {
+  const row = e.target.closest('[data-row-toggle]');
+  if (!row || e.target.closest('input, a, button, select, label')) return;
+  const cb = row.querySelector('input[type="checkbox"]');
+  if (cb && !cb.disabled) cb.click();
+});
 $('#setGlass').addEventListener('change', e => { setGlass(e.target.value); toast(`Glossed Interface: ${GLASS_NAMES[glass()]}`, 1800, true); });
 $('#setPomeo').addEventListener('change', e => { S.settings.pomeo = e.target.checked; save(); renderPomeo(); if (!e.target.checked) hideBubble(); });
 $('#setPomeoTalk').addEventListener('change', e => { S.settings.pomeoTalk = e.target.value; save(); });
@@ -9632,6 +10278,7 @@ async function boot() {
     return;
   }
   FB.onAuthStateChanged(FB.auth, user => {
+    if (isPreview()) return;   // the demo account runs without Firebase
     if (user) {
       localStorage.removeItem(GUEST_FLAG);
       startSession({ uid: user.uid, username: usernameOf(user) }, true);
