@@ -1,8 +1,9 @@
 # Pomodorolist 🍅
 
-A free, minimal focus timer that turns studying into a game. Custom Pomodoro timers, streaks and stats, a tomato garden, weekly boss battles, friends and leaderboards, and a friendly tomato mascot called Pomeo. Log in on any device and your progress follows you.
+A free, minimal focus timer that turns studying into a game. Custom Pomodoro timers, streaks and stats, a tomato garden, weekly boss battles, monthly Pomeo questlines, friends and leaderboards, all with a friendly tomato mascot called Pomeo. Log in on any device and your progress follows you.
 
 **Live app:** https://siverieg.github.io/Pomodorolist-V1.0/
+**Try before signing up:** tap **"Preview the app"** on the welcome page to explore a demo account.
 
 <!-- Add screenshots here: drag images into this editor -->
 
@@ -14,48 +15,54 @@ Most focus apps lock streaks, stats, sync and themes behind a subscription. Pomo
 
 ### Focus
 - **Custom Pomodoro timers:** your own focus and break lengths, saved as presets
-- **Named sessions and subtasks:** label what you're working on and tick off small goals during the session
-- **Distraction parking lot:** jot down a distracting thought in two seconds without stopping the timer, and review it on your break
+- **Named sessions and subtasks:** label what you're working on and tick off small goals
+- **Distraction parking lot:** jot down a distracting thought in two seconds without stopping the timer
 - **Ambient sounds:** rain, brown noise, café, ocean and more
-- **Energy check-ins:** rate how focused you felt after a session and discover when you focus best
+- **Energy check-ins:** rate your focus after a session and discover when you focus best
 
 ### Plan
-- **Reminders:** schedule study sessions; Pomeo reminds you 5–30 minutes before, with snooze and repeat
+- **Reminders:** Pomeo reminds you 5–30 minutes before a session, with snooze and repeat
 - **Add to calendar:** export reminders to your phone's calendar (.ics or Google Calendar)
-- **Spaced revision:** revise topics at 1, 3, 7, 21 and 45 days, with Hard/Easy adjustments
+- **Spaced revision:** revise topics at 1, 3, 7, 21 and 45 days
 - **Exam countdown:** days left plus how many focus hours you're on track for
 
 ### Stats
 - **Daily streaks** and a daily focus goal
 - **Focus graphs:** today's timeline, weekly bars, monthly heatmap, yearly contribution grid
-- **Insights:** best time of day, best session length and best days, from your energy check-ins
+- **Insights** from your energy check-ins: best time of day, session length and days
 - **Wrapped:** a monthly and yearly story-style recap with a shareable card
 
 ### Play
 - **Tomato garden:** every session grows a plant; quitting early leaves a wilted one
-- **Weekly boss battles:** beat a new boss each week with focus minutes, solo or with a squad of friends
+- **Weekly boss battles:** 10 bosses rotate week by week. Fight **Solo** or with a **Squad** of up to 5 friends in an animated arena, with angry phases, a battle log and a Trophy Hall
+- **Boss rewards (free):** Solo wins give the boss's theme and aura; Squad wins give its gradient name colour and a shimmering squad aura; beat both in one week to **Master** it
+- **Monthly Pomeo questlines:** a new themed event each month (Halloween, Monsoon Study, Christmas, New Year and more) with 8 hard quests and limited-time rewards: Pomeo skins, themes, auras, name colours, profile pictures, sounds and more
 - **XP, levels and 9 tiers:** Novice → Apprentice → Scholar → Focused → Disciplined → Expert → Master → Grandmaster → Legend
-- **Coins and a cosmetic shop:** themes, timer sounds, ambient sounds, timer styles, fonts, effects, profile pictures, Pomeo outfits and Streak Freezes (cosmetic only; nothing affects your stats)
-- **Achievements, daily login rewards and a streak aura** around your profile
+- **Coins and a cosmetic shop:** themes, sounds, timer styles, fonts, effects, profile pictures, Pomeo outfits and Streak Freezes (cosmetic only; nothing affects your stats)
+- **Achievements, daily login rewards and auras** around your profile
+
+### Bag 🎒
+- Everything you own in one place, sorted into categories, with where each item came from
+- Equip anything with a live preview, choose your streak aura or a special aura, and save full looks as **Loadouts**
 
 ### Pomeo 🍅
-- A tomato mascot who reacts when you tap or pet him, cheers you on, reminds you of sessions and gently suggests sleep late at night
-- Dress him up with outfits from the shop
+- A tomato mascot who reacts when you tap him, cheers you on, reminds you of sessions, dresses up for events, and gently suggests sleep late at night
 
 ### Friends
 - **Add friends** by username or invite link, with requests, remove and block
-- **Friend profiles:** streak, level, 7-day chart, heatmap and recent sessions, plus a side-by-side compare
+- **Friend profiles:** streak, level, charts, heatmap and recent sessions, plus a side-by-side compare
 - **Leaderboards:** Friends and Global (opt-in), for Daily, Weekly, Monthly and Lifetime
-- **Focusing now, kudos, nudges, friend streaks and weekly challenges**
+- **Focusing now, kudos, nudges, friend streaks, weekly challenges** and event boards
 
 ### Experience
-- **Interactive tutorial** with Pomeo for new users, and one-time tips
-- **True Minimalist mode:** hides all gamification for a clean, calm timer
-- **Glossed Interface:** a frosted-glass look (Off / Lite / Full)
-- **Smooth animations and soft interface sounds,** each adjustable or switchable off
-- **Inbox** for friend requests, kudos, reminders and rewards in one place
+- **Welcome page** with a demo account preview and theme switcher
+- **Interactive tutorial** with Pomeo for new users
+- **True Minimalist mode** and **Glossed Interface** (Off / Lite / Full)
+- **Smooth animations and soft interface sounds,** each adjustable, plus a **Test sounds** button
+- **Inbox** for requests, kudos, reminders and rewards
 - **Command palette** (Cmd/Ctrl+K) and keyboard shortcuts
-- **Light and dark mode,** offline support and JSON export/import
+- **Fast:** opens instantly from a saved copy on your device and syncs in the background
+- **Festive touches** during events (switchable off), light and dark mode, offline support and JSON export/import
 
 ## Keyboard shortcuts
 
@@ -74,8 +81,9 @@ Most focus apps lock streaks, stats, sync and themes behind a subscription. Pomo
 
 The app runs in your browser as a single HTML file, with no custom server.
 
-- **With an account:** data is stored in **Google Firebase** (Authentication + Firestore). A copy is kept in your browser so the app stays fast and works offline.
-- **Without an account:** choose **"Use on this device only"**. Everything stays in your browser and nothing is uploaded. Friends and leaderboards need an account.
+- **With an account:** data is stored in **Google Firebase** (Authentication + Firestore). A copy is kept on your device so the app opens instantly and works offline; changes from your other devices merge in within seconds.
+- **Without an account:** choose **"Continue without an account"**. Everything stays in your browser and nothing is uploaded. Friends, leaderboards and squad battles need an account.
+- **The demo preview** never saves anything anywhere.
 
 The Firebase config in the code is meant to be public. Access is controlled by Firestore security rules: your private data is readable only by you, and friend activity only by accepted friends.
 
@@ -95,6 +103,7 @@ The Firebase config in the code is meant to be public. Access is controlled by F
 - **Usernames can't be changed,** because the username is your login
 - **Reminders only fire while the app is open** (a background tab is fine). Use **Add to calendar** for reminders when the app is closed.
 - **Running timers stay on one device;** completed sessions sync everywhere
+- **Event rewards are limited:** quests must be completed during the event
 - **Leaderboards can't be fully cheat-proof** without a server; security rules block obvious cheating, but not every case
 - If you opt in to Global, someone who blocked you can still see your leaderboard row, but not your profile or activity
 
