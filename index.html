@@ -865,6 +865,15 @@ body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .s
 :root[data-motion="reduced"] .pomeo-bubble.show { animation: fadeIn .25s both; }
 @keyframes bubbleIn { from { opacity: 0; transform: scale(.7) translateX(-6px); } }
 
+/* During focus: the What's new card and the event banner wait; a due reminder is a slim banner at the top */
+:root[data-focusing] #newsSlot, :root[data-focusing] #eventSlot { display: none; }
+.pomeo-pop.compact { top: calc(10px + env(safe-area-inset-top)); bottom: auto; left: 50%; right: auto; transform: translateX(-50%); max-width: min(520px, calc(100vw - 24px)); width: max-content; }
+.pomeo-pop.compact .pomeo-pic { display: none; }
+.pomeo-pop.compact .pp-card { margin: 0; padding: 8px 10px 8px 14px; border-radius: 14px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; box-shadow: 0 10px 24px -14px rgba(0, 0, 0, .4); }
+.pomeo-pop.compact .pp-card::after { display: none; }
+.pomeo-pop.compact .pp-kicker { display: none; }
+.pomeo-pop.compact .pp-text { margin: 0; font-size: 13.5px; flex: 1 1 180px; }
+.pomeo-pop.compact .pp-acts .btn { padding: 5px 10px; font-size: 12.5px; min-height: 36px; }
 /* Pomeo pop-up for reminders (on any tab) */
 .pomeo-pop {
   position: fixed; right: 16px; bottom: calc(20px + env(safe-area-inset-bottom)); z-index: 90; display: flex; align-items: flex-end; gap: 6px;
@@ -2487,10 +2496,83 @@ body.first-load #todayBar { opacity: 0; }
 .cardpv i { position: absolute; left: 0; right: 0; top: 0; height: 15px; }
 .cardpv svg { width: 26px; height: 26px; position: relative; margin-top: 10px; }
 .cardpv b { font-family: Georgia, serif; position: relative; margin-top: 10px; }
+
+/* ==========================================================================
+   v1.13.1 — boss tiers, tiered reward looks, boss profile pictures
+   ========================================================================== */
+.btier { display: inline-flex; align-items: center; gap: 4px; font-size: 12.5px; font-weight: 650; color: var(--muted); white-space: nowrap; }
+.btier .bt-s { color: #d9a514; letter-spacing: .5px; }
+.btier.bt-1 { color: #4f9a5a; } .btier.bt-2 { color: #3f8fbf; } .btier.bt-3 { color: #c07a2c; } .btier.bt-4 { color: #b45f8c; }
+.btier.bt-5 { color: #c9a227; text-shadow: 0 0 10px rgba(242, 180, 40, .35); }
+:root[data-theme="dark"] .btier.bt-1 { color: #7fca8a; } :root[data-theme="dark"] .btier.bt-2 { color: #76b8e6; } :root[data-theme="dark"] .btier.bt-3 { color: #e3a35e; } :root[data-theme="dark"] .btier.bt-4 { color: #e08ab8; } :root[data-theme="dark"] .btier.bt-5 { color: #f2cf63; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btier.bt-1 { color: #7fca8a; } :root:not([data-theme="light"]) .btier.bt-2 { color: #76b8e6; } :root:not([data-theme="light"]) .btier.bt-3 { color: #e3a35e; } :root:not([data-theme="light"]) .btier.bt-4 { color: #e08ab8; } :root:not([data-theme="light"]) .btier.bt-5 { color: #f2cf63; } }
+.btier.sm { font-size: 10.5px; gap: 0; margin-top: 3px; flex-direction: column; line-height: 1.25; }
+.btier.sm .bt-s { font-size: 10px; letter-spacing: 0; }
+.boss-tier { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin: 0 0 6px; }
+.next-boss .btier { margin: 2px 0; }
+/* auras: a stronger pulse (level 3) and a flare (level 6) */
+:root[data-motion="full"] .aura.aura-pulse::before { animation: auraPulse 1.8s ease-in-out infinite; }
+.aura.aura-flare { filter: drop-shadow(0 0 5px var(--flare, rgba(255, 215, 120, .8))); }
+:root[data-motion="full"] .aura.aura-flare { animation: auraFlare 2.8s ease-in-out infinite; }
+@keyframes auraFlare { 50% { filter: drop-shadow(0 0 9px var(--flare, rgba(255, 215, 120, .9))) brightness(1.08); } }
+/* name colours: a moving shimmer (level 4+) */
+.ncg.ncsh { background-size: 320% 100%, 200% 100%; }
+:root[data-motion="full"] .ncg.ncsh { animation: ncShimmer 5s linear infinite; }
+@keyframes ncShimmer { from { background-position: 120% 0, 0 0; } to { background-position: -220% 0, -200% 0; } }
+/* boss profile pictures: Legendary ones bob gently; Golden ones twinkle */
+:root[data-motion="full"] .av-anim .av-bob { transform-box: fill-box; transform-origin: center bottom; animation: avBob 3.2s ease-in-out infinite; }
+@keyframes avBob { 50% { transform: translateY(-5px) rotate(-2deg); } }
+/* boss themes: an arena glow (Hard+), drifting (Elite+), rising embers (Legendary) */
+#themeFx { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+#themeFx.hidden { display: none; }
+#themeFx.tfx { background: radial-gradient(70% 45% at 50% 108%, color-mix(in srgb, var(--tf1) 13%, transparent), transparent 70%); }
+#themeFx.tfx::before { content: ""; position: absolute; inset: -20%; opacity: 0; }
+#themeFx.tfx-4::before, #themeFx.tfx-5::before { opacity: 1; background: radial-gradient(40% 32% at 78% 12%, color-mix(in srgb, var(--tf2) 11%, transparent), transparent 70%), radial-gradient(36% 30% at 14% 40%, color-mix(in srgb, var(--tf1) 8%, transparent), transparent 70%); }
+:root[data-motion="full"] #themeFx.tfx-4::before, :root[data-motion="full"] #themeFx.tfx-5::before { animation: tfxDrift 40s ease-in-out infinite alternate; }
+@keyframes tfxDrift { to { transform: translate(6%, 4%) rotate(4deg); } }
+#themeFx i { position: absolute; bottom: -10px; width: var(--s); height: var(--s); border-radius: 50%; background: var(--tf3); box-shadow: 0 0 6px var(--tf1); opacity: .35; }
+:root[data-motion="full"] #themeFx i { animation: tfxEmber var(--d) linear var(--dl) infinite; }
+:root:not([data-motion="full"]) #themeFx i { bottom: auto; top: calc(60% + var(--x)); opacity: .18; }
+@keyframes tfxEmber { 0% { transform: translate(0, 0); opacity: 0; } 10% { opacity: .5; } 80% { opacity: .3; } 100% { transform: translate(var(--x), -105vh); opacity: 0; } }
+:root[data-minimal] #themeFx { display: none; }
+
+/* ==========================================================================
+   INTRO (first visit) — over the welcome page, which is already loaded below
+   ========================================================================== */
+.intro { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; cursor: pointer; overflow: hidden; -webkit-user-select: none; user-select: none; }
+.intro.hidden { display: none; }
+.intro .in-bg { position: absolute; inset: 0; background: radial-gradient(60% 50% at 50% 46%, color-mix(in srgb, var(--accent) 13%, var(--bg)), var(--bg) 72%); transition: opacity .7s ease; }
+.intro.fade { opacity: 0; transition: opacity .3s ease; }
+.intro.leaving .in-bg, .intro.leaving .in-skip { opacity: 0; }
+.in-stage { position: relative; display: flex; align-items: center; gap: .3em; padding: 0 20px; font-size: clamp(30px, 8vw, 58px); font-weight: 750; letter-spacing: -.02em; color: var(--text); max-width: 100%; }
+.in-line { white-space: nowrap; transition: transform .72s cubic-bezier(.5, 0, .2, 1), color .72s; }
+.in-line { white-space: pre; }
+.in-w { display: inline-block; animation: inWord .38s cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes inWord { from { opacity: 0; transform: translateY(.32em); filter: blur(6px); } }
+.in-line.out { animation: inOut .2s ease both; }
+@keyframes inOut { to { opacity: 0; transform: translateY(-.22em); filter: blur(4px); } }
+.final .in-line { color: var(--text); }
+.in-dot { color: var(--accent); transition: opacity .3s; }
+.intro.leaving .in-dot { opacity: 0; }
+.in-cur { width: .08em; height: .95em; border-radius: 2px; background: var(--accent); opacity: .75; animation: inBlink 1s steps(1) infinite; }
+@keyframes inBlink { 50% { opacity: 0; } }
+.intro.pomeo-in .in-cur { display: none; }
+.in-pomeo { display: grid; place-items: center; width: 0; height: 1.5em; transform: scale(0); opacity: 0; transition: transform .72s cubic-bezier(.5, 0, .2, 1); }
+.in-pomeo .mascot { position: static; width: 1.5em; height: 1.5em; }
+.intro.pomeo-in .in-pomeo { width: 1.5em; opacity: 1; transform: none; animation: inPop .55s cubic-bezier(.3, 1.6, .5, 1) both; }
+.intro.leaving .in-pomeo { animation: none; }
+@keyframes inPop { from { transform: scale(0) rotate(-20deg); opacity: 0; } }
+.in-skip { position: absolute; right: 12px; top: calc(10px + env(safe-area-inset-top)); background: none; border: 0; color: var(--muted); font: inherit; font-size: 14px; text-decoration: underline; padding: 12px; min-height: 44px; cursor: pointer; transition: opacity .3s; }
+.intro.calm .in-w, .intro.calm .in-pomeo, .intro.calm .in-cur { animation: none !important; }
+.intro.calm .in-cur { display: none; }
+.intro-on #authView .auth-brand, .intro-on #lpPomeo { visibility: hidden; }
 </style>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true" focusable="false"><defs><clipPath id="avClip" clipPathUnits="userSpaceOnUse"><circle cx="12" cy="12" r="12"/></clipPath></defs></svg>
+<div class="intro hidden" id="intro" role="dialog" aria-modal="true" aria-label="Welcome to Pomodorolist"><div class="in-bg"></div>
+  <div class="in-stage"><span class="in-line" id="inLine" aria-live="polite"></span><span class="in-cur" aria-hidden="true"></span><span class="in-pomeo" id="inPomeo" aria-hidden="true"></span></div>
+  <button type="button" class="in-skip" id="inSkip">Skip</button></div>
 <div class="splash" id="splash" aria-hidden="true"><div class="splash-in">
   <div class="sp-greet" id="spGreet"></div>
   <div class="sp-pomeo" id="spPomeo"><svg class="sp-svg" viewBox="-4 -8 48 48"><g class="sp-body">
@@ -3362,6 +3444,7 @@ body.first-load #todayBar { opacity: 0; }
   <button class="btn primary" id="lvClose">Continue</button>
 </dialog>
 
+<div id="themeFx" class="hidden" aria-hidden="true"></div>
 <div id="todSky" class="hidden" aria-hidden="true"><i class="sky-sunrise"></i><i class="sky-day"></i><i class="sky-sunset"></i><i class="sky-night"></i><div class="sky-stars"></div><div class="sky-rain"></div></div>
 <div id="cardView" class="hidden"><div class="cv-wrap"><div class="cv-brand"><i aria-hidden="true"></i>Pomodorolist</div><div id="cvCard"></div>
   <div class="cv-cta"><a class="btn primary" id="cvMake" href="./">Make your own: free</a><p class="lbl">A free focus timer with streaks, stats, bosses and friends. This card is a snapshot shared by its owner.</p></div></div></div>
@@ -3468,6 +3551,8 @@ function toastHost() {
   return host;
 }
 function toast(msg, ms = 2600, ok = false, opt = {}) {
+  // During a focus block, toasts nobody asked for wait until it ends (see FOCUS GUARD)
+  if (!opt.now && !userJustActed() && holdForFocus('toast', 't:' + msg, () => toast(msg, ms, ok, { ...opt, now: true }))) return;
   const host = toastHost();
   if ([...host.children].some(c => c.dataset.msg === msg && !c.classList.contains('out'))) return;
   inboxLog(msg, opt);   // every toast is also kept in the inbox
@@ -3790,7 +3875,11 @@ function renderGreeting() {
 /* ---------- Rewards: achievement card, level-up particles, coins ---------- */
 const achQueue = [];
 let achBusy = false;
-function showAchCard(a) { inboxAdd({ type: 'ach', key: 'ach:' + a.id, title: `Achievement unlocked: ${a.name}`, body: `${a.desc} · +${a.coins} coins`, go: { tab: 'profile' }, read: true }); achQueue.push(a); if (!achBusy) nextAch(); }
+function showAchCard(a) {
+  inboxAdd({ type: 'ach', key: 'ach:' + a.id, title: `Achievement unlocked: ${a.name}`, body: `${a.desc} · +${a.coins} coins`, go: { tab: 'profile' }, read: true });
+  if (holdForFocus('ach', 'ach:' + a.id, () => { achQueue.push(a); if (!achBusy) nextAch(); })) return;
+  achQueue.push(a); if (!achBusy) nextAch();
+}
 function nextAch() {
   const a = achQueue.shift(), el = $('#achCard');
   if (!a) { achBusy = false; return; }
@@ -4133,6 +4222,7 @@ function mergeGame(local, remote) {
   for (const k of Object.keys(out.claims)) uni(out.claims[k], loc.claims[k]);
   for (const [k, v] of Object.entries(loc.equipped)) if (!(k in out.equipped)) { out.equipped[k] = v; ahead = true; }
   if (loc.seenAt > out.seenAt) { out.seenAt = loc.seenAt; ahead = true; }
+  if (loc.tierFrom && (!out.tierFrom || loc.tierFrom < out.tierFrom)) { out.tierFrom = loc.tierFrom; ahead = true; }
   return { game: out, ahead };
 }
 
@@ -4293,6 +4383,7 @@ let authMode = 'login';
 function showAuth() {
   showView('authView');
   initLanding();
+  playIntro();   // first visit on this device only
   if (!lpModeSet) { lpModeSet = true; const fromLink = /^#(signup|login)$/.test(location.hash); authMode = defaultAuthMode(); if (fromLink && authMode === 'signup') setTimeout(lpGoSignup, 400); }
   setAuthMode(authMode);
   $('#configWarn').classList.toggle('hidden', firebaseConfigured());
@@ -4415,6 +4506,7 @@ function legacyData() {
 
 function maybeOfferMigration() {
   if (isPreview()) return;
+  if (USER && holdForFocus('migrate', 'migrate', maybeOfferMigration)) return;
   const legacy = legacyData();
   const handled = readJSON(HANDLED_KEY, []);
   if (!legacy || handled.includes(USER.uid)) return;
@@ -4667,7 +4759,9 @@ function finishPhase(reason) {
     // For natural completion use endAt, so the log is exact even if the tab was asleep.
     const end = reason === 'complete' ? t.endAt : Date.now();
     if (focused >= 0.8 * t.planned) {
-      logSession(focused, end);
+      FG.ending = true;
+      try { logSession(focused, end); } finally { FG.ending = false; }
+      focusEnded();
       const fx = equippedId('effect');
       setTimeout(() => playEffect(fx), reason === 'complete' && motion() === 'full' ? 700 : 0);
     }
@@ -4680,6 +4774,7 @@ function finishPhase(reason) {
     }
   }
 
+  if (wasFocus) focusEnded();
   if (reason === 'reset') {
     // First reset: restart this phase. Reset again while idle: back to round 1.
     if (t.status === 'idle') { t.phase = 'focus'; t.round = 1; }
@@ -5310,6 +5405,7 @@ function normalizeGame(g) {
     grants: map(g.grants),           // itemId -> { src: 'boss:<id>:<mode>' | 'ev:<event>', at } (rewards in the bag)
     plog: map(g.plog),               // parked thought id -> ts (counts for questlines even after it's cleared)
     seenAt: +g.seenAt || 0,          // the bag was last opened (newer items are "New")
+    tierFrom: DAY_RE.test(g.tierFrom || '') ? g.tierFrom : '',   // first week with the fixed boss HP (v1.13.1)
     freezesUsed: map(g.freezesUsed), // 'YYYY-MM-DD' -> ts (day protected by a Streak Freeze)
   };
 }
@@ -5575,6 +5671,29 @@ const BOSSES = [
     skin: { light: { bg: '#f0f0fa', surface: '#fbfbff', text: '#1c1d3a', muted: '#5e6088', line: '#dddff0', accent: '#4b4fc4', heat0: '#e5e6f5' },
             dark:  { bg: '#0c0d1f', surface: '#13152e', text: '#e3e4fa', muted: '#9799c4', line: '#22254a', accent: '#e3b341', heat0: '#1b1d3d', 'on-accent': '#0c0d1f' } } },
 ];
+
+/* ---------- Boss difficulty: a fixed Solo HP per boss (1 HP = 1 focus minute), mixed along the rotation ----------
+   Squad HP = Solo HP × (1 + 0.6 × (members − 1)). Rewards get rarer and fancier with the tier; a Squad
+   win is always one step fancier than a Solo win of the same boss. */
+const BOSS_HP = { dragon: 600, goblin: 330, sloth: 400, hydra: 530, swarm: 300, golem: 470, tab: 360, kraken: 500, phantom: 570, wizard: 430 };
+const BOSS_TIERS = [
+  { n: 1, name: 'Easy', max: 330 }, { n: 2, name: 'Medium', max: 400 }, { n: 3, name: 'Hard', max: 470 },
+  { n: 4, name: 'Elite', max: 530 }, { n: 5, name: 'Legendary', max: Infinity },
+];
+const bossTier = id => BOSS_TIERS.find(t => (BOSS_HP[id] || 400) <= t.max);
+// Rarity by tier (+1 step for Squad): Easy → Common/Rare … Legendary → Legendary.
+const TIER_RARITY = ['common', 'rare', 'epic', 'epic', 'legendary', 'legendary'];
+/** How fancy a boss reward looks: 1 (Easy, Solo) … 6 (Legendary, Squad). */
+const rewardLevel = (id, mode) => bossTier(id).n + (mode === 'squad' ? 1 : 0);
+const bossRarity = (id, mode) => TIER_RARITY[rewardLevel(id, mode) - 1];
+const tierStars = n => '★'.repeat(n) + '☆'.repeat(5 - n);
+/** "★★★☆☆ Hard · 470 HP" */
+const tierBadge = (id, { hp = true, cls = '' } = {}) => {
+  const t = bossTier(id);
+  return `<span class="btier bt-${t.n}${cls ? ' ' + cls : ''}" title="${t.name} · ${BOSS_HP[id]} HP Solo"><span class="bt-s" aria-hidden="true">${tierStars(t.n)}</span><span class="bt-t">${t.name}${hp ? ` · ${BOSS_HP[id]} HP` : ''}</span></span>`;
+};
+const round10 = n => Math.round(n / 10) * 10;
+const squadHPFor = (solo, size) => round10(solo * (1 + 0.6 * (Math.max(1, size) - 1)));
 // Bosses from earlier versions, so old trophies still show their name and picture.
 const RETIRED_BOSSES = [{ id: 'gremlin', name: 'Clutter Gremlin', short: 'Gremlin', lore: 'Hides your notes and scatters your plans.', a: '#f0954a', b: '#7a3d12', c: '#ffd9b8', retired: true }];
 const BOSS_BY_ID = Object.fromEntries([...BOSSES, ...RETIRED_BOSSES].map(b => [b.id, b]));
@@ -5765,10 +5884,12 @@ ITEMS.push(
   { id: 'skin_none', cat: 'pomskin', name: 'Classic tomato', desc: 'Pomeo as he is', price: 0 },
 );
 for (const b of BOSSES) ITEMS.push(
-  { id: 'th_b_' + b.id, cat: 'theme', name: b.theme, desc: `${b.short}-themed colours · light and dark`, price: -1, boss: b.id, mode: 'solo', rarity: 'epic' },
-  { id: 'au_b_' + b.id, cat: 'aura', name: `${b.short} aura`, desc: `A glow in the ${b.short}’s colours`, price: -1, boss: b.id, mode: 'solo', rarity: 'epic' },
-  { id: 'col_b_' + b.id, cat: 'color', name: b.colName, desc: `A ${b.short} gradient for your name`, price: -1, boss: b.id, mode: 'squad', rarity: 'epic' },
-  { id: 'au_b_' + b.id + '_sq', cat: 'aura', name: `${b.short} squad aura`, desc: 'Spinning colours with a shimmer', price: -1, boss: b.id, mode: 'squad', rarity: 'epic' },
+  { id: 'th_b_' + b.id, cat: 'theme', name: b.theme, desc: `${b.short}-themed colours · light and dark${bossTier(b.id).n >= 5 ? ' · animated' : bossTier(b.id).n >= 3 ? ' · arena glow' : ''}`, price: -1, boss: b.id, mode: 'solo', rarity: bossRarity(b.id, 'solo') },
+  { id: 'au_b_' + b.id, cat: 'aura', name: `${b.short} aura`, desc: `A glow in the ${b.short}’s colours`, price: -1, boss: b.id, mode: 'solo', rarity: bossRarity(b.id, 'solo') },
+  { id: 'av_b_' + b.id, cat: 'avatar', name: `Little ${b.short}`, desc: `A chibi ${b.short} for your profile picture${bossTier(b.id).n >= 5 ? ' · animated' : ''}`, price: -1, boss: b.id, mode: 'solo', rarity: bossRarity(b.id, 'solo') },
+  { id: 'col_b_' + b.id, cat: 'color', name: b.colName, desc: `A ${b.short} gradient for your name${rewardLevel(b.id, 'squad') >= 4 ? ' · with shimmer' : ''}`, price: -1, boss: b.id, mode: 'squad', rarity: bossRarity(b.id, 'squad') },
+  { id: 'au_b_' + b.id + '_sq', cat: 'aura', name: `${b.short} squad aura`, desc: rewardLevel(b.id, 'squad') >= 5 ? 'Spinning colours with a shimmer' : rewardLevel(b.id, 'squad') >= 4 ? 'Spinning colours' : 'A pulsing glow in two colours', price: -1, boss: b.id, mode: 'squad', rarity: bossRarity(b.id, 'squad') },
+  { id: 'av_b_' + b.id + '_sq', cat: 'avatar', name: `Golden ${b.short}`, desc: `The squad’s ${b.short}: a golden frame and sparkles`, price: -1, boss: b.id, mode: 'squad', rarity: bossRarity(b.id, 'squad') },
 );
 for (const ev of EVENTS) for (const id of [...ev.rewards, ...ev.final]) {
   const r = EV_ITEMS.find(x => x[0] === id);
@@ -5912,6 +6033,7 @@ let knownInvalid = null;
 function reconcileRewards(mode = 'quiet') {
   if (!rewardsReady()) return [];
   const now = Date.now(), cl = S.game.claims, news = [];
+  if (!S.game.tierFrom) { S.game.tierFrom = dayKey(addDays(weekMonday(), 7)); save(); }   // fixed boss HP from next Monday
   G = null;
   const g0 = game();
   const froze = useStreakFreezes(g0, now);
@@ -6329,6 +6451,7 @@ function applyTheme(themeArg) {
   } else if (theme === 'light' || theme === 'dark') root.setAttribute('data-theme', theme);
   else root.removeAttribute('data-theme');
   setStarfield(skinId === 'th_starfield');
+  themeFx(skinId);
   favKey = '';
   try { renderSky(); } catch (e) { /* the sky isn't set up yet on the very first paint */ }
 }
@@ -6735,6 +6858,7 @@ function previewItem(id) {
 /** Level-up moment. A new tier gets a bigger badge, expanding rings and a soft chord. */
 function showLevelUp(from, to) {
   if (!S.settings.gamification) return;
+  if (holdForFocus('level', 'level', () => showLevelUp(from, Math.max(to, game().lv.level)))) return;
   inboxAdd({ type: 'level', key: 'lv:' + to, title: tierFor(from).id !== tierFor(to).id ? `New tier: ${tierFor(to).name} · level ${to}` : `Level up! You reached level ${to}`, go: { tab: 'profile' }, read: true });
   const t = tierFor(to), tierUp = tierFor(from).id !== t.id, dlg = $('#levelDlg');
   dlg.classList.toggle('tierup', tierUp);
@@ -7712,6 +7836,11 @@ const PB = { q: [], cur: null, timer: 0, lastEvent: 0 };
  *       'nudge' (water/stretch: its own setting; falls back to a toast).
  */
 function pomeoSay(text, { kind = 'event', ms = 5200, actions = null, closable = false, onClose = null } = {}) {
+  // During focus Pomeo keeps quiet: chatter is skipped, things worth saying wait for the end of the block.
+  if (kind !== 'tap' && !userJustActed() && (guardOn() || FG.q.length) && !FG.running) {
+    if (kind === 'event' && guardOn()) return;
+    if (holdForFocus('pomeo', 'pb:' + text, () => pomeoSay(text, { kind, ms, actions, closable, onClose }))) return;
+  }
   let talk = S.settings.pomeoTalk || 'sometimes';
   if (kind === 'event' && minimal()) talk = talk === 'chatty' ? 'sometimes' : 'quiet';   // quieter in True Minimalist
   const visible = pomeoOn() && S.ui.tab === 'timer' && !document.body.classList.contains('zen');
@@ -7965,10 +8094,13 @@ function showPomeoPop(r, day, text) {
   pop.classList.toggle('no-pomeo', !pomeoOn());
   pop.querySelector('.pomeo-pic').innerHTML = pomeoSVG({ state: 'excited', ...pomeoOutfit() });
   $('#popText').textContent = text;
+  const quiet = guardOn();   // during focus: a small banner, not a pop-up that grabs the keyboard
+  pop.classList.toggle('compact', quiet);
+  pop.setAttribute('role', quiet ? 'status' : 'alertdialog');
   pop.classList.remove('hidden', 'show');
   void pop.offsetWidth;
   pop.classList.add('show');
-  $('#popStart').focus({ preventScroll: true });
+  if (!quiet) $('#popStart').focus({ preventScroll: true });
 }
 function closePop() { $('#pomeoPop').classList.add('hidden'); POP.cur = null; }
 function remById(id) { return S.reminders.find(r => r.id === id) || revisionReminders().find(r => r.id === id); }
@@ -8518,7 +8650,12 @@ function bossIndexFor(d = new Date()) {
 }
 /** The boss of the week that contains d (any day of that week works). */
 const bossOfWeek = (d = new Date()) => BOSSES[bossIndexFor(d)];
-const soloHP = () => Math.max(100, Math.round(S.settings.goalMin * 5 / 10) * 10);
+const soloHP = () => Math.max(100, Math.round(S.settings.goalMin * 5 / 10) * 10);   // before v1.13.1: from the daily goal
+/** The first week with the fixed boss HP for this account: the Monday after its first visit with v1.13.1 (synced). */
+const tierFrom = () => S.game.tierFrom || dayKey(addDays(weekMonday(), 7));
+/** A week's Solo HP. A week that started before the change can only get easier, never harder (no progress lost). */
+function bossSoloHP(boss, wk) { const hp = BOSS_HP[boss.id] || 400; return wk < tierFrom() ? Math.min(hp, soloHP()) : hp; }
+function bossSquadHP(boss, size, wk) { const hp = squadHPFor(BOSS_HP[boss.id] || 400, size); return wk < tierFrom() ? Math.min(hp, round10(soloHP() * (1 + 0.8 * (size - 1)))) : hp; }
 /** Reward: about a third of what a week of sessions earns (a full 60-minute-goal week ≈ 110 coins). */
 const soloCoins = hp => clamp(Math.round(hp / 8), 30, 75);
 const squadMembers = () => {
@@ -8575,9 +8712,9 @@ function bossBattle(mode, now = new Date()) {
     const st = cached('publicStats', m.uid);
     members.push({ uid: m.uid, name: m.name, min: st && !st.denied && st.weekKey === wk ? st.weekMin || 0 : 0, loading: st === undefined });
   }
-  const base = soloHP(), size = done ? done.size || members.length : members.length;
+  const base = bossSoloHP(boss, wk), size = done ? done.size || members.length : members.length;
   const formed = mode === 'solo' || size >= 2;
-  const hp = done ? done.hp : mode === 'squad' ? Math.round(base * (1 + 0.8 * (size - 1)) / 10) * 10 : base;
+  const hp = done ? done.hp : mode === 'squad' ? bossSquadHP(boss, size, wk) : base;
   const raw = members.reduce((a, m) => a + m.min, 0);
   const coins = done ? done.coins : mode === 'squad' ? Math.min(120, Math.round(soloCoins(base) * (1 + 0.12 * (size - 1)))) : soloCoins(base);
   const dmg = done ? hp : Math.min(raw, hp), left = (hp - dmg) / hp;
@@ -8619,6 +8756,7 @@ function checkBoss() {
 }
 let bossFresh = null;
 function announceVictory(st) {
+  if (holdForFocus('boss', 'won:' + bkey(st.wk, st.mode), () => announceVictory(st))) return;
   const fresh = !rewardsClaimed(st.boss.id, st.mode), key = bkey(st.wk, st.mode);
   bossFresh = key;
   const what = `${st.boss.name} defeated${st.mode === 'squad' ? ' by your squad' : ''}! +${st.coins} coins`;
@@ -8632,7 +8770,7 @@ function announceVictory(st) {
 }
 
 /* ---------- Boss rewards ---------- */
-const BOSS_REWARDS = { solo: id => ['th_b_' + id, 'au_b_' + id], squad: id => ['col_b_' + id, 'au_b_' + id + '_sq'] };
+const BOSS_REWARDS = { solo: id => ['th_b_' + id, 'au_b_' + id, 'av_b_' + id], squad: id => ['col_b_' + id, 'au_b_' + id + '_sq', 'av_b_' + id + '_sq'] };
 const rewardsClaimed = (id, mode) => !!S.game.claims.brew[id + '|' + mode];
 /** Victories whose rewards haven't been claimed yet (once per boss and mode, any week). */
 function pendingBossRewards() {
@@ -8693,7 +8831,9 @@ async function claimBossRewards(id, mode) {
 }
 
 /* ---------- Reward reveal (boss and questline claims) ---------- */
-function showRewardReveal({ kicker, title, items, pal = [] }) {
+function showRewardReveal(opt) {
+  if (!userJustActed() && holdForFocus('reveal', 'rv:' + opt.title, () => showRewardReveal(opt))) return;
+  const { kicker, title, items, pal = [] } = opt;
   const dlg = $('#rewardDlg'), g = game();
   if (pal[0]) dlg.style.setProperty('--rw1', pal[0]); else dlg.style.removeProperty('--rw1');
   if (pal[1]) dlg.style.setProperty('--rw2', pal[1]); else dlg.style.removeProperty('--rw2');
@@ -8806,12 +8946,13 @@ function renderBossView(host) {
             ${formCard}
           </div>
           <div class="boss-name">${esc(b.name)}</div>
+          <div class="boss-tier">${tierBadge(b.id, { hp: false })}<span class="lbl">Solo ${fmtNum(view === 'solo' ? st.hp : bossBattle('solo').hp)} HP · Squad ${view === 'squad' && st.formed ? `${fmtNum(st.hp)} HP for ${st.members.length}` : `${fmtNum(bossSquadHP(b, 2, st.wk))}+ HP`}</span></div>
           <p class="boss-desc">${esc(b.lore)}</p>
           <div class="hpbar big" role="progressbar" aria-label="Boss health" aria-valuemin="0" aria-valuemax="${st.hp}" aria-valuenow="${hpNow}"><b style="transform:scaleX(${p0.toFixed(4)})"></b><i style="transform:scaleX(${p0.toFixed(4)})"></i><s aria-hidden="true"></s></div>
           <div class="hp-row"><span><strong data-count="boss-hp-${view}" data-val="${hpNow}">${fmtNum(hpNow)}</strong> / ${fmtNum(st.hp)} HP</span><span>${st.done ? 'Week complete' : weekLeftText(st.mon)}</span></div>
           <div class="boss-meta"><span class="pill">⚔️ ${fmtNum(st.formed ? st.rawDmg : 0)} damage</span><span class="pill">🪙 ${st.coins} coins</span>${other.done ? `<span class="pill">${view === 'solo' ? 'Squad' : 'Solo'} ✓ won</span>` : ''}</div>
           ${victory}
-          <p class="lbl" style="margin:12px 0 0">1 focus minute = 1 damage. ${view === 'squad' ? 'Squad HP grows with each member.' : `HP is about 5 days of your ${fmtMin(S.settings.goalMin)} daily goal.`} Solo and Squad are separate battles — win both this week to master the boss. Bosses that get away leave quietly.</p>
+          <p class="lbl" style="margin:12px 0 0">1 focus minute = 1 damage. ${view === 'squad' ? `Squad HP = Solo HP × (1 + 0.6 × each extra member)${st.formed ? `: ${fmtNum(BOSS_HP[b.id])} × ${(1 + 0.6 * (st.members.length - 1)).toFixed(1)}` : ''}.` : `Each boss has its own HP, from ${fmtNum(BOSS_HP.swarm)} (Easy) to ${fmtNum(BOSS_HP.dragon)} (Legendary): harder bosses give rarer rewards.`}${st.hp < (view === 'squad' ? squadHPFor(BOSS_HP[b.id], st.members.length) : BOSS_HP[b.id]) && !st.done ? ' This week’s HP is lower than usual, so no progress is lost with the new difficulty.' : ''} Solo and Squad are separate battles — win both this week to master the boss. Bosses that get away leave quietly.</p>
         </div>
         <div class="card"><div class="row between" style="margin-bottom:8px"><h2 style="margin:0">Battle log</h2><span class="lbl">${view === 'squad' ? 'Squad' : 'Solo'}</span></div>${logHTML}</div>
       </div>
@@ -8819,11 +8960,11 @@ function renderBossView(host) {
         ${pendCard}
         ${squadCard}${squadTeaser}
         <div class="card"><h2>Rewards for ${esc(b.short)}</h2>
-          ${rewardCell(BOSS_REWARDS.solo(b.id), 'Solo victory', 'Its own app theme + a special aura in its colours', rewardsClaimed(b.id, 'solo'))}
-          ${rewardCell(BOSS_REWARDS.squad(b.id), 'Squad victory', 'Its name colour + a shimmering squad aura', rewardsClaimed(b.id, 'squad'))}
+          ${rewardCell(BOSS_REWARDS.solo(b.id), `Solo victory · ${RARITY_LABEL[bossRarity(b.id, 'solo')]}`, 'Its own app theme, a special aura and a profile picture', rewardsClaimed(b.id, 'solo'))}
+          ${rewardCell(BOSS_REWARDS.squad(b.id), `Squad victory · ${RARITY_LABEL[bossRarity(b.id, 'squad')]}`, 'Its name colour, a fancier squad aura and a golden profile picture', rewardsClaimed(b.id, 'squad'))}
           <div class="rp${rec.mastered ? ' got' : ''}"><div class="rp-h"><b>Both in one week</b>${rec.mastered ? '<span class="ok">✓ Earned</span>' : ''}</div><div class="rp-items">${masteredBadge(b, rec.mastered)}</div><div class="lbl">A “Mastered” badge in the Trophy Hall</div></div>
           <p class="lbl" style="margin:10px 0 0">It returns every 10 weeks: beat it again for coins and another star on its trophy.</p></div>
-        <div class="card next-boss" style="--ba:${nb.a};--bb:${nb.b}"><div class="nb-art">${bossSVG(nb.id)}</div><div style="min-width:0"><div class="boss-kicker">Next week</div><div class="nb-name">${esc(nb.name)}</div><div class="lbl">Arrives Monday · in ${nbDays} day${nbDays === 1 ? '' : 's'}</div></div></div>
+        <div class="card next-boss" style="--ba:${nb.a};--bb:${nb.b}"><div class="nb-art">${bossSVG(nb.id)}</div><div style="min-width:0"><div class="boss-kicker">Next week</div><div class="nb-name">${esc(nb.name)}</div>${tierBadge(nb.id)}<div class="lbl">Arrives Monday · in ${nbDays} day${nbDays === 1 ? '' : 's'}</div></div></div>
       </div>
     </div>
     ${trophyHall(b.id)}`;
@@ -8862,7 +9003,7 @@ function trophyHall(curId) {
   const recs = BOSSES.map(b => [b, bossRecord(b.id)]), n = recs.filter(([, r]) => r.wins).length;
   return `<div class="card hall-card-wrap" style="margin-top:16px"><div class="row between" style="margin-bottom:10px"><h2 style="margin:0">Trophy Hall</h2><span class="lbl">${n} / ${BOSSES.length} defeated</span></div>
     <div class="hall">${recs.map(([b, r]) => `<div class="hall-card${r.wins ? ' won' : ''}${b.id === curId ? ' cur' : ''}" style="--ba:${b.a};--bb:${b.b}" title="${esc(b.name)}${r.wins ? ` · ${r.wins} victor${r.wins === 1 ? 'y' : 'ies'}` : ' · not defeated yet'}">
-        ${r.mastered ? masteredBadge(b, true) : ''}<div class="hc-art">${bossSVG(b.id)}</div><div class="hc-n">${esc(b.name.replace(/^The /, ''))}</div>
+        ${r.mastered ? masteredBadge(b, true) : ''}<div class="hc-art">${bossSVG(b.id)}</div><div class="hc-n">${esc(b.name.replace(/^The /, ''))}</div>${tierBadge(b.id, { cls: 'sm' })}
         <div class="hc-s">${r.wins ? `<span class="stars">${starText(r.wins)}</span>` : b.id === curId ? 'This week' : 'Not defeated yet'}</div>
         ${r.wins ? `<div class="hc-m">${r.solo ? '<span>Solo</span>' : ''}${r.squad ? '<span>Squad</span>' : ''}</div>` : ''}</div>`).join('')}</div></div>`;
 }
@@ -8929,7 +9070,7 @@ const auraFor = streak => AURAS.filter(a => streak >= a.min).pop() || null;
 function withAura(html, streak, auraId = '') {
   if (!S.settings.gamification) return html;
   const sp = auraId && SPECIAL_AURAS[auraId];
-  if (sp) return `<span class="aura aura-x-${auraId}${sp.spin ? ' aura-spin' : ''}${sp.shim ? ' aura-shim' : ''}" title="${esc(sp.name)}">${html}</span>`;
+  if (sp) return `<span class="aura aura-x-${auraId}${sp.spin ? ' aura-spin' : ''}${sp.shim ? ' aura-shim' : ''}${sp.pulse ? ' aura-pulse' : ''}${sp.flare ? ' aura-flare' : ''}" title="${esc(sp.name)}">${html}</span>`;
   const a = auraFor(+streak || 0);
   return a ? `<span class="aura aura-${a.id}" title="${a.name} aura · ${streak}-day streak">${html}</span>` : html;
 }
@@ -9000,6 +9141,7 @@ function updateLoginDot() {
 }
 function maybeShowLogin() {
   if (isPreview()) return;
+  if (holdForFocus('login', 'login', maybeShowLogin)) return;   // never over a running focus block (e.g. the tutorial demo)
   if (!loginOn() || loginToday().claimed) return;
   if (localStorage.getItem(LOGIN_LATER_KEY) === dayKey(new Date())) return;
   if (document.querySelector('dialog[open]') || !$('#tour').classList.contains('hidden')) return;
@@ -10146,9 +10288,10 @@ addEventListener('resize', () => $$('.catrow').forEach(updateFades));
    command palette, offline banner, pull to refresh, tab swipes, haptics.
    Everything here is stored on this device (localStorage); no new cloud data.
    ========================================================================== */
-const APP_VERSION = '1.13';
+const APP_VERSION = '1.13.1';
 const VER_KEY = 'pomodorolist-seen-version';
 const CHANGELOG = [
+  { v: '1.13.1', t: 'No more interruptions during focus, boss difficulty tiers, boss profile pictures, new intro', d: 'Nothing pops up over a focus block any more (daily rewards, level-ups, achievements, tips and Pomeo’s news wait and come one at a time when it ends; a due reminder is a slim banner). Each boss now has its own HP from 300 (Easy) to 600 (Legendary), with Squad HP growing by 60% per extra member, and harder bosses give rarer, fancier rewards — including a chibi profile picture for every boss (golden for Squad wins). Plus a short intro the first time you visit.' },
   { v: '1.13', t: 'Player cards, a living sky and completion stamps', d: 'A player card at the top of your Profile with a stats board (focus hours, streaks, a mini week chart and 12-week heatmap, top subjects, best focus time, bosses and garden), up to 3 featured slots, banners and card styles — save it as an image or share a read-only link, with a switch for every stat. An optional time-of-day background (sunrise, day, sunset, stars at night, plus a Rain mood), and a stamp that lands on every finished session, collectable in the Shop and from bosses and events.' },
   { v: '1.12', t: 'Boss arena, your bag and Pomeo’s questlines', d: 'Ten weekly bosses in a new arena (Solo and Squad are separate battles you can switch between freely, each with its own rewards, plus a Trophy Hall), a bag with everything you own, loadouts and special auras friends can see, and monthly Pomeo questlines starting with Pomeo’s Halloween — with optional festive touches.' },
   { v: '1.11', t: 'Bug fixes, faster loading and better sync', d: 'Opens straight from your last visit while it syncs (no more numbers counting up from 0), reminders, revision plans and exams sync item by item on every device (deleted stays deleted, a reminder rings on one device only), sounds work reliably on Safari and Chrome with a Test sounds button, and a fresh cast of demo friends.' },
@@ -10167,7 +10310,7 @@ const CHANGELOG = [
   { v: '1.1', t: 'Accounts & sync', d: 'Log in and keep your sessions in sync on every device, even offline.' },
   { v: '1.0', t: 'Focus timer', d: 'Pomodoro timer with named sessions, presets, streaks and stats.' },
 ];
-const NEWS = ['🪪 Your player card: stats board, banners, styles and featured wins — share it as an image or a link (Profile)', '🌅 A time-of-day sky behind the app, with an optional Rain mood (Settings → Appearance)', '✅ Completion stamps land on every finished session — collect more in the Shop, from bosses and events', '🔒 Choose exactly what your card shows; notes, reminders and email are never shared'];
+const NEWS = ['🤫 No more interruptions during focus: rewards and tips wait until the block ends', '⚔️ Boss difficulty tiers: 300–600 HP, rarer rewards for harder bosses', '🖼️ Boss profile pictures for every victory (golden for Squad wins)', '✨ A new intro for first-time visitors', '🪪 Your player card: stats board, banners, styles and featured wins — share it as an image or a link (Profile)', '🌅 A time-of-day sky behind the app, with an optional Rain mood (Settings → Appearance)', '✅ Completion stamps land on every finished session — collect more in the Shop, from bosses and events', '🔒 Choose exactly what your card shows; notes, reminders and email are never shared'];
 
 /* ---------- Haptics ---------- */
 const HAPTIC_KEY = 'pomodorolist-haptics';
@@ -10835,20 +10978,28 @@ for (const [id, ev] of Object.entries(EV_RINGS)) RING_CLASSES[id] = id === 'ring
 
 // ---- Name colours: plain colours stay in NAME_COLORS; gradients get a class with light and dark variants ----
 const NAME_GRADS = {};
-for (const b of BOSSES) NAME_GRADS['col_b_' + b.id] = { ...b.grad, squad: true };
+for (const b of BOSSES) {
+  const legend = bossTier(b.id).n >= 5, art = BOSS_ART[b.id], chibi = `<g transform="translate(-1.4 .4) scale(.215)"><g class="av-bob">${art.body}${art.calm}</g></g>`;
+  AVATAR_ART['av_b_' + b.id] = { bg: b.c, anim: legend, art: `<circle cx="12" cy="24" r="12" fill="${b.b}" opacity=".35"/>` + chibi };
+  AVATAR_ART['av_b_' + b.id + '_sq'] = { bg: '#2b2240', anim: true, art: `<circle cx="12" cy="13" r="10" fill="${b.a}" opacity=".45"/><circle cx="12" cy="13" r="7" fill="${b.c}" opacity=".5"/>` + chibi
+    + '<circle cx="12" cy="12" r="11.1" fill="none" stroke="#f2cf63" stroke-width="1.5"/><circle cx="12" cy="12" r="9.9" fill="none" stroke="#fff3c4" stroke-width=".4" opacity=".7"/>'
+    + [[4.6, 5.4, 1], [19.2, 6.2, .8], [18.6, 18.4, .9]].map(([x, y, r]) => `<path class="av-twinkle" d="M${x} ${y - 1.6 * r}l${.45 * r} ${1.15 * r} ${1.15 * r} ${.45 * r}-${1.15 * r} ${.45 * r}-${.45 * r} ${1.15 * r}-${.45 * r}-${1.15 * r}-${1.15 * r}-${.45 * r} ${1.15 * r}-${.45 * r}Z" fill="#ffe28a"/>`).join('') };
+}
+for (const b of BOSSES) NAME_GRADS['col_b_' + b.id] = { ...b.grad, squad: true, lv: rewardLevel(b.id, 'squad') };   // lv 3+: moving, 4+: shimmer, 5+: glow
 for (const ev of EVENTS) NAME_GRADS['col_ev_' + ev.id] = EV_LOOK[ev.id].grad;
 /** Attributes for an element showing someone's name in their name colour (class merged with `cls`). */
 function nameAttrs(colId, cls = '') {
   const g = !minimal() && NAME_GRADS[colId], c = !minimal() && NAME_COLORS[colId];
-  const k = [cls, g ? `ncg nc-${colId}${g.squad ? ' ncs' : ''}` : ''].filter(Boolean).join(' ');
+  const k = [cls, g ? `ncg nc-${colId}${(g.lv ? g.lv >= 3 : g.squad) ? ' ncs' : ''}${g.lv >= 4 ? ' ncsh' : ''}${g.lv >= 5 ? ' ncgl' : ''}` : ''].filter(Boolean).join(' ');
   return (k ? ` class="${k}"` : '') + (!g && c ? ` style="color:${c}"` : '');
 }
 
 // ---- Special auras: replace the automatic streak aura when chosen (and friends see them) ----
 const SPECIAL_AURAS = {};
 for (const b of BOSSES) {
-  SPECIAL_AURAS['au_b_' + b.id] = { cols: [b.a, b.b], name: `${b.short} aura` };
-  SPECIAL_AURAS['au_b_' + b.id + '_sq'] = { cols: [b.a, b.b, b.c], name: `${b.short} squad aura`, spin: true, shim: true };
+  // 1 one colour · 2 two colours · 3 a stronger pulse · 4 spinning · 5 + shimmer · 6 + a flare (Squad = one step up)
+  for (const [id, lv, name] of [['au_b_' + b.id, rewardLevel(b.id, 'solo'), `${b.short} aura`], ['au_b_' + b.id + '_sq', rewardLevel(b.id, 'squad'), `${b.short} squad aura`]])
+    SPECIAL_AURAS[id] = { cols: lv === 1 ? [b.a] : lv < 4 ? [b.a, b.b] : [b.a, b.b, b.c], name, lv, pulse: lv === 3, spin: lv >= 4, shim: lv >= 5, flare: lv >= 6 };
 }
 for (const ev of EVENTS) { const cols = EV_LOOK[ev.id].aura; SPECIAL_AURAS['au_ev_' + ev.id] = { cols, name: (EV_ITEMS.find(x => x[0] === 'au_ev_' + ev.id) || [])[2] + ' aura', spin: cols.length > 2 }; }
 
@@ -10863,12 +11014,17 @@ const EV_FX = Object.fromEntries(EVENTS.filter(ev => EV_LOOK[ev.id].fx).map(ev =
   for (const [id, a] of Object.entries(SPECIAL_AURAS)) {
     const [c1, c2, c3] = a.cols;
     if (a.spin) css.push(`.aura-x-${id}::before{inset:-5px;background:conic-gradient(${[...a.cols, c1].join(',')});filter:blur(4px);opacity:.88}`);
+    else if (a.lv === 1) css.push(`.aura-x-${id}::before{box-shadow:0 0 10px 3px ${hexA(c1, .55)}}`);
+    else if (a.lv === 3) css.push(`.aura-x-${id}::before{box-shadow:0 0 14px 4px ${hexA(c1, .7)},0 0 4px 2px ${hexA(c2, .9)}}`);
     else css.push(`.aura-x-${id}::before{box-shadow:0 0 11px 3px ${hexA(c1, .62)},0 0 3px 1.5px ${hexA(c2, .85)}}`);
+    if (a.flare) css.push(`.aura-x-${id}{--flare:${hexA(c3 || c1, .9)}}`);
     if (c3 && !a.spin) css.push(`.aura-x-${id}::before{box-shadow:0 0 11px 3px ${hexA(c1, .6)},0 0 4px 1.5px ${hexA(c3, .9)}}`);
   }
   for (const [id, g] of Object.entries(NAME_GRADS)) {
-    css.push(`.nc-${id}{background-image:linear-gradient(90deg,${g.l.join(',')}${g.squad ? ',' + g.l[0] : ''})}`);
-    const dk = `.nc-${id}{background-image:linear-gradient(90deg,${g.d.join(',')}${g.squad ? ',' + g.d[0] : ''})}`;
+    const sh = g.lv >= 4 ? 'linear-gradient(100deg,transparent 0 42%,rgba(255,255,255,.85) 50%,transparent 58% 100%),' : '';
+    css.push(`.nc-${id}{background-image:${sh}linear-gradient(90deg,${g.l.join(',')}${g.squad ? ',' + g.l[0] : ''})}`);
+    if (g.lv >= 5) css.push(`.nc-${id}.ncgl{filter:drop-shadow(0 0 5px ${hexA(g.l[0], .45)})}`, `:root[data-theme="dark"] .nc-${id}.ncgl{filter:drop-shadow(0 0 6px ${hexA(g.d[0], .55)})}`);
+    const dk = `.nc-${id}{background-image:${sh}linear-gradient(90deg,${g.d.join(',')}${g.squad ? ',' + g.d[0] : ''})}`;
     css.push(`:root[data-theme="dark"] ${dk}`, `@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) ${dk}}`);
   }
   for (const [id, ev] of Object.entries(EV_RINGS)) {
@@ -11049,6 +11205,7 @@ const TIPS = {
 const tipsSeen = () => new Set(readJSON(TIPS_KEY, []));
 let tipT = 0;
 function maybeTip(tab) {
+  if (holdForFocus('tip', 'tip:' + tab, () => maybeTip(tab))) return;
   if (!USER || isPreview() || !TIPS[tab] || !S.onboarded || $('#tutDlg').open || !$('#tour').classList.contains('hidden')) return;
   const seen = tipsSeen();
   if (seen.has(tab)) return;
@@ -11376,7 +11533,7 @@ function demoDocs() {
   const trophies = {}, bosses = {}, brew = {}, grants = {};
   [[1, 'solo'], [2, 'solo'], [2, 'squad'], [4, 'squad'], [10, 'solo']].forEach(([k, mode]) => {
     const wk = wkPast(k), b = bossOfWeek(parseDay(wk)), at = Date.now() - k * 6 * 864e5, key = wk + '|' + mode;
-    trophies[key] = { boss: b.id, mode, hp: mode === 'squad' ? 1560 : 600, coins: mode === 'squad' ? 70 : 45, size: mode === 'squad' ? 3 : 1, at };
+    trophies[key] = { boss: b.id, mode, hp: mode === 'squad' ? squadHPFor(BOSS_HP[b.id], 3) : BOSS_HP[b.id], coins: mode === 'squad' ? 70 : 45, size: mode === 'squad' ? 3 : 1, at };
     bosses[key] = at;
     if (k !== 4) { brew[b.id + '|' + mode] = at + 60e3; for (const id of BOSS_REWARDS[mode](b.id)) grants[id] = { src: `boss:${b.id}:${mode}`, at: at + 60e3 }; }
   });
@@ -11398,7 +11555,7 @@ function demoDocs() {
     recent: [{ name: 'Physics', presetId: 'p-deep', ts: Date.now() - 3600e3 }, { name: 'Maths', presetId: 'p-classic', ts: Date.now() - 7200e3 }, { name: 'Chemistry', presetId: 'p-deep', ts: Date.now() - 864e5 }],
     pinned: [{ name: 'Physics', presetId: 'p-deep' }],
     game: { purchases, equipped: { ...equipped, stamp: 'stamp_pixel', card: 'card_champion', aura: Object.keys(grants).find(id => /^au_b_.*_sq$/.test(id)) || 'au_streak', color: Object.keys(grants).find(id => id.startsWith('col_b_')) || equipped.color, frame: 'frame_cobweb' },
-      claims: { bosses, brew, quests, milestones: { 3: Date.now() - 20 * 864e5, 7: Date.now() - 16 * 864e5 } }, trophies, grants, freezesUsed: {}, seenAt: Date.now() - 2 * 864e5 },
+      tierFrom: '2000-01-03', claims: { bosses, brew, quests, milestones: { 3: Date.now() - 20 * 864e5, 7: Date.now() - 16 * 864e5 } }, trophies, grants, freezesUsed: {}, seenAt: Date.now() - 2 * 864e5 },
     cardPrefs: { banner: { v: 'bs:' + mastered, u: cardAt }, featured: { v: ['fm:' + mastered, 'fs:7', 'fe:frame_cobweb'], u: cardAt }, p_subjects: { v: true, u: cardAt } },
     loadouts: [{ id: 'demo_lo1', name: 'Exam mode', look: { theme: 'th_ocean', avatar: 'av_owl', frame: 'frame_double', color: 'col_teal', aura: 'au_streak', pomhat: 'hat_grad', pomacc: 'acc_glasses', pomskin: 'skin_none', title: 'ti_none' } },
       { id: 'demo_lo2', name: 'Spooky', look: { avatar: 'av_bat', frame: 'frame_cobweb', aura: 'au_streak', pomhat: 'hat_none', pomacc: 'acc_none', pomskin: 'skin_none' } }],
@@ -11410,7 +11567,7 @@ function demoDocs() {
     revisions: [{ id: 'demo_v1', topic: 'Chemistry', presetId: 'p-classic', time: '18:00', step: 1, next: dayKey(now), created: Date.now() - 3 * 864e5, log: [], done: {}, snooze: {} }],
     exams: [{ id: 'demo_x1', name: 'JEE Main', date: dayKey(addDays(now, 74)), added: Date.now() - 40 * 864e5 }],
     parked: [{ id: 'demo_p1', text: 'Ask James for the organic chemistry notes', at: Date.now() - 5400e3, done: false }],
-    squad: DEMO_FRIENDS.slice(0, 2).map(f => ({ uid: f.uid, name: f.name })),
+    squad: DEMO_FRIENDS.map(f => ({ uid: f.uid, name: f.name })),   // a full squad of 5, so the (smaller) v1.13.1 boss stays mid-battle
     subTemplates: [], energy,
   };
   // My minutes this week decide the friends' weekly numbers, so the boss is always mid-battle.
@@ -11418,9 +11575,9 @@ function demoDocs() {
   const docs = { 'users/demo': profile };
   for (const [m, list] of Object.entries(byMonth)) docs[`users/demo/months/${m}`] = { month: m, sessions: list };
   const wk = dayKey(mon), wkSun = dayKey(weekStartOf(now, 0));
-  // Squad boss HP is 2.6 × (5 × the 120-minute goal) = 1,560: the squad (me + the first two friends) sits at about 62%.
-  const squadLeft = Math.max(60, Math.round(1560 * .62 - myWeek));
-  const weekOf = [Math.round(squadLeft * .55), Math.round(squadLeft * .45), Math.round(myWeek * .6 + 30), Math.round(myWeek + 95), Math.round(myWeek * .85 + 20)];
+  // The squad (me + all five friends) sits at about 62% of this boss’s Squad HP.
+  const squadLeft = Math.max(60, Math.round(squadHPFor(BOSS_HP[bossOfWeek(now).id], 6) * .62 - myWeek));
+  const weekOf = [.3, .25, .17, .16, .12].map(f => Math.round(squadLeft * f));
   DEMO_FRIENDS.forEach((f, i) => {
     const weekMin = Math.max(30, weekOf[i]), dayMin = Math.round(Math.min(weekMin, 35 + i * 20));
     const pub = { username: f.name, level: f.level, tier: f.tier, frame: ITEM_BY_ID[f.frame] ? f.frame : 'frame_none', color: ITEM_BY_ID[f.color] ? f.color : 'col_default', avatar: f.avatar };
@@ -12859,6 +13016,7 @@ const UNLOCKS = [
   ...BOSSES.map(b => ({ id: 'stamp_b_' + b.id, src: `boss:${b.id}:emblem`, ok: () => bossRecord(b.id).wins > 0 })),
   { id: 'stamp_pumpkin', src: 'ev:hw26', ok: () => questClaimsIn('hw26') >= 3 },
   { id: 'stamp_snow', src: 'ev:xm26', ok: () => questClaimsIn('xm26') >= 3 },
+  ...BOSSES.flatMap(b => ['solo', 'squad'].map(mode => ({ id: 'av_b_' + b.id + (mode === 'squad' ? '_sq' : ''), src: `boss:${b.id}:${mode}`, ok: () => !!S.game.claims.brew[b.id + '|' + mode] }))),
   { id: 'card_champion', src: 'boss:mastered', ok: () => BOSSES.some(b => bossRecord(b.id).mastered) },
   { id: 'card_haunted', src: 'ev:hw26', ok: () => questClaimsIn('hw26') >= 4 },
   { id: 'card_frost', src: 'ev:xm26', ok: () => questClaimsIn('xm26') >= 4 },
@@ -13422,6 +13580,145 @@ async function shareCardLink() {
   if (navigator.share) { try { await navigator.share({ title: 'My Pomodorolist card', text: 'My focus stats on Pomodorolist', url: shareURL }); } catch (e) { /* cancelled */ } return; }
   copyCardLink();
 }
+
+/* ---------- Boss themes get richer with the boss: Hard and up add an arena glow behind the app,
+   Elite a slowly drifting one, Legendary rising embers too (still while Animations are off). ---------- */
+function themeFx(skinId) {
+  const el = $('#themeFx');
+  if (!el) return;
+  const m = /^th_b_(\w+)$/.exec(skinId || ''), b = m && BOSS_BY_ID[m[1]], n = b && USER && !minimal() ? bossTier(b.id).n : 0;
+  el.className = n >= 3 ? `tfx tfx-${n}` : 'hidden';
+  if (n < 3) return;
+  el.style.setProperty('--tf1', b.a); el.style.setProperty('--tf2', b.b); el.style.setProperty('--tf3', b.c);
+  if (n >= 5 && !el.childElementCount) {
+    let seed = 3;
+    const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    el.innerHTML = Array.from({ length: 16 }, () => `<i style="left:${(rnd() * 100).toFixed(1)}%;--d:${(9 + rnd() * 9).toFixed(1)}s;--dl:${(-rnd() * 18).toFixed(1)}s;--s:${(2 + rnd() * 3).toFixed(1)}px;--x:${(rnd() * 60 - 30).toFixed(0)}px"></i>`).join('');
+  } else if (n < 5) el.innerHTML = '';
+}
+
+/* ==========================================================================
+   FOCUS GUARD — nothing interrupts a focus block. While one is running or
+   paused (the tutorial's 1-minute demo and sessions started from a reminder
+   included), pop-ups and celebrations are held: daily rewards, level-ups,
+   achievements, unlocks, boss news, tips, Pomeo's chatter and background toasts.
+   They come back one at a time once the block ends (after the stamp lands),
+   most important first, never on top of each other or of an open dialog.
+   Still shown during focus: what you do yourself (the session's controls, the
+   parking lot, subtasks) and a reminder that is actually due, as a small banner.
+   ========================================================================== */
+const FG = { q: [], n: 0, until: 0, ending: false, input: -1e9, running: false };
+const HOLD_ORDER = { level: 1, ach: 2, boss: 3, reveal: 4, unlock: 5, login: 6, migrate: 7, tip: 8, pomeo: 9, toast: 10 };
+const HOLD_GAP = { level: 900, ach: 3200, boss: 4200, reveal: 900, unlock: 3000, login: 900, migrate: 900, tip: 900, pomeo: 4500, toast: 1600 };
+/** A focus block is in progress (running or paused), and it isn't the moment it ends. */
+const guardOn = () => !!USER && focusActive() && !FG.ending;
+// Feedback for something the user just did (a tap or a key) is never held.
+const userJustActed = () => performance.now() - FG.input < 1500;
+for (const type of ['pointerdown', 'keydown']) document.addEventListener(type, e => { if (e.isTrusted) FG.input = performance.now(); }, true);
+/**
+ * Hold a pop-up for after the focus block (or behind ones already waiting). Returns true when held.
+ * key: one per thing (a second request for the same thing is dropped).
+ */
+function holdForFocus(kind, key, run) {
+  if (FG.running || FG.ending || (!guardOn() && !FG.q.length)) return false;   // the block's own end-of-session feedback is never held
+  if (key && FG.q.some(x => x.key === key)) return true;
+  if (kind === 'pomeo') { const ps = FG.q.filter(x => x.kind === 'pomeo'); if (ps.length >= 2) FG.q.splice(FG.q.indexOf(ps[0]), 1); }   // only the latest few words
+  FG.q.push({ kind, key, run, n: FG.n++ });
+  return true;
+}
+/** Something on screen the next pop-up must not cover. */
+const guardBusy = () => !!document.querySelector('dialog[open]') || !$('#tour').classList.contains('hidden') || !$('#wrapped').classList.contains('hidden')
+  || achBusy || !!PB.cur || !$('#tipPop').classList.contains('hidden');
+function releaseHeld() {
+  const on = guardOn();
+  document.documentElement.toggleAttribute('data-focusing', on);
+  if (!FG.q.length || on || !USER || Date.now() < FG.until || document.hidden || guardBusy()) return;
+  FG.q.sort((a, b) => (HOLD_ORDER[a.kind] - HOLD_ORDER[b.kind]) || a.n - b.n);
+  const it = FG.q.shift();
+  FG.until = Date.now() + (HOLD_GAP[it.kind] || 1500);
+  FG.running = true;
+  try { it.run(); } catch (e) { console.warn('held pop-up failed', e); }
+  FG.running = false;
+}
+setInterval(releaseHeld, 500);
+/** The focus block just ended: let the session's own feedback (toast, stamp) go first. */
+function focusEnded() { FG.until = Math.max(FG.until, Date.now() + 1900); }
+
+/* ==========================================================================
+   INTRO — the first time this device opens the welcome page (nobody signed in,
+   no earlier use), a short title sequence plays over it: a few lines typed
+   word by word, Pomeo pops in, then the title glides into the page header and
+   Pomeo into his spot. The welcome page is already there underneath, so
+   nothing waits for it. Tap, click or any key skips it. Shown once per device;
+   Animations Reduced/Off (or the system's reduced motion) get a quick fade.
+   ========================================================================== */
+const INTRO_KEY = 'pomodorolist-intro-seen';
+const INTRO_LINES = ['Focus.', 'Grow your garden.', 'Beat the boss.', 'Pomodorolist.'];
+let INTRO = null;
+function introDue() {
+  try { return !localStorage.getItem(INTRO_KEY) && !localStorage.getItem(LAST_USER) && localStorage.getItem(GUEST_FLAG) !== '1' && !localStorage.getItem(TOUR_KEY) && !localStorage.getItem(LEGACY_KEY); }
+  catch (e) { return false; }
+}
+function playIntro() {
+  if (INTRO || !introDue()) return;
+  try { localStorage.setItem(INTRO_KEY, '1'); } catch (e) {}
+  const el = $('#intro'), m = motion(), calm = m !== 'full' || matchMedia('(prefers-reduced-motion: reduce)').matches;
+  INTRO = { timers: [], done: false, calm };
+  const at = (ms, fn) => INTRO.timers.push(setTimeout(fn, ms));
+  $('#inPomeo').innerHTML = pomeoSVG({ state: 'happy' });
+  el.classList.remove('hidden', 'leaving', 'fade', 'pomeo-in', 'final');
+  el.classList.toggle('calm', calm);
+  document.body.classList.add('intro-on');
+  if (calm) {   // a quick fade instead of the title sequence
+    $('#inLine').innerHTML = 'Pomodorolist<span class="in-dot">.</span>';
+    el.classList.add('final', 'pomeo-in');
+    at(m === 'off' ? 600 : 850, () => endIntro(true));
+    return;
+  }
+  const PER_WORD = 140, HOLD = 380;
+  let t = 200;
+  INTRO_LINES.forEach((line, li) => {
+    const last = li === INTRO_LINES.length - 1, words = last ? ['Pomodorolist'] : line.split(' ');
+    at(t, () => { const L = $('#inLine'); L.innerHTML = ''; L.classList.remove('out'); el.classList.toggle('final', last); });
+    words.forEach((w, wi) => at(t + 40 + wi * PER_WORD, () => {
+      const s = document.createElement('span');
+      s.className = 'in-w';
+      if (last) s.innerHTML = 'Pomodorolist<span class="in-dot">.</span>'; else s.textContent = w;
+      if (wi) $('#inLine').appendChild(document.createTextNode(' '));   // real spaces, so it reads right
+      $('#inLine').appendChild(s);
+    }));
+    t += 40 + words.length * PER_WORD + (last ? 0 : HOLD);
+    if (!last) { at(t, () => $('#inLine').classList.add('out')); t += 200; }
+  });
+  at(t + 120, () => el.classList.add('pomeo-in'));   // Pomeo pops in
+  at(t + 1000, () => endIntro());
+}
+/** Leave the intro: the title glides into the page header and Pomeo into his spot (or a quick fade). */
+function endIntro(quick = false) {
+  if (!INTRO || INTRO.done) return;
+  INTRO.done = true;
+  INTRO.timers.forEach(clearTimeout);
+  const el = $('#intro'), m = motion();
+  const finish = () => { el.classList.add('hidden'); el.classList.remove('leaving', 'fade'); document.body.classList.remove('intro-on'); $('#inLine').style.transform = ''; $('#inPomeo').style.transform = ''; INTRO = null; };
+  if (m === 'off') { finish(); return; }
+  if (quick || INTRO.calm || !el.classList.contains('pomeo-in')) { el.classList.add('fade'); setTimeout(finish, 320); return; }
+  // Glide: measure where the header title and Pomeo sit on the page underneath
+  const line = $('#inLine'), brand = $('#authView .auth-brand'), word = line.querySelector('.in-w') || line;
+  const text = [...brand.childNodes].find(n => n.nodeType === 3 && n.textContent.trim());
+  const r = document.createRange();
+  if (text) r.selectNodeContents(text);
+  const dst = text ? r.getBoundingClientRect() : brand.getBoundingClientRect(), src = word.getBoundingClientRect();
+  const s = parseFloat(getComputedStyle(brand).fontSize) / parseFloat(getComputedStyle(line).fontSize);
+  const lr = line.getBoundingClientRect();
+  line.style.transformOrigin = `${src.left - lr.left}px ${src.top - lr.top}px`;
+  line.style.transform = `translate(${(dst.left - src.left).toFixed(1)}px, ${(dst.top - src.top + (dst.height - src.height * s) / 2).toFixed(1)}px) scale(${s.toFixed(3)})`;
+  const pp = $('#inPomeo').getBoundingClientRect(), lp = $('#lpPomeo').getBoundingClientRect();
+  if (pp.width && lp.width) $('#inPomeo').style.transform = `translate(${(lp.left + lp.width / 2 - (pp.left + pp.width / 2)).toFixed(1)}px, ${(lp.top + lp.height / 2 - (pp.top + pp.height / 2)).toFixed(1)}px) scale(${(lp.width * .82 / pp.width).toFixed(3)})`;
+  el.classList.add('leaving');
+  setTimeout(finish, 760);
+}
+$('#intro').addEventListener('pointerdown', e => { e.preventDefault(); endIntro(true); });
+document.addEventListener('keydown', e => { if (INTRO && !INTRO.done) { e.preventDefault(); e.stopPropagation(); endIntro(true); } }, true);
 
 async function boot() {
   captureInvite();
