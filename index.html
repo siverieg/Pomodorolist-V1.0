@@ -2281,6 +2281,212 @@ body.first-load #todayBar { opacity: 0; }
 @keyframes skPulse { from { opacity: .55; } to { opacity: 1; } }
 .tabs .ls { display: none; }
 @media (max-width: 400px) { .tabs .lf { display: none; } .tabs .ls { display: inline; } .tabs button { font-size: 10px; } }
+
+/* ==========================================================================
+   PLAYER CARD (Profile, friends, shared links) — colours come from the card style
+   ========================================================================== */
+.pc-host { display: block; padding: 0; overflow: hidden; }
+.pc-host > .pcard { border: 0; border-radius: 0; box-shadow: none; }
+.pc-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px 12px; flex-wrap: wrap; padding: 12px 16px 14px; border-top: 1px solid var(--line); }
+.pc-bar .btn-row { flex-wrap: wrap; }
+.pcard { position: relative; overflow: hidden; background: var(--pc-bg); color: var(--pc-fg); font-family: var(--pc-font); border-radius: var(--radius); border: 1px solid var(--pc-line);
+  container-type: inline-size; text-align: left; }
+.pc-banner { position: relative; height: 104px; overflow: hidden; }
+.pc-banner .pc-bbg, .pc-banner .pc-bart, .cd-bn .pc-bbg, .cd-bn .pc-bart { position: absolute; inset: 0; width: 100%; height: 100%; }
+.pc-banner .pc-bart { right: 10px; width: calc(100% - 10px); }
+.pc-banner.pc-plain { height: 8px; background: var(--pc-acc); }
+.pc-deco { position: absolute; left: 14px; top: 12px; width: 40px; height: 40px; opacity: .95; }
+.pc-id { display: flex; align-items: flex-start; gap: 14px; padding: 0 18px; margin-top: -38px; position: relative; }
+.pc-mini .pc-id { margin-top: 16px; align-items: center; }
+.pc-av { flex: none; width: 84px; height: 84px; border-radius: 50%; display: grid; place-items: center; background: var(--pc-bg); }
+.pc-av .avatar.pc-init { width: 72px; height: 72px; font-size: 30px; }
+.pc-who { min-width: 0; flex: 1; padding-top: 44px; }
+.pc-mini .pc-who { padding-top: 0; }
+.pc-name { font-size: 21px; font-weight: 750; line-height: 1.2; overflow-wrap: anywhere; }
+.pc-name:not([style]):not(.ncg) { color: var(--pc-fg); }
+.pc-title { font-size: 12.5px; font-weight: 650; letter-spacing: .05em; color: var(--pc-acc); margin-top: 2px; }
+.pc-lv { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: 13px; color: var(--pc-mut); margin-top: 4px; }
+.pc-tier { display: inline-flex; align-items: center; gap: 5px; font-weight: 700; color: var(--tc); }
+.pc-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; padding: 14px 18px 0; }
+.pc-tile { background: var(--pc-tile); border: 1px solid var(--pc-line); border-radius: 14px; padding: 10px 12px; min-width: 0; }
+.pc-tile b { display: block; font-size: 21px; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pc-tile b small { font-size: 13px; font-weight: 600; margin-left: 1px; color: var(--pc-mut); }
+.pc-tile span { display: block; font-size: 11.5px; color: var(--pc-mut); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pc-charts { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px 18px; padding: 14px 18px 0; }
+.pc-sec { min-width: 0; }
+.pc-h { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--pc-mut); margin-bottom: 6px; }
+.pc-week { width: 100%; max-width: 270px; height: auto; max-height: 112px; display: block; }
+.pc-week text { font-size: 10px; fill: var(--pc-mut); font-family: var(--pc-font); }
+.pc-heat { width: 100%; max-width: 260px; height: auto; display: block; }
+.pc-more { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px; padding: 14px 18px 0; }
+.pc-fact { display: flex; align-items: center; gap: 10px; background: var(--pc-tile); border: 1px solid var(--pc-line); border-radius: 14px; padding: 8px 12px; min-width: 0; }
+.pc-fact i { font-style: normal; font-size: 20px; flex: none; }
+.pc-fact span { min-width: 0; font-size: 11.5px; color: var(--pc-mut); }
+.pc-fact b { display: block; font-size: 14px; color: var(--pc-fg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pc-more .pc-sec { grid-column: 1 / -1; }
+.pc-subj { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.pc-subj li { display: grid; grid-template-columns: minmax(0, 1fr) minmax(60px, 34%) 5.2em; align-items: center; gap: 10px; font-size: 13.5px; }
+.pc-subj li span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pc-subj li i { height: 8px; border-radius: 4px; background: linear-gradient(90deg, var(--pc-acc) var(--w), color-mix(in srgb, var(--pc-line) 80%, transparent) var(--w)); }
+.pc-subj li b { text-align: right; font-weight: 600; font-size: 12.5px; color: var(--pc-mut); font-variant-numeric: tabular-nums; }
+.pc-feat { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; padding: 14px 18px 0; }
+.pc-chip { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 14px; min-width: 0;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--pc-acc) 16%, var(--pc-tile)), var(--pc-tile)); border: 1px solid color-mix(in srgb, var(--pc-acc) 35%, var(--pc-line)); }
+.pc-chip > span:last-child { min-width: 0; font-size: 11.5px; color: var(--pc-mut); }
+.pc-chip b { display: block; font-size: 13.5px; color: var(--pc-fg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pc-fi { flex: none; display: grid; place-items: center; width: 30px; height: 30px; color: var(--pc-acc); }
+.pc-fi svg { width: 26px; height: 26px; }
+.pcard > :last-child { margin-bottom: 18px; }
+.pcard > .pc-foot { padding: 14px 18px 0; font-size: 12px; color: var(--pc-mut); text-align: center; }
+.pc-empty { padding: 14px 18px 0; margin: 0; color: var(--pc-mut); font-size: 13.5px; }
+@container (max-width: 520px) {
+  .pc-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pc-charts { grid-template-columns: minmax(0, 1fr); }
+  .pc-week, .pc-heat { max-width: none; }
+  .pc-heat { max-width: 300px; }
+}
+@container (max-width: 340px) {
+  .pc-id { gap: 10px; padding: 0 14px; }
+  .pc-av { width: 70px; height: 70px; } .pc-av > * { transform: scale(.84); }
+  .pc-tiles, .pc-charts, .pc-more, .pc-feat { padding-left: 14px; padding-right: 14px; }
+  .pc-name { font-size: 18px; }
+}
+/* styles */
+.pcard.cs-scholar { border: 3px double var(--pc-line); }
+.pcard.cs-scholar .pc-name, .pcard.cs-scholar .pc-tile b { font-weight: 700; }
+.pcard.cs-gamer { box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pc-acc) 45%, transparent), 0 0 24px -12px var(--pc-acc); }
+.pcard.cs-gamer .pc-tile, .pcard.cs-gamer .pc-fact, .pcard.cs-gamer .pc-chip { border-radius: 6px; border-color: color-mix(in srgb, var(--pc-acc) 40%, var(--pc-line)); box-shadow: 0 0 10px -6px var(--pc-acc); }
+.pcard.cs-gamer .pc-tile b { color: var(--pc-acc); text-shadow: 0 0 8px color-mix(in srgb, var(--pc-acc) 55%, transparent); }
+.pcard.cs-gamer .pc-h { color: var(--pc-acc2); }
+.pcard.cs-champion { border: 2px solid transparent; background: linear-gradient(var(--pc-bg), var(--pc-bg)) padding-box, linear-gradient(135deg, #fff0b0, #c99a2e 30%, #fff4c2 52%, #a87a1c 75%, #f3d77a) border-box; }
+.pcard.cs-champion .pc-tile b { color: var(--pc-acc); }
+.pcard.cs-haunted .pc-tile b, .pcard.cs-frost .pc-tile b { color: var(--pc-acc); }
+.pcard.cs-haunted { box-shadow: 0 0 30px -14px #f28c28; }
+:root[data-motion="full"] .pcard.cs-champion .pc-banner::after { content: ""; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 35%, rgba(255, 245, 200, .45) 50%, transparent 65%); background-size: 260% 100%; animation: pcFoil 5s ease-in-out infinite; }
+@keyframes pcFoil { from { background-position: 130% 0; } to { background-position: -130% 0; } }
+.pc-friend { margin-top: 16px; }
+
+/* Customise + Share dialogs */
+.card-dlg { width: min(980px, calc(100vw - 24px)); padding: 0; }
+.card-dlg .cd-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 16px 18px 10px; }
+.card-dlg h2 { margin: 0; font-size: 18px; }
+.cd-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; padding: 0 18px; max-height: calc(100vh - 150px); overflow: auto; }
+.cd-prev { position: sticky; top: 0; align-self: start; padding-bottom: 12px; }
+.cd-opts { min-width: 0; padding-bottom: 12px; }
+.cd-opts h3 { font-size: 14px; margin: 14px 0 8px; display: flex; gap: 8px; align-items: baseline; }
+.cd-opts h3:first-child { margin-top: 0; }
+.cd-styles { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 8px; }
+.cd-opt { display: grid; gap: 4px; justify-items: start; text-align: left; padding: 8px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--text); cursor: pointer; min-width: 0; font: inherit; }
+.cd-opt.sel { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+.cd-opt:disabled { cursor: default; opacity: .62; }
+.cd-opt .lbl { font-size: 11px; line-height: 1.3; }
+.cd-opt .lbl svg { vertical-align: -2px; }
+.cd-sw { width: 100%; height: 40px; border-radius: 8px; border: 1px solid; display: grid; place-items: center; font-weight: 700; font-family: Georgia, serif; }
+.cd-sw svg { width: 30px; height: 30px; }
+.cd-n { font-weight: 600; font-size: 13.5px; }
+.cd-bns { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; }
+.cd-bn { position: relative; height: 54px; border-radius: 10px; border: 2px solid transparent; overflow: hidden; cursor: pointer; padding: 0; color: #fff; }
+.cd-bn span { position: absolute; left: 6px; bottom: 4px; right: 6px; font-size: 11px; font-weight: 700; text-align: left; text-shadow: 0 1px 3px rgba(0, 0, 0, .55); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cd-bn.sel { border-color: var(--text); box-shadow: 0 0 0 2px var(--accent); }
+.cd-feats { display: grid; gap: 6px; }
+.cd-feat { display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-radius: 12px; border: 1px solid var(--line); cursor: pointer; }
+.cd-feat.on { border-color: var(--accent); background: var(--accent-soft); }
+.cd-feat .pc-fi { color: var(--accent); }
+.cd-feat > span:last-child { display: grid; min-width: 0; font-size: 13.5px; }
+.cd-feat input { flex: none; }
+.cd-privs { display: grid; gap: 2px; }
+.cd-tg { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; border-top: 1px solid var(--line); font-size: 14px; min-height: 44px; }
+.cd-tg input { flex: none; }
+.card-dlg .cd-foot { display: flex; justify-content: flex-end; gap: 8px; padding: 12px 18px 16px; border-top: 1px solid var(--line); }
+@media (max-width: 760px) {
+  .cd-grid { grid-template-columns: minmax(0, 1fr); max-height: calc(100vh - 140px); }
+  .cd-prev { position: static; }
+}
+.share-dlg { width: min(560px, calc(100vw - 24px)); }
+.share-dlg h2 { margin: 0 0 12px; font-size: 18px; }
+.sh-prev { display: grid; place-items: center; background: var(--bg); border: 1px solid var(--line); border-radius: 14px; padding: 12px; margin-bottom: 12px; }
+.sh-prev img { display: block; width: min(100%, 300px); aspect-ratio: 1; border-radius: 8px; box-shadow: 0 8px 24px -14px rgba(0, 0, 0, .5); }
+.sh-prev.story img { width: auto; height: min(52vh, 420px); aspect-ratio: 9 / 16; }
+.sh-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 10px 0; }
+.sh-link { display: flex; gap: 8px; margin: 6px 0 8px; }
+.sh-link input { flex: 1; min-width: 0; font-size: 13px; }
+.share-dlg .lbl { display: block; }
+
+/* A card opened from a link */
+#cardView { min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; padding: 24px 16px 40px; position: relative; z-index: 1; }
+#cardView.hidden { display: none; }
+.cv-wrap { width: min(620px, 100%); display: grid; gap: 16px; }
+.cv-brand { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 16px; justify-content: center; }
+.cv-brand i { width: 12px; height: 12px; border-radius: 50%; background: var(--accent); }
+.cv-cta { text-align: center; display: grid; gap: 8px; justify-items: center; }
+.cv-cta .btn { min-height: 46px; padding: 10px 22px; font-size: 15px; text-decoration: none; }
+.cv-cta p { margin: 0; max-width: 420px; }
+.cv-bad h2 { margin: 0 0 6px; font-size: 18px; }
+
+/* ==========================================================================
+   TIME-OF-DAY SKY — very faint, behind everything; text stays on solid cards
+   ========================================================================== */
+#todSky { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; --sky-a: 1; }
+#todSky.hidden { display: none; }
+#todSky > i { position: absolute; inset: 0; opacity: 0; transition: opacity 60s linear; }
+:root[data-motion="off"] #todSky > i, :root[data-motion="off"] #todSky .sky-stars { transition: none; }
+#todSky .sky-sunrise { background: radial-gradient(70% 45% at 18% 100%, rgba(255, 170, 120, .20), transparent 70%), linear-gradient(180deg, rgba(255, 196, 160, .16), rgba(255, 226, 200, .06) 45%, transparent 70%); }
+#todSky .sky-day { background: radial-gradient(40% 30% at 85% 0%, rgba(255, 236, 170, .18), transparent 70%), linear-gradient(180deg, rgba(150, 200, 245, .14), rgba(190, 225, 250, .05) 45%, transparent 70%); }
+#todSky .sky-sunset { background: radial-gradient(70% 45% at 82% 100%, rgba(255, 130, 90, .18), transparent 70%), linear-gradient(180deg, rgba(150, 120, 200, .14), rgba(255, 160, 120, .10) 45%, transparent 75%); }
+#todSky .sky-night { background: linear-gradient(180deg, rgba(60, 70, 140, .12), rgba(60, 70, 140, .04) 50%, transparent 75%); }
+:root[data-theme="dark"] #todSky .sky-sunrise { background: radial-gradient(70% 45% at 18% 100%, rgba(255, 150, 110, .09), transparent 70%), linear-gradient(180deg, rgba(255, 170, 140, .07), transparent 60%); }
+:root[data-theme="dark"] #todSky .sky-sunset { background: radial-gradient(70% 45% at 82% 100%, rgba(255, 120, 80, .08), transparent 70%), linear-gradient(180deg, rgba(130, 100, 190, .10), rgba(255, 140, 110, .04) 45%, transparent 75%); }
+:root[data-theme="dark"] #todSky .sky-rain { opacity: .3; }
+:root[data-theme="dark"] #todSky .sky-day { background: radial-gradient(40% 30% at 85% 0%, rgba(255, 236, 170, .07), transparent 70%), linear-gradient(180deg, rgba(110, 160, 220, .10), transparent 60%); }
+:root[data-theme="dark"] #todSky .sky-night { background: linear-gradient(180deg, rgba(40, 50, 120, .30), rgba(30, 40, 90, .10) 50%, transparent 75%); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) #todSky .sky-sunrise { background: radial-gradient(70% 45% at 18% 100%, rgba(255, 150, 110, .09), transparent 70%), linear-gradient(180deg, rgba(255, 170, 140, .07), transparent 60%); }
+  :root:not([data-theme="light"]) #todSky .sky-sunset { background: radial-gradient(70% 45% at 82% 100%, rgba(255, 120, 80, .08), transparent 70%), linear-gradient(180deg, rgba(130, 100, 190, .10), rgba(255, 140, 110, .04) 45%, transparent 75%); }
+  :root:not([data-theme="light"]) #todSky .sky-rain { opacity: .3; }
+  :root:not([data-theme="light"]) #todSky .sky-day { background: radial-gradient(40% 30% at 85% 0%, rgba(255, 236, 170, .07), transparent 70%), linear-gradient(180deg, rgba(110, 160, 220, .10), transparent 60%); }
+  :root:not([data-theme="light"]) #todSky .sky-night { background: linear-gradient(180deg, rgba(40, 50, 120, .30), rgba(30, 40, 90, .10) 50%, transparent 75%); }
+}
+#todSky .sky-stars { position: absolute; inset: 0 0 45% 0; opacity: 0; transition: opacity 60s linear; --star: #7d86c4; }
+:root[data-theme="dark"] #todSky .sky-stars { --star: #ffffff; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) #todSky .sky-stars { --star: #ffffff; } }
+#todSky .sky-stars i { position: absolute; width: var(--sz); height: var(--sz); border-radius: 50%; background: var(--star); opacity: .55; box-shadow: 0 0 4px var(--star); }
+:root[data-motion="full"] #todSky .sky-stars i { animation: twinkle var(--tw) ease-in-out var(--dl) infinite; }
+@keyframes twinkle { 0%, 100% { opacity: .65; } 50% { opacity: .12; } }
+#todSky .sky-rain { position: absolute; inset: -20% 0 0; display: none; opacity: .4;
+  background-image: repeating-linear-gradient(104deg, transparent 0 22px, color-mix(in srgb, var(--muted) 30%, transparent) 22px 23px, transparent 23px 61px),
+                    repeating-linear-gradient(100deg, transparent 0 37px, color-mix(in srgb, var(--muted) 20%, transparent) 37px 38px, transparent 38px 89px);
+  background-size: 100% 140px, 100% 210px; -webkit-mask-image: linear-gradient(180deg, #000, rgba(0, 0, 0, .35)); mask-image: linear-gradient(180deg, #000, rgba(0, 0, 0, .35)); }
+#todSky.rain .sky-rain { display: block; }
+#todSky.rain > i { filter: saturate(.6) brightness(.97); }
+:root[data-motion="full"] #todSky .sky-rain { animation: rainFall 1.1s linear infinite; }
+:root[data-motion="reduced"] #todSky .sky-rain { animation: rainFall 4s linear infinite; }
+@keyframes rainFall { to { background-position: -30px 140px, -40px 210px; } }
+:root[data-glass] #todSky { opacity: .85; }
+:root[data-minimal] #todSky { opacity: .7; }
+.setting.sub-setting { padding-left: 18px; }
+
+/* ==========================================================================
+   COMPLETION STAMPS
+   ========================================================================== */
+.after-row { position: relative; }
+.after-row.has-stamp .sum-head { padding-right: 70px; min-height: 52px; align-content: flex-start; }
+.stamp-land { position: absolute; right: 10px; top: 8px; width: 64px; height: 64px; pointer-events: none; transform: rotate(-12deg); z-index: 1; }
+.stamp-land .stamp-svg { position: relative; display: block; width: 64px; height: 64px; filter: drop-shadow(0 1px 0 rgba(0, 0, 0, .06)); }
+.stamp-land .ink { position: absolute; inset: 6px; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--accent) 30%, transparent), transparent 70%); opacity: 0; }
+.stamp-land.go .stamp-svg { animation: stampPress .62s cubic-bezier(.2, .9, .3, 1.25) both; }
+.stamp-land.go .ink { animation: stampInk .9s .3s ease-out both; }
+@keyframes stampPress { 0% { opacity: 0; transform: translateY(-26px) scale(1.9); } 48% { opacity: 1; transform: translateY(0) scale(.86); } 66% { transform: scale(1.07); } 82% { transform: scale(.97); } 100% { transform: scale(1); } }
+@keyframes stampInk { 0% { opacity: .9; transform: scale(.4); } 100% { opacity: 0; transform: scale(1.7); } }
+:root[data-motion="reduced"] .stamp-land.go .stamp-svg { animation: stampFade .3s ease-out both; }
+:root[data-motion="reduced"] .stamp-land.go .ink { animation: none; }
+@keyframes stampFade { from { opacity: 0; } to { opacity: 1; } }
+.st-mini { flex: none; display: inline-grid; width: 22px; height: 22px; transform: rotate(-10deg); }
+.st-mini svg { width: 22px; height: 22px; }
+.pvstamp { width: 58px; height: 58px; transform: rotate(-8deg); }
+.cardpv { width: 76px; height: 50px; border-radius: 8px; border: 1px solid; display: grid; place-items: center; overflow: hidden; position: relative; }
+.cardpv i { position: absolute; left: 0; right: 0; top: 0; height: 15px; }
+.cardpv svg { width: 26px; height: 26px; position: relative; margin-top: 10px; }
+.cardpv b { font-family: Georgia, serif; position: relative; margin-top: 10px; }
 </style>
 </head>
 <body>
@@ -2801,6 +3007,14 @@ body.first-load #todayBar { opacity: 0; }
           <div><div>Festive decorations</div><div class="desc">During monthly questlines: a small seasonal touch in the header, Pomeo in costume, event loading quotes and a banner on the Timer</div></div>
           <input type="checkbox" id="setFestive" aria-label="Festive decorations">
         </div>
+        <div class="setting" id="todRow" data-k="time of day background sky sunrise sunset night stars weather">
+          <div><div>Time-of-day background</div><div class="desc">A very faint sky that follows your clock: sunrise, day, sunset and a few stars at night. No location or weather data is used.</div></div>
+          <input type="checkbox" id="setTod" aria-label="Time-of-day background">
+        </div>
+        <div class="setting sub-setting" id="todRainRow" data-k="rain mood rainy background weather">
+          <div><div>Rain mood</div><div class="desc">Gentle rain over the sky. Calm with Animations off.</div></div>
+          <input type="checkbox" id="setTodRain" aria-label="Rain mood">
+        </div>
         <div class="setting" data-k="ripening ring colour color tomato green red progress">
           <div><div>Ripening ring</div><div class="desc">The timer ring ripens from green to tomato red during a focus block. Off: your theme colour.</div></div>
           <input type="checkbox" id="setRipen" aria-label="Ripening ring">
@@ -3123,6 +3337,23 @@ body.first-load #todayBar { opacity: 0; }
 </dialog>
 
 <!-- Level-up moment -->
+<!-- Player card: customise and share -->
+<dialog id="cardDlg" class="card-dlg" aria-labelledby="cdTitle">
+  <div class="cd-top"><h2 id="cdTitle">Customise your card</h2><button class="iconbtn" id="cdClose" aria-label="Close">✕</button></div>
+  <div class="cd-grid"><div class="cd-prev" id="cdPrev"></div><div class="cd-opts" id="cdOpts"></div></div>
+  <div class="cd-foot"><button class="btn" id="cdShare">↗ Share</button><button class="btn primary" id="cdDone">Done</button></div>
+</dialog>
+<dialog id="shareDlg" class="share-dlg" aria-labelledby="shTitle">
+  <h2 id="shTitle">Share your card</h2>
+  <div class="sh-prev" id="shPrev"><img id="shImg" alt="Preview of your card image"></div>
+  <div class="seg" id="shSize" role="group" aria-label="Image size"><button data-shsize="square" class="active">Square</button><button data-shsize="story">Story 9:16</button></div>
+  <div class="sh-row"><button class="btn primary" id="shSave">Save as image</button><button class="btn" id="shNative">Share…</button></div>
+  <label class="lbl" for="shUrl">Link to a read-only copy of your card</label>
+  <div class="sh-link"><input type="text" id="shUrl" readonly><button class="btn" id="shCopy">Copy</button><button class="btn" id="shLink">Share link</button></div>
+  <p class="lbl" style="margin:0 0 12px">The image and the link hold only what your card shows (change it in Customise) — never notes, reminders or your email. The link is a snapshot: it doesn’t update.</p>
+  <div class="btn-row" style="justify-content:flex-end"><button class="btn" id="shClose">Close</button></div>
+</dialog>
+
 <dialog id="levelDlg" class="lvdlg">
   <div class="lv-badge" id="lvBadge"></div>
   <div class="lv-kicker" id="lvKicker">Level up</div>
@@ -3131,6 +3362,9 @@ body.first-load #todayBar { opacity: 0; }
   <button class="btn primary" id="lvClose">Continue</button>
 </dialog>
 
+<div id="todSky" class="hidden" aria-hidden="true"><i class="sky-sunrise"></i><i class="sky-day"></i><i class="sky-sunset"></i><i class="sky-night"></i><div class="sky-stars"></div><div class="sky-rain"></div></div>
+<div id="cardView" class="hidden"><div class="cv-wrap"><div class="cv-brand"><i aria-hidden="true"></i>Pomodorolist</div><div id="cvCard"></div>
+  <div class="cv-cta"><a class="btn primary" id="cvMake" href="./">Make your own: free</a><p class="lbl">A free focus timer with streaks, stats, bosses and friends. This card is a snapshot shared by its owner.</p></div></div></div>
  <div id="glassBg" aria-hidden="true"><i class="g1"></i><i class="g2"></i><i class="g3"></i><i class="g4"></i></div>
 <div id="atmo" aria-hidden="true"><i class="a-focus"></i><i class="a-deep"></i><i class="a-break"></i></div>
 <canvas id="starCanvas" class="hidden" aria-hidden="true"></canvas>
@@ -3638,7 +3872,7 @@ function defaultState() {
                 shareActivity: true, shareNames: true, globalBoard: false,
                 pomeo: true, pomeoTalk: 'sometimes', waterNudge: true, dailyTip: true,
                 bossMode: 'solo', shortcuts: true, revIntervals: [1, 3, 7, 21, 45],
-                minPomeo: true, energy: 'always', useCase: '', atmosphere: true, ripen: true, festive: true },
+                minPomeo: true, energy: 'always', useCase: '', atmosphere: true, ripen: true, festive: true, todRain: false },
     presets: [
       { id: 'p-classic', name: 'Classic 25/5',    focus: 25, short: 5,  long: 15, rounds: 4 },
       { id: 'p-deep',    name: 'Deep Work 50/10', focus: 50, short: 10, long: 20, rounds: 3 },
@@ -3661,6 +3895,7 @@ function defaultState() {
     abandoned: [],  // focus blocks stopped before 80% (wilted plants), last 300
     squad: [],      // boss squad: [{ uid, name }], up to 5 friends
     loadouts: [],   // saved looks from the bag { id, name, look: { theme, aura, color, … } }
+    cardPrefs: {},  // player card: banner, featured, what it shows — { key: { v, u } } (see PLAYER CARD)
     game: normalizeGame(null),  // purchases, equipped items, claimed rewards, used streak freezes
     // Device-only fields (never uploaded):
     timer: { phase: 'focus', round: 1, status: 'idle', endAt: 0, remaining: 0, planned: 0, focusStartedAt: 0, name: '', subtasks: [] },
@@ -3693,6 +3928,7 @@ function hydrate(obj) {
   for (const k of ['tomb', 'remFired']) if (!out[k] || typeof out[k] !== 'object' || Array.isArray(out[k])) out[k] = {};
   if (!out.names || typeof out.names !== 'object' || Array.isArray(out.names)) out.names = {};
   out.game = normalizeGame(obj.game);
+  out.cardPrefs = mergeCardPrefs({}, obj.cardPrefs).prefs;
   out.wipedAt = +obj.wipedAt || 0;
   return out;
 }
@@ -3802,6 +4038,7 @@ function profileFromState() {
     squad: S.squad.slice(0, 5),
     subTemplates: S.subTemplates.slice(0, 20),
     loadouts: S.loadouts.slice(0, 8),
+    cardPrefs: S.cardPrefs,
     // Stored for reference only; the app always recalculates streaks from the session log.
     streak: { current: cur, longest, goalMin: S.settings.goalMin, today: dayKey(new Date()) },
   });
@@ -3905,7 +4142,7 @@ function applyProfile(d) {
   S.settings = { ...def.settings, ...(d.settings || {}) };
   if ((+d.wipedAt || 0) > (+S.wipedAt || 0)) {   // erased on another device: take the cloud copy as it is, merge nothing back
     for (const f of SYNC_LISTS) S[f] = f === 'presets' ? defaultState().presets : [];
-    S.tomb = {}; S.game = normalizeGame(null); S.wipedAt = +d.wipedAt;
+    S.tomb = {}; S.game = normalizeGame(null); S.cardPrefs = {}; S.wipedAt = +d.wipedAt;
     snapLists();
   }
   const ahead = mergeSyncFrom(d);   // reminders, revisions, exams, parked, presets, templates: item by item
@@ -3916,6 +4153,9 @@ function applyProfile(d) {
   S.pinned = Array.isArray(d.pinned) ? d.pinned : [];
   const mg = mergeGame(S.game, d.game);   // add-only maps: what this device saved last is never dropped
   S.game = mg.game;
+  const cp = mergeCardPrefs(S.cardPrefs, d.cardPrefs);   // the newer value wins, key by key
+  S.cardPrefs = cp.prefs;
+  if (cp.ahead) mg.ahead = true;
   S.onboarded = !!(d.onboarded || S.onboarded);
   for (const k of ['abandoned', 'squad']) if (Array.isArray(d[k])) S[k] = d[k].filter(x => x && typeof x === 'object');
   S.timer.round = Math.min(S.timer.round, activePreset().rounds);
@@ -3991,7 +4231,8 @@ function afterFirstLoad() {
    ========================================================================== */
 function showView(id) {
   if (id !== 'bootView') setTimeout(hideSplash, 0);
-  for (const v of ['bootView', 'authView', 'appView']) $('#' + v).classList.toggle('hidden', v !== id);
+  for (const v of ['bootView', 'authView', 'appView', 'cardView']) $('#' + v).classList.toggle('hidden', v !== id);
+  renderSky();
   if (id !== 'appView' && document.documentElement.hasAttribute('data-minimal')) { delete document.documentElement.dataset.minimal; applyMotion(); }
 }
 
@@ -4473,6 +4714,7 @@ function logSession(focusedMs, end) {
     duration: Math.round(focusedMs),
     planned: t.planned,
     preset: activePreset().name,
+    stamp: equippedId('stamp'),
   };
   const subRec = takeSubtasks();
   if (subRec) s.subtasks = subRec;
@@ -4494,7 +4736,7 @@ function logSession(focusedMs, end) {
   const goalDays = news.filter(n => n.type === 'goal').length;
   toast(`+${xpForSession(s)} XP · +${COINS_PER_SESSION + GOAL_BONUS * goalDays + subCoins} coins${goalDays ? ' · daily goal reached' : ''}`);
   setTimeout(() => uiSound('coin'), 900);
-  floatUp([[`+${xpForSession(s)} XP`], [`+${COINS_PER_SESSION + GOAL_BONUS * goalDays + subCoins} coins`, 'coin'], ...(S.game.claims.bosses[dayKey(weekMonday())] ? [] : [[`⚔️ −${Math.round(focusedMs / 60000)} HP`]])]);
+  floatUp([[`+${xpForSession(s)} XP`], [`+${COINS_PER_SESSION + GOAL_BONUS * goalDays + subCoins} coins`, 'coin'], ...(victoryOf(dayKey(weekMonday()), bossView()) ? [] : [[`⚔️ −${Math.round(focusedMs / 60000)} HP`]])]);
   announce(news, 'loud');
   socialAfterSession();
   const levelAfter = game().lv.level;
@@ -4778,6 +5020,7 @@ function dayTimeline(day, sessions) {
     const a = Math.max(s.start, t0), b = Math.min(s.end, t1);
     const x = xOf(a), w = Math.max(2, xOf(b) - x);
     svg += `<rect x="${x.toFixed(1)}" y="${T}" width="${w.toFixed(1)}" height="${BH}" rx="3" style="fill:${colorFor(s.name)}" data-tip="${esc(`${fmtTime(s.start)}–${fmtTime(s.end)} · ${s.name} · ${fmtMin(s.duration / 60000)}`)}"/>`;
+    if (stampOn() && w >= 9) svg += `<svg class="tl-stamp" x="${(x + w / 2 - 8).toFixed(1)}" y="${T + BH / 2 - 8}" width="16" height="16" viewBox="0 0 64 64" aria-hidden="true" style="pointer-events:none"><circle cx="32" cy="32" r="31" fill="#fff" opacity=".85"/>${stampArt(sessionStamp(s))}</svg>`;
   }
   const now = Date.now();
   if (now >= t0 && now < t1) {
@@ -4913,7 +5156,7 @@ function renderStats() {
           <li><span class="t">${fmtTime(s.start)}–${fmtTime(s.end)}</span>
             <span class="dot" style="background:${esc(colorFor(s.name))}"></span>
             <span class="nm" title="${esc(s.preset || '')}">${esc(s.name)}${S.energy[s.id] ? `<span class="en" title="Focus: ${ENERGY[S.energy[s.id]].t}">${ENERGY[S.energy[s.id]].e}</span>` : ''}${S.notes[s.id] ? `<span class="note">“${esc(S.notes[s.id])}”</span>` : ''}${s.subtasks && s.subtasks.length ? `<details class="subdet"><summary>${s.subtasks.filter(x => x.d).length}/${s.subtasks.length} subtasks</summary><ul>${s.subtasks.map(x => `<li class="${x.d ? 'ok' : 'no'}">${esc(x.t)}</li>`).join('')}</ul></details>` : ''}</span>
-            <span class="d">${fmtMin(s.duration / 60000)}</span>
+            ${stampOn() ? `<span class="st-mini" title="Stamp: ${esc(ITEM_BY_ID[sessionStamp(s)].name)}">${stampSVG(sessionStamp(s), 22)}</span>` : ''}<span class="d">${fmtMin(s.duration / 60000)}</span>
             <button class="linkbtn" data-del="${esc(s.id)}" title="Delete this session" aria-label="Delete">✕</button></li>`).join('')}</ul>`
       : sceneEmpty('read', '', 'No focus blocks on this day.', 'margin-top:12px');
     html += card('Timeline', dayTimeline(r.start, daySessions) + '<div class="tip" data-tipbox></div>' + list);
@@ -4974,6 +5217,9 @@ function renderSettings() {
   $('#setAtmo').checked = st.atmosphere !== false;
   $('#setFestive').checked = st.festive !== false;
   $('#festiveRow').classList.toggle('hidden', minimal());
+  $('#setTod').checked = st.tod === undefined ? !minimal() : !!st.tod;
+  $('#setTodRain').checked = !!st.todRain;
+  $('#todRainRow').classList.toggle('hidden', !$('#setTod').checked);
   $('#setRipen').checked = st.ripen !== false;
   $('#setMinPomeo').checked = st.minPomeo !== false;
   $('#minPomeoRow').classList.toggle('hidden', !minimal());
@@ -5175,7 +5421,7 @@ const ACH_BY_ID = Object.fromEntries(ACHIEVEMENTS.map(a => [a.id, a]));
 /* ---------- Shop catalogue (cosmetic only). price 0 = free default. lvl = minimum level. ---------- */
 const SHOP_CATS = [
   ['pomeo', 'Pomeo'], ['avatar', 'Profile pictures'], ['sound', 'Sounds'], ['ambient', 'Ambient'], ['theme', 'Themes'], ['ring', 'Timer ring'], ['font', 'Timer font'],
-  ['effect', 'Effects'], ['frame', 'Badge frame'], ['color', 'Name colour'], ['extra', 'Extras'], ['freeze', 'Streak freeze'],
+  ['effect', 'Effects'], ['stamp', 'Stamps'], ['frame', 'Badge frame'], ['color', 'Name colour'], ['extra', 'Extras'], ['freeze', 'Streak freeze'],
 ];
 const ITEMS = [
   { id: 'av_default',       cat: 'avatar', name: 'Default',         desc: 'Your badge, or your initial',      price: 0 },
@@ -5529,8 +5775,27 @@ for (const ev of EVENTS) for (const id of [...ev.rewards, ...ev.final]) {
   ITEMS.push({ id, cat: r[1], name: r[2], desc: r[3], price: -1, ev: ev.id, rarity: ev.final.includes(id) ? 'legendary' : 'epic' });
 }
 
+/* Completion stamps and player-card styles (v1.13). The free ones can be equipped by everyone; shop stamps are
+   bought; boss and event ones unlock by themselves (see UNLOCKS) and go to the bag like other rewards. */
+ITEMS.push(
+  { id: 'stamp_classic', cat: 'stamp', name: 'Classic seal', desc: 'A neat ✓ seal', price: 0 },
+  { id: 'stamp_tomato', cat: 'stamp', name: 'Tomato stamp', desc: 'A round tomato that says DONE', price: 90 },
+  { id: 'stamp_wax', cat: 'stamp', name: 'Wax seal', desc: 'Red wax with a tomato crest', price: 140 },
+  { id: 'stamp_pixel', cat: 'stamp', name: 'Pixel star', desc: 'An 8-bit gold star', price: 160 },
+  { id: 'stamp_locked', cat: 'stamp', name: 'Locked in 🔥', desc: 'For the really deep blocks', price: 220, lvl: 5 },
+  { id: 'stamp_pumpkin', cat: 'stamp', name: 'Pumpkin stamp', desc: 'A grinning pumpkin that says BOO', price: -1, rarity: 'epic', how: 'Claim 3 quests in Pomeo’s Halloween' },
+  { id: 'stamp_snow', cat: 'stamp', name: 'Snowflake stamp', desc: 'A frosty snowflake seal', price: -1, rarity: 'epic', how: 'Claim 3 quests in Pomeo’s Christmas' },
+  ...BOSSES.map(b => ({ id: 'stamp_b_' + b.id, cat: 'stamp', name: `${b.short} emblem`, desc: `The ${b.short} in a seal of its colours`, price: -1, rarity: 'rare', how: `Defeat ${b.name}` })),
+  { id: 'card_minimal', cat: 'card', name: 'Minimal', desc: 'Clean and calm', price: 0 },
+  { id: 'card_scholar', cat: 'card', name: 'Scholar', desc: 'Paper, ink and a serif', price: 0 },
+  { id: 'card_gamer', cat: 'card', name: 'Gamer', desc: 'A neon stats panel', price: 0 },
+  { id: 'card_champion', cat: 'card', name: 'Champion', desc: 'Gold foil for boss masters', price: -1, rarity: 'legendary', how: 'Master any boss (Solo + Squad in one week)' },
+  { id: 'card_haunted', cat: 'card', name: 'Haunted', desc: 'Pumpkin glow and bats', price: -1, rarity: 'epic', how: 'Claim 4 quests in Pomeo’s Halloween' },
+  { id: 'card_frost', cat: 'card', name: 'Frost', desc: 'Icy blue with snowflakes', price: -1, rarity: 'epic', how: 'Claim 4 quests in Pomeo’s Christmas' },
+);
+
 const ITEM_BY_ID = Object.fromEntries(ITEMS.map(i => [i.id, i]));
-const DEFAULTS = { avatar: 'av_default', pomhat: 'hat_none', pomacc: 'acc_none', pomskin: 'skin_none', sound: 'snd_chime', ambient: 'amb_none', theme: 'th_default', ring: 'ring_classic', font: 'font_system', effect: 'fx_none', frame: 'frame_none', color: 'col_default', aura: 'au_streak', title: 'ti_none' };
+const DEFAULTS = { avatar: 'av_default', pomhat: 'hat_none', pomacc: 'acc_none', pomskin: 'skin_none', sound: 'snd_chime', ambient: 'amb_none', theme: 'th_default', ring: 'ring_classic', font: 'font_system', effect: 'fx_none', frame: 'frame_none', color: 'col_default', aura: 'au_streak', title: 'ti_none', stamp: 'stamp_classic', card: 'card_minimal' };
 const NAME_COLORS = { col_teal: '#2f9e8f', col_sky: '#4a90c2', col_coral: '#e07a5f', col_violet: '#8a6fd1', col_rose: '#c95c84', col_gold: '#c9a227' };
 
 /* ---------- Derived game state (cached; cleared whenever state is saved) ---------- */
@@ -5670,6 +5935,7 @@ function reconcileRewards(mode = 'quiet') {
   if (knownInvalid && inv.some(p => !knownInvalid.has(p))) toast('A purchase made on another device couldn’t be covered and was refunded', 4000);
   knownInvalid = new Set(inv);
   if (mode !== 'collect') announce(news, mode);
+  checkUnlocks(mode !== 'quiet');
   if (news.length) renderToday();  // a used Streak Freeze changes the streak shown
   renderHeaderChip();
   if (S.ui.tab === 'profile') renderProfile();
@@ -6064,6 +6330,7 @@ function applyTheme(themeArg) {
   else root.removeAttribute('data-theme');
   setStarfield(skinId === 'th_starfield');
   favKey = '';
+  try { renderSky(); } catch (e) { /* the sky isn't set up yet on the very first paint */ }
 }
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (USER) applyTheme(); });
 
@@ -6300,11 +6567,8 @@ function renderProfile() {
   const on = S.settings.gamification, g = game();
   const badge = on ? withAura(badgeSVG(g.tier, { size: 44, frame: equippedId('frame'), avatar: myAvatar() }), g.streak.cur, myAura())
     : hasAvatar(myAvatar()) ? avatarSVG(myAvatar(), 44) : `<span class="avatar big" style="width:44px;height:44px;font-size:18px">${USER.guest ? '?' : esc(USER.username[0].toUpperCase())}</span>`;
-  $('#profileHead').innerHTML = `<div class="card prof-acct">
-    <div class="row" style="gap:14px;min-width:0">${badge}<div style="min-width:0">
-      <div${nameAttrs(on ? equippedId('color') : '', 'acct-name')}>${USER.guest ? 'Not signed in' : '@' + esc(USER.username)}</div>${on && TITLE_TEXT[equippedId('title')] ? `<div class="look-title">${esc(TITLE_TEXT[equippedId('title')])}</div>` : ''}
-      <div class="desc">${USER.guest ? 'Data stays on this device only' : 'Progress syncs across your devices'}</div></div></div>
-    <div class="btn-row" style="gap:8px">${on ? '<button class="btn icon-l" data-gotab="bag">🎒 Bag</button>' : ''}<button class="btn icon-l" id="openSettings">${GEAR_SVG}Settings</button></div></div>` + pomeoCard();
+  void badge;
+  $('#profileHead').innerHTML = playerCardHTML() + pomeoCard();
   if (on) renderProgress();
   else $('#progressView').innerHTML = `<div class="card empty-card"><p class="muted">Levels, badges and achievements are hidden.</p><button class="btn" id="openSettings2">Turn them on in Settings</button></div>`;
 }
@@ -6414,6 +6678,8 @@ function previewFor(it, g) {
   if (it.cat === 'font') { const f = FONTS[it.id]; return `<span class="fontpv"${f ? ` style="font-family:'${f.family}',system-ui"` : ''}>25:00</span>`; }
   if (it.cat === 'frame') return badgeSVG(g.tier, { size: 48, frame: it.id });
   if (it.cat === 'color') return `<span${nameAttrs(it.id, 'namepv')}>${esc(USER.guest ? 'You' : '@' + USER.username)}</span>`;
+  if (it.cat === 'stamp') return `<span class="pvstamp">${stampSVG(it.id, 58)}</span>`;
+  if (it.cat === 'card') { const p = cardPal(it.id); return `<span class="cardpv" style="background:${p.bg};border-color:${p.line};color:${p.acc}"><i style="background:linear-gradient(120deg,${p.acc},${p.acc2})"></i>${CARD_DECO[it.id] ? `<svg viewBox="0 0 64 64" aria-hidden="true">${CARD_DECO[it.id]}</svg>` : '<b>Aa</b>'}</span>`; }
   return `<span class="pvicon">${iconSVG(ICONS[it.id] || ICONS[it.cat], 28)}</span>`;
 }
 function itemCard(it, g) {
@@ -7249,6 +7515,7 @@ function renderFriendProfile() {
   const kudosBtns = target => REACTIONS.map(e => `<button class="kudo${SOC.sent.has(uid + '/k_' + USER.uid + '_' + target) ? ' sent' : ''}" data-kudos="${e}" data-target="${target}" title="Send ${e}">${e}</button>`).join('');
   let actHtml = '';
   if (!isFriend) actHtml = '';
+  else if (tab === 'card') actHtml = `<div class="pc-friend">${cardHTML(friendCardData(prof, act, name), 'friend')}</div>${shared ? '' : '<p class="lbl" style="margin:8px 2px 0">Their activity is private, so charts aren’t on their card.</p>'}`;
   else if (!shared) actHtml = `<div class="card"><div class="empty">@${esc(name)} keeps their activity private.</div></div>`;
   else if (tab === 'compare') actHtml = compareView(act, name);
   else actHtml = activityView(act, uid, kudosBtns);
@@ -7266,7 +7533,7 @@ function renderFriendProfile() {
       ${tile(prof.streak + 'd', 'Current streak')}${tile(prof.longest + 'd', 'Longest streak')}${tile(fmtNum(prof.hours) + 'h', 'Total focus')}${tile(isFriend && shared ? fs + 'd' : '—', 'Friend streak')}
     </div>
     ${isFriend && prof.streak ? `<div class="card kudo-row"><span class="lbl">Cheer their ${prof.streak}-day streak</span><span>${kudosBtns('st_' + dayKey(new Date()))}</span></div>` : ''}
-    ${isFriend && shared ? `<div class="stats-head" style="margin-top:16px"><div class="seg" id="fpTab"><button data-fptab="activity" class="${tab !== 'compare' ? 'active' : ''}">Activity</button><button data-fptab="compare" class="${tab === 'compare' ? 'active' : ''}">Compare</button></div></div>` : ''}
+    ${isFriend ? `<div class="stats-head" style="margin-top:16px"><div class="seg" id="fpTab"><button data-fptab="activity" class="${tab !== 'compare' && tab !== 'card' ? 'active' : ''}">Activity</button>${shared ? `<button data-fptab="compare" class="${tab === 'compare' ? 'active' : ''}">Compare</button>` : ''}<button data-fptab="card" class="${tab === 'card' ? 'active' : ''}">Card</button></div></div>` : ''}
     ${actHtml}
     ${f ? `<div class="btn-row" style="margin-top:16px;justify-content:flex-end">
       ${isFriend ? `<button class="btn small" data-remove="${f.id}">Remove friend</button>` : ''}
@@ -8142,6 +8409,7 @@ function offerNote(sessionId) {
   renderSumHead();
   renderEnergyRow(sessionId);
   $('#noteRow').classList.remove('hidden');
+  landStamp(s);
 }
 function hideNote() { noteFor = null; subSum = null; sumFor = null; energyFor = null; clearTimeout(energyT); $('#noteRow').classList.add('hidden'); }
 /** Close the after-session row once nothing in it is waiting for an answer. */
@@ -8343,6 +8611,7 @@ function checkBoss() {
   G = null;
   save();
   for (const st of won) announceVictory(st);
+  setTimeout(() => checkUnlocks(), 2500);   // a boss emblem stamp (and Champion when it's Mastered), after the victory
   renderHeaderChip();
   updateQuestDot();
   if (S.ui.tab === 'quests') renderQuests();
@@ -9877,9 +10146,10 @@ addEventListener('resize', () => $$('.catrow').forEach(updateFades));
    command palette, offline banner, pull to refresh, tab swipes, haptics.
    Everything here is stored on this device (localStorage); no new cloud data.
    ========================================================================== */
-const APP_VERSION = '1.12';
+const APP_VERSION = '1.13';
 const VER_KEY = 'pomodorolist-seen-version';
 const CHANGELOG = [
+  { v: '1.13', t: 'Player cards, a living sky and completion stamps', d: 'A player card at the top of your Profile with a stats board (focus hours, streaks, a mini week chart and 12-week heatmap, top subjects, best focus time, bosses and garden), up to 3 featured slots, banners and card styles — save it as an image or share a read-only link, with a switch for every stat. An optional time-of-day background (sunrise, day, sunset, stars at night, plus a Rain mood), and a stamp that lands on every finished session, collectable in the Shop and from bosses and events.' },
   { v: '1.12', t: 'Boss arena, your bag and Pomeo’s questlines', d: 'Ten weekly bosses in a new arena (Solo and Squad are separate battles you can switch between freely, each with its own rewards, plus a Trophy Hall), a bag with everything you own, loadouts and special auras friends can see, and monthly Pomeo questlines starting with Pomeo’s Halloween — with optional festive touches.' },
   { v: '1.11', t: 'Bug fixes, faster loading and better sync', d: 'Opens straight from your last visit while it syncs (no more numbers counting up from 0), reminders, revision plans and exams sync item by item on every device (deleted stays deleted, a reminder rings on one device only), sounds work reliably on Safari and Chrome with a Test sounds button, and a fresh cast of demo friends.' },
   { v: '1.10', t: 'Pomeo wakes up', d: 'A new loading screen (Pomeo stretches, yawns and hops into the timer, with a growing tomato vine and a study quote), a Focus atmosphere background that deepens as you focus, a timer ring that ripens from green to red, and Pomeo in the empty garden, stats and friends screens.' },
@@ -9897,7 +10167,7 @@ const CHANGELOG = [
   { v: '1.1', t: 'Accounts & sync', d: 'Log in and keep your sessions in sync on every device, even offline.' },
   { v: '1.0', t: 'Focus timer', d: 'Pomodoro timer with named sessions, presets, streaks and stats.' },
 ];
-const NEWS = ['🎃 Pomeo’s Halloween questline: 8 spooky quests until 7 November', '⚔️ A new boss arena: 10 bosses, Solo and Squad rewards, and a Trophy Hall', '🎒 Your bag: everything you own, loadouts, and special auras friends can see', '🍂 Festive touches during events (Settings → Appearance)'];
+const NEWS = ['🪪 Your player card: stats board, banners, styles and featured wins — share it as an image or a link (Profile)', '🌅 A time-of-day sky behind the app, with an optional Rain mood (Settings → Appearance)', '✅ Completion stamps land on every finished session — collect more in the Shop, from bosses and events', '🔒 Choose exactly what your card shows; notes, reminders and email are never shared'];
 
 /* ---------- Haptics ---------- */
 const HAPTIC_KEY = 'pomodorolist-haptics';
@@ -10136,6 +10406,8 @@ function cmdList(q) {
   if (wp.length) add('🎁', `Open ${wp[0].kind === 'year' ? wp[0].label : wp[0].short} Wrapped`, 'Stats', () => { showTab('stats'); openWrapped(0); }, 'wrapped story recap');
   if (loginOn() && !loginToday().claimed) add('🎁', 'Claim daily reward', 'Rewards', () => { showTab('profile'); openLoginDlg(); }, 'login daily');
   add('📅', 'Manage exams', 'Timer', openExams, 'exam countdown');
+  add('🪪', 'Share my player card', 'Profile', () => { showTab('profile'); openShareDlg(); }, 'card share image link stats profile png');
+  add('🪪', 'Customise my player card', 'Profile', () => { showTab('profile'); openCardDlg(); }, 'card style banner featured privacy');
   if (S.settings.gamification) {
     add('🎒', 'Open your bag', 'Rewards', () => showTab('bag'), 'inventory items equip loadout');
     add('⚔️', 'Weekly boss', 'Quests', () => { S.ui.questView = 'boss'; showTab('quests'); }, 'boss battle squad solo trophy hall');
@@ -10628,6 +10900,7 @@ function applyMinimal() {
   try { localStorage.setItem('pomodorolist-calm', on ? '1' : '0'); } catch (e) {}
   applyMotion();
   sheenLoop();
+  renderSky();
 }
 function setMinimal(on) {
   S.settings.gamification = !on;
@@ -11071,7 +11344,8 @@ function demoSessions() {
       const end = +st + len * 6e4;
       if (end > now - 5 * 6e4) break;
       const name = SUBJ[Math.floor(rnd() * SUBJ.length)];
-      const s = { id: `demo${d}_${k++}`, name, start: +st, end, duration: len * 6e4, planned: len * 6e4, preset: len >= 45 ? 'Deep Work 50/10' : 'Classic 25/5' };
+      const s = { id: `demo${d}_${k++}`, name, start: +st, end, duration: len * 6e4, planned: len * 6e4, preset: len >= 45 ? 'Deep Work 50/10' : 'Classic 25/5',
+        stamp: ['stamp_pixel', 'stamp_tomato', 'stamp_pixel', 'stamp_classic', 'stamp_pixel'][(d + k) % 5] };
       if (d < 6 && rnd() < .5) s.subtasks = TASKS[name].map((t, i) => ({ t, d: i < 2 || rnd() < .5 }));
       out.push(s);
       mins += len;
@@ -11094,7 +11368,7 @@ function demoDocs() {
   for (const s of sessions) { const m = monthKeyOf(new Date(s.start)); (byMonth[m] ||= []).push(s); }
   const own = (cat, ids) => ids.filter(id => ITEM_BY_ID[id]).map(id => [id, ITEM_BY_ID[id]]);
   const purchases = {}, equipped = {};
-  own('', ['th_ocean', 'ring_grad', 'frame_double', 'hat_grad', 'acc_glasses', 'snd_digital', 'av_owl', 'col_teal']).forEach(([id, it], i) => { purchases['demo' + i] = { item: id, price: it.price || 0, at: Date.now() - (30 - i) * 864e5 }; });
+  own('', ['th_ocean', 'ring_grad', 'frame_double', 'hat_grad', 'acc_glasses', 'snd_digital', 'av_owl', 'col_teal', 'stamp_tomato', 'stamp_pixel']).forEach(([id, it], i) => { purchases['demo' + i] = { item: id, price: it.price || 0, at: Date.now() - (30 - i) * 864e5 }; });
   for (const [id, it] of Object.values(purchases).map(p => [p.item, ITEM_BY_ID[p.item]])) if (it.cat !== 'theme' && it.cat !== 'sound') equipped[it.cat] = id;
   const wkPast = k => dayKey(addDays(weekStartOf(now, 1), -7 * k));
   // Past bosses (the real rotation): a Solo win, a mastered week (Solo + Squad), a Squad win with rewards still to claim,
@@ -11110,6 +11384,9 @@ function demoDocs() {
   const quests = { 'hw26:q1': Date.now() - 5 * 864e5, 'hw26:q8': Date.now() - 864e5 };
   grants.av_bat = { src: 'ev:hw26', at: quests['hw26:q1'] };
   grants.frame_cobweb = { src: 'ev:hw26', at: quests['hw26:q8'] };
+  for (const t of Object.values(trophies)) grants['stamp_b_' + t.boss] = { src: `boss:${t.boss}:emblem`, at: t.at + 90e3 };   // boss emblem stamps
+  grants.card_champion = { src: 'boss:mastered', at: Date.now() - 12 * 864e5 };   // the mastered week
+  const mastered = trophies[wkPast(2) + '|solo'].boss, cardAt = Date.now() - 864e5;
   const rec = sessions.slice(-30), energy = {};
   rec.forEach((s, i) => { energy[s.id] = new Date(s.start).getHours() < 12 ? (i % 5 ? 4 : 3) : (i % 3 ? 3 : 2); });
   const tomorrow = addDays(startOfDay(now), 1), soon = new Date(Date.now() + 3 * 3600e3);
@@ -11120,8 +11397,9 @@ function demoDocs() {
     names: [['Physics', '#3f9fbf', 'JEE'], ['Chemistry', '#d0843d', 'JEE'], ['Maths', '#8b6cc8', 'JEE'], ['Biology', '#4f9a5a', 'Boards']].map(([name, color, tag]) => ({ name, color, tag })),
     recent: [{ name: 'Physics', presetId: 'p-deep', ts: Date.now() - 3600e3 }, { name: 'Maths', presetId: 'p-classic', ts: Date.now() - 7200e3 }, { name: 'Chemistry', presetId: 'p-deep', ts: Date.now() - 864e5 }],
     pinned: [{ name: 'Physics', presetId: 'p-deep' }],
-    game: { purchases, equipped: { ...equipped, aura: Object.keys(grants).find(id => /^au_b_.*_sq$/.test(id)) || 'au_streak', color: Object.keys(grants).find(id => id.startsWith('col_b_')) || equipped.color, frame: 'frame_cobweb' },
-      claims: { bosses, brew, quests }, trophies, grants, freezesUsed: {}, seenAt: Date.now() - 2 * 864e5 },
+    game: { purchases, equipped: { ...equipped, stamp: 'stamp_pixel', card: 'card_champion', aura: Object.keys(grants).find(id => /^au_b_.*_sq$/.test(id)) || 'au_streak', color: Object.keys(grants).find(id => id.startsWith('col_b_')) || equipped.color, frame: 'frame_cobweb' },
+      claims: { bosses, brew, quests, milestones: { 3: Date.now() - 20 * 864e5, 7: Date.now() - 16 * 864e5 } }, trophies, grants, freezesUsed: {}, seenAt: Date.now() - 2 * 864e5 },
+    cardPrefs: { banner: { v: 'bs:' + mastered, u: cardAt }, featured: { v: ['fm:' + mastered, 'fs:7', 'fe:frame_cobweb'], u: cardAt }, p_subjects: { v: true, u: cardAt } },
     loadouts: [{ id: 'demo_lo1', name: 'Exam mode', look: { theme: 'th_ocean', avatar: 'av_owl', frame: 'frame_double', color: 'col_teal', aura: 'au_streak', pomhat: 'hat_grad', pomacc: 'acc_glasses', pomskin: 'skin_none', title: 'ti_none' } },
       { id: 'demo_lo2', name: 'Spooky', look: { avatar: 'av_bat', frame: 'frame_cobweb', aura: 'au_streak', pomhat: 'hat_none', pomacc: 'acc_none', pomskin: 'skin_none' } }],
     reminders: [
@@ -11221,9 +11499,9 @@ const PV_BLOCK = ['#mainBtn', '#skipBtn', '[data-qs]', '[data-buy]', '[data-equi
   '[data-exdel]', '[data-tdel]', '[data-tload]', '[data-remove]', '[data-tick]', '[data-energy]', '#parkBtn', '#subToggle', '#subCheckAdd', '#managePresets', '#noteSave', '#revSchedule', '#examsBtn',
   '#importBtn', '#exportBtn', '#wipeBtn', '#pomeoOutfit', '#replayTour', '#resetTips', '[data-news-tut]', '[data-news-min]', '#addFriendForm button', '#chips .chip', '[data-pin]', '.chip .pin',
   '#squadBtn', '[data-squad]', '#examCard', '[data-gl]', '#tutMinimal', '#squadEdit', '[data-bclaim]', '[data-qclaim]', '[data-bequip]', '[data-bunequip]', '[data-btoggle]',
-  '#loNew', '[data-lo-apply]', '[data-lo-del]', '#setFestive'].join(',');
+  '#loNew', '[data-lo-apply]', '[data-lo-del]', '#setFestive', '[data-cdstyle]', '[data-cdbn]', '[data-cdfeat]', '[data-cdpriv]', '#shSave', '#shNative', '#shCopy', '#shLink', '#setTod', '#setTodRain'].join(',');
 const PV_WHY = [['[data-buy],[data-equip],[data-toggle-extra]', 'buy and equip shop items'], ['#mainBtn,[data-qs],#skipBtn', 'start your own focus sessions'], ['[data-kudos],[data-accept],[data-decline],#addFriendForm button,[data-block]', 'add friends and send kudos'],
-  ['[data-claimlogin],#loginClaim', 'collect daily rewards'], ['[data-bclaim],[data-qclaim]', 'claim boss and questline rewards'], ['[data-bequip],[data-bunequip],[data-btoggle],#loNew,[data-lo-apply],[data-lo-del]', 'equip items and save looks'], ['#remAdd,[data-remadd],[data-rdone],[data-redit],[data-rdel]', 'plan your own reminders']];
+  ['[data-claimlogin],#loginClaim', 'collect daily rewards'], ['[data-bclaim],[data-qclaim]', 'claim boss and questline rewards'], ['[data-bequip],[data-bunequip],[data-btoggle],#loNew,[data-lo-apply],[data-lo-del]', 'equip items and save looks'], ['#remAdd,[data-remadd],[data-rdone],[data-redit],[data-rdel]', 'plan your own reminders'], ['[data-cdstyle],[data-cdbn],[data-cdfeat],[data-cdpriv],#shSave,#shNative,#shCopy,#shLink', 'make and share your own player card']];
 function previewPrompt(el) {
   const why = (PV_WHY.find(([sel]) => el && el.closest(sel)) || [, 'save your own sessions and settings'])[1];
   $('#pvWhy').textContent = `This is a demo account, so nothing can be changed. Create your own free account to ${why}.`;
@@ -11398,6 +11676,7 @@ async function claimQuest(evId, qid) {
   showRewardReveal({ kicker: qid === 'final' ? `${ev.name} · final reward` : `${ev.name} · quest ${qid.slice(1)} of ${ev.quests.length}`,
     title: qid === 'final' ? 'Questline complete! 🏆' : q.title, items, pal: [ev.a, ev.b] });
   inboxAdd({ type: 'event', key: 'quest:' + key, title: `${ev.emoji} ${items.map(i => ITEM_BY_ID[i].name).join(' + ')} added to your bag`, go: { tab: 'bag' }, read: true });
+  setTimeout(() => checkUnlocks(), 2500);   // event stamps and card styles come with enough quests
   updateQuestDot();
   updateBagDot();
   renderFestive();
@@ -11540,11 +11819,11 @@ SCENES.bag = { vb: '-12 -8 66 50', state: 'idle', props: `
    game.equipped, exactly like the Shop.
    ========================================================================== */
 const CAT_LABEL = { theme: 'Theme', avatar: 'Profile picture', pomhat: 'Pomeo hat', pomacc: 'Pomeo accessory', pomskin: 'Pomeo skin', aura: 'Aura', color: 'Name colour',
-  title: 'Title', sound: 'Sound', ambient: 'Ambient sound', ring: 'Timer ring', font: 'Timer font', effect: 'Effect', frame: 'Badge frame', extra: 'Timer extra', freeze: 'Consumable' };
+  title: 'Title', sound: 'Sound', ambient: 'Ambient sound', ring: 'Timer ring', font: 'Timer font', effect: 'Effect', frame: 'Badge frame', extra: 'Timer extra', freeze: 'Consumable', stamp: 'Stamp', card: 'Card style' };
 const BAG_CATS = [
   ['theme', 'Themes', ['theme']], ['avatar', 'Profile pictures', ['avatar']], ['pomeo', 'Pomeo outfits', ['pomhat', 'pomacc', 'pomskin']], ['aura', 'Auras', ['aura']],
   ['color', 'Name colours', ['color']], ['title', 'Titles', ['title']], ['sound', 'Sounds', ['sound', 'ambient']], ['timer', 'Timer styles', ['ring', 'extra']],
-  ['font', 'Fonts', ['font']], ['effect', 'Effects', ['effect']], ['frame', 'Badge frames', ['frame']], ['trophies', 'Boss trophies', []], ['event', 'Event items', []], ['consumables', 'Consumables', []],
+  ['font', 'Fonts', ['font']], ['effect', 'Effects', ['effect']], ['stamp', 'Stamps', ['stamp']], ['card', 'Card styles', ['card']], ['frame', 'Badge frames', ['frame']], ['trophies', 'Boss trophies', []], ['event', 'Event items', []], ['consumables', 'Consumables', []],
 ];
 const BAG_FILTERS = [['all', 'All'], ['equipped', 'Equipped'], ['new', 'New'], ['shop', 'Shop'], ['boss', 'Bosses'], ['event', 'Events'], ['reward', 'Rewards']];
 const RARITY_LABEL = { common: 'Common', rare: 'Rare', epic: 'Epic', legendary: 'Legendary' };
@@ -11557,6 +11836,8 @@ function itemRarity(it) {
 }
 function srcOf(s) {
   const [k, a, b] = String(s || '').split(':');
+  if (k === 'boss' && a === 'mastered') return { kind: 'boss', label: 'Boss mastery' };
+  if (k === 'boss' && b === 'emblem') { const bb = BOSS_BY_ID[a]; return { kind: 'boss', label: `Boss: ${bb ? bb.name.replace(/^The /, '') : a}` }; }
   if (k === 'boss') { const bb = BOSS_BY_ID[a]; return { kind: 'boss', label: `Boss: ${bb ? bb.name.replace(/^The /, '') : a} (${b === 'squad' ? 'Squad' : 'Solo'})` }; }
   if (k === 'ev') { const ev = EVENT_BY_ID[a]; return { kind: 'event', label: ev ? ev.label : 'Event' }; }
   if (k === 'ach') return { kind: 'reward', label: 'Achievement' };
@@ -11636,6 +11917,7 @@ function bagCard(x, g) {
   const it = x.it, eq = isEquippedItem(it), rar = itemRarity(it), fresh = bagFresh.has(it.id);
   const canPlay = ['sound', 'ambient', 'effect'].includes(it.cat);
   const btn = it.cat === 'extra' ? `<button class="btn" data-btoggle="${it.id}">${eq ? 'Turn off' : 'Turn on'}</button>`
+    : eq && DEFAULTS[it.cat] === it.id ? '<button class="btn" disabled>In use</button>'
     : eq ? `<button class="btn" data-bunequip="${it.cat}">Unequip</button>` : `<button class="btn primary" data-bequip="${it.id}">Equip</button>`;
   return `<div class="item bag-item r-${rar}${eq ? ' equipped' : ''}${bagSel === it.id ? ' sel' : ''}" data-bid="${it.id}" tabindex="0" aria-label="${esc(it.name)} · ${esc(CAT_LABEL[it.cat] || it.cat)}">
     <div class="pv">${rewardPreview(it, g)}${fresh ? '<span class="tag new">New</span>' : eq ? `<span class="tag">${CHECK_SVG}Equipped</span>` : ''}</div>
@@ -11700,7 +11982,8 @@ function renderBagList() {
   const special = (f === 'all' || f === 'boss') && !q;
   const trophies = special || (q && 'boss trophies trophy'.includes(q)) ? trophyCards() : [];
   const cons = (f === 'all' || f === 'shop') && (!q || 'streak freeze consumable'.includes(q)) ? consumableCards(g) : [];
-  const counts = Object.fromEntries(BAG_CATS.map(c => [c[0], c[0] === 'trophies' ? trophies.length : c[0] === 'consumables' ? cons.length : items.filter(x => inCat(c, x)).length]));
+  const starters = ITEMS.filter(it => (it.cat === 'stamp' || it.cat === 'card') && it.price === 0).map(it => ({ it, src: { kind: 'reward', label: 'Free' }, at: 0 })).filter(match);
+  const counts = Object.fromEntries(BAG_CATS.map(c => [c[0], c[0] === 'trophies' ? trophies.length : c[0] === 'consumables' ? cons.length : [...starters, ...items].filter(x => inCat(c, x)).length]));
   const shown = BAG_CATS.filter(c => counts[c[0]] || c[0] === 'aura');
   if (cat !== 'all' && !shown.some(c => c[0] === cat)) cat = 'all';
   $('#bagCats').innerHTML = `<button data-bcat="all" class="${cat === 'all' ? 'active' : ''}">All</button>` + shown.map(c => `<button data-bcat="${c[0]}" class="${cat === c[0] ? 'active' : ''}">${c[1]} <span class="cnt">${counts[c[0]]}</span></button>`).join('');
@@ -11708,7 +11991,7 @@ function renderBagList() {
   const nNew = bagFresh.size, nb = $('#bagFilters [data-bfilter="new"]');
   if (nb) nb.textContent = nNew ? `New (${nNew})` : 'New';
   const section = c => {
-    let cards = c[0] === 'trophies' ? trophies : c[0] === 'consumables' ? cons : items.filter(x => inCat(c, x)).map(x => bagCard(x, g));
+    let cards = c[0] === 'trophies' ? trophies : c[0] === 'consumables' ? cons : [...(c[0] === 'stamp' || c[0] === 'card' ? starters : []), ...items].filter(x => inCat(c, x)).map(x => bagCard(x, g));
     if (c[0] === 'aura' && (f === 'all' || (f === 'equipped' && !SPECIAL_AURAS[myAura()]))) {   // the automatic streak aura is always a choice
       const auto = ITEM_BY_ID.au_streak, on = !SPECIAL_AURAS[myAura()];
       if (!q || 'streak aura automatic'.includes(q)) cards = [`<div class="item bag-item r-common${on ? ' equipped' : ''}" data-bid="au_streak" tabindex="0"><div class="pv">${rewardPreview(auto, g)}${on ? `<span class="tag">${CHECK_SVG}Equipped</span>` : ''}</div>
@@ -12081,6 +12364,7 @@ function renderAll() {
   if (S.ui.tab === 'reminders') renderReminders();
   if (S.ui.tab === 'profile') renderProfile();
   if (S.ui.tab === 'shop') renderShop();
+  renderSky();
 }
 
 /* ==========================================================================
@@ -12259,6 +12543,23 @@ $('#setMotion').addEventListener('change', e => {
 });
 $('#setMinimal').addEventListener('change', e => { setMinimal(e.target.checked); toast(e.target.checked ? 'True Minimalist on — nothing was deleted' : 'True Minimalist off — everything is back', 2400, true); });
 $('#setAtmo').addEventListener('change', e => { S.settings.atmosphere = e.target.checked; save(); renderAtmo(); });
+$('#setTod').addEventListener('change', e => { S.settings.tod = e.target.checked; save(); renderSky(); $('#todRainRow').classList.toggle('hidden', !e.target.checked); toast(`Time-of-day background ${e.target.checked ? 'on' : 'off'}`, 1600, true); });
+$('#setTodRain').addEventListener('change', e => { S.settings.todRain = e.target.checked; save(); renderSky(); });
+$('#cardDlg').addEventListener('click', e => {
+  if (e.target === e.currentTarget || e.target.closest('#cdClose, #cdDone')) { $('#cardDlg').close(); return; }
+  if (e.target.closest('#cdShare')) { $('#cardDlg').close(); openShareDlg(); return; }
+  onCardDlg(e);
+});
+$('#cardDlg').addEventListener('change', onCardDlgChange);
+$('#shareDlg').addEventListener('click', e => {
+  if (e.target === e.currentTarget || e.target.closest('#shClose')) { $('#shareDlg').close(); return; }
+  const sz = e.target.closest('[data-shsize]');
+  if (sz) { shareSize = sz.dataset.shsize; renderShareDlg(); uiSound('tap'); return; }
+  if (e.target.closest('#shSave')) saveCardImage(false);
+  else if (e.target.closest('#shNative')) saveCardImage(true);
+  else if (e.target.closest('#shCopy')) copyCardLink();
+  else if (e.target.closest('#shLink')) shareCardLink();
+});
 $('#setFestive').addEventListener('change', e => { S.settings.festive = e.target.checked; save(); renderFestive(); toast(`Festive decorations ${e.target.checked ? 'on' : 'off'}`, 1600, true); });
 $('#setRipen').addEventListener('change', e => { S.settings.ripen = e.target.checked; save(); paintRing(); });
 $('#setMinPomeo').addEventListener('change', e => { S.settings.minPomeo = e.target.checked; save(); renderAll(); });
@@ -12307,6 +12608,8 @@ $('#coinPill').addEventListener('click', () => showTab('shop'));
 $('#tab-profile').addEventListener('click', e => {
   if (e.target.closest('[data-claimlogin]')) { openLoginDlg(); return; }
   if (e.target.closest('#openSettings, #openSettings2')) showTab('settings');
+  if (e.target.closest('#cardEdit')) openCardDlg();
+  if (e.target.closest('#cardShare')) openShareDlg();
   if (e.target.closest('#pomeoOutfit')) { S.ui.shopCat = 'pomeo'; showTab('shop'); }
   if (e.target.closest('#pomeoShow')) { S.settings.pomeo = true; save(); renderPomeo(); renderProfile(); }
 });
@@ -12492,9 +12795,638 @@ function initInputs() {
 }
 
 if (window.__spSet) window.__spSet(.4);   // app script loaded
+/* ==========================================================================
+   COMPLETION STAMPS — when a focus block completes, the equipped stamp lands on
+   the session-complete card (press, bounce, ink spread) with a soft thump.
+   Each session remembers its stamp (session.stamp, in the synced session log),
+   so it also shows in the Day list and on the timeline. Boss emblems and event
+   stamps unlock by themselves (UNLOCKS) and go to the bag as rewards.
+   ========================================================================== */
+const PIXEL_STAR = ['....#....', '....#....', '...###...', '#########', '.#######.', '..#####..', '..##.##..', '.##...##.', '.#.....#.'];
+const STAMP_FLAME = '<path d="M0-7c2.4 2.8 4.6 4.8 4.6 8.2a4.6 4.6 0 0 1-9.2 0c0-1.8.8-3.2 1.9-4.1.3 1.4 1 2.3 1.9 2.6-.5-2.3-.1-4.6.8-6.7Z"/>';
+const STAMP_ART = {
+  stamp_classic: '<circle cx="32" cy="32" r="27" fill="none" stroke="#2f8f83" stroke-width="3.2"/><circle cx="32" cy="32" r="21.5" fill="none" stroke="#2f8f83" stroke-width="1.3" stroke-dasharray="2.4 2.2"/><path d="M21 33.5l7.5 7.5L44 25" fill="none" stroke="#2f8f83" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>',
+  stamp_tomato: '<circle cx="32" cy="34" r="22" fill="none" stroke="#d6452f" stroke-width="3.4"/><path d="M32 13l-5-3 2 4.2-5 1.4 5.2 1 2.8-.8 2.8.8 5.2-1-5-1.4 2-4.2Z" fill="#4e8a4a"/><text x="32" y="39.5" font-size="12.5" font-weight="900" letter-spacing="1" fill="#d6452f" text-anchor="middle" font-family="system-ui, sans-serif">DONE</text><path d="M18 46q14 6 28 0" fill="none" stroke="#d6452f" stroke-width="1.6" stroke-linecap="round"/>',
+  stamp_wax: '<path d="M32 4c4.4 0 6.6 3.6 10.2 4.8s8.4.4 10.2 4.8-1.2 7.6-.6 11.4 5.6 6.4 4.4 10.2-6.6 3-8.6 6.4-1.6 8.8-6 10.2-7.4-2.2-11.2-1.4-7 5.4-11 4.2-2.8-6.6-6.2-8.6-9.4-1.4-10.4-6 3.4-7.4 2.4-11.2-5.4-6.8-3.6-10.4 6.6-2.6 8.8-6 2.2-8.6 6.6-9.6 7.6 2 11.4 1.2Z" fill="#b8323a"/><circle cx="32" cy="32" r="16" fill="#a3282f"/><circle cx="32" cy="32" r="16" fill="none" stroke="#dc6066" stroke-width="1.3"/><ellipse cx="32" cy="35" rx="7.5" ry="6.5" fill="none" stroke="#ea8d91" stroke-width="2.2"/><path d="M32 23.5v5M27.6 26.2l4.4 3 4.4-3" stroke="#ea8d91" stroke-width="2.2" stroke-linecap="round" fill="none"/>',
+  stamp_pixel: '<g fill="#f2b632" stroke="#c98a12" stroke-width=".6">' + PIXEL_STAR.flatMap((row, y) => [...row].map((c, x) => (c === '#' ? `<rect x="${5 + x * 6}" y="${5 + y * 6}" width="6" height="6"/>` : ''))).join('') + '</g>',
+  stamp_locked: '<g transform="rotate(-8 32 32)"><rect x="5" y="15" width="54" height="34" rx="5" fill="none" stroke="#d6452f" stroke-width="3"/><rect x="8.5" y="18.5" width="47" height="27" rx="3" fill="none" stroke="#d6452f" stroke-width="1.1"/><text x="32" y="30.5" font-size="10.5" font-weight="900" letter-spacing="1.2" fill="#d6452f" text-anchor="middle" font-family="system-ui, sans-serif">LOCKED</text><text x="28.5" y="42" font-size="10.5" font-weight="900" letter-spacing="1.2" fill="#d6452f" text-anchor="middle" font-family="system-ui, sans-serif">IN</text><g fill="#f28c28" transform="translate(41 38.5) scale(.75)">' + STAMP_FLAME + '</g></g>',
+  stamp_pumpkin: '<circle cx="32" cy="32" r="27.5" fill="none" stroke="#e8761e" stroke-width="2.6" stroke-dasharray="5 3"/><ellipse cx="32" cy="36" rx="17" ry="14" fill="none" stroke="#e8761e" stroke-width="3"/><path d="M32 22q-5 6-5 14t5 14M32 22q5 6 5 14t-5 14" fill="none" stroke="#e8761e" stroke-width="1.6"/><path d="M31 22q-.6-4 2-6.4" stroke="#6b4a1f" stroke-width="2.6" stroke-linecap="round" fill="none"/><path d="M24.5 33l3.6-.4-1.6 3.4ZM36 32.6l3.6.4-2 3.2Z" fill="#e8761e"/><path d="M25 40.5q7 4 14 0" stroke="#e8761e" stroke-width="2" fill="none" stroke-linecap="round"/>',
+  stamp_snow: '<circle cx="32" cy="32" r="27" fill="none" stroke="#4a90c2" stroke-width="3"/><g stroke="#4a90c2" stroke-width="3" stroke-linecap="round">' + [0, 60, 120].map(a => `<path d="M32 12v40M27 15l5 5 5-5M27 49l5-5 5 5" transform="rotate(${a} 32 32)" fill="none"/>`).join('') + '</g>',
+};
+function stampArt(id) {
+  if (STAMP_ART[id]) return STAMP_ART[id];
+  const b = /^stamp_b_(\w+)$/.exec(id || '');
+  const bb = b && BOSS_BY_ID[b[1]], art = bb && BOSS_ART[bb.id];
+  if (art) return `<circle cx="32" cy="32" r="28.5" fill="none" stroke="${bb.a}" stroke-width="3"/><circle cx="32" cy="32" r="24" fill="${bb.c}" opacity=".55"/><circle cx="32" cy="32" r="24" fill="none" stroke="${bb.b}" stroke-width="1.2" stroke-dasharray="3 2"/><g transform="translate(12.5 12.5) scale(.325)">${art.body}${art.calm}</g>`;
+  return STAMP_ART.stamp_classic;
+}
+const stampSVG = (id, size = 40, cls = '') => `<svg class="stamp-svg${cls ? ' ' + cls : ''}" viewBox="0 0 64 64" width="${size}" height="${size}" aria-hidden="true">${stampArt(id)}</svg>`;
+const stampOn = () => !!USER && !minimal();
+/** The stamp a session got (sessions from before stamps show the classic seal). */
+const sessionStamp = s => (s && ITEM_BY_ID[s.stamp] && ITEM_BY_ID[s.stamp].cat === 'stamp' ? s.stamp : 'stamp_classic');
+
+/** The stamp lands on the session-complete card. */
+function landStamp(s) {
+  const host = $('#noteRow');
+  if (!host) return;
+  host.querySelectorAll('.stamp-land').forEach(x => x.remove());
+  host.classList.toggle('has-stamp', stampOn() && !!s);
+  if (!stampOn() || !s) return;
+  const el = document.createElement('div');
+  el.className = 'stamp-land';
+  el.setAttribute('role', 'img');
+  el.setAttribute('aria-label', `Stamp: ${ITEM_BY_ID[sessionStamp(s)].name}`);
+  el.innerHTML = `<i class="ink" aria-hidden="true"></i>${stampSVG(sessionStamp(s), 64)}`;
+  host.appendChild(el);
+  const m = motion();
+  if (m !== 'off') { void el.offsetWidth; el.classList.add('go'); }   // start from the first frame (no wait for an animation frame)
+  setTimeout(() => { playStampSound(); if (m === 'full') haptic(18); }, m === 'full' ? 330 : 0);
+}
+/** A soft stamp: a low thump and a papery tap (master Sound + interface sounds). */
+function playStampSound() {
+  if (!S.settings.sound || !UIS.prefs.on || document.hidden) return false;
+  const v = UIS.prefs.vol;
+  return withAudio(c => {
+    noiseHit(c, c.destination, { freq: 220, q: 0.8, peak: 0.55 * v, d: 0.11, type: 'lowpass' });
+    tone(c, c.destination, { f: 120, f2: 70, fd: 0.09, peak: 0.16 * v, a: 0.003, d: 0.14 });
+    noiseHit(c, c.destination, { t: 0.012, freq: 2600, q: 1.4, peak: 0.12 * v, d: 0.05 });
+  }, 800);
+}
+
+/* ---------- Rewards that unlock by themselves (boss emblems, event stamps, rarer card styles) ---------- */
+const questClaimsIn = ev => Object.keys(S.game.claims.quests).filter(k => k.startsWith(ev + ':q')).length;
+const UNLOCKS = [
+  ...BOSSES.map(b => ({ id: 'stamp_b_' + b.id, src: `boss:${b.id}:emblem`, ok: () => bossRecord(b.id).wins > 0 })),
+  { id: 'stamp_pumpkin', src: 'ev:hw26', ok: () => questClaimsIn('hw26') >= 3 },
+  { id: 'stamp_snow', src: 'ev:xm26', ok: () => questClaimsIn('xm26') >= 3 },
+  { id: 'card_champion', src: 'boss:mastered', ok: () => BOSSES.some(b => bossRecord(b.id).mastered) },
+  { id: 'card_haunted', src: 'ev:hw26', ok: () => questClaimsIn('hw26') >= 4 },
+  { id: 'card_frost', src: 'ev:xm26', ok: () => questClaimsIn('xm26') >= 4 },
+];
+/** Grant anything newly unlocked (keyed by item id, so never twice). Returns the new item ids. */
+function checkUnlocks(announceIt = true) {
+  if (!USER || !rewardsReady() || isPreview()) return [];
+  const got = [];
+  for (const u of UNLOCKS) if (!S.game.grants[u.id] && ITEM_BY_ID[u.id] && u.ok()) { S.game.grants[u.id] = { src: u.src, at: Date.now() }; got.push(u.id); }
+  if (!got.length) return got;
+  G = null;
+  save();
+  updateBagDot();
+  if (announceIt && S.settings.gamification) {
+    const names = got.map(id => ITEM_BY_ID[id].name);
+    toast(`🎁 Unlocked: ${names.slice(0, 2).join(', ')}${names.length > 2 ? ` +${names.length - 2} more` : ''} — in your bag`, 3600, true, { log: false });
+    inboxAdd({ type: 'boss', key: 'unlock:' + got.join(','), title: `🎁 Unlocked ${names.join(', ')}`, body: 'Equip it from your bag', go: { tab: 'bag' } });
+  }
+  return got;
+}
+
+/* ==========================================================================
+   TIME-OF-DAY BACKGROUND — a very faint sky behind the app that follows the
+   local clock: sunrise, day, sunset, night (a few twinkling stars), blending
+   slowly between them. No weather service or location: just the time.
+   Optional "Rain" mood adds gentle falling rain. On by default, except in True
+   Minimalist (where it starts off); hidden on the Starfield theme (its own sky).
+   ========================================================================== */
+// [hour, sunrise, day, sunset, night]; the sky blends linearly between these points.
+const SKY_KEYS = [[0, 0, 0, 0, 1], [4.5, 0, 0, 0, 1], [5.5, 1, 0, 0, 0], [6.5, 1, 0, 0, 0], [8, 0, 1, 0, 0], [16.5, 0, 1, 0, 0], [17.75, 0, 0, 1, 0], [18.75, 0, 0, 1, 0], [20, 0, 0, 0, 1], [24, 0, 0, 0, 1]];
+const SKY_PHASES = ['sunrise', 'day', 'sunset', 'night'];
+/** Weights of the four skies at a time (they add up to 1). */
+function skyAt(d = new Date()) {
+  const h = d.getHours() + d.getMinutes() / 60 + d.getSeconds() / 3600;
+  let i = 0;
+  while (i < SKY_KEYS.length - 2 && h >= SKY_KEYS[i + 1][0]) i++;
+  const [h0, ...a] = SKY_KEYS[i], [h1, ...b] = SKY_KEYS[i + 1], k = h1 > h0 ? (h - h0) / (h1 - h0) : 0;
+  return Object.fromEntries(SKY_PHASES.map((p, j) => [p, +(a[j] + (b[j] - a[j]) * k).toFixed(3)]));
+}
+const skyPhase = (d = new Date()) => { const w = skyAt(d); return SKY_PHASES.reduce((x, y) => (w[y] > w[x] ? y : x)); };
+const todOn = () => !!USER && (S.settings.tod === undefined ? !minimal() : !!S.settings.tod) && equippedId('theme') !== 'th_starfield';
+let skyKey = '';
+function renderSky() {
+  const el = $('#todSky');
+  if (!el) return;
+  const on = todOn() && !$('#appView').classList.contains('hidden');
+  el.classList.toggle('hidden', !on);
+  el.classList.toggle('rain', on && !!S.settings.todRain);
+  if (!on) { skyKey = ''; return; }
+  const w = skyAt(), key = SKY_PHASES.map(p => w[p]).join() + (S.settings.todRain ? 'r' : '');
+  if (key === skyKey) return;
+  skyKey = key;
+  for (const p of SKY_PHASES) el.querySelector('.sky-' + p).style.opacity = w[p];
+  el.querySelector('.sky-stars').style.opacity = w.night;
+  el.dataset.phase = skyPhase();
+}
+(function buildSky() {
+  // a few stars in the top part of the sky, always in the same places
+  let seed = 7;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  $('#todSky .sky-stars').innerHTML = Array.from({ length: 26 }, (_, i) => `<i style="left:${(rnd() * 100).toFixed(1)}%;top:${(rnd() * 42).toFixed(1)}%;--tw:${(2.6 + rnd() * 3).toFixed(1)}s;--dl:${(-rnd() * 5).toFixed(1)}s;--sz:${(1 + rnd() * 1.6).toFixed(1)}px"></i>`).join('');
+})();
+setInterval(renderSky, 60000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) renderSky(); });
+
+/* ==========================================================================
+   PLAYER CARD — a game-style card at the top of the Profile page: banner, badge
+   with frame and aura, name colour, title, level and tier, a stats board and up
+   to 3 featured achievements. Card styles are items (cat "card", in the bag);
+   the banner, featured slots and privacy switches live in S.cardPrefs
+   ({ key: { v, u } }, merged key by key across devices in users/{uid}).
+   Sharing: a PNG (square or 9:16 story, drawn from an SVG) or a #card= link that
+   holds a compact snapshot of only what the card shows. Opening a link shows a
+   read-only card without signing in and without loading Firebase at all.
+   ========================================================================== */
+const CARD_PRIV = [['hours', 'Total focus hours'], ['streak', 'Current and longest streak'], ['sessions', 'Sessions'], ['week', 'Weekly chart'], ['heat', '12-week heatmap'],
+  ['best', 'Best focus time'], ['subjects', 'Top subjects (shows your session names)'], ['bosses', 'Bosses defeated and Mastered', 1], ['garden', 'Garden plants', 1], ['featured', 'Featured slots', 1]];
+const CARD_PRIV_OFF = { subjects: true };   // session names stay private unless you switch this on
+const cardPref = k => { const p = S.cardPrefs && S.cardPrefs[k]; return p ? p.v : k.startsWith('p_') ? !CARD_PRIV_OFF[k.slice(2)] : undefined; };
+function setCardPref(k, v) {
+  if (isPreview()) return;
+  S.cardPrefs[k] = { v, u: Date.now() };
+  save();
+}
+/** Card preferences: the newer value wins key by key, so two devices editing different things both keep theirs. */
+function mergeCardPrefs(local, remote) {
+  const ok = m => (m && typeof m === 'object' && !Array.isArray(m) ? m : {});
+  const out = {}, L = ok(local), R = ok(remote);
+  let ahead = false;
+  for (const k of new Set([...Object.keys(L), ...Object.keys(R)])) {
+    const a = L[k], b = R[k], ua = a && +a.u || 0, ub = b && +b.u || 0;
+    if (!ua && !ub) continue;
+    if (ua > ub) { out[k] = a; ahead = true; } else out[k] = b;
+  }
+  return { prefs: out, ahead };
+}
+
+/* ---------- Card styles: colours for the screen and for the image ---------- */
+const CARD_FONT = 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+const CARD_STYLES = {
+  card_scholar: { l: { bg: '#f8f1e3', fg: '#2b2118', mut: '#76654f', acc: '#8b2f2f', acc2: '#a8782a', tile: '#efe4cc', line: '#dccdae' },
+                  d: { bg: '#231d17', fg: '#f0e5cf', mut: '#b5a385', acc: '#e3906f', acc2: '#d9b26a', tile: '#2e261d', line: '#43372a' }, font: 'Georgia, "Times New Roman", serif' },
+  card_gamer:   { l: { bg: '#0e1126', fg: '#eaeeff', mut: '#959bc9', acc: '#3ef0ff', acc2: '#ff4fd8', tile: '#171b3b', line: '#2b3066' }, font: 'ui-monospace, "SF Mono", Menlo, Consolas, monospace' },
+  card_champion:{ l: { bg: '#18130a', fg: '#fbf1d8', mut: '#c9b382', acc: '#e7c35a', acc2: '#fff0b0', tile: '#251c0e', line: '#55431b' } },
+  card_haunted: { l: { bg: '#180f1e', fg: '#f6e8de', mut: '#b39bb0', acc: '#f28c28', acc2: '#b07cf0', tile: '#24182c', line: '#3d2b48' } },
+  card_frost:   { l: { bg: '#eef6fc', fg: '#14283a', mut: '#58718c', acc: '#2a78b8', acc2: '#6dbbe6', tile: '#deedf8', line: '#c9dff0' },
+                  d: { bg: '#0d1824', fg: '#e2f0fb', mut: '#8fa9c2', acc: '#7fc8f0', acc2: '#bfe6ff', tile: '#152536', line: '#22384d' } },
+};
+const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+/** Is the page dark right now (system setting, chosen mode or an always-dark theme)? */
+function pageDark() {
+  const m = /^#?([0-9a-f]{6})$/i.exec(cssVar('--bg')) || [];
+  if (!m[1]) { const a = document.documentElement.getAttribute('data-theme'); return a === 'dark' || (!a && systemDark()); }
+  const n = parseInt(m[1], 16), lum = (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
+  return lum < 0.5;
+}
+/** Colours of a card style. `real` = actual colours (for the image); otherwise Minimal follows the theme through CSS variables. */
+function cardPal(style, real = false) {
+  const s = CARD_STYLES[style];
+  if (s) { const v = (pageDark() && s.d) || s.l; return { ...v, font: s.font || CARD_FONT }; }
+  if (!real) return { bg: 'var(--surface)', fg: 'var(--text)', mut: 'var(--muted)', acc: 'var(--accent)', acc2: 'var(--accent)', tile: 'var(--bg)', line: 'var(--line)', font: CARD_FONT };
+  const sf = cssVar('--surface'), bg = cssVar('--bg');
+  return { bg: /rgba/.test(sf) ? bg : sf || '#ffffff', fg: cssVar('--text') || '#1f2322', mut: cssVar('--muted') || '#66706e', acc: cssVar('--accent') || '#2f8f83', acc2: cssVar('--accent') || '#2f8f83', tile: bg || '#f6f6f3', line: cssVar('--line') || '#e3e6e4', font: CARD_FONT };
+}
+// A small ornament in the corner of the rarer styles (64×64).
+const CARD_DECO = {
+  card_champion: '<g fill="none" stroke="#e7c35a" stroke-width="2.2" stroke-linecap="round"><path d="M32 54C18 50 10 38 12 22M32 54c14-4 22-16 20-32"/>' + [0, 1, 2, 3].map(i => `<path d="M${14 - i * .4} ${44 - i * 8}q-6-2-7-8M${50 + i * .4} ${44 - i * 8}q6-2 7-8"/>`).join('') + '</g><path d="M32 10l3.2 6.6 7.2 1-5.2 5 1.3 7.2L32 26.4l-6.5 3.4 1.3-7.2-5.2-5 7.2-1Z" fill="#e7c35a"/>',
+  card_haunted: '<g fill="#b07cf0"><path d="M10 20q6-8 12-2 2-5 4-1 2-4 4 1 6-6 12 2-7-2-9 3-3-2-7 0-2-5-9-3Z"/><path d="M36 42q5-6 10-1 1.6-4 3-.8 1.6-3.2 3 .8 5-5 10 1-6-1.6-7.6 2.6-2.4-1.6-5.6 0-1.6-4-7.4-2.6Z" opacity=".7"/></g>',
+  card_frost: '<g stroke="#7fc8f0" stroke-width="2" stroke-linecap="round" fill="none">' + [0, 60, 120].map(a => `<path d="M32 14v36M27 18l5 5 5-5M27 46l5-5 5 5" transform="rotate(${a} 32 32)"/>`).join('') + '</g>',
+  card_gamer: '<g fill="none" stroke="#3ef0ff" stroke-width="2.4"><path d="M8 22V8h14M56 22V8H42"/></g><g fill="#ff4fd8"><rect x="26" y="40" width="5" height="5"/><rect x="33" y="40" width="5" height="5"/><rect x="29.5" y="47" width="5" height="5"/></g>',
+  card_scholar: '<g fill="none" stroke="#a8782a" stroke-width="1.8"><path d="M14 46V20l18-8 18 8v26"/><path d="M20 24v20M28 24v20M36 24v20M44 24v20M12 48h40"/></g>',
+};
+
+/* ---------- Banners: a few free ones, your themes, arenas of bosses you beat, art from questlines ---------- */
+const FREE_BANNERS = {
+  bn_mint: { name: 'Mint', l: ['#c9ebe3', '#5fb3a5'], d: ['#173a35', '#2f8f83'] },
+  bn_dawn: { name: 'Dawn', l: ['#ffe2bf', '#f4978e'], d: ['#4a2a2a', '#b5594f'] },
+  bn_dusk: { name: 'Dusk', l: ['#c7c9f5', '#c98bb4'], d: ['#26284f', '#6b4a7c'] },
+  bn_ink:  { name: 'Ink',  l: ['#dfe4ea', '#8796a8'], d: ['#151a22', '#3a4656'] },
+};
+const WAVES = '<path d="M0 92q50-22 100 0t100 0 100 0 100 0V120H0Z" fill="#fff" opacity=".18"/><path d="M0 104q50-16 100 0t100 0 100 0 100 0V120H0Z" fill="#fff" opacity=".14"/>';
+/** A banner's two layers: bg stretches across the whole banner, art sits on the right at its own shape. */
+const bannerLayers = bn => `<svg class="pc-bbg" viewBox="0 0 400 120" preserveAspectRatio="none" aria-hidden="true">${bn.bg || ''}</svg><svg class="pc-bart" viewBox="0 0 400 120" preserveAspectRatio="xMaxYMid meet" aria-hidden="true">${bn.art}</svg>`;
+/** { a, b, art, name } for a banner id; null if the id isn't a banner. Art is drawn in a 400×120 box anchored right. */
+function bannerLook(id, dark = pageDark()) {
+  const [k, x] = String(id || '').split(':');
+  if (FREE_BANNERS[k] && !x) { const f = FREE_BANNERS[k]; const [a, b] = dark ? f.d : f.l; return { a, b, bg: WAVES, art: '<circle cx="330" cy="40" r="22" fill="#fff" opacity=".3"/><circle cx="372" cy="88" r="10" fill="#fff" opacity=".2"/>', name: f.name }; }
+  if (k === 'th' && ITEM_BY_ID[x] && ITEM_BY_ID[x].cat === 'theme') {
+    const sk = SKINS[x] || DEFAULT_SKIN, v = (sk.force || dark ? sk.dark || sk.light : sk.light) || DEFAULT_SKIN.light;
+    const stars = x === 'th_starfield' ? Array.from({ length: 18 }, (_, i) => `<circle cx="${(i * 97) % 400}" cy="${(i * 53) % 110 + 5}" r="${i % 3 ? 1.2 : 2}" fill="#fff" opacity="${i % 2 ? .5 : .85}"/>`).join('') : '';
+    return { a: v.bg, b: v.accent, art: stars || `<circle cx="340" cy="30" r="46" fill="${v.surface && !/rgba/.test(v.surface) ? v.surface : '#fff'}" opacity=".35"/><circle cx="270" cy="96" r="30" fill="#fff" opacity=".16"/>`, name: ITEM_BY_ID[x].name };
+  }
+  if (k === 'bs' && BOSS_BY_ID[x] && BOSS_ART[x]) {
+    const b = BOSS_BY_ID[x], [a, c] = dark ? b.arena.d : b.arena.l;
+    return { a, b: c, art: `<circle cx="330" cy="64" r="58" fill="${b.c}" opacity=".35"/><g transform="translate(270 4) scale(1)">${BOSS_ART[x].body}${BOSS_ART[x].calm}</g>`, name: `${b.short} arena` };
+  }
+  if (k === 'ev' && EVENT_BY_ID[x]) {
+    const ev = EVENT_BY_ID[x];
+    return { a: ev.a, b: ev.b, bg: WAVES, art: `<text x="340" y="84" font-size="64" text-anchor="middle">${ev.emoji}</text>`, name: ev.name };
+  }
+  return null;
+}
+const questClaimed = ev => Object.keys(S.game.claims.quests).some(k => k.startsWith(ev + ':'));
+/** Banners you can choose: free ones, themes you own, arenas of bosses you beat, art from questlines you took part in. */
+function bannerOptions() {
+  return [...Object.keys(FREE_BANNERS),
+    ...ITEMS.filter(it => it.cat === 'theme' && isOwned(it.id)).map(it => 'th:' + it.id),
+    ...BOSSES.filter(b => bossRecord(b.id).wins).map(b => 'bs:' + b.id),
+    ...EVENTS.filter(ev => questClaimed(ev.id)).map(ev => 'ev:' + ev.id)];
+}
+function myBanner() {
+  const want = cardPref('banner'), opts = bannerOptions();
+  return opts.includes(want) ? want : 'th:' + equippedId('theme');
+}
+
+/* ---------- Featured slots: a Mastered boss, a streak milestone, an event reward or an achievement ---------- */
+const EV_OF_ITEM = {};
+for (const ev of EVENTS) for (const id of [...(ev.rewards || []), ...(ev.final || [])]) EV_OF_ITEM[id] = ev.id;
+const FLAME_PATH = '<path d="M12 3.8c2.6 3 5.2 5.3 5.2 9.2a5.2 5.2 0 0 1-10.4 0c0-2 .9-3.6 2.1-4.6.3 1.6 1.2 2.6 2.1 2.9-.6-2.6-.1-5.2 1-7.5Z"/>';
+/** What a featured id shows: { label, sub, icon(size) } — works without being signed in (shared cards). */
+function featureInfo(f) {
+  const [k, x] = String(f || '').split(':');
+  if (k === 'fm' && BOSS_BY_ID[x] && BOSS_ART[x]) { const b = BOSS_BY_ID[x]; return { label: `${b.short} mastered`, sub: 'Solo + Squad', icon: s => `<svg viewBox="0 0 120 120" width="${s}" height="${s}" aria-hidden="true">${BOSS_ART[x].body}${BOSS_ART[x].calm}</svg>` }; }
+  if (k === 'fs' && STREAK_BONUS[x]) return { label: `${x}-day streak`, sub: 'Streak milestone', icon: s => `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="#f28c28" aria-hidden="true">${FLAME_PATH}</svg>` };
+  if (k === 'fa' && ACH_BY_ID[x]) return { label: ACH_BY_ID[x].name, sub: 'Achievement', icon: s => `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[ACH_BY_ID[x].icon]}</svg>` };
+  if (k === 'fe' && EV_OF_ITEM[x] && ITEM_BY_ID[x]) { const ev = EVENT_BY_ID[EV_OF_ITEM[x]]; return { label: ITEM_BY_ID[x].name, sub: ev.name, icon: s => `<svg viewBox="0 0 24 24" width="${s}" height="${s}" aria-hidden="true"><text x="12" y="18.5" font-size="17" text-anchor="middle">${ev.emoji}</text></svg>` }; }
+  return null;
+}
+/** Everything you could feature right now. */
+function featureOptions() {
+  const cl = S.game.claims;
+  return [...BOSSES.filter(b => bossRecord(b.id).mastered).map(b => 'fm:' + b.id),
+    ...Object.keys(STREAK_BONUS).filter(m => cl.milestones[m]).sort((a, b) => b - a).map(m => 'fs:' + m),
+    ...Object.entries(S.game.grants).filter(([id, g]) => g && String(g.src).startsWith('ev:') && EV_OF_ITEM[id]).map(([id]) => 'fe:' + id),
+    ...ACHIEVEMENTS.filter(a => cl.achievements[a.id]).map(a => 'fa:' + a.id)];
+}
+function myFeatured() {
+  const want = cardPref('featured'), opts = new Set(featureOptions());
+  return (Array.isArray(want) ? want : []).filter(f => opts.has(f)).slice(0, 3);
+}
+
+/* ---------- The snapshot: exactly what the card shows (also what a link carries) ---------- */
+function topSubjects(n = 3) {
+  const by = {};
+  for (const s of S.sessions) if (s.name && s.name !== 'Untitled') by[s.name] = (by[s.name] || 0) + (+s.duration || 0) / 60000;
+  return Object.entries(by).sort((a, b) => b[1] - a[1]).slice(0, n).map(([k, m]) => [String(k).slice(0, 40), Math.round(m)]);
+}
+function cardData() {
+  const g = game(), mini = minimal(), on = k => !!cardPref('p_' + k), today = startOfDay(new Date());
+  const d = { v: 1, n: USER && !USER.guest ? USER.username : '' };
+  if (mini) d.m = 1;
+  else {
+    Object.assign(d, { c: equippedId('color'), lv: g.lv.level, tr: g.tier.id, av: myAvatar(), fr: equippedId('frame'), st: equippedId('card'), bn: myBanner() });
+    if (TITLE_TEXT[equippedId('title')]) d.t = equippedId('title');
+    if (SPECIAL_AURAS[myAura()]) d.au = myAura(); else if (on('streak')) d.sk = g.streak.cur;   // the streak aura would give a hidden streak away
+  }
+  if (on('hours')) d.h = Math.round(g.focusMs / 3.6e5) / 10;
+  if (on('streak')) { d.cs = g.streak.cur; d.ls = g.streak.longest; }
+  if (on('sessions')) d.ss = S.sessions.length;
+  if (on('week')) { d.wd = dayKey(addDays(today, -6)); d.wk = Array.from({ length: 7 }, (_, i) => Math.min(1440, Math.round((g.idx[dayKey(addDays(today, i - 6))] || {}).total || 0))); }
+  if (on('heat')) {
+    const start = addDays(weekStartOf(today, S.settings.weekStart), -77);
+    d.hs = dayKey(start);
+    d.hm = Array.from({ length: 84 }, (_, i) => addDays(start, i)).filter(x => x <= today).map(x => heatLevel((g.idx[dayKey(x)] || {}).total || 0)).join('');
+  }
+  if (on('best')) { const I = energyInsights(); if (I.time) d.bt = I.time.k; }
+  if (on('subjects')) { const sj = topSubjects(); if (sj.length) d.sj = sj; }
+  if (!mini) {
+    if (on('bosses')) { d.bd = allVictories().length; d.ms = BOSSES.filter(b => bossRecord(b.id).mastered).length; }
+    if (on('garden')) d.gp = gardenStats(gardenItems(0, Infinity)).grown;
+    if (on('featured')) { const f = myFeatured(); if (f.length) d.ft = f; }
+  }
+  return d;
+}
+/** A friend's card from what friends can already read (public profile + shared activity). */
+function friendCardData(prof, act, name) {
+  const d = { v: 1, n: name || prof.username || '' };
+  if (minimal()) d.m = 1;
+  else Object.assign(d, { c: NAME_GRADS[prof.color] || NAME_COLORS[prof.color] ? prof.color : '', lv: +prof.level || 1, tr: tierById(prof.tier).id, av: AVATAR_ART[prof.avatar] ? prof.avatar : '',
+    fr: ITEM_BY_ID[prof.frame] ? prof.frame : 'frame_none', st: 'card_minimal', bn: 'bn_mint', au: profAura(prof), sk: profStreak(prof) });
+  d.h = +prof.hours || 0; d.cs = +prof.streak || 0; d.ls = +prof.longest || 0;
+  if (act && !act.denied && act.visible && act.days) {
+    const today = startOfDay(new Date()), start = addDays(weekStartOf(today, S.settings.weekStart), -77);
+    d.wd = dayKey(addDays(today, -6)); d.wk = Array.from({ length: 7 }, (_, i) => +act.days[dayKey(addDays(today, i - 6))] || 0);
+    d.hs = dayKey(start); d.hm = Array.from({ length: 84 }, (_, i) => addDays(start, i)).filter(x => x <= today).map(x => { const m = +act.days[dayKey(x)] || 0; return m <= 0 ? 0 : m < 30 ? 1 : m < 60 ? 2 : m < 120 ? 3 : 4; }).join('');
+  }
+  return d;
+}
+/** Everything in a snapshot from a link is checked: ids must exist, numbers are clamped, text is length-limited (and escaped when shown). */
+function sanitizeCard(o) {
+  if (!o || typeof o !== 'object' || Array.isArray(o) || o.v !== 1) return null;
+  const num = (v, hi, dec = 0) => (Number.isFinite(+v) && v !== null && v !== '' ? Math.round(clamp(+v, 0, hi) * 10 ** dec) / 10 ** dec : undefined);
+  const item = (v, cat) => (typeof v === 'string' && ITEM_BY_ID[v] && ITEM_BY_ID[v].cat === cat ? v : '');
+  const d = { v: 1, n: typeof o.n === 'string' && /^[A-Za-z0-9_]{1,20}$/.test(o.n) ? o.n : '' };
+  if (o.m) d.m = 1;
+  else {
+    d.lv = num(o.lv, 999) || 1;
+    d.tr = TIERS.some(t => t.id === o.tr) ? o.tr : tierFor(d.lv).id;
+    d.c = item(o.c, 'color'); d.av = item(o.av, 'avatar'); d.fr = item(o.fr, 'frame') || 'frame_none';
+    d.st = item(o.st, 'card') || 'card_minimal'; d.bn = bannerLook(o.bn) ? o.bn : 'bn_mint';
+    if (TITLE_TEXT[o.t]) d.t = o.t;
+    if (SPECIAL_AURAS[o.au]) d.au = o.au; else if (num(o.sk, 99999)) d.sk = num(o.sk, 99999);
+  }
+  for (const [k, hi, dec] of [['h', 1e6, 1], ['cs', 99999], ['ls', 99999], ['ss', 1e6], ['bd', 9999], ['ms', BOSSES.length], ['gp', 1e6]]) { const v = num(o[k], hi, dec); if (v !== undefined) d[k] = v; }
+  if (d.cs !== undefined && d.ls === undefined) d.ls = d.cs;
+  if (Array.isArray(o.wk) && o.wk.length === 7 && DAY_RE.test(o.wd || '')) { d.wk = o.wk.map(v => num(v, 1440) || 0); d.wd = o.wd; }
+  if (typeof o.hm === 'string' && /^[0-4]{1,84}$/.test(o.hm) && DAY_RE.test(o.hs || '')) { d.hm = o.hm; d.hs = o.hs; }
+  if (['Morning', 'Afternoon', 'Evening', 'Night'].includes(o.bt)) d.bt = o.bt;
+  if (Array.isArray(o.sj)) { const sj = o.sj.filter(x => Array.isArray(x) && typeof x[0] === 'string' && x[0].trim()).slice(0, 3).map(x => [x[0].slice(0, 40), num(x[1], 1e7) || 0]); if (sj.length) d.sj = sj; }
+  if (!d.m && Array.isArray(o.ft)) { const ft = [...new Set(o.ft.filter(f => typeof f === 'string' && featureInfo(f)))].slice(0, 3); if (ft.length) d.ft = ft; }
+  return d;
+}
+
+/* ---------- Drawing the card (HTML on screen) ---------- */
+const PARTS = { Morning: '🌅', Afternoon: '☀️', Evening: '🌆', Night: '🌙' };
+function weekBars(d) {
+  const max = Math.max(30, ...d.wk), start = parseDay(d.wd);
+  return `<svg class="pc-week" viewBox="0 0 196 86" role="img" aria-label="Focus minutes in the last 7 days">${d.wk.map((m, i) => {
+    const h = m ? Math.max(3, m / max * 58) : 2, x = 4 + i * 28;
+    return `<rect x="${x}" y="${66 - h}" width="18" height="${h}" rx="4" fill="var(--pc-acc)" opacity="${m ? 1 : .25}"><title>${fmtShort(addDays(start, i))} · ${fmtMin(m)}</title></rect><text x="${x + 9}" y="82" text-anchor="middle">${WEEKDAYS[addDays(start, i).getDay()][0]}</text>`;
+  }).join('')}</svg>`;
+}
+function heatGrid(d) {
+  const C = 11, G = 3;
+  return `<svg class="pc-heat" viewBox="0 0 ${12 * (C + G) - G} ${7 * (C + G) - G}" role="img" aria-label="Focus over the last 12 weeks">${[...d.hm].map((c, i) => {
+    const lv = +c;
+    return `<rect x="${Math.floor(i / 7) * (C + G)}" y="${(i % 7) * (C + G)}" width="${C}" height="${C}" rx="2.5" fill="${lv ? 'var(--pc-acc)' : 'var(--pc-line)'}" opacity="${lv ? HEAT_OPACITY[lv] : .7}"><title>${fmtShort(addDays(parseDay(d.hs), i))}</title></rect>`;
+  }).join('')}</svg>`;
+}
+/** The card. ctx: 'own' (Profile), 'shared' (from a link), 'friend', 'preview' (in Customise). */
+function cardHTML(d, ctx = 'own') {
+  const mini = !!d.m, style = mini ? 'card_minimal' : d.st || 'card_minimal', pal = cardPal(style), tier = mini ? null : tierById(d.tr);
+  const vars = `--pc-bg:${pal.bg};--pc-fg:${pal.fg};--pc-mut:${pal.mut};--pc-acc:${pal.acc};--pc-acc2:${pal.acc2};--pc-tile:${pal.tile};--pc-line:${pal.line};--pc-font:${pal.font.replace(/"/g, "'")}`;
+  const name = d.n ? '@' + esc(d.n) : ctx === 'own' && USER && USER.guest ? 'You' : 'Pomodorolist user';
+  const bn = !mini && bannerLook(d.bn);
+  const banner = mini ? '<div class="pc-banner pc-plain"></div>'
+    : `<div class="pc-banner" style="background:linear-gradient(120deg,${bn.a},${bn.b})">${bannerLayers(bn)}${CARD_DECO[style] ? `<svg class="pc-deco" viewBox="0 0 64 64" aria-hidden="true">${CARD_DECO[style]}</svg>` : ''}</div>`;
+  const pic = mini ? (d.av && hasAvatar(d.av) ? avatarSVG(d.av, 72) : `<span class="avatar big pc-init">${esc((d.n || '?')[0]).toUpperCase()}</span>`)
+    : withAura(badgeSVG(tier, { size: 72, frame: d.fr, avatar: d.av }), d.sk || 0, d.au || '');
+  const tile = (v, s) => `<div class="pc-tile"><b>${v}</b><span>${s}</span></div>`;
+  const tiles = [d.h !== undefined && tile(fmtNum(Math.floor(d.h)) + (d.h % 1 && d.h < 100 ? (d.h % 1).toFixed(1).slice(1) : '') + 'h', 'Total focus'),
+    d.cs !== undefined && tile(`${d.cs}<small>d</small>`, 'Current streak'), d.ls !== undefined && tile(`${d.ls}<small>d</small>`, 'Longest streak'),
+    d.ss !== undefined && tile(fmtNum(d.ss), 'Sessions')].filter(Boolean);
+  const more = [d.bt && `<div class="pc-fact"><i aria-hidden="true">${PARTS[d.bt]}</i><span><b>${d.bt}</b>Best focus time</span></div>`,
+    d.bd !== undefined && `<div class="pc-fact"><i aria-hidden="true">⚔️</i><span><b>${fmtNum(d.bd)} defeated</b>Bosses${d.ms ? ` · ${d.ms} Mastered` : ''}</span></div>`,
+    d.gp !== undefined && `<div class="pc-fact"><i aria-hidden="true">🌱</i><span><b>${fmtNum(d.gp)} plants</b>Tomato garden</span></div>`].filter(Boolean);
+  const subj = d.sj ? `<div class="pc-sec"><div class="pc-h">Top subjects</div><ol class="pc-subj">${d.sj.map(([n, m]) => `<li><span>${esc(n)}</span><i style="--w:${Math.max(8, m / d.sj[0][1] * 100).toFixed(0)}%"></i><b>${fmtMin(m)}</b></li>`).join('')}</ol></div>` : '';
+  const feat = d.ft ? `<div class="pc-feat">${d.ft.map(f => { const fi = featureInfo(f); return `<div class="pc-chip"><span class="pc-fi">${fi.icon(26)}</span><span><b>${esc(fi.label)}</b>${esc(fi.sub)}</span></div>`; }).join('')}</div>` : '';
+  const charts = (d.wk ? `<div class="pc-sec"><div class="pc-h">Last 7 days</div>${weekBars(d)}</div>` : '') + (d.hm ? `<div class="pc-sec"><div class="pc-h">12 weeks</div>${heatGrid(d)}</div>` : '');
+  const empty = !tiles.length && !charts && !more.length && !subj && !feat;
+  return `<article class="pcard cs-${style.slice(5)}${mini ? ' pc-mini' : ''} pc-${ctx}" style="${vars}" aria-label="Player card of ${name}">
+    ${banner}
+    <div class="pc-id"><div class="pc-av">${pic}</div><div class="pc-who">
+      <div${nameAttrs(mini ? '' : d.c, 'pc-name')}>${name}</div>
+      ${!mini && d.t ? `<div class="pc-title">${esc(TITLE_TEXT[d.t])}</div>` : ''}
+      ${tier ? `<div class="pc-lv"><span class="pc-tier" style="--tc:${tier.color}">${badgeSVG(tier, { size: 16 })}${tier.name}</span><span>Level ${d.lv}</span></div>` : ''}</div></div>
+    ${tiles.length ? `<div class="pc-tiles">${tiles.join('')}</div>` : ''}
+    ${charts ? `<div class="pc-charts">${charts}</div>` : ''}
+    ${more.length || subj ? `<div class="pc-more">${more.join('')}${subj}</div>` : ''}
+    ${feat}
+    ${empty ? '<p class="pc-empty">Everything on this card is hidden.</p>' : ''}
+    ${ctx === 'shared' ? `<div class="pc-foot">Pomodorolist · ${esc(location.host + location.pathname.replace(/index\.html$/, ''))}</div>` : ''}
+  </article>`;
+}
+
+/* ---------- The image: the card drawn as an SVG at full size, then painted onto a canvas ---------- */
+let measureCtx = null;
+function fitText(text, font, maxW) {
+  measureCtx ||= document.createElement('canvas').getContext('2d');
+  measureCtx.font = font;
+  let t = String(text);
+  if (measureCtx.measureText(t).width <= maxW) return t;
+  while (t.length > 1 && measureCtx.measureText(t + '…').width > maxW) t = t.slice(0, -1);
+  return t + '…';
+}
+const AURA_GLOW = { soft: ['#ffffff', '#d0d0d0'], green: ['#4cbe6e', '#9be3b0'], blue: ['#4696f0', '#a6cbf7'], purple: ['#965feb', '#c9a7f7'], gold: ['#f2b428', '#ffe08a'], rainbow: ['#ff6b6b', '#ffd166', '#6ee7a7', '#6ab8ff', '#b18cff'] };
+/** SVG of the whole image. size: 'square' (1080×1080) or 'story' (1080×1920). */
+function cardImageSVG(d, size = 'square') {
+  const story = size === 'story', W = 1080, H = story ? 1920 : 1080, mini = !!d.m, style = mini ? 'card_minimal' : d.st || 'card_minimal';
+  const p = cardPal(style, true), dark = pageDark(), bn = !mini && bannerLook(d.bn, dark), tier = mini ? null : tierById(d.tr);
+  const F = p.font.replace(/"/g, "'"), X = 54, CW = W - 2 * X, IN = 42, x0 = X + IN, iw = CW - 2 * IN;
+  const T = (x, y, s, txt, o = '') => `<text x="${x}" y="${y}" font-size="${s}" font-family="${F}" ${o}>${txt}</text>`;
+  let o = '', y;
+  const BH = story ? 320 : 200, top = story ? 110 : 54, BOT = story ? 170 : 80;
+  // banner
+  o += `<defs><clipPath id="avClip" clipPathUnits="userSpaceOnUse"><circle cx="12" cy="12" r="12"/></clipPath><clipPath id="cardClip"><rect x="${X}" y="${top}" width="${CW}" height="${H - top - BOT}" rx="44"/></clipPath>
+    <linearGradient id="bnG" x1="0" y1="0" x2="1" y2=".5"><stop offset="0" stop-color="${bn ? bn.a : p.acc}"/><stop offset="1" stop-color="${bn ? bn.b : p.acc}"/></linearGradient>
+    <radialGradient id="pageG" cx=".2" cy="0" r="1.3"><stop offset="0" stop-color="${bn ? bn.b : p.acc}" stop-opacity=".35"/><stop offset="1" stop-color="${bn ? bn.b : p.acc}" stop-opacity="0"/></radialGradient></defs>`;
+  o += `<rect width="${W}" height="${H}" fill="${p.tile}"/><rect width="${W}" height="${H}" fill="url(#pageG)"/>`;
+  const CH = H - top - BOT;
+  o += `<rect x="${X}" y="${top}" width="${CW}" height="${CH}" rx="44" fill="${p.bg}" stroke="${style === 'card_champion' ? p.acc : p.line}" stroke-width="${style === 'card_champion' ? 6 : 2}"/>`;
+  o += `<g clip-path="url(#cardClip)">${mini ? `<rect x="${X}" y="${top}" width="${CW}" height="12" fill="${p.acc}"/>` : `<rect x="${X}" y="${top}" width="${CW}" height="${BH}" fill="url(#bnG)"/><svg x="${X}" y="${top}" width="${CW}" height="${BH}" viewBox="0 0 400 120" preserveAspectRatio="none">${bn.bg || ''}</svg><svg x="${X}" y="${top}" width="${CW - 20}" height="${BH}" viewBox="0 0 400 120" preserveAspectRatio="xMaxYMid meet">${bn.art}</svg>`}</g>`;
+  if (!mini && CARD_DECO[style]) o += `<svg x="${X + 30}" y="${top + 24}" width="${story ? 110 : 84}" height="${story ? 110 : 84}" viewBox="0 0 64 64">${CARD_DECO[style]}</svg>`;
+  // avatar + name
+  const AV = story ? 230 : 160, avx = x0, avy = mini ? top + 60 : top + BH - AV / 2;
+  if (!mini) {
+    const glow = d.au && SPECIAL_AURAS[d.au] ? SPECIAL_AURAS[d.au].cols : (auraFor(d.sk || 0) ? AURA_GLOW[auraFor(d.sk).id] : null);
+    o += `<circle cx="${avx + AV / 2}" cy="${avy + AV / 2}" r="${AV / 2 + 10}" fill="${p.bg}"/>`;
+    if (glow) o += `<defs><filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="${story ? 14 : 10}"/></filter></defs>` + glow.map((c, i) => `<circle cx="${avx + AV / 2 + Math.cos(i * 2.1) * 8}" cy="${avy + AV / 2 + Math.sin(i * 2.1) * 8}" r="${AV / 2 + 6}" fill="none" stroke="${c}" stroke-width="${story ? 18 : 14}" opacity=".75" filter="url(#glow)"/>`).join('');
+    o += `<svg x="${avx}" y="${avy}" width="${AV}" height="${AV}" viewBox="-1 -1 26 26">${badgeSVG(tier, { size: AV, frame: d.fr, avatar: d.av }).replace(/^<svg[^>]*>|<\/svg>$/g, '')}</svg>`.replace('<svg x', `<svg fill="none" stroke="${tier.color}" color="${tier.color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" x`);
+  } else {
+    o += d.av && hasAvatar(d.av) ? `<svg x="${avx}" y="${avy}" width="${AV}" height="${AV}" viewBox="0 0 24 24">${avatarArt(d.av)}</svg>`
+      : `<circle cx="${avx + AV / 2}" cy="${avy + AV / 2}" r="${AV / 2}" fill="${p.acc}" opacity=".16"/>` + T(avx + AV / 2, avy + AV / 2 + AV * .17, AV * .46, esc((d.n || '?')[0].toUpperCase()), `font-weight="700" fill="${p.acc}" text-anchor="middle"`);
+  }
+  const nx = avx + AV + (story ? 36 : 28), nameMax = X + CW - IN - nx;
+  const nameStr = d.n ? '@' + d.n : 'Pomodorolist user', NS = story ? 64 : 50;
+  const nameFill = !mini && NAME_GRADS[d.c] ? 'url(#nameG)' : !mini && NAME_COLORS[d.c] ? NAME_COLORS[d.c] : p.fg;
+  if (nameFill === 'url(#nameG)') { const g = NAME_GRADS[d.c], cols = dark ? g.d : g.l; o += `<defs><linearGradient id="nameG" x1="0" x2="1">${cols.map((c, i) => `<stop offset="${i / Math.max(1, cols.length - 1)}" stop-color="${c}"/>`).join('')}</linearGradient></defs>`; }
+  let ny = mini ? avy + AV / 2 + NS * .35 : top + BH + (story ? 74 : 56);
+  o += T(nx, ny, NS, esc(fitText(nameStr, `700 ${NS}px ${p.font}`, nameMax)), `font-weight="700" fill="${nameFill}"`);
+  if (!mini) {
+    if (d.t) { ny += story ? 50 : 40; o += T(nx, ny, story ? 34 : 27, esc(fitText(TITLE_TEXT[d.t], `600 ${story ? 34 : 27}px ${p.font}`, nameMax)), `font-weight="600" fill="${p.acc}" letter-spacing="1"`); }
+    ny += story ? 52 : 42;
+    o += `<svg x="${nx}" y="${ny - (story ? 30 : 24)}" width="${story ? 36 : 28}" height="${story ? 36 : 28}" viewBox="-1 -1 26 26" fill="none" stroke="${tier.color}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${tier.icon}</svg>`
+      + T(nx + (story ? 46 : 36), ny, story ? 32 : 26, `<tspan font-weight="700" fill="${tier.color}">${tier.name}</tspan><tspan fill="${p.mut}"> · Level ${d.lv}</tspan>`);
+  }
+  y = Math.max(avy + AV, ny) + (story ? 60 : 30);
+  // stat tiles
+  const tiles = [d.h !== undefined && [(d.h >= 100 ? fmtNum(Math.floor(d.h)) : d.h) + 'h', 'Total focus'], d.cs !== undefined && [d.cs + 'd', 'Current streak'],
+    d.ls !== undefined && [d.ls + 'd', 'Longest streak'], d.ss !== undefined && [fmtNum(d.ss), 'Sessions']].filter(Boolean);
+  if (tiles.length) {
+    const cols = story ? Math.min(2, tiles.length) : tiles.length, gap = 18, tw = (iw - gap * (cols - 1)) / cols, th = story ? 124 : 104;
+    tiles.forEach(([v, s], i) => {
+      const tx = x0 + (i % cols) * (tw + gap), ty = y + Math.floor(i / cols) * (th + gap);
+      o += `<rect x="${tx}" y="${ty}" width="${tw}" height="${th}" rx="24" fill="${p.tile}" stroke="${p.line}" stroke-width="1.5"/>`
+        + T(tx + 26, ty + th * .52, story ? 58 : 46, esc(v), `font-weight="800" fill="${p.fg}"`) + T(tx + 26, ty + th * .82, story ? 26 : 21, s, `fill="${p.mut}"`);
+    });
+    y += Math.ceil(tiles.length / cols) * (th + gap) + (story ? 26 : 10);
+  }
+  // charts
+  const chartH = story ? 260 : 170, both = d.wk && d.hm, cw = both ? (iw - 30) / 2 : iw;
+  const head = (x, yy, s) => T(x, yy, story ? 28 : 22, s, `font-weight="700" fill="${p.mut}" letter-spacing="1.5"`);
+  if (d.wk) {
+    const max = Math.max(30, ...d.wk), bw = cw / 7, start = parseDay(d.wd), base = y + chartH - 34;
+    o += head(x0, y + 24, 'LAST 7 DAYS');
+    d.wk.forEach((m, i) => {
+      const h = m ? Math.max(6, m / max * (chartH - 80)) : 4, bx = x0 + i * bw + bw * .18;
+      o += `<rect x="${bx}" y="${base - h}" width="${bw * .64}" height="${h}" rx="8" fill="${p.acc}" opacity="${m ? 1 : .25}"/>` + T(bx + bw * .32, base + 30, story ? 24 : 20, WEEKDAYS[addDays(start, i).getDay()].slice(0, story ? 3 : 1), `fill="${p.mut}" text-anchor="middle"`);
+    });
+    if (!both) y += chartH + (story ? 30 : 16);
+  }
+  if (d.hm) {
+    const hx = both ? x0 + cw + 30 : x0, gap = story ? 6 : 5, cell = Math.min((cw - 11 * gap) / 12, (chartH - 50 - 6 * gap) / 7);
+    o += head(hx, y + 24, '12 WEEKS');
+    [...d.hm].forEach((c, i) => { const lv = +c; o += `<rect x="${hx + Math.floor(i / 7) * (cell + gap)}" y="${y + 44 + (i % 7) * (cell + gap)}" width="${cell}" height="${cell}" rx="${cell * .22}" fill="${lv ? p.acc : p.line}" opacity="${lv ? HEAT_OPACITY[lv] : .8}"/>`; });
+    y += chartH + (story ? 30 : 16);
+  } else if (both) y += chartH + 16;
+  // facts, subjects, featured
+  const facts = [d.bt && [PARTS[d.bt], d.bt, 'Best focus time'], d.bd !== undefined && ['⚔️', `${fmtNum(d.bd)} boss${d.bd === 1 ? '' : 'es'} beaten`, d.ms ? `${d.ms} Mastered` : 'Bosses'], d.gp !== undefined && ['🌱', `${fmtNum(d.gp)} plants`, 'Tomato garden']].filter(Boolean);
+  const pill = (x, yy, w, h, icon, b, s) => `<rect x="${x}" y="${yy}" width="${w}" height="${h}" rx="${h / 2.6}" fill="${p.tile}" stroke="${p.line}" stroke-width="1.5"/>${icon}`
+    + T(x + h * .95, yy + h * .45, story ? 28 : 22, esc(fitText(b, `700 ${story ? 28 : 22}px ${p.font}`, w - h * 1.15)), `font-weight="700" fill="${p.fg}"`) + T(x + h * .95, yy + h * .78, story ? 21 : 17, esc(fitText(s, `${story ? 21 : 17}px ${p.font}`, w - h * 1.15)), `fill="${p.mut}"`);
+  const emo = (x, yy, h, e) => T(x + h * .48, yy + h * .66, h * .44, e, 'text-anchor="middle"');
+  const rowOf = (list, ph, draw, cols = list.length) => { if (!list.length) return; const gap = 16, w = (iw - gap * (cols - 1)) / cols; list.forEach((it, i) => { o += draw(x0 + (i % cols) * (w + gap), y + Math.floor(i / cols) * (ph + 12), w, ph, it); }); y += Math.ceil(list.length / cols) * (ph + 12) - 12 + (story ? 24 : 14); };
+  const room = H - BOT - 26;
+  if (facts.length && y + (story ? 96 : 68) <= room) rowOf(facts, story ? 96 : 68, (x, yy, w, h, [e, b, s]) => pill(x, yy, w, h, emo(x, yy, h, e), b, s));
+  if (d.sj && story && y + 60 + d.sj.length * 50 <= room) {
+    o += head(x0, y + 24, 'TOP SUBJECTS'); y += 46;
+    d.sj.forEach(([n, m]) => { o += T(x0, y + 30, 30, esc(fitText(n, `30px ${p.font}`, iw * .5)), `fill="${p.fg}"`) + `<rect x="${x0 + iw * .54}" y="${y + 10}" width="${iw * .3}" height="20" rx="10" fill="${p.line}"/><rect x="${x0 + iw * .54}" y="${y + 10}" width="${Math.max(16, iw * .3 * m / d.sj[0][1])}" height="20" rx="10" fill="${p.acc}"/>` + T(x0 + iw, y + 30, 28, fmtMin(m), `fill="${p.mut}" text-anchor="end"`); y += 46; });
+    y += 14;
+  } else if (d.sj && y + 68 <= room) rowOf([d.sj.map(x => x[0]).join(' · ')], 68, (x, yy, w, h, txt) => pill(x, yy, w, h, emo(x, yy, h, '📚'), txt, 'Top subjects'));
+  const fcols = story && d.ft && d.ft.length > 2 ? 2 : d.ft ? d.ft.length : 1, frows = d.ft ? Math.ceil(d.ft.length / fcols) : 1;
+  const fh = Math.min(story ? 92 : 76, Math.floor((room - y - 12 * (frows - 1)) / frows));   // shrinks a little rather than dropping the featured slots
+  if (d.ft && fh >= (story ? 64 : 56)) rowOf(d.ft, fh, (x, yy, w, h, f) => { const fi = featureInfo(f), s = h * .56; return pill(x, yy, w, h, `<svg x="${x + h * .2}" y="${yy + (h - s) / 2}" width="${s}" height="${s}" ${f.startsWith('fa:') ? `color="${p.acc}"` : ''} viewBox="${f.startsWith('fm:') ? '0 0 120 120' : '0 0 24 24'}">${fi.icon(s).replace(/^<svg[^>]*>|<\/svg>$/g, '')}</svg>`.replace('<svg x', f.startsWith('fa:') ? `<svg fill="none" stroke="${p.acc}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" x` : f.startsWith('fs:') ? '<svg fill="#f28c28" x' : '<svg x'), fi.label, fi.sub); }, fcols);
+  // footer: the app's name and link
+  const fy = H - (story ? 76 : 30);
+  o += `<circle cx="${W / 2 - (story ? 250 : 210)}" cy="${fy - (story ? 11 : 9)}" r="${story ? 13 : 10}" fill="${p.acc}"/>` + T(W / 2 + 10, fy, story ? 36 : 28, `<tspan font-weight="700" fill="${p.fg}">Pomodorolist</tspan><tspan fill="${p.mut}">  ·  ${esc(location.host + location.pathname.replace(/index\.html$/, ''))}</tspan>`, 'text-anchor="middle"');
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${o}</svg>`;
+}
+/** Paint the image on a canvas and return it as a PNG blob. */
+async function cardPNG(d, size = 'square') {
+  const svg = cardImageSVG(d, size), img = new Image();
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  await img.decode();
+  const c = document.createElement('canvas');
+  c.width = img.width || 1080; c.height = img.height || (size === 'story' ? 1920 : 1080);
+  const x = c.getContext('2d');
+  x.imageSmoothingQuality = 'high';
+  x.drawImage(img, 0, 0, c.width, c.height);
+  return new Promise(res => c.toBlob(res, 'image/png'));
+}
+
+/* ---------- Share link: #card=<base64url of the snapshot> ---------- */
+function b64uEnc(str) {
+  let bin = '';
+  for (const b of new TextEncoder().encode(str)) bin += String.fromCharCode(b);
+  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+function b64uDec(s) {
+  const bin = atob(s.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((s.length + 3) % 4));
+  return new TextDecoder('utf-8', { fatal: true }).decode(Uint8Array.from(bin, c => c.charCodeAt(0)));
+}
+const cardLink = d => `${location.origin}${location.pathname}#card=${b64uEnc(JSON.stringify(d))}`;
+const isCardHash = () => /^#card=/.test(location.hash);
+function parseCardHash(hash = location.hash) {
+  const m = /^#card=([A-Za-z0-9_-]{8,6000})$/.exec(hash);
+  if (!m) return null;
+  try { return sanitizeCard(JSON.parse(b64uDec(m[1]))); } catch (e) { return null; }
+}
+/** Opened from a card link: a read-only card, no sign-in and no Firebase. */
+function showSharedCard() {
+  const d = parseCardHash();
+  document.title = d && d.n ? `@${d.n} · Pomodorolist` : 'Pomodorolist card';
+  $('#cvCard').innerHTML = d ? cardHTML(d, 'shared') : `<div class="card cv-bad"><h2>This card link doesn’t work</h2><p class="muted">It may have been cut off when it was copied. Ask for the link again.</p></div>`;
+  $('#cvMake').href = location.pathname + location.search;
+  showView('cardView');
+}
+window.addEventListener('hashchange', () => { if (isCardHash() || !$('#cardView').classList.contains('hidden')) location.reload(); });
+
+/* ---------- Profile, Customise and Share ---------- */
+function playerCardHTML() {
+  const on = S.settings.gamification;
+  return `<div class="card prof-acct pc-host">${cardHTML(cardData(), 'own')}
+    <div class="pc-bar"><div class="desc">${USER.guest ? 'Not signed in · data stays on this device only' : 'Progress syncs across your devices'}</div>
+      <div class="btn-row" style="gap:8px"><button class="btn icon-l" id="cardEdit">✏️ Customise</button><button class="btn icon-l" id="cardShare">↗ Share</button>
+        ${on ? '<button class="btn icon-l" data-gotab="bag">🎒 Bag</button>' : ''}<button class="btn icon-l" id="openSettings">${GEAR_SVG}Settings</button></div></div></div>`;
+}
+function openCardDlg() { renderCardDlg(); $('#cardDlg').showModal(); uiSound('open'); }
+function renderCardDlg() {
+  const dlg = $('#cardDlg');
+  if (!dlg) return;
+  const mini = minimal(), style = equippedId('card'), bn = myBanner(), fts = myFeatured(), opts = featureOptions();
+  $('#cdPrev').innerHTML = cardHTML(cardData(), 'preview');
+  const styles = ITEMS.filter(it => it.cat === 'card').map(it => {
+    const own = isOwned(it.id), sel = style === it.id, p = CARD_STYLES[it.id] ? cardPal(it.id) : null;
+    return `<button class="cd-opt cd-style r-${itemRarity(it)}${sel ? ' sel' : ''}" ${own ? `data-cdstyle="${it.id}"` : 'disabled'} aria-pressed="${sel}" title="${esc(own ? it.desc : it.how || '')}">
+      <span class="cd-sw" style="background:${p ? p.bg : 'var(--surface)'};color:${p ? p.acc : 'var(--accent)'};border-color:${p ? p.line : 'var(--line)'}">${CARD_DECO[it.id] ? `<svg viewBox="0 0 64 64">${CARD_DECO[it.id]}</svg>` : 'Aa'}</span>
+      <span class="cd-n">${esc(it.name)}</span><span class="lbl">${own ? RARITY_LABEL[itemRarity(it)] : `${LOCK_SVG} ${esc(it.how || '')}`}</span></button>`;
+  }).join('');
+  const banners = bannerOptions().map(id => { const b = bannerLook(id); return `<button class="cd-bn${id === bn ? ' sel' : ''}" data-cdbn="${esc(id)}" aria-pressed="${id === bn}" title="${esc(b.name)}" style="background:linear-gradient(120deg,${b.a},${b.b})">${bannerLayers(b)}<span>${esc(b.name)}</span></button>`; }).join('');
+  const feats = opts.length ? opts.map(f => { const fi = featureInfo(f), on = fts.includes(f); return `<label class="cd-feat${on ? ' on' : ''}"><input type="checkbox" data-cdfeat="${esc(f)}"${on ? ' checked' : ''}${!on && fts.length >= 3 ? ' disabled' : ''}><span class="pc-fi">${fi.icon(22)}</span><span><b>${esc(fi.label)}</b><span class="lbl">${esc(fi.sub)}</span></span></label>`; }).join('')
+    : '<p class="lbl">Master a boss, reach a streak milestone, earn an achievement or an event reward to feature it here.</p>';
+  const priv = CARD_PRIV.filter(([, , game]) => !game || !mini).map(([k, label]) => `<label class="cd-tg"><span>${label}</span><input type="checkbox" class="switch" data-cdpriv="${k}"${cardPref('p_' + k) ? ' checked' : ''}></label>`).join('');
+  $('#cdOpts').innerHTML = (mini ? '<p class="lbl" style="margin:0 0 12px">True Minimalist is on, so your card is clean: no levels, styles or featured slots. Choose what it shows.</p>'
+    : `<h3>Card style</h3><div class="cd-styles">${styles}</div>
+      <h3>Banner</h3><div class="cd-bns">${banners}</div>
+      <h3>Featured <span class="lbl">${fts.length}/3</span></h3><div class="cd-feats">${feats}</div>`)
+    + `<h3>Show on my card</h3><p class="lbl" style="margin:-4px 0 8px">What’s off here is left out of the image and the link too. Notes, reminders and your email are never on it.</p><div class="cd-privs">${priv}</div>`;
+}
+function onCardDlg(e) {
+  const t = e.target;
+  const st = t.closest('[data-cdstyle]');
+  if (st && isOwned(st.dataset.cdstyle)) { S.game.equipped.card = st.dataset.cdstyle; save(); uiSound('on'); afterCardEdit(); return; }
+  const bn = t.closest('[data-cdbn]');
+  if (bn) { setCardPref('banner', bn.dataset.cdbn); uiSound('tap'); afterCardEdit(); return; }
+}
+function onCardDlgChange(e) {
+  const t = e.target;
+  if (t.dataset.cdfeat) {
+    const cur = myFeatured().filter(f => f !== t.dataset.cdfeat);
+    setCardPref('featured', t.checked ? [...cur, t.dataset.cdfeat].slice(0, 3) : cur);
+  } else if (t.dataset.cdpriv) setCardPref('p_' + t.dataset.cdpriv, t.checked);
+  else return;
+  uiSound(t.checked ? 'on' : 'off');
+  afterCardEdit();
+}
+function afterCardEdit() {
+  const scroll = $('#cdOpts') ? $('#cdOpts').scrollTop : 0;
+  renderCardDlg();
+  if ($('#cdOpts')) $('#cdOpts').scrollTop = scroll;
+  if (S.ui.tab === 'profile') renderProfile();
+}
+
+let shareSize = 'square', shareURL = '';
+async function openShareDlg() {
+  shareSize = 'square';
+  renderShareDlg();
+  $('#shareDlg').showModal();
+  uiSound('open');
+}
+async function renderShareDlg() {
+  const d = cardData();
+  shareURL = cardLink(d);
+  $('#shUrl').value = shareURL;
+  $$('#shSize [data-shsize]').forEach(b => { b.classList.toggle('active', b.dataset.shsize === shareSize); b.setAttribute('aria-pressed', b.dataset.shsize === shareSize); });
+  $('#shPrev').classList.toggle('story', shareSize === 'story');
+  $('#shImg').src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(cardImageSVG(d, shareSize));
+  $('#shNative').classList.toggle('hidden', !navigator.share);
+}
+async function saveCardImage(share = false) {
+  const btn = share ? $('#shNative') : $('#shSave');
+  btn.disabled = true;
+  try {
+    const blob = await cardPNG(cardData(), shareSize);
+    const file = new File([blob], `pomodorolist-card-${shareSize}.png`, { type: 'image/png' });
+    if (share && navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: 'My Pomodorolist card', text: shareURL }); return; }
+    if (share && navigator.share) { await navigator.share({ title: 'My Pomodorolist card', url: shareURL }); return; }
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = file.name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+    toast('Card image saved', 2000, true);
+  } catch (e) { if (e && e.name !== 'AbortError') toast('Couldn’t make the image — try again'); }
+  finally { btn.disabled = false; }
+}
+async function copyCardLink() {
+  try { await navigator.clipboard.writeText(shareURL); }
+  catch (e) { const i = $('#shUrl'); i.focus(); i.select(); try { document.execCommand('copy'); } catch (er) { toast('Select the link and copy it'); return; } }
+  toast('Card link copied', 2000, true);
+}
+async function shareCardLink() {
+  if (navigator.share) { try { await navigator.share({ title: 'My Pomodorolist card', text: 'My focus stats on Pomodorolist', url: shareURL }); } catch (e) { /* cancelled */ } return; }
+  copyCardLink();
+}
+
 async function boot() {
   captureInvite();
   applyTheme(readJSON(THEME_KEY, 'auto'));
+  if (isCardHash()) { showSharedCard(); return; }   // a shared player card: read-only, no sign-in, Firebase is never loaded
   const guest = localStorage.getItem(GUEST_FLAG) === '1';
 
   if (!firebaseConfigured()) {
