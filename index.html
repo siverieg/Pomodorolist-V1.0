@@ -1126,6 +1126,14 @@ body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .s
 @keyframes auraPulse { 50% { opacity: .45; transform: scale(1.06); } }
 @keyframes auraSpin { to { transform: rotate(360deg); } }
 .aura-tiers .at .dot.aura::before { inset: -3px; }
+.look-pic { display: inline-grid; place-items: center; flex: none; vertical-align: middle; line-height: 0; }
+.look-pic.avatar { line-height: normal; }
+.nm-row { display: flex; align-items: baseline; gap: 6px; min-width: 0; overflow: hidden; }
+.nm-row > .nm, .nm-row > .fp-name, .nm-row > .cp-n { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nm-row > :not(.nm):not(.fp-name) { flex: none; }
+.lb .nm-row { flex: 1; }
+.fp-name-row { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.fp-name-row .ctag { font-size: 15px; }
 
 /* ==========================================================================
    EXAM COUNTDOWN · PARKING LOT · AFTER-SESSION ROW · REVISION
@@ -2780,6 +2788,17 @@ body.first-load #todayBar { opacity: 0; }
 #csGrid .item { min-width: 0; }
 #csGrid .item .nm { overflow-wrap: anywhere; }
 #csGrid .act .btn { min-width: 0; }
+.lv-mode, .cs-mode { font-size: 11.5px; font-weight: 600; padding: 2px 9px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; }
+.cs-mode.synced, .lv-mode.synced { background: color-mix(in srgb, #8a6fd1 16%, transparent); color: #7a5cc4; }
+:root[data-theme="dark"] .cs-mode.synced, :root[data-theme="dark"] .lv-mode.synced { color: #b39cf0; }
+.lv-cd { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 13px; }
+.lv-cd.paused { color: var(--muted); }
+.lv-seat.st-paused, .lv-seat.st-idle { opacity: .85; }
+.mode-seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.mode-seg button { flex: 1 1 140px; text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 9px 12px; cursor: pointer; color: var(--text); font: inherit; min-height: 44px; }
+.mode-seg button b { display: block; font-size: 14px; }
+.mode-seg button span { font-size: 12px; color: var(--muted); }
+.mode-seg button.active { border-color: var(--accent); background: var(--accent-soft); }
 </style>
 </head>
 <body>
@@ -3500,7 +3519,8 @@ body.first-load #todayBar { opacity: 0; }
   <h2 id="csdTitle">Schedule a session</h2>
   <label class="lbl" for="csdName">Session</label><select id="csdName"></select>
   <div id="csdOwnWrap" class="hidden"><label class="lbl" for="csdOwn">Session name</label><input type="text" id="csdOwn" maxlength="40" autocomplete="off" placeholder="e.g. Physics revision"></div>
-  <label class="lbl" for="csdPattern">Pattern</label><select id="csdPattern"></select>
+  <label class="lbl">Mode</label><div class="mode-seg" id="csdMode" role="group" aria-label="Session mode"><button type="button" data-cmode2="together"><b>Focus together</b><span>Everyone runs their own timer at one table</span></button><button type="button" data-cmode2="synced"><b>Synced timer</b><span>One shared timer; the host starts, pauses, skips</span></button></div>
+  <label class="lbl" for="csdPattern" id="csdPatternLbl">Pattern</label><select id="csdPattern"></select>
   <div class="row sched-only" style="gap:12px;flex-wrap:wrap">
     <div style="flex:1 1 140px"><label class="lbl" for="csdDate">Date</label><input type="date" id="csdDate"></div>
     <div style="flex:1 1 110px"><label class="lbl" for="csdTime">Time</label><input type="time" id="csdTime"></div>
@@ -4524,7 +4544,11 @@ function mergeGame(local, remote) {
   const uni = (a, b) => { for (const [k, v] of Object.entries(b)) if (!(k in a)) { a[k] = v; ahead = true; } };
   for (const k of ['purchases', 'trophies', 'grants', 'freezesUsed', 'plog']) uni(out[k], loc[k]);
   for (const k of Object.keys(out.claims)) uni(out.claims[k], loc.claims[k]);
-  for (const [k, v] of Object.entries(loc.equipped)) if (!(k in out.equipped)) { out.equipped[k] = v; ahead = true; }
+  for (const [k, v] of Object.entries(loc.equipped)) {
+    const lt = +loc.eqAt[k] || 0, rt = +out.eqAt[k] || 0;
+    if (!(k in out.equipped) || (lt > rt && out.equipped[k] !== v)) { out.equipped[k] = v; if (lt) out.eqAt[k] = lt; ahead = true; }
+  }
+  for (const [k, t] of Object.entries(loc.eqAt)) if ((+t || 0) > (+out.eqAt[k] || 0) && out.equipped[k] === loc.equipped[k]) out.eqAt[k] = t;
   if (loc.seenAt > out.seenAt) { out.seenAt = loc.seenAt; ahead = true; }
   if (loc.tierFrom && (!out.tierFrom || loc.tierFrom < out.tierFrom)) { out.tierFrom = loc.tierFrom; ahead = true; }
   return { game: out, ahead };
@@ -4998,7 +5022,7 @@ function notify(title, body) {
 const activePreset = () => S.presets.find(p => p.id === S.activePresetId) || S.presets[0];
 
 function phaseMs(phase) {
-  if (S.timer.live && LIVE.doc) return (phase === 'focus' ? LIVE.doc.pattern.focus : LIVE.doc.pattern.short) * 60000;
+  if (S.timer.live && S.timer.live.mode !== 'together' && LIVE.doc) return (phase === 'focus' ? LIVE.doc.pattern.focus : LIVE.doc.pattern.short) * 60000;
   const p = activePreset();
   return (phase === 'focus' ? p.focus : phase === 'short' ? p.short : p.long) * 60000;
 }
@@ -5028,6 +5052,7 @@ function startTimer() {
       hideNote();
       pomeoFocusStart();
       clanFocusStarted(now + t.remaining);
+      togetherBlockStart();
     }
   }
   t.endAt = now + t.remaining;
@@ -5103,7 +5128,7 @@ function finishPhase(reason) {
     if (!endSoundRang(endedAt)) playEndSound();   // the booked chime may have rung already (on time, in a background tab)
     if (wasFocus) notify('Focus complete', `Nice work on “${t.name || 'Untitled'}”. Time for a break.`);
     else notify('Break over', 'Ready for the next focus block?');
-    if (S.settings.autoStart && !t.live) { startTimer(); return; }
+    if (S.settings.autoStart && !(t.live && t.live.mode !== 'together')) { startTimer(); return; }
   }
   save();
   renderAll();
@@ -5123,7 +5148,7 @@ function logSession(focusedMs, end) {
     planned: t.planned,
     preset: activePreset().name,
     stamp: equippedId('stamp'),
-    ...(t.live ? { live: t.live.lid, clan: t.live.cid, stamp: 'stamp_together' } : {}),
+    ...(t.live && (t.live.mode !== 'together' || (LIVE.blockMates && LIVE.blockMates.size)) ? { live: t.live.lid, clan: t.live.cid, stamp: 'stamp_together' } : t.live ? { live: t.live.lid, clan: t.live.cid } : {}),
   };
   const subRec = takeSubtasks();
   if (subRec) s.subtasks = subRec;
@@ -5258,7 +5283,7 @@ function renderClock() {
 }
 
 function renderTimer() {
-  const t = S.timer, p = t.live && LIVE.doc ? { ...activePreset(), rounds: LIVE.doc.pattern.rounds, name: LIVE.doc.title } : activePreset();
+  const t = S.timer, p = t.live && t.live.mode !== 'together' && LIVE.doc ? { ...activePreset(), rounds: LIVE.doc.pattern.rounds, name: LIVE.doc.title } : activePreset();
   renderLiveBar();
   const isBreak = t.phase !== 'focus';
   const label = t.phase === 'focus' ? 'Focus' : t.phase === 'short' ? 'Short break' : 'Long break';
@@ -5706,6 +5731,7 @@ function normalizeGame(g) {
   return {
     purchases: map(g.purchases),     // purchaseId -> { item, price, at }
     equipped: map(g.equipped),       // category -> itemId, or extraId -> true/false
+    eqAt: map(g.eqAt),               // category/extraId -> when it last changed (the newest choice wins across devices)
     claims: {                        // one-time rewards, value = time claimed
       goalDays: map(c.goalDays),     // 'YYYY-MM-DD' -> ts
       milestones: map(c.milestones), // '3' | '7' | '30' | '100' -> ts
@@ -6376,7 +6402,8 @@ function equippedId(cat) {
   const id = S.game.equipped[cat];
   return id && ITEM_BY_ID[id] && ITEM_BY_ID[id].cat === cat && isOwned(id) ? id : DEFAULTS[cat];
 }
-const extraOn = id => isOwned(id) && S.game.equipped[id] === true;
+const EXTRA_ON_BY_DEFAULT = new Set(['x_clantag']);   // shown unless switched off
+const extraOn = id => isOwned(id) && (S.game.equipped[id] === true || (S.game.equipped[id] === undefined && EXTRA_ON_BY_DEFAULT.has(id)));
 // Rewards are only claimed once the cloud copy has loaded (otherwise we'd claim against partial data).
 const rewardsReady = () => !!USER && (USER.guest || localOnly || firstLoadDone);
 
@@ -6473,8 +6500,8 @@ function buyItem(id) {
   if (!confirm(`Buy “${it.name}” for ${it.price} coins?`)) return;
   S.game.purchases['b' + uid()] = { item: id, price: it.price, at: Date.now() };
   if (it.cat !== 'freeze') markEquipped(id);
-  if (it.cat === 'extra') S.game.equipped[id] = true;
-  else if (it.cat !== 'freeze') S.game.equipped[it.cat] = id;
+  if (it.cat === 'extra') eqSet(id, true);
+  else if (it.cat !== 'freeze') eqSet(it.cat, id);
   G = null;
   save();
   applyCosmetics();
@@ -6486,7 +6513,7 @@ function buyItem(id) {
 function equipItem(id) {
   const it = ITEM_BY_ID[id];
   if (!it || !isOwned(id)) return;
-  S.game.equipped[it.cat] = id;
+  eqSet(it.cat, id);
   markEquipped(id);
   save();
   applyCosmetics();
@@ -6494,7 +6521,7 @@ function equipItem(id) {
 }
 function toggleExtra(id) {
   if (!isOwned(id)) return;
-  S.game.equipped[id] = !extraOn(id);
+  eqSet(id, !extraOn(id));
   if (S.game.equipped[id]) markEquipped(id);
   save();
   applyCosmetics();
@@ -7003,6 +7030,7 @@ function applyCosmetics() {
   syncTimerAudio();
   renderHeaderChip();
   renderPomeo();
+  lookChanged();
 }
 
 /* ==========================================================================
@@ -7337,7 +7365,7 @@ function writePublic(col, data) {
   if (lastPub[col] === json) return null;
   lastPub[col] = json;
   const p = FB.setDoc(FB.doc(FB.db, col, USER.uid), { ...data, updatedAt: FB.serverTimestamp() });
-  if (col === 'publicProfiles' && 'aura' in data) p.then(() => { if (!SOC.auraOk) { SOC.auraOk = true; delete lastPub.publicStats; schedulePublish(); } }, () => {});
+  if (col === 'publicProfiles' && 'aura' in data) p.then(() => { writeLS('pomodorolist-auraok:' + USER.uid, 1); if (!SOC.auraOk) { SOC.auraOk = true; delete lastPub.publicStats; schedulePublish(); } }, () => {});
   trackWrite(p.catch(e => {
     // Rules from before special auras refuse the "aura" field: publish without it (friends see the streak aura).
     if (e.code === 'permission-denied' && 'aura' in data && col === 'publicProfiles' && !SOC.auraRejected) {
@@ -7403,6 +7431,7 @@ function publishPublic(first) {
   const flair = { level: g.lv.level, tier: g.tier.id, frame: equippedId('frame'), color: equippedId('color'), ...(SOC.avatarRejected ? {} : { avatar: myAvatar() }), ...(clanTagOn() && !SOC.clanTagRejected ? { clanTag: CLAN.doc.tag } : {}) };
   // A special aura (from a boss or questline) is shared as "aura"; leaderboards get it once the rules have accepted it once.
   const aura = !SOC.auraRejected && SPECIAL_AURAS[myAura()] ? { aura: myAura() } : {};
+  if (!SOC.auraOk && localStorage.getItem('pomodorolist-auraok:' + USER.uid)) SOC.auraOk = true;
   writePublic('publicProfiles', {
     username: USER.username, ...flair, ...aura, streak: g.streak.cur, longest: g.streak.longest,
     hours: Math.round(g.focusMs / 3.6e5) / 10,
@@ -7779,11 +7808,8 @@ function renderFriends(fromLoad) {
 }
 
 function personRow(uid, name, prof, extra = '') {
-  const t = prof && !prof.denied ? tierById(prof.tier) : null;
-  const av = prof && !prof.denied && AVATAR_ART[prof.avatar] ? prof.avatar : 'av_default';
-  const badge = t && S.settings.gamification ? withAura(badgeSVG(t, { size: 30, frame: prof.frame, avatar: av }), profStreak(prof), profAura(prof))
-    : hasAvatar(av) ? avatarSVG(av, 30) : `<span class="avatar">${esc(name[0] || '?').toUpperCase()}</span>`;
-  return `${badge}<div class="who"><div${nameAttrs(prof && !prof.denied ? prof.color : '', 'nm')}>@${esc(name)}${prof && !prof.denied && S.settings.gamification ? ` <span class="lvl">Lv ${prof.level}</span>` : ''}</div>${extra}</div>`;
+  const L = personLook(uid, name);
+  return `${lookPic(L, 30)}<div class="who"><div class="nm-row">${lookName(L)}${prof && !prof.denied && S.settings.gamification ? ` <span class="lvl">Lv ${L.level}</span>` : ''}</div>${extra}</div>`;
 }
 
 function renderFriendsList(fromLoad) {
@@ -7909,10 +7935,10 @@ async function renderBoard(fromLoad) {
   const rowSel = '#boardBody .lb:not(.pinned) li[data-uid]';
   const before = $('#boardBody .lb li[data-uid]') ? flipCapture(rowSel) : SOC.flipFrom;
   const row = r => {
-    const t = tierById(r.tier), plain = minimal(), me = r.uid === USER.uid;
+    const me = r.uid === USER.uid, L = personLook(r.uid, r.username, r);
     return `<li class="${me ? 'me' : ''}${r.rank <= 3 ? ' top' + r.rank : ''}" data-uid="${r.uid}"${!me && scope === 'friends' ? ` data-open="${r.uid}"` : ''}>
-      <span class="rk">${r.rank}</span>${plain ? `<span class="avatar">${esc((r.username || '?')[0].toUpperCase())}</span>` : withAura(badgeSVG(t, { size: 26, frame: r.frame, avatar: me ? myAvatar() : (AVATAR_ART[r.avatar] ? r.avatar : '') }), me ? myStreak() : profStreak(cached('publicProfiles', r.uid)), me ? myAura() : profAura(r) || profAura(cached('publicProfiles', r.uid)))}
-      <span${nameAttrs(me ? equippedId('color') : r.color, 'nm')}>@${esc(r.username)}${(me ? clanTagOn() && CLAN.doc.tag : !minimal() && r.clanTag) ? ' ' + clanTagHTML(me ? CLAN.doc.tag : r.clanTag) : ''}${me ? ' <span class="lbl">(you)</span>' : ''}</span>
+      <span class="rk">${r.rank}</span>${lookPic(L, 26)}
+      <span class="nm-row">${lookName(L)}${me ? ' <span class="lbl">(you)</span>' : ''}</span>
       <span class="v">${fmtMin(r.minutes)}</span></li>`;
   };
   let note = '';
@@ -7955,7 +7981,7 @@ function renderChallenges(fromLoad) {
       const v = uid === USER.uid ? challengeProgress(c.preset, c.weekKey) : (c.progress[uid] || 0);
       const pct = Math.min(100, v / p.goal * 100);
       const val = p.unit === 'min' ? `${fmtMin(v)} / ${fmtMin(p.goal)}` : `${v} / ${p.goal}`;
-      return `<div class="cp${uid === USER.uid ? ' me' : ''}"><span class="nm">${miniPic(uid, c.names[uid])}@${esc(c.names[uid] || '?')}</span><span class="bar"><i data-fill="${pct.toFixed(1)}" data-fill-key="c${c.id}${uid}"></i></span><span class="lbl">${val}</span></div>`;
+      return `<div class="cp${uid === USER.uid ? ' me' : ''}"><span class="nm">${miniPic(uid, c.names[uid])}${lookName(personLook(uid, c.names[uid] || '?'), { cls: 'cp-n' })}</span><span class="bar"><i data-fill="${pct.toFixed(1)}" data-fill-key="c${c.id}${uid}"></i></span><span class="lbl">${val}</span></div>`;
     }).join('');
     return `<div class="card chal"><div class="row between"><b>${p.name}</b><span class="lbl">${done ? '✓ ' : ''}${COIN_SVG} +${p.coins}</span></div>
       <div class="lbl" style="margin-bottom:10px">Started by @${esc(c.names[c.creator] || '?')} · ${c.members.length} joined</div>${people}
@@ -8011,9 +8037,9 @@ function renderFriendProfile() {
   else actHtml = activityView(act, uid, kudosBtns);
   $('#friendsBody').innerHTML = `${back}
     <div class="card fp-head">
-      ${gameOn ? withAura(badgeSVG(t, { size: 64, frame: prof.frame, avatar: AVATAR_ART[prof.avatar] ? prof.avatar : '' }), profStreak(prof), profAura(prof)) : hasAvatar(prof.avatar) && AVATAR_ART[prof.avatar] ? avatarSVG(prof.avatar, 64) : `<span class="avatar big">${esc(name[0] || '?').toUpperCase()}</span>`}
+      ${lookPic(personLook(uid, name), 64)}
       <div style="flex:1;min-width:0">
-        <div${nameAttrs(gameOn ? prof.color : '', 'fp-name')}>@${esc(name)}</div>
+        <div class="fp-name-row">${lookName(personLook(uid, name), { cls: 'fp-name' })}</div>
         <div class="lbl">${gameOn ? `${t.name} · Level ${prof.level} · ` : ''}joined ${new Date(prof.joined).toLocaleDateString([], { month: 'short', year: 'numeric' })}</div>
         ${now ? `<div class="sub now" style="margin-top:4px"><i class="live"></i>${esc(now)}</div>` : ''}
       </div>
@@ -9299,11 +9325,11 @@ function renderBossView(host) {
       <span>+${st.done.coins} coins${rec.wins > 1 ? ` · ${starText(rec.wins)} on its trophy` : ''}${rec.mastered ? ' · Mastered' : ''}</span>
       ${pendHere ? `<button class="btn primary small" data-bclaim="${b.id}|${view}">Claim rewards 🎁</button>` : ''}</div>` : '';
   const log = st.formed ? battleLog(st) : [];
-  const logHTML = log.length ? `<ul class="blog">${log.slice(0, 8).map(r => `<li${r.me ? ' class="me"' : ''}><span class="bl-pic">${r.me ? miniPic(USER.uid, USER.username || 'Y', 22) : miniPic(r.uid, r.who.slice(1), 22)}</span><span class="bl-t"><b>${esc(r.who)}</b> dealt <b class="bl-d">${fmtNum(r.dmg)} dmg</b></span><span class="lbl">${r.week ? 'this week' : bossAgo(r.t)}</span></li>`).join('')}</ul>${log.length > 8 ? `<p class="lbl" style="margin:8px 0 0">+ ${log.length - 8} more hits this week</p>` : ''}`
+  const logHTML = log.length ? `<ul class="blog">${log.slice(0, 8).map(r => `<li${r.me ? ' class="me"' : ''}><span class="bl-pic">${r.me ? miniPic(USER.uid, USER.username || 'Y', 22) : miniPic(r.uid, r.who.slice(1), 22)}</span><span class="bl-t"><b>${r.me ? esc(r.who) : lookName(personLook(r.uid, r.who.replace(/^@/, '')), { tag: false })}</b> dealt <b class="bl-d">${fmtNum(r.dmg)} dmg</b></span><span class="lbl">${r.week ? 'this week' : bossAgo(r.t)}</span></li>`).join('')}</ul>${log.length > 8 ? `<p class="lbl" style="margin:8px 0 0">+ ${log.length - 8} more hits this week</p>` : ''}`
     : `<p class="muted" style="margin:0;font-size:14px">${noSquad ? 'Form a squad to see everyone’s hits here.' : 'No hits yet this week. Finish a focus block and Pomeo attacks!'}</p>`;
   const squadCard = view === 'squad' && st.formed ? `<div class="card"><div class="row between" style="margin-bottom:10px"><h2 style="margin:0">Squad · ${st.members.length}</h2>
       ${st.done ? '<span class="lbl">Locked until Monday</span>' : '<button class="linkbtn" id="squadEdit">Edit squad</button>'}</div>
-      <ul class="squad-list portraits">${st.members.slice().sort((a, c) => c.min - a.min).map(m => `<li><span class="sq-who">${miniPic(m.uid, m.name, 36)}<span class="sq-n">${m.me ? '<b>You</b>' : '@' + esc(m.name)}</span></span><span class="lbl">${m.loading ? '…' : fmtNum(m.min) + ' dmg'}</span>
+      <ul class="squad-list portraits">${st.members.slice().sort((a, c) => c.min - a.min).map(m => `<li><span class="sq-who">${miniPic(m.uid, m.name, 36)}<span class="sq-n">${m.me ? '<b>You</b>' : lookName(personLook(m.uid, m.name))}</span></span><span class="lbl">${m.loading ? '…' : fmtNum(m.min) + ' dmg'}</span>
         <span class="sbar"><i style="transform:scaleX(${st.rawDmg ? (m.min / Math.max(st.rawDmg, 1)).toFixed(3) : 0})"></i></span></li>`).join('')}</ul>
       <p class="lbl" style="margin:10px 0 0">Everyone’s focus minutes this week (Mon–Sun) hit the boss together. Friends’ numbers update every few minutes.</p></div>` : '';
   const nb = bossOfWeek(addDays(st.mon, 7)), nbDays = Math.max(1, Math.ceil((addDays(st.mon, 7) - Date.now()) / 864e5));
@@ -9452,7 +9478,7 @@ const auraFor = streak => AURAS.filter(a => streak >= a.min).pop() || null;
 function withAura(html, streak, auraId = '') {
   if (!S.settings.gamification) return html;
   const sp = auraId && SPECIAL_AURAS[auraId];
-  if (sp) return `<span class="aura aura-x-${auraId}${sp.spin ? ' aura-spin' : ''}${sp.shim ? ' aura-shim' : ''}${sp.pulse ? ' aura-pulse' : ''}${sp.flare ? ' aura-flare' : ''}" title="${esc(sp.name)}">${html}</span>`;
+  if (sp) return `<span class="aura aura-x-${auraId}${sp.spin ? ' aura-spin' : ''}${sp.shim ? ' aura-shim' : ''}${sp.pulse ? ' aura-pulse' : ''}${sp.flare ? ' aura-flare' : ''}${sp.sq ? ' aura-sq' : ''}" title="${esc(sp.name)}">${html}</span>`;
   const a = auraFor(+streak || 0);
   return a ? `<span class="aura aura-${a.id}" title="${a.name} aura · ${streak}-day streak">${html}</span>` : html;
 }
@@ -10670,9 +10696,11 @@ addEventListener('resize', () => $$('.catrow').forEach(updateFades));
    command palette, offline banner, pull to refresh, tab swipes, haptics.
    Everything here is stored on this device (localStorage); no new cloud data.
    ========================================================================== */
-const APP_VERSION = '1.14';
+const APP_VERSION = '1.14.2';
 const VER_KEY = 'pomodorolist-seen-version';
 const CHANGELOG = [
+  { v: '1.14.2', t: 'Focus together', d: 'Clan sessions now start as Focus together by default: everyone runs their own timer and preset at one study table, sees each other’s countdowns and states, and stepping away or leaving only affects you. The shared Synced timer with host controls is still there when you want it, and planned sessions show which mode they use.' },
+  { v: '1.14.1', t: 'Cosmetics fixes', d: 'Squad boss auras now look different from Solo ones everywhere (a double ring with a shimmer), and every special aura has a crisp ring so it shows at small sizes and with animations off. Your picture, frame, aura, name colour and clan tag now look the same on every screen: friends, friend profiles, all leaderboards, the Inbox, boss squads and battle logs, challenges, event boards, your clan and live study tables, and shared cards. Changing your look on one device now wins on your others, your clan tag shows by default, and shared card links keep it.' },
   { v: '1.14', t: 'Clans and a to-do list', d: 'Clans are your study group: create one or join with a link or code (approval or open), Leader / Officer / Member roles, clan levels 1–30 from the focus you do after joining, Clan Points for a cosmetic clan shop (emblems, banners, colours, frames), clan cosmetics in your bag (clan tag, name colours, auras, a shield frame), a weekly clan quest, a monthly raid boss, planned group sessions with RSVPs and reminders, live sessions on one shared timer with a study table and preset reactions (no chat), a clan leaderboard, an activity feed, an MVP and a trophy case. Plus a to-do list inside Reminders: due dates, priorities, tags, notes, a checklist that becomes subtasks, drag to reorder and swipe on phones.' },
   { v: '1.13.1', t: 'No more interruptions during focus, boss difficulty tiers, boss profile pictures, new intro', d: 'Nothing pops up over a focus block any more (daily rewards, level-ups, achievements, tips and Pomeo’s news wait and come one at a time when it ends; a due reminder is a slim banner). Each boss now has its own HP from 300 (Easy) to 600 (Legendary), with Squad HP growing by 60% per extra member, and harder bosses give rarer, fancier rewards — including a chibi profile picture for every boss (golden for Squad wins). Plus a short intro the first time you visit.' },
   { v: '1.13', t: 'Player cards, a living sky and completion stamps', d: 'A player card at the top of your Profile with a stats board (focus hours, streaks, a mini week chart and 12-week heatmap, top subjects, best focus time, bosses and garden), up to 3 featured slots, banners and card styles — save it as an image or share a read-only link, with a switch for every stat. An optional time-of-day background (sunrise, day, sunset, stars at night, plus a Rain mood), and a stamp that lands on every finished session, collectable in the Shop and from bosses and events.' },
@@ -10693,7 +10721,7 @@ const CHANGELOG = [
   { v: '1.1', t: 'Accounts & sync', d: 'Log in and keep your sessions in sync on every device, even offline.' },
   { v: '1.0', t: 'Focus timer', d: 'Pomodoro timer with named sessions, presets, streaks and stats.' },
 ];
-const NEWS = ['🛡️ Clans: your study group — create one or join with a link or code', '🔴 Study live on one shared timer, at a study table with your clan (reactions, no chat)', '📅 Plan group sessions: RSVP, a reminder 5–30 min before, add to your calendar', '⭐ Clan levels, Clan Points and a cosmetic clan shop; clan tags, colours and auras in your bag', '🏆 A weekly clan quest, a monthly raid boss, a clan leaderboard and a trophy case', '☑️ A to-do list in Reminders: due dates, priorities, tags and a checklist that becomes subtasks', '🔒 Members-only clan data, approval by default, and leave / remove / disband any time'];
+const NEWS = ['🪑 Focus together: clan sessions where everyone runs their own timer at one table (the Synced timer is still an option)', '✨ Cosmetics fixes: Squad auras look different from Solo ones, and your look is the same on every screen', '🛡️ Clans: your study group — create one or join with a link or code', '🔴 Study live on one shared timer, at a study table with your clan (reactions, no chat)', '📅 Plan group sessions: RSVP, a reminder 5–30 min before, add to your calendar', '⭐ Clan levels, Clan Points and a cosmetic clan shop; clan tags, colours and auras in your bag', '🏆 A weekly clan quest, a monthly raid boss, a clan leaderboard and a trophy case', '☑️ A to-do list in Reminders: due dates, priorities, tags and a checklist that becomes subtasks', '🔒 Members-only clan data, approval by default, and leave / remove / disband any time'];
 
 /* ---------- Haptics ---------- */
 const HAPTIC_KEY = 'pomodorolist-haptics';
@@ -10774,8 +10802,8 @@ function renderInbox() {
   const groups = [['Today', list.filter(x => x.at >= today)], ['Yesterday', list.filter(x => x.at >= yest && x.at < today)], ['Earlier', list.filter(x => x.at < yest)]];
   $('#ibBody').innerHTML = list.length ? groups.filter(([, g]) => g.length).map(([name, g]) => `<div class="ib-group">${name}</div><ul class="ib-list">${g.map(x => `
     <li class="ib-item${x.read ? '' : ' unread'}" data-ib="${esc(x.id)}" tabindex="0" role="button" aria-label="${esc(x.title)}${x.read ? '' : ' (unread)'}">
-      <span class="ib-dot" aria-hidden="true"></span><span class="ib-ic" aria-hidden="true">${x.who && hasAvatar(avatarOf(x.who)) ? avatarSVG(avatarOf(x.who), 34) : (IB_TYPES[x.type] || IB_TYPES.info).ic}</span>
-      <span class="ib-main"><span class="ib-t">${esc(x.title)}</span>${x.body ? `<span class="ib-s" style="display:block">${esc(x.body)}</span>` : ''}<span class="ib-s" style="display:block">${ibWhen(x.at)}</span>${ibActionsHTML(x)}</span>
+      <span class="ib-dot" aria-hidden="true"></span><span class="ib-ic" aria-hidden="true">${x.who && (cached('publicProfiles', x.who) || cached('publicStats', x.who)) ? lookPic(personLook(x.who), 34) : (IB_TYPES[x.type] || IB_TYPES.info).ic}</span>
+      <span class="ib-main"><span class="ib-t">${ibTitle(x)}</span>${x.body ? `<span class="ib-s" style="display:block">${esc(x.body)}</span>` : ''}<span class="ib-s" style="display:block">${ibWhen(x.at)}</span>${ibActionsHTML(x)}</span>
       ${x.read ? '' : `<button class="ib-x" data-ibread aria-label="Mark as read" title="Mark as read">●</button>`}
       <button class="ib-x" data-ibdel aria-label="Dismiss" title="Dismiss">✕</button></li>`).join('')}</ul>`).join('')
     : `<div class="empty e-inbox">${ibFilter === 'all' ? 'You’re all caught up. New requests, reminders and rewards will show up here.' : 'Nothing here yet.'}</div>`;
@@ -11385,7 +11413,7 @@ const SPECIAL_AURAS = {};
 for (const b of BOSSES) {
   // 1 one colour · 2 two colours · 3 a stronger pulse · 4 spinning · 5 + shimmer · 6 + a flare (Squad = one step up)
   for (const [id, lv, name] of [['au_b_' + b.id, rewardLevel(b.id, 'solo'), `${b.short} aura`], ['au_b_' + b.id + '_sq', rewardLevel(b.id, 'squad'), `${b.short} squad aura`]])
-    SPECIAL_AURAS[id] = { cols: lv === 1 ? [b.a] : lv < 4 ? [b.a, b.b] : [b.a, b.b, b.c], name, lv, pulse: lv === 3, spin: lv >= 4, shim: lv >= 5, flare: lv >= 6 };
+    SPECIAL_AURAS[id] = { cols: lv === 1 ? [b.a] : lv < 4 ? [b.a, b.b] : [b.a, b.b, b.c], name, lv, pulse: lv === 3, spin: lv >= 4, shim: lv >= 5 || id.endsWith('_sq'), flare: lv >= 6, sq: id.endsWith('_sq') };
 }
 for (const ev of EVENTS) { const cols = EV_LOOK[ev.id].aura; SPECIAL_AURAS['au_ev_' + ev.id] = { cols, name: (EV_ITEMS.find(x => x[0] === 'au_ev_' + ev.id) || [])[2] + ' aura', spin: cols.length > 2 }; }
 
@@ -11421,6 +11449,8 @@ const EV_FX = Object.fromEntries(EVENTS.filter(ev => EV_LOOK[ev.id].fx).map(ev =
     else css.push(`.aura-x-${id}::before{box-shadow:0 0 11px 3px ${hexA(c1, .62)},0 0 3px 1.5px ${hexA(c2, .85)}}`);
     if (a.flare) css.push(`.aura-x-${id}{--flare:${hexA(c3 || c1, .9)}}`);
     if (c3 && !a.spin) css.push(`.aura-x-${id}::before{box-shadow:0 0 11px 3px ${hexA(c1, .6)},0 0 4px 1.5px ${hexA(c3, .9)}}`);
+    // A crisp ring (Squad: a double ring in the second colour) so every special aura reads at any size, with animations off too
+    css.push(a.sq ? `.aura-x-${id}{outline:4.5px double ${hexA(c2 || c1, .95)};outline-offset:2px}` : `.aura-x-${id}{outline:1.5px solid ${hexA(c1, .9)};outline-offset:1.5px}`);
   }
   for (const [id, g] of Object.entries(NAME_GRADS)) {
     const sh = g.lv >= 4 ? 'linear-gradient(100deg,transparent 0 42%,rgba(255,255,255,.85) 50%,transparent 58% 100%),' : '';
@@ -11440,10 +11470,7 @@ const EV_FX = Object.fromEntries(EVENTS.filter(ev => EV_LOOK[ev.id].fx).map(ev =
 })();
 
 /** Small round picture for lists: the avatar, or the initial when they use Default. */
-function miniPic(uid, name, size = 22) {
-  const id = avatarOf(uid);
-  return hasAvatar(id) ? `<span class="mini-av">${avatarSVG(id, size)}</span>` : `<span class="avatar mini" style="width:${size}px;height:${size}px;font-size:${Math.round(size * .45)}px">${esc((name || '?')[0]).toUpperCase()}</span>`;
-}
+function miniPic(uid, name, size = 22) { return lookPic(personLook(uid, name), size); }   // the same picture as everywhere else (see LOOKS)
 
 /* ==========================================================================
    TRUE MINIMALIST — one switch (the old "Progression" setting, inverted).
@@ -12305,7 +12332,7 @@ function eventBoardCard(ev) {
   const rows = eventBoardRows(ev), n = SOC.started ? friendsList().length : 0;
   return `<div class="card ev-board"><div class="row between" style="margin-bottom:8px"><h2 style="margin:0">Friends’ event board</h2><span class="lbl">focus hours</span></div>
     ${rows.length > 1 ? `<ol class="evb-list">${rows.slice(0, 10).map((r, i) => { const prof = r.me ? null : cached('publicProfiles', r.uid);
-      return `<li${r.me ? ' class="me"' : ''}><span class="rk">${i + 1}</span>${miniPic(r.uid, r.name, 26)}<span${nameAttrs(r.me ? equippedId('color') : prof && !prof.denied ? prof.color : '', 'evb-n')}>${r.me ? 'You' : '@' + esc(r.name)}</span><b>${(Math.floor(r.h * 10) / 10).toFixed(1)}h</b></li>`; }).join('')}</ol>`
+      return `<li${r.me ? ' class="me"' : ''}><span class="rk">${i + 1}</span>${miniPic(r.me ? USER.uid : r.uid, r.name, 26)}<span class="evb-n">${r.me ? lookName(personLook(USER.uid), { you: 'You', tag: false }) : lookName(personLook(r.uid, r.name))}</span><b>${(Math.floor(r.h * 10) / 10).toFixed(1)}h</b></li>`; }).join('')}</ol>`
       : `<p class="muted" style="margin:0;font-size:14px">${n ? 'Your friends’ hours show here when they share their activity.' : 'Add friends to compare event progress.'}</p>${n ? '' : '<button class="btn small" data-gofriends style="margin-top:10px">Add friends</button>'}`}
     <p class="lbl" style="margin:8px 0 0">Friends only · since ${parseDay(ev.start).toLocaleDateString([], { day: 'numeric', month: 'short' })}</p></div>`;
 }
@@ -12598,7 +12625,7 @@ function loSwatch(lo) {
 function bagEquip(id) {
   const it = ITEM_BY_ID[id];
   if (!it || !isOwned(id)) return;
-  S.game.equipped[it.cat] = id;
+  eqSet(it.cat, id);
   markEquipped(id);
   if (themePreviewId) themePreviewId = '';
   save();
@@ -12609,7 +12636,7 @@ function bagEquip(id) {
 }
 function bagUnequip(cat) {
   if (!DEFAULTS[cat]) return;
-  S.game.equipped[cat] = DEFAULTS[cat];
+  eqSet(cat, DEFAULTS[cat]);
   save();
   applyCosmetics();
   toast(cat === 'aura' ? 'Back to your streak aura' : `${CAT_LABEL[cat] || 'Item'} back to default`, 1600, true);
@@ -12629,7 +12656,7 @@ function applyLoadout(id) {
   for (const c of LOOK_CATS) {
     const v = (lo.look || {})[c];
     if (!v) continue;
-    if (ITEM_BY_ID[v] && ITEM_BY_ID[v].cat === c && isOwned(v)) S.game.equipped[c] = v; else miss++;
+    if (ITEM_BY_ID[v] && ITEM_BY_ID[v].cat === c && isOwned(v)) eqSet(c, v); else miss++;
   }
   themePreviewId = '';
   save();
@@ -13325,8 +13352,9 @@ function tick() {
   if (!USER) return;
   renderGreeting();
   const t = S.timer;
-  if (t.live) { liveSync(); renderLiveClock(); }
-  if (t.status === 'running' && !t.live && Date.now() >= t.endAt) { finishPhase('complete'); return; }
+  if (t.live && t.live.mode !== 'together') { liveSync(); renderLiveClock(); }
+  if (t.status === 'running' && !(t.live && t.live.mode !== 'together') && Date.now() >= t.endAt) { finishPhase('complete'); return; }
+  if (t.live && t.live.mode === 'together' && LIVE.lid) togetherTick();
   renderClock();
   renderAtmo();
   // Local midnight passed: refresh today's progress, streak and stats.
@@ -13694,6 +13722,7 @@ function sanitizeCard(o) {
     d.st = item(o.st, 'card') || 'card_minimal'; d.bn = bannerLook(o.bn) ? o.bn : 'bn_mint';
     if (TITLE_TEXT[o.t]) d.t = o.t;
     if (SPECIAL_AURAS[o.au]) d.au = o.au; else if (num(o.sk, 99999)) d.sk = num(o.sk, 99999);
+    if (okTag(o.ct)) { d.ct = o.ct; if (Object.values(CLAN_ROLES).includes(o.cr)) d.cr = o.cr; }
   }
   for (const [k, hi, dec] of [['h', 1e6, 1], ['cs', 99999], ['ls', 99999], ['ss', 1e6], ['bd', 9999], ['ms', BOSSES.length], ['gp', 1e6]]) { const v = num(o[k], hi, dec); if (v !== undefined) d[k] = v; }
   if (d.cs !== undefined && d.ls === undefined) d.ls = d.cs;
@@ -13791,6 +13820,13 @@ function cardImageSVG(d, size = 'square') {
     const glow = d.au && SPECIAL_AURAS[d.au] ? SPECIAL_AURAS[d.au].cols : (auraFor(d.sk || 0) ? AURA_GLOW[auraFor(d.sk).id] : null);
     o += `<circle cx="${avx + AV / 2}" cy="${avy + AV / 2}" r="${AV / 2 + 10}" fill="${p.bg}"/>`;
     if (glow) o += `<defs><filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="${story ? 14 : 10}"/></filter></defs>` + glow.map((c, i) => `<circle cx="${avx + AV / 2 + Math.cos(i * 2.1) * 8}" cy="${avy + AV / 2 + Math.sin(i * 2.1) * 8}" r="${AV / 2 + 6}" fill="none" stroke="${c}" stroke-width="${story ? 18 : 14}" opacity=".75" filter="url(#glow)"/>`).join('');
+    const spa = d.au && SPECIAL_AURAS[d.au], cx = avx + AV / 2, cy = avy + AV / 2, k = story ? 1.4 : 1;
+    if (spa && !spa.sq) o += `<circle cx="${cx}" cy="${cy}" r="${AV / 2 + 12 * k}" fill="none" stroke="${spa.cols[0]}" stroke-width="${4 * k}" opacity=".95"/>`;
+    if (spa && spa.sq) {
+      const c2 = spa.cols[1] || spa.cols[0], r1 = AV / 2 + 12 * k, r2 = AV / 2 + 21 * k, arc = 2 * Math.PI * r2 * .14;
+      o += `<circle cx="${cx}" cy="${cy}" r="${r1}" fill="none" stroke="${c2}" stroke-width="${4 * k}" opacity=".95"/><circle cx="${cx}" cy="${cy}" r="${r2}" fill="none" stroke="${c2}" stroke-width="${4 * k}" opacity=".95"/>`
+        + `<circle cx="${cx}" cy="${cy}" r="${r2}" fill="none" stroke="#fff" stroke-width="${5 * k}" stroke-linecap="round" stroke-dasharray="${arc} ${2 * Math.PI * r2}" transform="rotate(-60 ${cx} ${cy})" opacity=".9"/>`;
+    }
     o += `<svg x="${avx}" y="${avy}" width="${AV}" height="${AV}" viewBox="-1 -1 26 26">${badgeSVG(tier, { size: AV, frame: d.fr, avatar: d.av }).replace(/^<svg[^>]*>|<\/svg>$/g, '')}</svg>`.replace('<svg x', `<svg fill="none" stroke="${tier.color}" color="${tier.color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" x`);
   } else {
     o += d.av && hasAvatar(d.av) ? `<svg x="${avx}" y="${avy}" width="${AV}" height="${AV}" viewBox="0 0 24 24">${avatarArt(d.av)}</svg>`
@@ -13806,7 +13842,7 @@ function cardImageSVG(d, size = 'square') {
     if (d.t) { ny += story ? 50 : 40; o += T(nx, ny, story ? 34 : 27, esc(fitText(TITLE_TEXT[d.t], `600 ${story ? 34 : 27}px ${p.font}`, nameMax)), `font-weight="600" fill="${p.acc}" letter-spacing="1"`); }
     ny += story ? 52 : 42;
     o += `<svg x="${nx}" y="${ny - (story ? 30 : 24)}" width="${story ? 36 : 28}" height="${story ? 36 : 28}" viewBox="-1 -1 26 26" fill="none" stroke="${tier.color}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${tier.icon}</svg>`
-      + T(nx + (story ? 46 : 36), ny, story ? 32 : 26, `<tspan font-weight="700" fill="${tier.color}">${tier.name}</tspan><tspan fill="${p.mut}"> · Level ${d.lv}</tspan>`);
+      + T(nx + (story ? 46 : 36), ny, story ? 32 : 26, `<tspan font-weight="700" fill="${tier.color}">${tier.name}</tspan><tspan fill="${p.mut}"> · Level ${d.lv}</tspan>${okTag(d.ct) ? `<tspan font-weight="700" fill="${p.acc}"> · [${d.ct}]</tspan>` : ''}`);
   }
   y = Math.max(avy + AV, ny) + (story ? 60 : 30);
   // stat tiles
@@ -14625,6 +14661,7 @@ async function clanLoadDetails(force = false) {
     }
     const me = CLAN.members.find(m => m.id === USER.uid);
     if (me) CLAN.me = me;
+    prefetchLooks(CLAN.members.map(m => m.id), () => { if (S.ui.tab === 'clan') renderClan(); });
     CLAN.at.details = Date.now();
     clanSaveLocal();
     G = null;
@@ -14980,13 +15017,16 @@ async function clanSchedule(f, editId = '') {
   const bad = clanTitleProblem(f.title) || clanTitleProblem(f.tag || 'ok');
   if (bad) throw new Error(bad);
   const data = { title: f.title.trim().slice(0, 40), start: f.start, pattern: { focus: f.pattern.focus, short: f.pattern.short, rounds: f.pattern.rounds },
-    repeat: f.repeat, days: f.days || [], tag: (f.tag || '').trim().slice(0, 30), max: clamp(+f.max || 30, 2, 30), updatedAt: FB.serverTimestamp() };
+    repeat: f.repeat, days: f.days || [], tag: (f.tag || '').trim().slice(0, 30), max: clamp(+f.max || 30, 2, 30), updatedAt: FB.serverTimestamp(),
+    ...(f.mode === 'synced' && !editId ? {} : { mode: f.mode === 'synced' ? 'synced' : 'together' }) };   // a new Synced session needs no mode (works with the 1.14 rules too)
+  try {
   if (editId) await FB.updateDoc(cDoc(CLAN.id, 'sessions', editId), { ...data, cancelled: false });
   else {
     await FB.addDoc(cCol(CLAN.id, 'sessions'), { ...data, creator: USER.uid, creatorName: USER.username, cancelled: false, rsvp: {}, createdAt: FB.serverTimestamp() });
     const d = new Date(f.start);
     clanFeed('sched', d.getHours() * 60 + d.getMinutes());
   }
+  } catch (e) { if (e && e.code === 'permission-denied' && data.mode === 'together' && !editId && clanCanSchedule()) throw new Error('Choosing a session mode needs the Firestore rules from Pomodorolist 1.14.2 — ask whoever set up the app to publish them'); throw e; }
   await clanLoadDetails(true);
 }
 async function clanCancelSession(sid) {
@@ -15069,7 +15109,7 @@ function watchClanLive() {
     const before = new Set((CLAN.lives || []).map(l => l.id));
     CLAN.lives = qs.docs.map(livePlain);
     for (const l of CLAN.lives) if (!before.has(l.id) && l.host !== USER.uid && Date.now() - (l.createdAt || 0) < 10 * 60000)
-      toast(`🛡️ @${l.hostName} started a live session: ${l.title}`, 4200, false, { type: 'clan', key: 'clive:' + l.id, go: { tab: 'clan' } });
+      toast(`🛡️ @${l.hostName} started a live session (${CLAN_MODES[liveModeOf(l)].short}): ${l.title}`, 4200, false, { type: 'clan', key: 'clive:' + l.id, go: { tab: 'clan' } });
     renderClanBits();
   }), e => console.warn('clan live', e && e.code));
 }
@@ -15078,21 +15118,23 @@ async function clockOffset() {
   if (srv) LIVE.off = srv - (t0 + Date.now()) / 2;
 }
 /** Start a live session ("Study now", or a planned session when it's time). */
-async function liveStart({ title, pattern, sid = '' }) {
+async function liveStart({ title, pattern, sid = '', mode = 'together' }) {
   if (!inClan()) return;
   if (inLive()) { toast('You’re already in a live session'); return; }
-  if (S.timer.status !== 'idle') { toast('Finish or reset your current timer first', 2600, false, { now: true }); return; }
+  if (mode !== 'together' && S.timer.status !== 'idle') { toast('Finish or reset your current timer first — a Synced timer takes over your timer', 3200, false, { now: true }); return; }
   await clockOffset();
   const day = dayKey(new Date());
   const lid = sid ? `${sid}_${day.replace(/-/g, '')}` : FB.doc(cCol(CLAN.id, 'live')).id;
   const ref = cDoc(CLAN.id, 'live', lid);
   const data = { title: String(title).slice(0, 40), host: USER.uid, hostName: USER.username, pattern: { focus: pattern.focus, short: pattern.short, rounds: pattern.rounds },
-    startAt: FB.serverTimestamp(), pausedAt: sid ? Math.round(liveSrvNow()) : 0, pauseTotal: 0, shift: 0, open: true, counted: false, sid, createdAt: FB.serverTimestamp(), endedAt: 0, updatedAt: FB.serverTimestamp() };
+    startAt: FB.serverTimestamp(), pausedAt: sid && mode !== 'together' ? Math.round(liveSrvNow()) : 0, pauseTotal: 0, shift: 0, open: true, counted: false, sid, createdAt: FB.serverTimestamp(), endedAt: 0, updatedAt: FB.serverTimestamp(),
+    ...(mode === 'together' ? { mode: 'together' } : {}) };   // no mode = Synced (as before 1.14.2)
   try { await FB.setDoc(ref, data); }
   catch (e) {
     // someone already opened this planned session today: join theirs
     const ex = await FB.getDoc(ref).catch(() => null);
     if (ex && ex.exists() && ex.data().open) return liveJoin(lid);
+    if (e && e.code === 'permission-denied' && mode === 'together') throw new Error('Focus together needs the Firestore rules from Pomodorolist 1.14.2 — ask whoever set up the app to publish them');
     throw e;
   }
   await liveJoin(lid, true);
@@ -15101,19 +15143,22 @@ async function liveJoin(lid, fresh = false) {
   if (!inClan()) return;
   if (inLive() && LIVE.lid !== lid) { toast('Leave your current live session first'); return; }
   const resuming = S.timer.live && S.timer.live.lid === lid;
-  if (!inLive() && !resuming && S.timer.status !== 'idle') { toast('Finish or reset your current timer first', 2600, false, { now: true }); return; }
   if (!fresh) await clockOffset();
   const snap = await FB.getDoc(cDoc(CLAN.id, 'live', lid));
   const d = livePlain(snap);
-  if (!d || !d.open) { toast('That live session has ended'); return; }
-  Object.assign(LIVE, { cid: CLAN.id, lid, doc: d, people: {}, joinAt: resuming ? +S.timer.live.joinAt || Date.now() : LIVE.lid === lid && LIVE.joinAt ? LIVE.joinAt : Date.now(), idx: null, shiftSeen: d.shift || 0, summary: null, closing: false, myMin: LIVE.lid === lid ? LIVE.myMin : 0, reacts: [] });
-  S.timer.live = { cid: CLAN.id, lid, title: d.title, joinAt: LIVE.joinAt };
+  if (!d || !d.open) { if (resuming) { S.timer.live = null; saveLocal(); } toast('That live session has ended'); return; }
+  const mode = liveModeOf(d);
+  if (mode !== 'together' && !inLive() && !resuming && S.timer.status !== 'idle') { toast('Finish or reset your current timer first — a Synced timer takes over your timer', 3200, false, { now: true }); return; }
+  Object.assign(LIVE, { cid: CLAN.id, lid, doc: d, people: {}, joinAt: resuming ? +S.timer.live.joinAt || Date.now() : LIVE.lid === lid && LIVE.joinAt ? LIVE.joinAt : Date.now(), idx: null, shiftSeen: d.shift || 0, summary: null, closing: false, myMin: LIVE.lid === lid ? LIVE.myMin : 0, reacts: [],
+    mates: LIVE.lid === lid && LIVE.mates ? LIVE.mates : new Set(), blockMates: new Set() });
+  S.timer.live = { cid: CLAN.id, lid, title: d.title, joinAt: LIVE.joinAt, mode };
+  togetherSig = '';
   saveLocal();
   liveListen();
   liveBeat(true);
   clearInterval(LIVE.beatTimer);
   LIVE.beatTimer = setInterval(() => liveBeat(), 60000);   // presence heartbeat: once a minute
-  liveSync();
+  if (mode !== 'together') liveSync();
   renderAll();
   showTab('clan');
 }
@@ -15124,11 +15169,12 @@ function liveListen() {
     const d = livePlain(s);
     if (!d) { liveEnded('gone'); return; }
     LIVE.doc = d;
-    liveSync();
+    if (inTogether()) { if (!d.open) liveEnded('closed'); } else liveSync();
     renderLive();
   }), e => console.warn('live', e && e.code)));
   LIVE.unsubs.push(FB.onSnapshot(FB.collection(FB.db, ...base, 'people'), safeSnap(qs => {
     LIVE.people = Object.fromEntries(qs.docs.map(x => [x.id, livePlain(x)]));
+    prefetchLooks(Object.keys(LIVE.people), () => renderLive());
     liveMaybeCount();
     renderLive();
   }), e => console.warn('live people', e && e.code)));
@@ -15143,6 +15189,7 @@ function liveUnlisten() { LIVE.unsubs.forEach(u => { try { u(); } catch (e) { /*
 
 /* ---------- Presence ---------- */
 function liveMyState() {
+  if (inTogether()) return togetherState();
   const t = S.timer;
   if (document.hidden && Date.now() - (LIVE.hiddenAt || Date.now()) > 120000) return 'away';
   return t.phase === 'focus' ? 'focus' : 'break';
@@ -15154,10 +15201,14 @@ function liveBeat(force = false) {
   LIVE.state = st; LIVE.lastBeat = Date.now();
   const look = memberLook();
   FB.setDoc(FB.doc(FB.db, 'clans', LIVE.cid, 'live', LIVE.lid, 'people', USER.uid), {
-    name: USER.username, avatar: look.avatar, color: look.color, aura: look.aura, state: st,
+    name: USER.username, avatar: look.avatar, color: look.color, aura: look.aura, state: LIVE.legacy && (st === 'paused' || st === 'idle') ? 'break' : st,
     sname: S.settings.shareNames && S.timer.phase === 'focus' ? String(currentName()).slice(0, 80) : '', min: Math.min(1440, Math.round(LIVE.myMin)),
-    beat: FB.serverTimestamp(), joinedAt: LIVE.joinAt,
-  }).catch(e => console.warn('beat', e && e.code));
+    beat: FB.serverTimestamp(), joinedAt: LIVE.joinAt, ...(inTogether() && !LIVE.legacy ? togetherSeat() : {}),
+  }).catch(e => {
+    // rules from before 1.14.2 refuse a countdown and the paused/ready states: keep showing up, without them
+    if (e && e.code === 'permission-denied' && inTogether() && !LIVE.legacy) { LIVE.legacy = true; LIVE.state = ''; liveBeat(true); return; }
+    console.warn('beat', e && e.code);
+  });
 }
 document.addEventListener('visibilitychange', () => { if (document.hidden) LIVE.hiddenAt = Date.now(); else { LIVE.hiddenAt = 0; liveBeat(); } });
 /** Who's at the table: a missed heartbeat for ~2 minutes shows as away, ~5 minutes and they're gone. */
@@ -15165,14 +15216,14 @@ function livePeople() {
   const now = liveSrvNow();
   return Object.entries(LIVE.people).map(([id, p]) => {
     const age = now - tsMs(p.beat);
-    return { id, ...p, st: p.state === 'left' ? 'left' : age > 300000 ? 'gone' : age > 120000 || p.state === 'away' ? 'away' : p.state };
+    return { id, ...p, endAt: +p.endAt || 0, left: +p.left || 0, st: p.state === 'left' ? 'left' : age > 300000 ? 'gone' : age > 120000 || p.state === 'away' ? 'away' : p.state };
   }).filter(p => p.st !== 'gone' && p.st !== 'left').sort((a, b) => (a.joinedAt || 0) - (b.joinedAt || 0));
 }
 
 /* ---------- The shared timer drives this device's timer ---------- */
 function liveSync() {
   const t = S.timer, d = LIVE.doc;
-  if (!t.live || !d) return;
+  if (!t.live || !d || t.live.mode === 'together') return;
   if (!d.open) { liveEnded('closed'); return; }
   const st = liveState(d);
   if (st.done) { liveClose(); liveEnded('done'); return; }
@@ -15209,6 +15260,7 @@ function liveSync() {
 /** The session is over (time up, closed by the host, or removed): show the summary and give the timer back. */
 function liveEnded(why) {
   if (!S.timer.live) return;
+  if (inTogether()) { togetherLeave(why); return; }
   const t = S.timer, people = livePeople(), d = LIVE.doc || {};
   if (t.status !== 'idle' && t.phase === 'focus' && why !== 'done') { LIVE.syncing = true; try { finishPhase('skip'); } finally { LIVE.syncing = false; } }
   else if (t.status !== 'idle' && why === 'done') { t.endAt = Math.min(t.endAt, Date.now()); LIVE.syncing = true; try { finishPhase('complete'); } finally { LIVE.syncing = false; } }
@@ -15223,19 +15275,33 @@ function liveTeardown() {
   liveUnlisten();
   clearInterval(LIVE.beatTimer);
   if (LIVE.lid && !isPreview() && cloudReady()) FB.deleteDoc(FB.doc(FB.db, 'clans', LIVE.cid, 'live', LIVE.lid, 'people', USER.uid)).catch(() => {});
-  const t = S.timer;
-  t.live = null; t.status = 'idle'; t.phase = 'focus'; t.round = 1; t.endAt = 0; t.remaining = 0;
+  const t = S.timer, synced = t.live && t.live.mode !== 'together';
+  if (synced) { t.status = 'idle'; t.phase = 'focus'; t.round = 1; t.endAt = 0; t.remaining = 0; }
+  t.live = null;
   LIVE.lid = ''; LIVE.doc = null; LIVE.people = {}; LIVE.idx = null; LIVE.myMin = 0; LIVE.doneMin = 0;
   saveLocal();
 }
 async function liveLeave() {
   if (!inLive()) return;
+  if (inTogether()) { togetherLeave('left'); return; }
   const t = S.timer;
   if (t.status !== 'idle' && t.phase === 'focus') { LIVE.syncing = true; try { finishPhase('skip'); } finally { LIVE.syncing = false; } }
   LIVE.summary = null;
   liveTeardown();
   renderAll();
   toast('You left the live session', 2200, false, { now: true });
+}
+/** Leave a Focus-together table (or it closed): your timer carries on as a normal session; the last one out closes the table. */
+function togetherLeave(why) {
+  const d = LIVE.doc || {}, mates = [...(LIVE.mates || [])], others = livePeople().filter(p => p.id !== USER.uid);
+  const mine = S.sessions.filter(s => s.live === LIVE.lid && s.start >= (LIVE.joinAt || 0) - 4 * 3600e3);
+  const seen = mates.map(id => LIVE.people[id] ? { id, ...LIVE.people[id] } : (CLAN.members || []).find(m => m.id === id)).filter(Boolean);
+  LIVE.summary = { title: d.title || 'Focus together', people: [{ id: USER.uid, name: USER.username, ...memberLook() }, ...seen], min: mine.reduce((a, s) => a + s.duration, 0) / 60000,
+    blocks: mine.length, why, together: mates.length > 0 };
+  if (why === 'left' && !others.length && d.open) liveClose();
+  liveTeardown();
+  renderAll(); renderLive();
+  if (why === 'left') toast(S.timer.status === 'idle' ? 'You left the table' : 'You left the table — your own timer keeps going', 2600, false, { now: true });
 }
 /** Close the session once (the host's "End", or anyone when its time is up), with a feed event. */
 async function liveClose() {
@@ -15273,7 +15339,7 @@ async function liveControl(kind) {
 async function liveMaybeCount() {
   const d = LIVE.doc;
   if (!d || d.counted || LIVE.counting || isPreview() || !inClan()) return;
-  if (livePeople().filter(p => p.st === 'focus' || p.st === 'break').length < 2) return;
+  if (livePeople().filter(p => ['focus', 'break', 'paused', 'idle'].includes(p.st)).length < 2) return;
   LIVE.counting = true;
   const lref = FB.doc(FB.db, 'clans', LIVE.cid, 'live', LIVE.lid), cref = cDoc(LIVE.cid), today = dayKey(new Date()), wkNow = dayKey(weekMonday());
   try {
@@ -15313,7 +15379,7 @@ function showReaction(from, emoji) {
 /* ---------- Main timer buttons while in a live session ---------- */
 /** Returns true when the click was handled by the live session. */
 function liveButton(which) {
-  if (!inLive()) return false;
+  if (!inSynced()) return false;   // Focus together: your timer is all yours
   const d = LIVE.doc, st = d && liveState(d);
   if (!d) return true;
   if (which === 'main') {
@@ -15331,10 +15397,10 @@ function liveButton(which) {
 async function liveResume() {
   const lv = S.timer.live;
   if (!lv || LIVE.lid || isPreview()) return;
-  if (!inClan() || CLAN.id !== lv.cid) { S.timer.live = null; S.timer.status = 'idle'; saveLocal(); return; }
+  if (!inClan() || CLAN.id !== lv.cid) { if (lv.mode !== 'together') S.timer.status = 'idle'; S.timer.live = null; saveLocal(); return; }
   LIVE.joinAt = lv.joinAt || Date.now();
   LIVE.lid = '';
-  try { await liveJoin(lv.lid); } catch (e) { S.timer.live = null; S.timer.status = 'idle'; saveLocal(); renderAll(); }
+  try { await liveJoin(lv.lid); } catch (e) { if (lv.mode !== 'together') S.timer.status = 'idle'; S.timer.live = null; saveLocal(); renderAll(); }
 }
 
 /* ---------- Clan screen ---------- */
@@ -15342,11 +15408,13 @@ const clanAgo = at => { const m = Math.max(0, Math.round((Date.now() - at) / 600
 const clanTagHTML = tag => (tag ? `<span class="ctag">[${esc(tag)}]</span>` : '');
 const SHIELD_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="M9 12l2 2 4-4"/></svg>';
 /** A person's little picture with their aura (cosmetics hidden in True Minimalist). */
-function clanPic(p, size = 34) {
-  const pic = hasAvatar(p.avatar) ? `<span class="mini-av">${avatarSVG(p.avatar, size)}</span>` : `<span class="avatar mini" style="width:${size}px;height:${size}px;font-size:${Math.round(size * .42)}px">${esc((p.name || '?')[0]).toUpperCase()}</span>`;
-  return p.aura && SPECIAL_AURAS[p.aura] ? withAura(pic, 0, p.aura) : pic;
+const clanPic = (p, size = 34) => lookPic(personLook(p.id, p.name, p), size);
+const clanName = p => lookName(personLook(p.id, p.name, p), { tag: false });
+/** A feed line with the person's name in their colour. */
+function feedLine(e) {
+  const t = esc(FEED_TEXT[e.type](e.who, e.n)), m = (CLAN.members || []).find(x => x.name === e.who);
+  return m ? t.replace('@' + esc(e.who), clanName(m)) : t;
 }
-const clanName = p => `<span${nameAttrs(p.color, 'nm')}>@${esc(p.name)}</span>`;
 let clanCbView = 'week';   // contribution board: this week / all time
 function renderClan() {
   const body = $('#clanBody');
@@ -15418,16 +15486,17 @@ function clanHeaderHTML(d) {
 /* ---------- Live sessions on the clan screen ---------- */
 function liveHTML() {
   if (inLive() || (isPreview() && (CLAN.lives || []).length)) return liveTableHTML();
-  const lives = (CLAN.lives || []).filter(l => l.open);
-  const rows = lives.map(l => `<li class="clan-live-row"><span class="live-dot" aria-hidden="true"></span><div><b>${esc(l.title)}</b><div class="lbl">Hosted by @${esc(l.hostName)} · ${CLAN_PATTERNS.find(p => p.focus === l.pattern.focus && p.rounds === l.pattern.rounds)?.name || `${l.pattern.focus} min focus`}</div></div>
+  const lives = (CLAN.lives || []).filter(l => l.open && Date.now() - (l.createdAt || 0) < 12 * 3600e3);
+  const rows = lives.map(l => `<li class="clan-live-row"><span class="live-dot" aria-hidden="true"></span><div><b>${esc(l.title)}</b> <span class="lv-mode${liveModeOf(l) === 'synced' ? ' synced' : ''}">${CLAN_MODES[liveModeOf(l)].short}</span><div class="lbl">${liveModeOf(l) === 'together' ? `Started by @${esc(l.hostName)} · everyone runs their own timer` : `Host @${esc(l.hostName)} · ${CLAN_PATTERNS.find(p => p.focus === l.pattern.focus && p.rounds === l.pattern.rounds)?.name || `${l.pattern.focus} min focus`}`}</div></div>
     <button class="btn primary small" data-cjoinlive="${esc(l.id)}">Join</button></li>`).join('');
   return `<div class="card clan-live"><div class="row between"><h2 style="margin:0">Study live</h2><button class="btn small primary" id="clanStudyNow">Study now</button></div>
-    ${rows ? `<ul class="clan-lives">${rows}</ul>` : '<p class="lbl" style="margin:8px 0 0">No one is studying live right now. Start a session and your clanmates can join you on one shared timer.</p>'}</div>`;
+    ${rows ? `<ul class="clan-lives">${rows}</ul>` : '<p class="lbl" style="margin:8px 0 0">No one is studying live right now. Start a session: by default everyone runs their own timer at one table (Focus together), or pick a Synced timer.</p>'}</div>`;
 }
 function liveTableHTML() {
   const demo = !inLive(), d = demo ? CLAN.lives[0] : LIVE.doc;
   if (!d) return `<div class="card">${skelRows(2)}</div>`;
   const people = demo ? Object.values(DEMO_LIVE_PEOPLE()) : livePeople();
+  if (liveModeOf(d) === 'together') return togetherTableHTML(d, people, demo);
   const st = liveState(d, demo ? Date.now() : undefined), host = !demo && liveMine();
   const seats = people.map(p => {
     const mem = (CLAN.members || []).find(m => m.id === p.id) || {}, share = mem.shareNames !== false && p.sname;
@@ -15436,7 +15505,7 @@ function liveTableHTML() {
   }).join('');
   const phase = st.done ? 'Finished' : st.waiting ? 'Waiting for the host to start' : `${st.phase === 'focus' ? 'Focus' : 'Break'} · round ${st.round} of ${d.pattern.rounds}${st.paused ? ' · paused' : ''}`;
   return `<div class="card lv-card${st.phase === 'short' ? ' brk' : ''}" id="lvCard">
-    <div class="row between" style="gap:8px;flex-wrap:wrap"><h2 style="margin:0"><span class="live-dot" aria-hidden="true"></span> ${esc(d.title)}</h2><span class="lbl">Hosted by @${esc(d.hostName)}</span></div>
+    <div class="row between" style="gap:8px;flex-wrap:wrap"><h2 style="margin:0"><span class="live-dot" aria-hidden="true"></span> ${esc(d.title)}</h2><span class="lbl"><span class="lv-mode synced">Synced timer</span> · host @${esc(d.hostName)}</span></div>
     <div class="lv-clock"><b id="lvTime">${st.done ? '0:00' : fmtClock(st.left)}</b><span id="lvPhase">${phase}</span></div>
     <div class="lv-table">${pomeoOn() ? `<span class="lv-pomeo">${pomeoSVG({ state: st.phase === 'focus' && !st.paused ? 'focus' : 'happy', ...pomeoOutfit() })}</span>` : ''}${seats || '<span class="lbl">Just you so far</span>'}</div>
     <div class="lv-reacts" role="group" aria-label="Send a reaction">${CLAN_REACTIONS.map(e => `<button class="lv-r" data-react="${e}" aria-label="React ${e}">${e}</button>`).join('')}</div>
@@ -15448,7 +15517,7 @@ function liveTableHTML() {
   </div>`;
 }
 function renderLiveClock() {
-  const d = inLive() ? LIVE.doc : null, el = $('#lvTime');
+  const d = inSynced() ? LIVE.doc : null, el = $('#lvTime');
   if (!d || !el) return;
   const st = liveState(d);
   el.textContent = st.done ? '0:00' : fmtClock(st.left);
@@ -15478,7 +15547,7 @@ function sessionsHTML() {
     return `<li class="cs-row" data-csid="${esc(s.id)}">
       <div class="cs-when"><b>${fmtHM(at)}</b><span>${esc(fmtClanWhen(at).split(' · ')[0])}</span></div>
       <div class="cs-main"><div class="rt">${esc(s.title)}${s.tag ? ` <span class="chip-tag">${esc(s.tag)}</span>` : ''}</div>
-        <div class="lbl">${esc([pat ? pat.name : `${s.pattern.focus}/${s.pattern.short} × ${s.pattern.rounds}`, clanRepeatText(s), `${going} going${maybe ? ` · ${maybe} maybe` : ''}${s.max < 30 ? ` · max ${s.max}` : ''}`, `by @${s.creatorName}`].filter(Boolean).join(' · '))}</div>
+        <div class="lbl"><span class="cs-mode${s.mode === 'together' ? '' : ' synced'}">${CLAN_MODES[s.mode === 'together' ? 'together' : 'synced'].short}</span> ${esc([s.mode === 'together' ? (pat ? 'suggested ' + pat.name : '') : pat ? pat.name : `${s.pattern.focus}/${s.pattern.short} × ${s.pattern.rounds}`, clanRepeatText(s), `${going} going${maybe ? ` · ${maybe} maybe` : ''}${s.max < 30 ? ` · max ${s.max}` : ''}`, `by @${s.creatorName}`].filter(Boolean).join(' · '))}</div>
         <div class="seg cs-rsvp" role="group" aria-label="Are you going?">${[['going', 'Going'], ['maybe', 'Maybe'], ['no', 'Can’t']].map(([v, n]) => `<button data-rsvp="${v}" class="${mine === v ? 'active' : ''}">${n}</button>`).join('')}</div>
         <div class="cs-acts">
           ${live ? `<button class="btn primary small" data-cjoinlive="${esc(live.id)}">Join live</button>` : soon ? `<button class="btn primary small" data-cstart="${esc(s.id)}">Start live</button>` : ''}
@@ -15540,7 +15609,7 @@ function membersHTML() {
 function feedHTML() {
   const f = CLAN.feed;
   if (!f) return '';
-  const rows = f.filter(e => FEED_TEXT[e.type]).slice(0, 20).map(e => `<li><span>${esc(FEED_TEXT[e.type](e.who, e.n))}</span><span class="lbl">${clanAgo(e.at || Date.now())}</span></li>`).join('');
+  const rows = f.filter(e => FEED_TEXT[e.type]).slice(0, 20).map(e => `<li><span>${feedLine(e)}</span><span class="lbl">${clanAgo(e.at || Date.now())}</span></li>`).join('');
   return `<div class="card"><h2>Activity</h2>${rows ? `<ul class="clan-feed">${rows}</ul>` : '<p class="lbl">Nothing yet — focus sessions, new members and level-ups show up here.</p>'}</div>`;
 }
 function trophyHTML(d) {
@@ -15665,6 +15734,7 @@ function openClanSched(s = null, now = false) {
   $('#csdPattern').innerHTML = CLAN_PATTERNS.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
   const pat = s && CLAN_PATTERNS.find(p => p.focus === s.pattern.focus && p.short === s.pattern.short && p.rounds === s.pattern.rounds);
   $('#csdPattern').value = pat ? pat.id : 'c25';
+  setSchedMode(s ? (s.mode === 'together' ? 'together' : 'synced') : 'together');
   $('#csdDate').value = dayKey(at); $('#csdTime').value = `${pad(at.getHours())}:${pad(at.getMinutes())}`;
   $('#csdRepeat').value = s ? s.repeat : 'none';
   $('#csdTag').value = s ? s.tag : ''; $('#csdMax').value = s ? s.max : 30;
@@ -15764,7 +15834,7 @@ $('#tab-clan').addEventListener('click', async e => {
     if (b.hasAttribute('data-ccal')) { const r = clanReminders(true).find(x => x.clanSess === s.id); if (r) openCal(r); return; }
     if (b.hasAttribute('data-cedit')) return openClanSched(s);
     if (b.hasAttribute('data-ccancel')) { if (await confirmDlg({ title: `Cancel “${s.title}”?`, body: s.repeat !== 'none' ? 'This cancels every repeat. People who RSVP’d get a notice.' : 'People who RSVP’d get a notice.', ok: 'Cancel session', danger: true })) clanAct(b, () => clanCancelSession(s.id), 'Session cancelled'); return; }
-    if (b.dataset.cstart) return clanAct(b, () => liveStart({ title: s.title, pattern: s.pattern, sid: s.id }));
+    if (b.dataset.cstart) return clanAct(b, () => liveStart({ title: s.title, pattern: s.pattern, sid: s.id, mode: s.mode === 'together' ? 'together' : 'synced' }));
   }
 });
 document.addEventListener('toggle', e => {   // one member menu open at a time
@@ -15819,18 +15889,25 @@ $('#csdSave').addEventListener('click', e => clanAct(e.currentTarget, async () =
   const pat = CLAN_PATTERNS.find(p => p.id === $('#csdPattern').value) || CLAN_PATTERNS[0];
   const bad = clanTitleProblem(title) || (title.length > 40 && 'Keep the name under 40 characters') || clanTitleProblem($('#csdTag').value || 'ok');
   if (bad) { $('#csdErr').textContent = bad; return false; }
-  if (schedNow) { $('#clanSchedDlg').close(); await liveStart({ title, pattern: pat }); return; }
+  if (schedNow) { $('#clanSchedDlg').close(); await liveStart({ title, pattern: pat, mode: schedMode }); return; }
   const [y, mo, da] = $('#csdDate').value.split('-').map(Number), [h, mi] = $('#csdTime').value.split(':').map(Number);
   const start = new Date(y, mo - 1, da, h, mi).getTime();
   if (!start || (start < Date.now() - 60000 && $('#csdRepeat').value === 'none')) { $('#csdErr').textContent = 'Pick a time in the future'; return false; }
   const days = $$('#csdDays .active').map(b => +b.dataset.d);
   if ($('#csdRepeat').value === 'weekly' && !days.length) { $('#csdErr').textContent = 'Pick at least one day'; return false; }
-  await clanSchedule({ title, start, pattern: pat, repeat: $('#csdRepeat').value, days, tag: $('#csdTag').value, max: +$('#csdMax').value || 30 }, schedEdit);
+  await clanSchedule({ title, start, pattern: pat, repeat: $('#csdRepeat').value, days, tag: $('#csdTag').value, max: +$('#csdMax').value || 30, mode: schedMode }, schedEdit);
   $('#clanSchedDlg').close();
   toast(schedEdit ? 'Session updated' : 'Session scheduled — your clan can RSVP', 2600, true, { now: true });
   renderClan(); renderReminderBits();
 }));
 $('#csdCancel').addEventListener('click', () => $('#clanSchedDlg').close());
+let schedMode = 'together';
+function setSchedMode(m) {
+  schedMode = m === 'synced' ? 'synced' : 'together';
+  $$('#csdMode [data-cmode2]').forEach(b => { b.classList.toggle('active', b.dataset.cmode2 === schedMode); b.setAttribute('aria-pressed', b.dataset.cmode2 === schedMode); });
+  $('#csdPatternLbl').textContent = schedMode === 'together' ? 'Suggested pattern (everyone can use their own)' : 'Shared pattern';
+}
+$('#csdMode').addEventListener('click', e => { const b = e.target.closest('[data-cmode2]'); if (b) setSchedMode(b.dataset.cmode2); });
 $('#cstBody').addEventListener('click', async e => {
   const b = e.target.closest('button');
   if (!b) return;
@@ -15928,7 +16005,7 @@ function renderLiveBar() {
   el.classList.toggle('hidden', !on);
   if (!on) { el.innerHTML = ''; return; }
   const n = livePeople().length;
-  el.innerHTML = `<span class="live-dot" aria-hidden="true"></span><b>Live: ${esc(LIVE.doc.title)}</b><span class="lbl">${n} at the table · ${liveMine() ? 'you run the timer' : 'host @' + esc(LIVE.doc.hostName)}</span><button class="linkbtn" data-goclan>Open table</button>`;
+  el.innerHTML = `<span class="live-dot" aria-hidden="true"></span><b>${inTogether() ? 'At the table' : 'Live'}: ${esc(LIVE.doc.title)}</b><span class="lbl">${n} at the table · ${inTogether() ? 'your own timer' : liveMine() ? 'you run the timer' : 'host @' + esc(LIVE.doc.hostName)}</span><button class="linkbtn" data-goclan>Open table</button>`;
 }
 $('#liveBar').addEventListener('click', e => { if (e.target.closest('[data-goclan]')) showTab('clan'); });
 function clanTodayLine() {
@@ -15966,15 +16043,16 @@ function clanFromReminder(r) {
   const s = (CLAN.sessions || []).find(x => x.id === r.clanSess);
   if (!s || isPreview()) return;
   const live = (CLAN.lives || []).find(l => l.sid === s.id && l.open);
-  clanAct(null, () => (live ? liveJoin(live.id) : liveStart({ title: s.title, pattern: s.pattern, sid: s.id })));
+  clanAct(null, () => (live ? liveJoin(live.id) : liveStart({ title: s.title, pattern: s.pattern, sid: s.id, mode: s.mode === 'together' ? 'together' : 'synced' })));
 }
 STAMP_ART.stamp_together = '<circle cx="32" cy="32" r="27" fill="none" stroke="#6a4bc4" stroke-width="3"/><circle cx="32" cy="32" r="21.5" fill="none" stroke="#6a4bc4" stroke-width="1.2" stroke-dasharray="2.4 2.2"/><circle cx="26.5" cy="28" r="6.4" fill="none" stroke="#6a4bc4" stroke-width="2.8"/><circle cx="37.5" cy="28" r="6.4" fill="none" stroke="#e5654f" stroke-width="2.8"/><text x="32" y="45.5" font-size="7.2" font-weight="900" letter-spacing=".7" fill="#6a4bc4" text-anchor="middle" font-family="system-ui, sans-serif">TOGETHER</text>';
 
 /* ---------- Demo preview: a sample clan, a planned session and a live table (nothing is written) ---------- */
 const DEMO_LIVE_PEOPLE = () => ({
-  demo_f1: { id: 'demo_f1', name: 'James', avatar: 'av_fox', color: 'col_teal', aura: 'au_c_bond', st: 'focus', sname: 'Rotational motion' },
-  demo: { id: 'demo', name: 'demo_scholar', avatar: myAvatar(), color: 'col_c_steel', aura: 'au_c_pact', st: 'focus', sname: 'Organic chemistry' },
-  demo_f4: { id: 'demo_f4', name: 'Princess_cupcake', avatar: 'av_panda', color: 'col_rose', aura: '', st: 'break', sname: '' },
+  demo_f1: { id: 'demo_f1', name: 'James', avatar: 'av_fox', color: 'col_teal', aura: 'au_c_bond', st: 'focus', sname: 'Rotational motion', endAt: Date.now() + 14 * 60000 },
+  demo: { id: 'demo', name: 'demo_scholar', avatar: myAvatar(), color: 'col_c_steel', aura: 'au_c_pact', st: 'focus', sname: 'Organic chemistry', endAt: Date.now() + 18.7 * 60000 },
+  demo_f4: { id: 'demo_f4', name: 'Princess_cupcake', avatar: 'av_panda', color: 'col_rose', aura: '', st: 'break', sname: '', endAt: Date.now() + 3 * 60000 },
+  demo_f2: { id: 'demo_f2', name: 'siverieg', avatar: 'av_robot', color: '', aura: '', st: 'paused', sname: '', left: 21 * 60000 },
   demo_f5: { id: 'demo_f5', name: 'lenvixty', avatar: 'av_cat', color: 'col_violet', aura: '', st: 'away', sname: '' },
 });
 function demoClanDocs(ts, wk) {
@@ -15993,15 +16071,152 @@ function demoClanDocs(ts, wk) {
   mem.forEach(([id, name, role, avatar, color, aura, contrib, weekMin], i) => {
     docs[`clans/${cid}/members/${id}`] = { name, role, joinedAt: now - (60 - i * 9) * 864e5, contrib, weekKey: wk, weekMin, lastAt: now - i * 3600e3, lastIds: [], avatar, color, aura, level: 10 + i, tier: 'scholar', shareNames: i < 2, focusUntil: i === 2 ? now + 18 * 60000 : 0, updatedAt: ts(now) };
   });
-  docs[`clans/${cid}/sessions/demo_s1`] = { title: 'Night owls', start: at(21, 0) - 7 * 864e5, pattern: { focus: 50, short: 10, rounds: 2 }, repeat: 'daily', days: [], tag: 'JEE', max: 30, creator: 'demo_f1', creatorName: 'James', cancelled: false,
+  docs[`clans/${cid}/sessions/demo_s1`] = { mode: 'together', title: 'Night owls', start: at(21, 0) - 7 * 864e5, pattern: { focus: 50, short: 10, rounds: 2 }, repeat: 'daily', days: [], tag: 'JEE', max: 30, creator: 'demo_f1', creatorName: 'James', cancelled: false,
     rsvp: { demo_f1: 'going', demo: 'going', demo_f4: 'maybe' }, createdAt: ts(now - 8 * 864e5), updatedAt: ts(now) };
   const sat = addDays(startOfDay(today), (6 - today.getDay() + 7) % 7 || 7);
   docs[`clans/${cid}/sessions/demo_s2`] = { title: 'Mock test', start: sat.getTime() + 9.5 * 3600e3, pattern: { focus: 90, short: 15, rounds: 2 }, repeat: 'none', days: [], tag: 'Full syllabus', max: 10, creator: 'demo', creatorName: 'demo_scholar', cancelled: false,
     rsvp: { demo: 'going', demo_f5: 'going' }, createdAt: ts(now - 2 * 864e5), updatedAt: ts(now) };
-  docs[`clans/${cid}/live/demo_live`] = { title: 'Group study', host: 'demo_f1', hostName: 'James', pattern: { focus: 25, short: 5, rounds: 4 }, startAt: ts(now - 12 * 60000), pausedAt: 0, pauseTotal: 0, shift: 0, open: true, counted: true, sid: '', createdAt: ts(now - 12 * 60000), endedAt: 0, updatedAt: ts(now) };
+  docs[`clans/${cid}/live/demo_live`] = { title: 'Group study', host: 'demo_f1', hostName: 'James', pattern: { focus: 25, short: 5, rounds: 4 }, startAt: ts(now - 12 * 60000), pausedAt: 0, pauseTotal: 0, shift: 0, open: true, counted: true, sid: '', createdAt: ts(now - 12 * 60000), endedAt: 0, updatedAt: ts(now), mode: 'together' };
   [['live', 'James', 3, 50], ['focus', 'Princess_cupcake', 50, 140], ['level', 'lenvixty', 9, 600], ['focus', 'James', 25, 1500], ['raid', 'demo_scholar', 0, 2 * 1440], ['join', 'siverieg', 0, 4 * 1440]]
     .forEach(([type, who, n, ago], i) => { docs[`clans/${cid}/feed/demo_e${i}`] = { type, who, n, at: ts(now - ago * 60000) }; });
   return docs;
+}
+
+/* ==========================================================================
+   LOOKS (v1.14.1) — one picture and one name for a person, the same everywhere:
+   avatar inside, badge frame around it, aura outside, name colour on the name,
+   clan tag next to it. Built from the newest public data we have about them;
+   ids an older (or newer) app version doesn't know fall back to the defaults.
+   ========================================================================== */
+const tsOf = d => { const u = d && d.updatedAt; return u ? (typeof u.toMillis === 'function' ? u.toMillis() : +u || 0) : 0; };
+const okItem = (v, cat) => (typeof v === 'string' && ITEM_BY_ID[v] && ITEM_BY_ID[v].cat === cat ? v : '');
+const okTag = t => (typeof t === 'string' && /^[A-Z0-9]{2,5}$/.test(t) ? t : '');
+/**
+ * Someone's public look. `extra` is anything else we hold about them (a leaderboard row, a clan
+ * member, a seat at a live table). Public profiles and leaderboard stats both carry the full look;
+ * the newer of the two wins, so a stale cache never hides a change.
+ */
+function personLook(uid, name = '', extra = null) {
+  if (USER && !USER.guest && uid === USER.uid) {
+    const g = game();
+    return { uid, me: true, name: USER.username, avatar: myAvatar(), frame: equippedId('frame'), color: equippedId('color'), aura: SPECIAL_AURAS[myAura()] ? myAura() : '',
+      streak: g.streak.cur, tier: g.tier.id, level: g.lv.level, clanTag: clanTagOn() ? CLAN.doc.tag : '' };
+  }
+  const ok = d => d && typeof d === 'object' && !d.denied;
+  const pub = [cached('publicProfiles', uid), cached('publicStats', uid), extra && 'username' in extra ? extra : null].filter(ok).sort((a, b) => tsOf(b) - tsOf(a));
+  const src = pub[0] || (ok(extra) ? extra : {});
+  const any = k => { for (const d of [...pub, extra]) if (ok(d) && d[k] !== undefined && d[k] !== '') return d[k]; return undefined; };
+  const tier = TIERS.some(t => t.id === src.tier) ? src.tier : TIERS.some(t => t.id === any('tier')) ? any('tier') : TIERS[0].id;
+  return {
+    uid, me: false, name: String(name || src.username || src.name || any('username') || '?'),
+    avatar: okItem(src.avatar, 'avatar') || 'av_default', frame: okItem(src.frame, 'frame') || okItem(any('frame'), 'frame') || 'frame_none',
+    color: okItem(src.color, 'color'), aura: SPECIAL_AURAS[src.aura] ? src.aura : '',
+    streak: +any('streak') || 0, tier, level: +src.level || +any('level') || 1, clanTag: okTag(pub[0] && pub[0].clanTag),
+  };
+}
+/** The picture: badge (avatar or tier symbol) + frame + aura. True Minimalist: just the initial. */
+function lookPic(L, size = 26) {
+  if (minimal()) return `<span class="avatar mini look-pic" style="width:${size}px;height:${size}px;font-size:${Math.round(size * .45)}px">${esc((L.name || '?')[0]).toUpperCase()}</span>`;
+  return `<span class="look-pic">${withAura(badgeSVG(tierById(L.tier), { size, frame: L.frame, avatar: L.avatar }), L.streak, L.aura)}</span>`;
+}
+/** The name: in their name colour, with their clan tag (both hidden in True Minimalist). */
+function lookName(L, { cls = 'nm', tag = true, at = true, you = '' } = {}) {
+  return `<span${nameAttrs(L.color, cls)}>${you || (at ? '@' : '') + esc(L.name)}</span>${tag && L.clanTag && !minimal() ? ' ' + clanTagHTML(L.clanTag) : ''}`;
+}
+/** Fetch public profiles for people on screen (clan members, live seats) — cached for 15 minutes. */
+let lookFetch = null;
+function prefetchLooks(uids, then) {
+  if (!socialReady() && !isPreview()) return;
+  const need = [...new Set(uids)].filter(u => u && u !== USER.uid && !(SOC.cache['publicProfiles/' + u] && Date.now() - SOC.cache['publicProfiles/' + u].at < 15 * 60000));
+  if (!need.length) return;
+  Promise.all(need.map(u => getPublic('publicProfiles', u, 15 * 60000))).then(() => { clearTimeout(lookFetch); lookFetch = setTimeout(() => then && then(), 50); });
+}
+/** My look changed: keep the copies other people read in step (clan member list, live table, public profile). */
+let lookSync = 0;
+function lookChanged() {
+  clearTimeout(lookSync);
+  lookSync = setTimeout(() => {
+    if (typeof syncMemberLook === 'function') syncMemberLook();
+    if (typeof inLive === 'function' && inLive()) liveBeat(true);
+  }, 1500);
+}
+/** Equip something (or switch an extra on/off), remembering when, so the newest choice wins on every device. */
+function eqSet(key, val) {
+  S.game.equipped[key] = val;
+  (S.game.eqAt ||= {})[key] = Date.now();
+}
+/** An inbox title with the sender's name in their colour and with their clan tag. */
+function ibTitle(x) {
+  const t = esc(x.title);
+  if (!x.who || !(cached('publicProfiles', x.who) || cached('publicStats', x.who))) return t;
+  const L = personLook(x.who), at = '@' + esc(L.name);
+  return t.includes(at) ? t.replace(at, lookName(L)) : t;
+}
+
+/* ==========================================================================
+   FOCUS TOGETHER (v1.14.2) — the default kind of clan session. Everyone runs
+   their OWN timer (own preset, start, pause, stop) and sits at the same study
+   table: each seat shows that person's countdown and state. Nobody controls
+   anyone else's timer; stepping away or leaving only affects you. Presence is
+   the same low-frequency write as the synced timer: when your timer changes
+   state, plus a heartbeat about once a minute.
+   "Synced timer" (one shared timer with host controls) is still there.
+   ========================================================================== */
+const CLAN_MODES = { together: { name: 'Focus together', short: 'Focus together', desc: 'Everyone runs their own timer at one table' },
+  synced: { name: 'Synced timer', short: 'Synced timer', desc: 'One shared timer; the host starts, pauses and skips' } };
+const liveModeOf = d => (d && d.mode === 'together' ? 'together' : 'synced');   // no mode = a session from before 1.14.2: synced
+const inTogether = () => inLive() && S.timer.live.mode === 'together';
+const inSynced = () => inLive() && S.timer.live.mode !== 'together';
+/** My state at a Focus-together table. */
+function togetherState() {
+  const t = S.timer;
+  if (document.hidden && Date.now() - (LIVE.hiddenAt || Date.now()) > 120000) return 'away';
+  if (t.status === 'running') return t.phase === 'focus' ? 'focus' : 'break';
+  return t.status === 'paused' ? 'paused' : 'idle';
+}
+/** What my seat shows to others: my countdown as server time (so every device shows the same seconds). */
+function togetherSeat() {
+  const t = S.timer;
+  return { endAt: t.status === 'running' ? Math.round(t.endAt + LIVE.off) : 0, left: t.status === 'paused' ? Math.round(t.remaining) : 0 };
+}
+/** Every tick at a Focus-together table: write when my timer changed state, note who focused with me, update the countdowns. */
+let togetherSig = '';
+function togetherTick() {
+  const t = S.timer, sig = `${t.phase}|${t.status}|${t.round}|${Math.round((t.endAt || 0) / 5000)}`;
+  if (sig !== togetherSig) { const first = !togetherSig; togetherSig = sig; if (!first) liveBeat(true); }
+  // anyone focusing at the table while I focus: we studied together (stamp + summary)
+  if (t.status === 'running' && t.phase === 'focus') for (const p of livePeople()) if (p.id !== USER.uid && p.st === 'focus') { LIVE.blockMates.add(p.id); LIVE.mates.add(p.id); }
+  for (const el of document.querySelectorAll('.lv-cd[data-end]')) { const end = +el.dataset.end; el.textContent = fmtClock(Math.max(0, end - liveSrvNow())); }
+  const mine = $('#lvMine');
+  if (mine) mine.textContent = fmtClock(remainingMs());
+}
+/** A focus block started: count who focuses with me from now on. */
+function togetherBlockStart() { if (inTogether()) LIVE.blockMates = new Set(livePeople().filter(p => p.id !== USER.uid && p.st === 'focus').map(p => p.id)); }
+/** The seat's little countdown text. */
+function seatClock(p) {
+  if (p.st === 'away') return '';
+  if (p.endAt > 0) return `<span class="lv-cd" data-end="${p.endAt}">${fmtClock(Math.max(0, p.endAt - liveSrvNow()))}</span>`;
+  if (p.left > 0) return `<span class="lv-cd paused">${fmtClock(p.left)}</span>`;
+  return '';
+}
+const SEAT_STATE = { focus: 'Focusing', break: 'On a break', paused: 'Paused', idle: 'Ready', away: 'Away' };
+function togetherTableHTML(d, people, demo) {
+  const t = S.timer, mineSt = demo ? 'focus' : togetherState();
+  const seats = people.map(p => {
+    const mem = (CLAN.members || []).find(m => m.id === p.id) || {}, share = mem.shareNames !== false && p.sname;
+    return `<div class="lv-seat st-${p.st}" data-uid="${esc(p.id)}">${clanPic(p, 46)}<span class="lv-state">${SEAT_STATE[p.st] || 'Ready'}</span>${seatClock(p)}
+      <span class="lv-name">${clanName(p)}</span>${share ? `<span class="lv-sname">${esc(p.sname)}</span>` : ''}</div>`;
+  }).join('');
+  return `<div class="card lv-card lv-together" id="lvCard">
+    <div class="row between" style="gap:8px;flex-wrap:wrap"><h2 style="margin:0"><span class="live-dot" aria-hidden="true"></span> ${esc(d.title)}</h2><span class="lv-mode">${CLAN_MODES.together.name}</span></div>
+    <div class="lv-clock"><b id="lvMine">${demo ? '18:42' : fmtClock(remainingMs())}</b><span>Your timer · ${demo ? 'Focusing' : t.status === 'idle' ? 'ready when you are' : SEAT_STATE[mineSt].toLowerCase()}</span></div>
+    <div class="lv-table">${pomeoOn() ? `<span class="lv-pomeo">${pomeoSVG({ state: mineSt === 'focus' ? 'focus' : 'happy', ...pomeoOutfit() })}</span>` : ''}${seats || '<span class="lbl">Just you so far</span>'}</div>
+    <div class="lv-reacts" role="group" aria-label="Send a reaction">${CLAN_REACTIONS.map(e => `<button class="lv-r" data-react="${e}" aria-label="React ${e}">${e}</button>`).join('')}</div>
+    <div class="btn-row" style="justify-content:center">
+      ${demo ? '<button class="btn primary small" data-cjoinlive="demo">Join</button>' : `<button class="btn primary small" data-gotab="timer">${t.status === 'idle' ? 'Start my timer' : 'Open my timer'}</button><button class="btn small" id="lvLeave">Leave table</button>`}
+    </div>
+    <p class="lbl lv-note">Everyone runs their own timer and preset — nobody controls yours. Stepping away or leaving only affects you, and your focus counts like any session. Session names show only for people who share them.</p>
+  </div>`;
 }
 
 async function boot() {
