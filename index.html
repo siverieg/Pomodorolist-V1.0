@@ -65,15 +65,6 @@ h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacin
 }
 .brand { font-weight: 600; display: flex; align-items: center; gap: 8px; letter-spacing: .01em; }
 .brand i { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); display: inline-block; }
-.tabs { position: relative; display: flex; gap: 2px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 3px; }
-.tabs button {
-  position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 7px; border: 0; background: none;
-  padding: 7px 13px; border-radius: 999px; color: var(--muted); cursor: pointer; font-size: 14px; white-space: nowrap;
-}
-.tabs button svg { width: 17px; height: 17px; flex: none; }
-.tabs button.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-.tabs.has-ind > button.active { background: transparent; }
-.tabs > .seg-ind { background: var(--accent-soft); }
 .hdr-right { display: flex; align-items: center; gap: 8px; }
 .coinpill {
   display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px 5px 8px; border: 1px solid var(--line); border-radius: 999px;
@@ -81,34 +72,106 @@ h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacin
 }
 .coinpill .coin { width: 16px; height: 16px; }
 .coinpill:hover, .lvchip:hover { border-color: var(--muted); }
-/* Tablets: compact top bar with the label under each icon */
-@media (min-width: 641px) and (max-width: 1380px) {
-  .sync b { display: none; }
-  .tabs { border-radius: 18px; }
-  .tabs button { flex-direction: column; gap: 2px; padding: 5px 11px; font-size: 11px; border-radius: 14px; }
-  .tabs > .seg-ind { border-radius: 14px; }
-  .lvchip .uname { display: none; }
+/* ---------- Navigation (v1.14.3): a sidebar on wide screens, a ☰ slide-in menu on tablets,
+   a bottom bar + More on phones. Labels are never cut off: they either fit in full or aren't shown. ---------- */
+:root { --navw: 224px; }
+:root.nav-mini { --navw: 72px; }
+.hdr-left { min-width: 0; flex-wrap: nowrap; }
+#navBurger { display: none; position: relative; }
+.nav-burger svg { width: 20px; height: 20px; }
+.nav-burger .tbadge, #navMore .tbadge { top: 3px; right: 3px; }
+.nav-cur { display: none; font-size: 14px; color: var(--muted); white-space: nowrap; }
+.nav-cur::before { content: "·"; margin: 0 8px 0 2px; }
+.shell { display: flex; align-items: flex-start; }
+.shell > main { flex: 1 1 auto; min-width: 0; width: 100%; }
+.sidenav { display: flex; flex-direction: column; gap: 1px; background: var(--bg); overscroll-behavior: contain; }
+.nv-top { display: none; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 4px 10px 12px; }
+.nv-grp { display: flex; flex-direction: column; gap: 1px; }
+.nv-grp + .nv-grp { margin-top: 6px; }
+.nv-h { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 10px 12px 5px; white-space: nowrap; }
+.nv-solo { border-top: 1px solid var(--line); padding-top: 6px; margin-top: 10px !important; }
+.sidenav [data-tab], .nv-collapse {
+  position: relative; display: flex; align-items: center; gap: 12px; width: 100%; min-height: 42px; padding: 9px 12px; border: 0; border-radius: 11px;
+  background: none; color: var(--muted); font: inherit; font-size: 14.5px; text-align: left; cursor: pointer; white-space: nowrap;
+  transition: background-color .15s, color .15s;
 }
-@media (min-width: 641px) and (max-width: 860px) { .tabs button[data-tab="shop"] { display: none; }   /* the coin pill opens the Shop, as on phones */
-  .tabs button { padding: 5px 7px; } .top { gap: 8px; padding-left: 12px; padding-right: 12px; } }
-@media (min-width: 641px) { .tabs { min-width: 0; } .tabs button { min-width: 0; } .tabs button span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; } .hdr-right { flex: none; } }
-/* Phones: fixed bottom tab bar (icon + label), Profile/Settings behind the header badge */
+.sidenav [data-tab] svg, .nv-collapse svg { width: 20px; height: 20px; flex: none; }
+.sidenav [data-tab]:hover, .nv-collapse:hover { background: color-mix(in srgb, var(--text) 6%, transparent); color: var(--text); }
+.sidenav [data-tab].active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.sidenav [data-tab].active::before { content: ""; position: absolute; left: -10px; top: 9px; bottom: 9px; width: 3px; border-radius: 0 3px 3px 0; background: var(--accent); }
+.sidenav .tbadge { top: 50%; right: 12px; margin-top: -4px; }
+.sidenav [data-tab]:focus-visible, .nv-collapse:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.nv-foot { margin-top: auto; padding-top: 10px; }
+.nv-collapse svg { transition: transform .25s var(--ease); }
+:root.nav-mini .nv-collapse svg { transform: scaleX(-1); }
+.nav-scrim { position: fixed; inset: 0; z-index: 58; background: rgba(10, 14, 20, .38); opacity: 0; pointer-events: none; transition: opacity .22s var(--ease); }
+.nav-scrim.on { opacity: 1; pointer-events: auto; }
+.btmbar { display: none; }
+
+/* Wide screens: the sidebar, under the header, with the content beside it */
+@media (min-width: 1180px) {
+  .sidenav { position: sticky; top: var(--hdrh, 58px); flex: none; width: var(--navw); height: calc(100vh - var(--hdrh, 58px)); height: calc(100dvh - var(--hdrh, 58px));
+    padding: 14px 10px 12px; overflow-y: auto; overflow-x: hidden; border-right: 1px solid var(--line); z-index: 9; transition: width .22s var(--ease); }
+  .shell > main { max-width: 1040px; margin: 0 auto; }
+  :root.nav-mini .sidenav .nv-l, :root.nav-mini .sidenav .nv-h { display: none; }
+  :root.nav-mini .sidenav [data-tab], :root.nav-mini .nv-collapse { justify-content: center; padding-left: 0; padding-right: 0; }
+  :root.nav-mini .nv-grp + .nv-grp { border-top: 1px solid var(--line); padding-top: 6px; }
+  :root.nav-mini .sidenav .tbadge { top: 7px; right: 12px; margin-top: 0; }
+}
+/* Tablets and phones: the same list slides in from the left */
+@media (max-width: 1179px) {
+  .sidenav { position: fixed; z-index: 59; left: 0; top: 0; bottom: 0; width: min(296px, 86vw); padding: max(14px, env(safe-area-inset-top)) 10px calc(14px + env(safe-area-inset-bottom));
+    overflow-y: auto; border-right: 1px solid var(--line); background: var(--surface); box-shadow: 18px 0 40px -18px rgba(0, 0, 0, .35);
+    transform: translateX(-104%); visibility: hidden; transition: transform .26s var(--ease), visibility 0s linear .26s; }
+  body.nav-open .sidenav { transform: none; visibility: visible; transition: transform .26s var(--ease); }
+  .nv-top { display: flex; }
+  .nv-foot { display: none; }
+  .sidenav [data-tab].active::before { left: -10px; }
+  .sidenav [data-tab] { min-height: 46px; font-size: 15px; }
+}
+@media (min-width: 641px) and (max-width: 1179px) {
+  #navBurger { display: inline-flex; }
+  .nav-cur { display: inline; }
+}
+@media (min-width: 641px) and (max-width: 899px) { .sync b, .lvchip .uname { display: none; } }
+/* without tabs in the header there's room for the name and level again (these were hidden to fit the old tab bar) */
+@media (min-width: 641px) { .top .brand span:not(.brand-deco), .top .lvchip .lvn { display: inline; } }
+.nv-top .brand span:not(.brand-deco) { display: inline !important; }
+@media (min-width: 641px) and (max-width: 760px) { .nav-cur { display: none; } }
+:root[data-motion="off"] :is(.sidenav, .nav-scrim, .nv-collapse svg) { transition: none !important; }
+@media (prefers-reduced-motion: reduce) { :is(.sidenav, .nav-scrim) { transition-duration: .01s !important; } }
+
+/* Phones: a bottom bar with the main sections and More */
 @media (max-width: 640px) {
-  .tabs {
-    position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; justify-content: space-around; gap: 0;
+  .btmbar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; display: flex; justify-content: space-around; gap: 0;
     border: 0; border-top: 1px solid var(--line); border-radius: 0; padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
     background: var(--surface);
   }
-  .tabs button { flex: 1 1 0; min-width: 0; flex-direction: column; gap: 3px; padding: 4px 2px; font-size: 10.5px; border-radius: 12px; }
-  .tabs button span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
-  .tabs button svg { width: 22px; height: 22px; }
-  .tabs button[data-tab="profile"], .tabs button[data-tab="shop"] { display: none; }   /* Shop: the coin pill in the header */
-  .tabs.has-ind > .seg-ind { background: transparent; top: 6px; bottom: auto; height: 30px; }
-  .tabs > .seg-ind::before { content: ""; position: absolute; left: 50%; top: 0; width: 56px; height: 30px; margin-left: -28px; border-radius: 999px; background: var(--accent-soft); }
+  .btmbar button {
+    position: relative; z-index: 1; flex: 1 1 0; min-width: 0; display: inline-flex; flex-direction: column; align-items: center; gap: 3px; border: 0; background: none;
+    padding: 4px 1px; border-radius: 12px; color: var(--muted); cursor: pointer; font-size: 11px; white-space: nowrap;
+  }
+  .btmbar button svg { width: 22px; height: 22px; flex: none; }
+  .btmbar button.active { color: var(--accent); font-weight: 600; }
+  .btmbar.has-ind > .seg-ind { background: transparent; top: 6px; bottom: auto; height: 30px; }
+  .btmbar > .seg-ind::before { content: ""; position: absolute; left: 50%; top: 0; width: 56px; height: 30px; margin-left: -28px; border-radius: 999px; background: var(--accent-soft); }
+  .btmbar .tbadge { top: 3px; right: calc(50% - 16px); }
   main { padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
   .toasts { bottom: calc(84px + env(safe-area-inset-bottom)); }
   .float-emoji { bottom: calc(160px + env(safe-area-inset-bottom)); }
 }
+@media (max-width: 380px) { .btmbar button { font-size: 10.5px; letter-spacing: -.01em; } }
+/* Glossed Interface: the sidebar and the slide-in menu are glass too */
+:root[data-glass] .sidenav { background-color: color-mix(in srgb, var(--surface) 55%, transparent); border-color: var(--glass-edge); }
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root[data-glass] .sidenav { -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)); backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-sat)); }
+  @media (max-width: 1179px) { :root[data-glass] .sidenav { background-color: color-mix(in srgb, var(--surface) 90%, transparent); } }
+}
+:root[data-glass][data-glass-solid] .sidenav { background-color: color-mix(in srgb, var(--surface) 96%, transparent); -webkit-backdrop-filter: none; backdrop-filter: none; }
+:root[data-minimal] .sidenav [data-tab].active { color: var(--text); background: color-mix(in srgb, var(--text) 8%, transparent); }
+:root[data-minimal] .sidenav [data-tab].active::before { background: var(--text); }
+:root[data-minimal] [data-dot="questDot"] { display: none !important; }
 
 /* Sync status indicator */
 .sync { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); margin-left: 6px; white-space: nowrap; }
@@ -720,9 +783,9 @@ dialog::backdrop { background: rgba(10, 12, 12, .32); -webkit-backdrop-filter: b
 @keyframes bounceIn { 0% { transform: scale(.7); opacity: .2; } 60% { transform: scale(1.07); opacity: 1; } 100% { transform: scale(1); } }
 
 /* Focus mode: everything but the timer steps back while a focus block runs */
-.top, .greet, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .stack > .card:not(.timer-card) { transition: opacity .6s var(--ease); }
-body.focus-dim :is(.top, .greet, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .stack > .card:not(.timer-card)) { opacity: .26; }
-body.focus-dim :is(.top, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .stack > .card:not(.timer-card)):is(:hover, :focus-within) { opacity: 1; }
+.top, .sidenav, .btmbar, .greet, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .stack > .card:not(.timer-card) { transition: opacity .6s var(--ease); }
+body.focus-dim :is(.top, .sidenav, .btmbar, .greet, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .stack > .card:not(.timer-card)) { opacity: .26; }
+body.focus-dim :is(.top, .sidenav, .btmbar, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .stack > .card:not(.timer-card)):is(:hover, :focus-within) { opacity: 1; }
 
 /* Tomato mascot */
 .mascot { position: absolute; top: 10px; left: 12px; width: 40px; height: 40px; overflow: visible; }
@@ -1739,7 +1802,7 @@ dialog.tut { width: min(460px, calc(100vw - 24px)); padding: 20px; box-sizing: b
 .auth.lp { display: block; padding: 0; min-height: 100vh; min-height: 100dvh; }
 .lp-top { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; justify-content: center; padding: max(32px, env(safe-area-inset-top)) 20px 16px; }
 .lp-wrap { width: 100%; max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; align-items: center; }
-@media (min-width: 900px) { .lp-wrap { grid-template-columns: minmax(0, 1.1fr) minmax(340px, 410px); gap: 56px; } }
+@media (min-width: 900px) { .lp-wrap { grid-template-columns: minmax(0, 1.1fr) minmax(340px, 430px); grid-template-areas: "bar bar" "hero side" "look side"; gap: 26px 56px; } }
 .lp-hero { min-width: 0; }
 .lp-greet { display: flex; align-items: center; gap: 10px; margin: 22px 0 10px; }
 .lp-pomeo { width: 56px; height: 56px; flex: none; display: grid; place-items: center; border-radius: 18px; background: var(--accent-soft); }
@@ -2799,6 +2862,134 @@ body.first-load #todayBar { opacity: 0; }
 .mode-seg button b { display: block; font-size: 14px; }
 .mode-seg button span { font-size: 12px; color: var(--muted); }
 .mode-seg button.active { border-color: var(--accent); background: var(--accent-soft); }
+/* Player card: the stats board folds under the header (v1.14.3) */
+.pc-toggle { display: inline-flex; align-items: center; gap: 6px; margin: 12px 18px 0; padding: 6px 12px; min-height: 36px; border: 1px solid var(--pc-line); border-radius: 999px;
+  background: var(--pc-tile); color: var(--pc-fg); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.pc-toggle:hover { border-color: var(--pc-acc); }
+.pc-toggle:focus-visible { outline: 2px solid var(--pc-acc); outline-offset: 2px; }
+.pc-toggle i { font-style: normal; display: inline-block; transition: transform .28s var(--ease); }
+.pc-fold:not(.pc-closed) .pc-toggle i { transform: rotate(180deg); }
+.pc-fold .pc-body { display: grid; grid-template-rows: 1fr; transition: grid-template-rows .34s var(--ease), opacity .28s var(--ease); }
+.pc-fold.pc-closed .pc-body { grid-template-rows: 0fr; opacity: 0; }
+.pc-body-in { min-height: 0; overflow: hidden; }
+:root[data-motion="off"] :is(.pc-fold .pc-body, .pc-toggle i) { transition: none; }
+:root[data-motion="reduced"] .pc-fold .pc-body { transition: opacity .2s; }
+@media (max-width: 520px) { .pc-toggle { margin-left: 14px; margin-right: 14px; } }
+/* ---------- Welcome page (v1.14.3): the hero and a peek at the app first; the sign-up / log-in card opens on request ---------- */
+@media (max-width: 899px) { .lp-wrap { grid-template-areas: "bar" "hero" "side" "look"; } }
+.lp-look { grid-area: look; }
+.lp-bar { grid-area: bar; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.lp-bar .auth-brand { margin: 0; }
+.lp-login { min-height: 40px; padding: 8px 18px; font-weight: 600; }
+.lp-hero { grid-area: hero; }
+.lp-peek, .lp-auth { grid-area: side; min-width: 0; align-self: center; }
+.lp-greet { margin-top: 6px; }
+.lp-cta { gap: 10px; margin-bottom: 10px; }
+.lp-cta .btn { min-height: 46px; padding: 11px 20px; font-weight: 600; }
+.lp-cta .lp-guest { background: transparent; border-color: transparent; color: var(--muted); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; padding-left: 10px; padding-right: 10px; }
+.lp-cta .lp-guest:hover { color: var(--text); }
+:root[data-glass] .lp-cta .btn.lp-guest { background: transparent; border-color: transparent; box-shadow: none; }
+.lp-cta .btn.primary.lp-preview svg { stroke: currentColor; }
+.lp-cta-note { display: block; margin: 0 0 22px; max-width: 46ch; }
+.lp-alert { margin: -10px 0 18px; padding: 8px 12px; border-radius: 12px; background: color-mix(in srgb, var(--danger) 12%, transparent); color: var(--danger); font-size: 13.5px; }
+/* the peek: a small animated window of the app, plus what's inside */
+.lp-peek { display: grid; gap: 14px; align-content: center; }
+.pk-win { border-radius: 20px; background: var(--surface); border: 1px solid var(--line); box-shadow: 0 24px 50px -28px rgba(0, 0, 0, .35); overflow: hidden; }
+.pk-bar { display: flex; align-items: center; gap: 6px; padding: 10px 14px; border-bottom: 1px solid var(--line); font-size: 12px; color: var(--muted); }
+.pk-bar i { width: 9px; height: 9px; border-radius: 50%; background: var(--line); }
+.pk-bar i:first-child { background: #f28b82; } .pk-bar i:nth-child(2) { background: #f7c66b; } .pk-bar i:nth-child(3) { background: #7fd1a8; }
+.pk-bar span { margin-left: 8px; font-weight: 600; }
+.pk-body { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px; align-items: center; padding: 18px; }
+.pk-ring { position: relative; width: 132px; height: 132px; }
+.pk-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.pk-tr { fill: none; stroke: var(--line); stroke-width: 8; }
+.pk-arc { fill: none; stroke: var(--accent); stroke-width: 8; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 26; }
+.pk-time { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
+.pk-time b { font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: .01em; }
+.pk-time span { font-size: 11px; color: var(--muted); }
+.pk-side { display: grid; gap: 12px; min-width: 0; }
+.pk-stat { display: flex; align-items: center; gap: 8px; }
+.pk-ic { font-size: 20px; }
+.pk-stat b { display: block; font-size: 15px; }
+.pk-stat small { color: var(--muted); font-size: 11.5px; }
+.pk-bars { display: flex; align-items: flex-end; gap: 5px; height: 46px; }
+.pk-bars i { flex: 1; height: var(--h); border-radius: 4px 4px 2px 2px; background: color-mix(in srgb, var(--accent) 70%, transparent); transform-origin: bottom; }
+.pk-boss { display: grid; gap: 5px; font-size: 12px; color: var(--muted); }
+.pk-hp { display: block; height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.pk-hp i { display: block; height: 100%; width: 64%; border-radius: inherit; background: linear-gradient(90deg, #e5654f, #f2a03d); }
+.pk-chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.pk-chips li { padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); font-size: 13px; white-space: nowrap; }
+:root[data-motion="full"] .pk-arc { animation: pkArc 9s linear infinite; }
+:root[data-motion="full"] .pk-bars i { animation: pkBar 3.2s var(--ease) infinite alternate; }
+:root[data-motion="full"] .pk-bars i:nth-child(2n) { animation-delay: .4s; } :root[data-motion="full"] .pk-bars i:nth-child(3n) { animation-delay: .8s; }
+:root[data-motion="full"] .pk-hp i { animation: pkHp 7s var(--ease) infinite; }
+@keyframes pkArc { from { stroke-dashoffset: 8; } to { stroke-dashoffset: 92; } }
+@keyframes pkBar { from { transform: scaleY(.55); } to { transform: scaleY(1); } }
+@keyframes pkHp { 0% { width: 88%; } 80%, 100% { width: 22%; } }
+@media (prefers-reduced-motion: reduce) { :is(.pk-arc, .pk-bars i, .pk-hp i) { animation: none !important; } }
+/* the card: hidden until asked for */
+.lp-auth { display: none; }
+.auth-card { position: relative; }
+.auth-close { position: absolute; top: 10px; right: 10px; width: 36px; height: 36px; min-height: 0; z-index: 2; }
+.lp-auth .auth-card .auth-tabs { width: auto; margin-right: 46px; }
+.lp-scrim { position: fixed; inset: 0; z-index: 69; background: rgba(10, 14, 20, .45); opacity: 0; pointer-events: none; transition: opacity .24s var(--ease); }
+@media (min-width: 900px) {
+  .lp.auth-open .lp-peek { display: none; }
+  .lp.auth-open .lp-auth { display: block; }
+  :root:not([data-motion="off"]) .lp.auth-open .lp-auth { animation: lpIn .45s var(--ease) both; }
+  .lp-scrim { display: none; }
+}
+@media (max-width: 899px) {
+  .lp-auth { display: block; position: fixed; z-index: 70; visibility: hidden; transition: transform .3s var(--ease), opacity .24s var(--ease), visibility 0s linear .3s; }
+  .lp.auth-open .lp-auth { visibility: visible; transition: transform .3s var(--ease), opacity .24s var(--ease); }
+  .lp.auth-open .lp-scrim { opacity: 1; pointer-events: auto; }
+  .lp-auth .auth-card { max-width: none; box-shadow: 0 30px 60px -20px rgba(0, 0, 0, .45); }
+  :root.lp-modal, :root.lp-modal body { overflow: hidden; }
+}
+/* tablets: a window in the middle */
+@media (min-width: 641px) and (max-width: 899px) {
+  .lp-auth { left: 50%; top: 50%; width: min(440px, calc(100vw - 40px)); max-height: calc(100dvh - 40px); overflow-y: auto; transform: translate(-50%, -46%); opacity: 0; border-radius: var(--radius); }
+  .lp.auth-open .lp-auth { transform: translate(-50%, -50%); opacity: 1; }
+}
+/* phones: a sheet from the bottom */
+@media (max-width: 640px) {
+  .lp-auth { left: 0; right: 0; bottom: 0; max-height: 92dvh; overflow-y: auto; overscroll-behavior: contain; transform: translateY(104%); }
+  .lp.auth-open .lp-auth { transform: none; }
+  .lp-auth .auth-card { border-radius: 22px 22px 0 0; border-bottom: 0; padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
+  .lp-cta .btn { flex: 1 1 100%; }
+  .lp-cta .lp-guest { flex-basis: auto; margin: 0 auto; }
+  .pk-body { grid-template-columns: 1fr; justify-items: center; }
+  .pk-side { width: 100%; }
+}
+:root[data-motion="off"] :is(.lp-auth, .lp-scrim) { transition: none !important; }
+:root[data-glass] .pk-win { background-color: color-mix(in srgb, var(--surface) 55%, transparent); border-color: var(--glass-edge); }
+@media (max-width: 899px) { :root[data-glass] .lp-auth .auth-card { background-color: color-mix(in srgb, var(--surface) 94%, transparent); } }
+:root[data-minimal] .pk-boss { display: none; }
+/* Monthly raid (v1.14.3) */
+.rc-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.rc-tier { font-size: 11.5px; font-weight: 700; padding: 2px 9px; border-radius: 999px; color: var(--tc); background: color-mix(in srgb, var(--tc) 14%, transparent); white-space: nowrap; }
+.rc-line { margin: 6px 0 0; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.rc-scale { margin: 10px 0 0; }
+.rc-reward { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-top: 8px; font-size: 13px; color: var(--muted); }
+.rc-rar { color: var(--rc); }
+.rc-rally { font-size: 12px; font-weight: 600; padding: 2px 9px; border-radius: 999px; border: 1px dashed var(--line); }
+.rc-rally.on { border-style: solid; border-color: #d9a514; color: #a07a08; background: color-mix(in srgb, #f2c14e 16%, transparent); }
+:root[data-theme="dark"] .rc-rally.on { color: #f2c14e; }
+.rc-more { margin-top: 10px; }
+.rc-more summary { cursor: pointer; font-weight: 600; font-size: 14px; min-height: 44px; display: flex; align-items: center; gap: 6px; }
+.rc-list { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 6px; }
+.rc-row { display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(50px, 30%) auto; align-items: center; gap: 8px; font-size: 14px; }
+.rc-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rc-bar { height: 7px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.rc-bar i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--ra, var(--accent)), var(--rb, var(--accent))); }
+.rc-row .v { font-variant-numeric: tabular-nums; font-size: 13px; color: var(--muted); }
+.rc-next { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); }
+.rc-next ul { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 6px; }
+.rc-next li { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13.5px; }
+.rc-mon { width: 34px; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+.ctro.rallied { box-shadow: 0 0 0 2px #f2c14e inset; }
+:root[data-minimal] .rc-rally, :root[data-minimal] .rc-next { display: none; }
+@media (max-width: 480px) { .rc-row { grid-template-columns: auto minmax(0, 1fr) auto; } .rc-row .rc-bar { display: none; } }
 </style>
 </head>
 <body>
@@ -2889,11 +3080,58 @@ body.first-load #todayBar { opacity: 0; }
 
 <!-- ================================ LOGIN / SIGN UP ================================ -->
 <section class="auth lp hidden" id="authView">
+  <div class="lp-scrim" id="lpScrim" aria-hidden="true"></div>
   <div class="lp-top">
     <div class="lp-wrap">
+      <div class="lp-auth" id="lpAuth">
+        <div class="card auth-card" id="authCard" role="dialog" aria-modal="false" aria-labelledby="authLead">
+          <button type="button" class="iconbtn auth-close" id="authClose" aria-label="Close">✕</button>
+          <div class="seg auth-tabs" id="authSeg" role="tablist" aria-label="Sign up or log in">
+            <button type="button" role="tab" data-mode="signup">Sign up</button>
+            <button type="button" role="tab" data-mode="login">Log in</button>
+          </div>
+          <p class="lead" id="authLead">Keep your sessions, streaks and stats in sync on every device.</p>
+          <form class="auth-form" id="authForm" novalidate>
+            <label class="field" for="authUser">Username</label>
+            <input type="text" id="authUser" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="20" required aria-describedby="userHint">
+            <div class="hint" id="userHint" aria-live="polite">3–20 characters: letters, numbers or _ (not case-sensitive)</div>
+
+            <label class="field" for="authPass">Password</label>
+            <div class="pw">
+              <input type="password" id="authPass" autocomplete="current-password" minlength="6" required aria-describedby="pwHint">
+              <button type="button" data-toggle="authPass" aria-label="Show password">Show</button>
+            </div>
+            <div class="pw-meter hidden" id="pwMeter" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+            <div class="hint" id="pwHint" aria-live="polite"></div>
+
+            <div id="confirmWrap" class="hidden">
+              <label class="field" for="authPass2">Confirm password</label>
+              <div class="pw">
+                <input type="password" id="authPass2" autocomplete="new-password" minlength="6" aria-describedby="pw2Hint">
+                <button type="button" data-toggle="authPass2" aria-label="Show password">Show</button>
+              </div>
+              <div class="hint" id="pw2Hint" aria-live="polite"></div>
+              <p class="pw-warn" id="pwWarn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20Z"/><path d="M12 10v4M12 17h.01"/></svg>There’s no password reset yet, so pick one you’ll remember.</p>
+            </div>
+
+            <label class="stay"><input type="checkbox" id="authStay" checked> Stay logged in on this device</label>
+            <div class="auth-error" id="authError" role="alert" aria-live="polite"></div>
+            <button type="submit" class="btn primary" id="authSubmit">Log in</button>
+          </form>
+          <div class="auth-or"><span>or</span></div>
+          <div class="auth-foot">
+            <button class="btn" type="button" data-guest>Continue without an account</button>
+            <p class="hint">Saved only on this device: no sync, friends or leaderboards. You can create an account later and bring your sessions along.</p>
+          </div>
+          <div class="auth-warn hidden" id="configWarn">
+            <b>Firebase isn’t set up yet.</b> Paste your <code>firebaseConfig</code> into the
+            “FIREBASE CONFIG” section near the top of the script in <code>index.html</code>.
+          </div>
+        </div>
+      </div>
+      <div class="lp-bar"><div class="auth-brand"><i></i>Pomodorolist</div><button type="button" class="btn lp-login" id="lpLoginTop" data-mode="login">Log in</button></div>
       <div class="lp-hero">
-        <div class="auth-brand"><i></i>Pomodorolist</div>
-        <div class="lp-greet" aria-hidden="true"><span class="lp-pomeo" id="lpPomeo"></span><span class="lp-wave">👋</span><span class="lp-hi">Hi, I’m Pomeo!</span></div>
+        <div class="lp-greet" aria-hidden="true"><span class="lp-pomeo" id="lpPomeo"></span><span class="lp-wave">👋</span><span class="lp-hi" id="lpHi">Hi, I’m Pomeo!</span></div>
         <h1 class="lp-h1">Focus that feels like progress.</h1>
         <p class="lp-sub">Create a free account: no ads, no tracking, no subscription.</p>
         <ul class="lp-badges" aria-label="What you get">
@@ -2902,61 +3140,36 @@ body.first-load #todayBar { opacity: 0; }
           <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17 19 7.5"/></svg>No tracking</li>
         </ul>
         <div class="lp-cta">
-          <button type="button" class="btn lp-preview" id="previewBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5 12 5s9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z"/><circle cx="12" cy="12" r="3"/></svg>Preview the app</button>
-          <span class="lp-cta-note">Look around a demo account first. Nothing is saved.</span>
+          <button type="button" class="btn primary lp-back-only" id="lpLoginHero" data-mode="login">Log in</button>
+          <button type="button" class="btn primary lp-preview" id="previewBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5 12 5s9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7Z"/><circle cx="12" cy="12" r="3"/></svg>Preview the app</button>
+          <button type="button" class="btn lp-create" data-mode="signup">Create free account</button>
+          <button type="button" class="btn lp-guest" id="guestBtn" data-guest>Continue without an account</button>
         </div>
-        <div class="lp-look" aria-label="Try a look">
+        <p class="lp-cta-note" id="lpCtaNote">Preview looks around a demo account (nothing is saved). Without an account, everything stays on this device.</p>
+        <p class="lp-alert hidden" id="lpAlert" role="alert"></p>
+      </div>
+      <div class="lp-peek" role="img" aria-label="A peek at Pomodorolist: a focus timer counting down, a 12-day streak, a week of focus and the weekly boss">
+        <div class="pk-win" aria-hidden="true">
+          <div class="pk-bar"><i></i><i></i><i></i><span>Pomodorolist</span></div>
+          <div class="pk-body">
+            <div class="pk-ring"><svg viewBox="0 0 120 120"><circle class="pk-tr" cx="60" cy="60" r="50"/><circle class="pk-arc" cx="60" cy="60" r="50" pathLength="100"/></svg>
+              <div class="pk-time"><b id="pkTime">18:42</b><span>Physics · Focus</span></div></div>
+            <div class="pk-side">
+              <div class="pk-stat"><span class="pk-ic">🔥</span><span><b>12 days</b><small>streak</small></span></div>
+              <div class="pk-bars"><i style="--h:38%"></i><i style="--h:62%"></i><i style="--h:45%"></i><i style="--h:80%"></i><i style="--h:54%"></i><i style="--h:92%"></i><i style="--h:70%"></i></div>
+              <div class="pk-boss"><span>⚔️ Weekly boss</span><span class="pk-hp"><i></i></span></div>
+            </div>
+          </div>
+        </div>
+        <ul class="pk-chips" aria-hidden="true"><li>⏱️ Focus timer</li><li>📊 Stats &amp; streaks</li><li>🌱 Tomato garden</li><li>⚔️ Boss battles</li><li>🛡️ Clans</li><li>🔔 Reminders</li></ul>
+      </div>
+      <div class="lp-look" aria-label="Try a look">
           <span class="lbl">Try a look</span>
           <div class="lp-swatches" id="lpSwatches" role="radiogroup" aria-label="Theme"></div>
           <div class="seg lp-gl" id="lpGlass" role="radiogroup" aria-label="Glossed Interface">
             <button type="button" data-lpgl="off">Plain</button><button type="button" data-lpgl="lite">Glossed</button><button type="button" data-lpgl="full">Extra glossy</button>
           </div>
         </div>
-      </div>
-
-      <div class="card auth-card" id="authCard">
-        <div class="seg auth-tabs" id="authSeg" role="tablist" aria-label="Sign up or log in">
-          <button type="button" role="tab" data-mode="signup">Sign up</button>
-          <button type="button" role="tab" data-mode="login">Log in</button>
-        </div>
-        <p class="lead" id="authLead">Keep your sessions, streaks and stats in sync on every device.</p>
-        <form class="auth-form" id="authForm" novalidate>
-          <label class="field" for="authUser">Username</label>
-          <input type="text" id="authUser" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="20" required aria-describedby="userHint">
-          <div class="hint" id="userHint" aria-live="polite">3–20 characters: letters, numbers or _ (not case-sensitive)</div>
-
-          <label class="field" for="authPass">Password</label>
-          <div class="pw">
-            <input type="password" id="authPass" autocomplete="current-password" minlength="6" required aria-describedby="pwHint">
-            <button type="button" data-toggle="authPass" aria-label="Show password">Show</button>
-          </div>
-          <div class="pw-meter hidden" id="pwMeter" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-          <div class="hint" id="pwHint" aria-live="polite"></div>
-
-          <div id="confirmWrap" class="hidden">
-            <label class="field" for="authPass2">Confirm password</label>
-            <div class="pw">
-              <input type="password" id="authPass2" autocomplete="new-password" minlength="6" aria-describedby="pw2Hint">
-              <button type="button" data-toggle="authPass2" aria-label="Show password">Show</button>
-            </div>
-            <div class="hint" id="pw2Hint" aria-live="polite"></div>
-            <p class="pw-warn" id="pwWarn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20Z"/><path d="M12 10v4M12 17h.01"/></svg>There’s no password reset yet, so pick one you’ll remember.</p>
-          </div>
-
-          <label class="stay"><input type="checkbox" id="authStay" checked> Stay logged in on this device</label>
-          <div class="auth-error" id="authError" role="alert" aria-live="polite"></div>
-          <button type="submit" class="btn primary" id="authSubmit">Log in</button>
-        </form>
-        <div class="auth-or"><span>or</span></div>
-        <div class="auth-foot">
-          <button class="btn" id="guestBtn" type="button">Continue without an account</button>
-          <p class="hint">Saved only on this device: no sync, friends or leaderboards. You can create an account later and bring your sessions along.</p>
-        </div>
-        <div class="auth-warn hidden" id="configWarn">
-          <b>Firebase isn’t set up yet.</b> Paste your <code>firebaseConfig</code> into the
-          “FIREBASE CONFIG” section near the top of the script in <code>index.html</code>.
-        </div>
-      </div>
     </div>
     <a class="lp-more-link" href="#lpFeatures">See what’s inside <span aria-hidden="true">↓</span></a>
   </div>
@@ -3000,21 +3213,12 @@ body.first-load #todayBar { opacity: 0; }
 <div id="appView" class="hidden">
 <div class="pv-banner hidden" id="pvBanner" role="region" aria-label="Preview mode"><span><b>You’re previewing a demo account.</b><span class="pv-long"> Create your own: all free, no ads, no tracking.</span></span><span class="btn-row" style="gap:8px;flex-wrap:nowrap"><button type="button" class="btn pv-go">Create account</button><button type="button" class="btn pv-exit">Exit preview</button></span></div>
 <header class="top">
-  <div class="row" style="gap:4px">
+  <div class="row hdr-left" style="gap:4px">
+    <button class="iconbtn nav-burger" id="navBurger" type="button" aria-label="Menu" aria-controls="tabs" aria-expanded="false" title="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><i class="tbadge hidden" id="navBurgerDot" aria-label="Something new in the menu"></i></button>
     <div class="brand"><i></i><span>Pomodorolist</span></div>
+    <span class="nav-cur" id="navCur" aria-hidden="true"></span>
     <span class="sync" id="syncStatus" title="Cloud sync status"><i></i><b>Synced</b></span>
   </div>
-  <nav class="tabs" id="tabs" aria-label="Main">
-    <button data-tab="timer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2h4"/><path d="M12 14l3-3"/><circle cx="12" cy="14" r="8"/></svg><span>Timer</span></button>
-    <button data-tab="reminders" id="remTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span>Reminders</span></button>
-    <button data-tab="quests" id="questTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 17.5 3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 21l2-2"/><path d="M14.5 6.5 18 3h3v3l-3.5 3.5"/><path d="M5 14l4 4"/><path d="M7 17l-3 3"/><path d="M3 19l2 2"/></svg><span>Quests</span><i class="tbadge hidden" id="questDot" aria-label="Rewards to claim"></i></button>
-    <button data-tab="stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg><span>Stats</span></button>
-    <button data-tab="board" id="boardTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg><span class="lf">Leaderboard</span><span class="ls">Ranks</span></button>
-    <button data-tab="shop" id="shopTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><span>Shop</span></button>
-    <button data-tab="friends"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Friends</span><i class="tbadge hidden" id="friendsBadge" aria-label="New activity"></i></button>
-    <button data-tab="clan" id="clanTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="M9 12l2 2 4-4"/></svg><span>Clan</span><i class="tbadge hidden" id="clanDot" aria-label="Clan activity"></i></button>
-    <button data-tab="profile" id="profileTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.66V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.66"/></svg><span>Profile</span><i class="tbadge hidden" id="profileDot" aria-label="Daily reward ready"></i></button>
-  </nav>
   <div class="hdr-right">
     <button class="iconbtn" id="cmdBtn" aria-label="Search and commands (Ctrl+K)" title="Search &amp; commands (Ctrl/⌘ K)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
     <button class="iconbtn" id="inboxBtn" aria-label="Inbox" title="Inbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span class="hdr-count hidden" id="inboxCount" aria-hidden="true"></span></button>
@@ -3024,7 +3228,28 @@ body.first-load #todayBar { opacity: 0; }
     <button class="iconbtn hidden" id="avatarBtn" aria-label="Profile and settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.66V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.66"/></svg></button>
   </div>
 </header>
-
+<div class="shell" id="shell">
+<nav class="sidenav" id="tabs" aria-label="Main">
+  <div class="nv-top"><div class="brand"><i></i><span>Pomodorolist</span></div><button class="iconbtn" id="navClose" type="button" aria-label="Close the menu">✕</button></div>
+  <div class="nv-grp" role="group" aria-labelledby="nvhFocus"><div class="nv-h" id="nvhFocus">Focus</div>
+    <button type="button" title="Timer (1)" data-tab="timer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2h4"/><path d="M12 14l3-3"/><circle cx="12" cy="14" r="8"/></svg><span class="nv-l">Timer</span></button>
+    <button type="button" title="Reminders (2)" data-tab="reminders" id="remTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span class="nv-l">Reminders</span></button>
+  </div>
+  <div class="nv-grp" role="group" aria-labelledby="nvhProgress"><div class="nv-h" id="nvhProgress">Progress</div>
+    <button type="button" title="Stats (4)" data-tab="stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg><span class="nv-l">Stats</span></button>
+    <button type="button" title="Quests (3)" data-tab="quests" id="questTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 17.5 3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 21l2-2"/><path d="M14.5 6.5 18 3h3v3l-3.5 3.5"/><path d="M5 14l4 4"/><path d="M7 17l-3 3"/><path d="M3 19l2 2"/></svg><span class="nv-l">Quests</span><i class="tbadge hidden" id="questDot" aria-label="Rewards to claim"></i></button>
+    <button type="button" title="Profile (8)" data-tab="profile" id="profileTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.66V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.66"/></svg><span class="nv-l">Profile</span><i class="tbadge hidden" id="profileDot" aria-label="Daily reward ready"></i></button>
+  </div>
+  <div class="nv-grp" role="group" aria-labelledby="nvhSocial"><div class="nv-h" id="nvhSocial">Social</div>
+    <button type="button" title="Friends (7)" data-tab="friends"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nv-l">Friends</span><i class="tbadge hidden" id="friendsBadge" aria-label="New activity"></i></button>
+    <button type="button" title="Clan (9)" data-tab="clan" id="clanTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="M9 12l2 2 4-4"/></svg><span class="nv-l">Clan</span><i class="tbadge hidden" id="clanDot" aria-label="Clan activity"></i></button>
+    <button type="button" title="Leaderboard (5)" data-tab="board" id="boardTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg><span class="nv-l">Leaderboard</span></button>
+  </div>
+  <div class="nv-grp nv-solo" role="group" aria-label="Shop">
+    <button type="button" title="Shop (6)" data-tab="shop" id="shopTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><span class="nv-l">Shop</span></button>
+  </div>
+  <div class="nv-foot"><button class="nv-collapse" id="navCollapse" type="button" aria-expanded="true" aria-label="Collapse the sidebar" title="Collapse the sidebar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9 4v16"/><path d="m15 10-2 2 2 2"/></svg><span class="nv-l">Collapse</span></button></div>
+</nav>
 <main>
   <!-- ================================ TIMER TAB ================================ -->
   <section class="tab" id="tab-timer">
@@ -3406,7 +3631,7 @@ body.first-load #todayBar { opacity: 0; }
           </div>
           <div class="setting" data-k="invite link friend code share">
             <div><div>Invite link</div><div class="desc" id="inviteDesc"></div></div>
-            <button class="btn small" id="copyInvite">Share</button>
+            <span class="btn-row" style="gap:6px;flex-wrap:nowrap"><button class="btn small" id="copyInvite">Copy</button><button class="btn small hidden" id="shareInvite2" data-native-share>Share</button></span>
           </div>
           <div id="blockedList"></div>
         </div>
@@ -3479,6 +3704,16 @@ body.first-load #todayBar { opacity: 0; }
   </section>
 </main>
 </div>
+<nav class="tabs btmbar" id="btmBar" aria-label="Main sections">
+  <button type="button" data-tab="timer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2h4"/><path d="M12 14l3-3"/><circle cx="12" cy="14" r="8"/></svg><span>Timer</span></button>
+  <button type="button" data-tab="reminders"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span>Reminders</span></button>
+  <button type="button" data-tab="quests"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 17.5 3 6V3h3l11.5 11.5"/><path d="M13 19l6-6"/><path d="M16 16l4 4"/><path d="M19 21l2-2"/><path d="M14.5 6.5 18 3h3v3l-3.5 3.5"/><path d="M5 14l4 4"/><path d="M7 17l-3 3"/><path d="M3 19l2 2"/></svg><span>Quests</span><i class="tbadge hidden" data-dot="questDot" aria-hidden="true"></i></button>
+  <button type="button" data-tab="stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg><span>Stats</span></button>
+  <button type="button" data-tab="clan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="M9 12l2 2 4-4"/></svg><span>Clan</span><i class="tbadge hidden" data-dot="clanDot" aria-hidden="true"></i></button>
+  <button type="button" id="navMore" aria-controls="tabs" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg><span>More</span><i class="tbadge hidden" id="navMoreDot" aria-label="Something new under More"></i></button>
+</nav>
+<div class="nav-scrim" id="navScrim" aria-hidden="true"></div>
+</div>
 
 <!-- Reminder editor -->
 <dialog id="clanCreateDlg" class="clan-dlg" aria-labelledby="ccTitle">
@@ -3503,8 +3738,8 @@ body.first-load #todayBar { opacity: 0; }
 <dialog id="clanInviteDlg" class="clan-dlg" aria-labelledby="ciTitle">
   <h2 id="ciTitle">Invite to your clan</h2>
   <p class="lbl" style="margin:0">Share the code or the link. <span id="ciMode"></span></p>
-  <div class="ci-code" id="ciCode"></div>
-  <div class="row" style="gap:8px"><input type="text" id="ciLink" readonly aria-label="Invite link" style="flex:1;min-width:0"><button class="btn" id="ciCopy" type="button">Copy</button></div>
+  <div class="ci-coderow"><div class="ci-code" id="ciCode"></div><button class="btn small" id="ciCodeCopy" type="button">Copy code</button></div>
+  <div class="row copy-row" style="gap:8px"><input type="text" id="ciLink" readonly data-copyfield aria-label="Invite link" style="flex:1;min-width:0"><button class="btn" id="ciCopy" type="button">Copy</button><button class="btn hidden" id="ciShare" type="button" data-native-share>Share</button></div>
   <div class="btn-row" style="justify-content:space-between;margin-top:14px"><button class="btn small" id="ciRegen" type="button">New code</button><button class="btn" id="ciClose" type="button">Done</button></div>
 </dialog>
 <dialog id="clanShopDlg" class="clan-dlg cshop-dlg" aria-labelledby="csTitle">
@@ -3750,7 +3985,7 @@ body.first-load #todayBar { opacity: 0; }
   <div class="seg" id="shSize" role="group" aria-label="Image size"><button data-shsize="square" class="active">Square</button><button data-shsize="story">Story 9:16</button></div>
   <div class="sh-row"><button class="btn primary" id="shSave">Save as image</button><button class="btn" id="shNative">Share…</button></div>
   <label class="lbl" for="shUrl">Link to a read-only copy of your card</label>
-  <div class="sh-link"><input type="text" id="shUrl" readonly><button class="btn" id="shCopy">Copy</button><button class="btn" id="shLink">Share link</button></div>
+  <div class="sh-link"><input type="text" id="shUrl" readonly data-copyfield aria-label="Card link"><button class="btn" id="shCopy">Copy</button><button class="btn hidden" id="shLink" data-native-share>Share link</button></div>
   <p class="lbl" style="margin:0 0 12px">The image and the link hold only what your card shows (change it in Customise) — never notes, reminders or your email. The link is a snapshot: it doesn’t update.</p>
   <div class="btn-row" style="justify-content:flex-end"><button class="btn" id="shClose">Close</button></div>
 </dialog>
@@ -3824,6 +4059,84 @@ const FIREBASE_VERSION = '10.12.2';
 const USERNAME_DOMAIN = 'pomodorolist.app';
 // Developer testing only: open index.html?emulator=1 to use the local Firebase emulators.
 const USE_EMULATOR = /[?&]emulator=1\b/.test(location.search);
+
+/* ==========================================================================
+   TABLE OF CONTENTS — the sections of this script, in file order. Each one
+   starts with a banner comment like this one; search for its heading text.
+    1. SMALL UTILITIES
+    2. MOTION — animations and micro-interactions
+    3. STATE
+    4. FIREBASE: loading, auth, Firestore sync
+    5. SESSION START / LOGIN / LOGOUT
+    6. MIGRATION + MERGING (old device data, JSON import)
+    7. NAMES (colour + tag per session name)
+    8. SOUND + NOTIFICATIONS
+    9. TIMER ENGINE
+   10. RECENT + PINNED CHIPS
+   11. AGGREGATION + STREAKS (always derived from the synced session log)
+   12. RENDER: TIMER TAB
+   13. RENDER: STATS TAB (hand-drawn SVG charts, no dependencies)
+   14. RENDER: SETTINGS
+   15. PRESET MANAGER
+   16. PROGRESSION — XP, LEVELS, TIERS, COINS, ACHIEVEMENTS
+   17. AUDIO — end sounds, start cue and ambient sound, all generated with Web Audio
+   18. VISUAL COSMETICS — themes, ring styles, fonts, effects, live tab icon
+   19. RENDER — header chip, Progress page, Shop, level-up moment
+   20. SOCIAL — public profile, friends, leaderboards, kudos, nudges, challenges
+   21. RENDER — Friends tab (friends · leaderboard · challenges), friend profile
+   22. MASTER RENDER + TABS
+   23. POMEO — the tomato buddy
+   24. REMINDERS
+   25. GLOSSED INTERFACE — a per-device look (like Animations): off | lite | full
+   26. SMALL EXTRAS — tip of the day, session notes, today summary
+   27. QUESTS — a weekly boss (Monday–Sunday, local time) in a fixed 10-week cycle,
+   28. AURA — a glow around the badge. Automatic from the current streak, unless a
+   29. DAILY LOGIN REWARDS — a 7-day cycle; a missed day starts it again.
+   30. SPACED REVISION — topics come back after 1, 3, 7, 21, 45 days (editable).
+   31. EXAM COUNTDOWN — S.exams [{ id, name, date 'YYYY-MM-DD', added }]
+   32. DISTRACTION PARKING LOT — jot a thought without stopping the timer.
+   33. TOMATO GARDEN — one plant per focus session (separate from Pomeo).
+   34. WRAPPED — monthly (previous month, from the 1st) and yearly (from Dec 20)
+   35. KEYBOARD SHORTCUTS (desktop). Off while typing, and switchable in Settings.
+   36. SUBTASKS — an optional checklist for the current focus session.
+   37. INTERFACE SOUNDS — small, soft UI sounds, all made with Web Audio.
+   38. VISUAL POLISH — cursor glow, tilt and magnetic buttons (mouse + Full
+   39. INBOX / NOTIFICATION CENTRE — last 100 items, on this device.
+   40. WHAT'S NEW + ABOUT
+   41. SETTINGS SEARCH
+   42. COMMAND PALETTE — Ctrl/⌘ K (or the search button)
+   43. OFFLINE BANNER + QUIET SYNC RETRY
+   44. PHONES: pull to refresh, swipe between tabs, swipe-to-dismiss helper
+   45. PROFILE PICTURES — pre-made avatars (no uploads), drawn on a 24×24 grid.
+   46. REWARD LOOKS — the art and styles behind boss and questline rewards, added to
+   47. TRUE MINIMALIST — one switch (the old "Progression" setting, inverted).
+   48. CONTACT
+   49. ONBOARDING TUTORIAL WITH POMEO (replaces the old spotlight tour)
+   50. ENERGY CHECK-IN — "How focused did you feel?" after a session.
+   51. WELCOME PAGE — pitch, sign-up/log-in card, features, comparison, FAQ.
+   52. PREVIEW — a read-only demo account ("demo_scholar") built from sample data
+   53. POMEO EMPTY STATES — small scenes drawn around the usual Pomeo:
+   54. QUESTLINE — a Pomeo event each month or season (EVENTS). Progress is worked
+   55. BAG — everything you own, in one place (the bag button next to the inbox).
+   56. FOCUS ATMOSPHERE + RIPENING RING
+   57. SYNC MERGE — lists of items (reminders, revision plans, exams, parked thoughts,
+   58. EVENTS
+   59. TICK LOOP + MIDNIGHT HANDLING
+   60. INIT
+   61. COMPLETION STAMPS — when a focus block completes, the equipped stamp lands on
+   62. TIME-OF-DAY BACKGROUND — a very faint sky behind the app that follows the
+   63. PLAYER CARD — a game-style card at the top of the Profile page: banner, badge
+   64. FOCUS GUARD — nothing interrupts a focus block. While one is running or
+   65. INTRO — the first time this device opens the welcome page (nobody signed in,
+   66. TO-DO LIST — the second view of the Reminders tab. S.todos (synced item by
+   67. CLANS — the app's study-group system (also called study groups / crews).
+   68. MONTHLY RAID (v1.14.3). From November 2026 every month has its own raid boss
+   69. LIVE CLAN SESSIONS — one shared timer, computed from timestamps.
+   70. LOOKS (v1.14.1) — one picture and one name for a person, the same everywhere:
+   71. FOCUS TOGETHER (v1.14.2) — the default kind of clan session. Everyone runs
+   72. COPY AND SHARE (v1.14.3). Every Copy button goes through copyText: the
+   73. NAVIGATION (v1.14.3). One list of sections (#tabs), shown three ways:
+   ========================================================================== */
 
 /* ==========================================================================
    SMALL UTILITIES
@@ -4668,7 +4981,7 @@ function startSession(user, cloud, early = false) {
   if (USER && !USER.guest && user.uid && USER.uid === user.uid) { if (cloud && !cloudStarted) startCloud(); return; }
   USER = user;
   if (!user.preview) applyGlass();   // the welcome page's look preview is not kept
-  if (!user.guest) writeLS(LAST_USER, user);
+  if (!user.guest) { writeLS(LAST_USER, user); writeLS(BEEN_KEY, '1'); }
   const stored = readJSON(user.guest ? LEGACY_KEY : cacheKey(user.uid), null);
   firstUseHere = !stored;   // nothing saved on this device yet for this user
   S = hydrate(stored);
@@ -4716,7 +5029,14 @@ function showAuth() {
   showView('authView');
   initLanding();
   playIntro();   // first visit on this device only
-  if (!lpModeSet) { lpModeSet = true; const fromLink = /^#(signup|login)$/.test(location.hash); authMode = defaultAuthMode(); if (fromLink && authMode === 'signup') setTimeout(lpGoSignup, 400); }
+  lpSetup();
+  if (!lpModeSet) {
+    lpModeSet = true;
+    const fromLink = /^#(signup|login)$/.test(location.hash);
+    authMode = defaultAuthMode();
+    if (fromLink) setTimeout(() => lpOpenAuth(authMode), 400);                  // a link asked for sign-up or log-in
+    else if (lpReturning() && lpWide()) lpOpenAuth('login', false);            // back on a computer: the log-in card is ready
+  }
   setAuthMode(authMode);
   $('#configWarn').classList.toggle('hidden', firebaseConfigured());
   if (fbLoadError) authErr(fbLoadError);
@@ -6263,7 +6583,23 @@ const RAID_BOSSES = [
   { id: 'titan', name: 'Burnout Titan', art: 'golem', a: '#8a6fd1', b: '#4b2e83', lore: 'It grows when nobody rests. Steady focus — with breaks — brings it down.' },
   { id: 'leviathan', name: 'Doomscroll Leviathan', art: 'kraken', a: '#1f9e8f', b: '#14544b', lore: 'Endless feeds are its ocean. Every focus minute drains a wave.' },
   { id: 'colossus', name: 'Cram Colossus', art: 'dragon', a: '#e2552f', b: '#7a2414', lore: 'Feeds on last-night cramming. Beat it with a month of calm study.' },
+  // From November 2026 (v1.14.3): one boss per month, each with a tier and an HP range for 1 → 30 members
+  { id: 'behemoth', name: 'Burnout Behemoth', short: 'Behemoth', art: 'golem', a: '#8b78e6', b: '#3d2a7a', tier: 'hard', min: 7000, max: 9300, lore: 'It feeds on all-nighters and skipped breaks. Steady focus with real rests wears it down.' },
+  { id: 'wyrm', name: 'Frostbite Wyrm', short: 'Wyrm', art: 'dragon', a: '#6cc4f0', b: '#1d4f7a', tier: 'elite', min: 7500, max: 10000, lore: 'The cold month’s dragon freezes plans in place. Every focus minute thaws a scale.' },
+  { id: 'hydra', name: 'Resolution Hydra', short: 'Hydra', art: 'hydra', a: '#5fc495', b: '#1f5e44', tier: 'easy', min: 5000, max: 6000, lore: 'Cut one excuse and two grow back — unless the whole clan keeps cutting.' },
+  { id: 'phantom', name: 'Distraction Phantom', short: 'Phantom', art: 'phantom', a: '#a99be0', b: '#3b3166', tier: 'normal', min: 6500, max: 8500, lore: 'It whispers “just one quick check”. Focus blocks make it fade.' },
+  { id: 'swarm', name: 'Notification Swarm', short: 'Swarm', art: 'swarm', a: '#f2bb4a', b: '#7a4a0e', tier: 'elite', min: 8000, max: 10000, lore: 'A thousand tiny pings. Only a month of shared, silent focus clears the air.' },
+  { id: 'goblin', name: 'Snooze Goblin', short: 'Goblin', art: 'goblin', a: '#94c95a', b: '#3d5f1c', tier: 'easy', min: 5000, max: 6000, lore: 'It hits snooze for you. Early sessions send it running.' },
+  { id: 'sloth', name: 'Exam-Eve Sloth', short: 'Sloth', art: 'sloth', a: '#c9a873', b: '#5e4523', tier: 'hard', min: 7000, max: 9300, lore: 'It waits until the night before. Beat it with study spread across the month.' },
+  { id: 'kraken', name: 'Doomscroll Kraken', short: 'Kraken', art: 'kraken', a: '#33bfae', b: '#0f5249', tier: 'normal', min: 6500, max: 8500, lore: 'Its arms are endless feeds. Each focus minute pulls one back under.' },
+  { id: 'wizard', name: 'Overthink Wizard', short: 'Wizard', art: 'wizard', a: '#7896f2', b: '#25397a', tier: 'easy', min: 5000, max: 6000, lore: 'It spins plans about plans. Starting a timer breaks the spell.' },
+  { id: 'gremlin', name: 'Gadget Gremlin', short: 'Gremlin', art: 'gremlin', a: '#e8846a', b: '#6e2a18', tier: 'normal', min: 6000, max: 8000, lore: 'It tinkers with your apps and settings so you don’t touch your work.' },
+  { id: 'tyrant', name: 'Hundred-Tab Tyrant', short: 'Tyrant', art: 'tab', a: '#ea6c96', b: '#6b1c3c', tier: 'elite', min: 8500, max: 10000, lore: 'It rules a hundred open tabs. One tab, one task — and the whole clan together.' },
+  { id: 'pumpkin', name: 'Pumpkin Golem', short: 'Pumpkin', art: 'golem', a: '#f59a3c', b: '#6b3410', tier: 'normal', min: 5500, max: 7500, lore: 'A Halloween giant stuffed with unfinished work. Carve through it together.' },
 ];
+// Raid tiers: harder months give rarer rewards (the emblem and the aura)
+const RAID_TIERS = { easy: { name: 'Easier', c: '#3f9f6b', rar: 'rare', lv: 3 }, normal: { name: 'Normal', c: '#3f8fbf', rar: 'epic', lv: 4 },
+  hard: { name: 'Hard', c: '#d9822b', rar: 'epic', lv: 4 }, elite: { name: 'Elite', c: '#c9456b', rar: 'legendary', lv: 5 } };
 /* ---------- Personal clan cosmetics: unlocked by the clan's level, kept while in the clan ---------- */
 ITEMS.push(
   { id: 'x_clantag', cat: 'extra', name: 'Clan tag', desc: 'Your clan’s [TAG] next to your name (friends and leaderboards see it)', price: -1, clanLv: 1, rarity: 'common' },
@@ -6277,7 +6613,7 @@ ITEMS.push(
   { id: 'au_c_crown', cat: 'aura', name: 'Clan crown aura', desc: 'Spinning gold with a shimmer', price: -1, clanLv: 16, rarity: 'legendary' },
   { id: 'col_c_legend', cat: 'color', name: 'Clan legend', desc: 'Animated rainbow gold, with a glow', price: -1, clanLv: 20, rarity: 'legendary' },
   { id: 'au_c_legend', cat: 'aura', name: 'Clan legend aura', desc: 'The rarest clan aura: spinning, shimmering, flaring', price: -1, clanLv: 25, rarity: 'legendary' },
-  ...RAID_BOSSES.map(r => ({ id: 'au_cr_' + r.id, cat: 'aura', name: `${r.name.split(' ')[1]} raid aura`, desc: `For clans that beat the ${r.name}`, price: -1, clanRaid: r.id, rarity: 'epic' })),
+  ...RAID_BOSSES.map(r => ({ id: 'au_cr_' + r.id, cat: 'aura', name: `${r.short || r.name.split(' ')[1]} raid aura`, desc: `For clans that beat the ${r.name}`, price: -1, clanRaid: r.id, rarity: r.tier ? RAID_TIERS[r.tier].rar : 'epic' })),
 );
 // badge frames for clan members
 FRAMES.frame_clan = '<path d="M12 .8 21.4 4.2v7.4c0 5.6-4 9.7-9.4 11.6C6.6 21.3 2.6 17.2 2.6 11.6V4.2Z" stroke-width="1.1" opacity=".75"/>';
@@ -6291,7 +6627,7 @@ const inClan = () => !!(CLAN.id && CLAN.doc && CLAN.me);
 function clanOwns(it) {
   if (!inClan() || minimal()) return false;
   if (it.clanLv) return (CLAN.doc.level || 1) >= it.clanLv;
-  if (it.clanRaid) return Object.values(CLAN.doc.raids || {}).includes(it.clanRaid);
+  if (it.clanRaid) return raidsWon(CLAN.doc).includes(it.clanRaid);
   return false;
 }
 const clanTagOn = () => inClan() && !minimal() && extraOn('x_clantag');
@@ -6532,7 +6868,6 @@ function toggleExtra(id) {
 /* ==========================================================================
    AUDIO — end sounds, start cue and ambient sound, all generated with Web Audio
    ========================================================================== */
-const getCtx = () => ensureAudio();
 function envelope(g, t, peak, attack, decay) {
   g.gain.setValueAtTime(0.0001, t);
   g.gain.linearRampToValueAtTime(peak, t + attack);
@@ -7548,12 +7883,8 @@ async function unblockUser(uid) {
   try { await FB.deleteDoc(FB.doc(FB.db, 'users', USER.uid, 'blocked', uid)); } catch (e) { toast('Couldn’t unblock — try again'); }
 }
 const inviteLink = () => `${location.origin}${location.pathname}?invite=${USER.username}`;
-async function shareInvite() {
-  const url = inviteLink();
-  try {
-    if (navigator.share) await navigator.share({ title: 'Pomodorolist', text: `Focus with me on Pomodorolist — I’m @${USER.username}`, url });
-    else { await navigator.clipboard.writeText(url); toast('Invite link copied', 2600, true); }
-  } catch (e) { /* share cancelled */ }
+function shareInvite(btn) {
+  return shareLink({ title: 'Pomodorolist', text: `Focus with me on Pomodorolist — I’m @${USER.username}`, url: inviteLink(), btn, what: 'Invite link' });
 }
 /** ?invite=username opens a "Send request?" prompt once the user is signed in. */
 function captureInvite() {
@@ -7722,7 +8053,8 @@ async function loadChallenges(force) {
       const qs = await FB.getDocs(FB.query(col, FB.where(field, 'array-contains', USER.uid), FB.where('weekKey', '==', wk)));
       qs.docs.forEach(d => { out[d.id] = { id: d.id, ...d.data() }; });
     }
-    SOC.challenges = Object.values(out);
+    const friends = new Set(friendsList().map(otherUid));   // invitations count only from friends (anyone can list uids as invited)
+    SOC.challenges = Object.values(out).filter(c => (c.members || []).includes(USER.uid) || friends.has(c.creator));
     SOC.challengesAt = Date.now();
     await syncChallengeProgress();
   } catch (e) { console.warn('challenges', e); if (!SOC.challenges) SOC.challenges = []; }
@@ -7835,7 +8167,7 @@ function renderFriendsList(fromLoad) {
           </form>
           <div class="row between" style="margin-top:12px">
             <span class="lbl">Your friend code: <b class="code">@${esc(USER.username)}</b></span>
-            <button class="btn small" id="shareInvite">Share invite link</button>
+            <span class="btn-row" style="gap:6px"><button class="btn small" data-copy-invite>Copy invite link</button><button class="btn small${canShareNative() ? '' : ' hidden'}" data-share-invite data-native-share>Share</button></span>
           </div>
         </div>
         ${inc.length ? `<div class="card"><h2>Requests <span class="pill">${inc.length}</span></h2><ul class="plist">${inc.map(f => `
@@ -8115,6 +8447,7 @@ function renderPrivacy() {
   $('#setShareNames').checked = S.settings.shareNames;
   $('#setGlobal').checked = S.settings.globalBoard;
   $('#inviteDesc').textContent = `Friend code @${USER.username}`;
+  syncShareButtons($('#privacyCard'));
   const b = Object.entries(SOC.blocked);
   $('#blockedList').innerHTML = b.length ? `<div class="setting"><div><div>Blocked</div>${b.map(([uid, n]) =>
     `<div class="row" style="gap:6px;margin-top:4px"><span class="desc">@${esc(n)}</span><button class="linkbtn" data-unblock="${uid}">Unblock</button></div>`).join('')}</div></div>` : '';
@@ -8134,7 +8467,8 @@ function showTab(tab) {
   S.ui.tab = tab;
   const navTab = tab === 'settings' || tab === 'about' ? 'profile' : tab;   // Settings and About are part of Profile
   if (tab === 'about') renderAbout();
-  $$('#tabs button').forEach(b => { b.classList.toggle('active', b.dataset.tab === navTab); b.setAttribute('aria-current', b.dataset.tab === navTab ? 'page' : 'false'); });
+  navMark(navTab);
+  navOpen(false);
   $$('.tab').forEach(s => s.classList.toggle('active', s.id === 'tab-' + tab));
   if (tab === 'stats') renderStats();
   if (tab === 'settings') renderSettings();
@@ -8393,14 +8727,12 @@ setInterval(pomeoNightCheck, 60000);
    ========================================================================== */
 const REM_FIRED_KEY = 'pomodorolist-rem-fired';     // occurrences already alerted on this device
 const REM_PERM_KEY = 'pomodorolist-rem-perm-asked';
-const REM_BEFORE = [0, 5, 10, 15, 30];
 const WD = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const BELL_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>';
 const CAL_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M12 14v4M10 16h4"/></svg>';
 const EDIT_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
 const TRASH_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>';
 const TICK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
-const INFO_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>';
 
 const parseDay = k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); };
 const remAt = (r, day) => { const [h, mi] = r.time.split(':').map(Number); const d = new Date(day); d.setHours(h, mi, 0, 0); return d.getTime(); };
@@ -9129,7 +9461,6 @@ function bossBattle(mode, now = new Date()) {
   const phase = done ? 'down' : left <= 0.1 ? 'almost' : left <= 0.5 ? 'angry' : 'calm';
   return { wk, mon, boss, mode, members, hp, dmg, rawDmg: raw, coins, done, formed, phase, loading: members.some(m => m.loading) };
 }
-const bossState = () => bossBattle(bossView());
 let bossLoading = false;
 async function loadSquadStats(force) {
   if (bossLoading || !squadMembers().length) return;
@@ -9854,7 +10185,6 @@ function gardenStats(items) {
   for (const it of items) { const k = plantKind(it); if (k === 'wilted') st.wilted++; else { st.grown++; if (k === 'golden') st.golden++; if (k === 'ripe') st.ripe++; } }
   return st;
 }
-let gardenNewest = 0;
 function renderGarden() {
   const el = $('#gardenSlot');
   if (!el || !USER) return;
@@ -10696,9 +11026,10 @@ addEventListener('resize', () => $$('.catrow').forEach(updateFades));
    command palette, offline banner, pull to refresh, tab swipes, haptics.
    Everything here is stored on this device (localStorage); no new cloud data.
    ========================================================================== */
-const APP_VERSION = '1.14.2';
+const APP_VERSION = '1.14.3';
 const VER_KEY = 'pomodorolist-seen-version';
 const CHANGELOG = [
+  { v: '1.14.3', t: 'Stronger raids, cleaner menu', d: 'Monthly clan raid bosses are much stronger from November: every month has its own boss, tier and HP (about 5,000–10,000 depending on the boss and clan size), with everyone’s hits, a rally bonus for 5+ contributors and rarer rewards in harder months. The navigation never cuts labels off any more: a sidebar on wide screens, a ☰ menu on tablets and a bottom bar with More on phones. Copy buttons work everywhere (with a Share button on phones), your profile card can fold its stats away, and the welcome page shows what’s inside before asking you to sign up.' },
   { v: '1.14.2', t: 'Focus together', d: 'Clan sessions now start as Focus together by default: everyone runs their own timer and preset at one study table, sees each other’s countdowns and states, and stepping away or leaving only affects you. The shared Synced timer with host controls is still there when you want it, and planned sessions show which mode they use.' },
   { v: '1.14.1', t: 'Cosmetics fixes', d: 'Squad boss auras now look different from Solo ones everywhere (a double ring with a shimmer), and every special aura has a crisp ring so it shows at small sizes and with animations off. Your picture, frame, aura, name colour and clan tag now look the same on every screen: friends, friend profiles, all leaderboards, the Inbox, boss squads and battle logs, challenges, event boards, your clan and live study tables, and shared cards. Changing your look on one device now wins on your others, your clan tag shows by default, and shared card links keep it.' },
   { v: '1.14', t: 'Clans and a to-do list', d: 'Clans are your study group: create one or join with a link or code (approval or open), Leader / Officer / Member roles, clan levels 1–30 from the focus you do after joining, Clan Points for a cosmetic clan shop (emblems, banners, colours, frames), clan cosmetics in your bag (clan tag, name colours, auras, a shield frame), a weekly clan quest, a monthly raid boss, planned group sessions with RSVPs and reminders, live sessions on one shared timer with a study table and preset reactions (no chat), a clan leaderboard, an activity feed, an MVP and a trophy case. Plus a to-do list inside Reminders: due dates, priorities, tags, notes, a checklist that becomes subtasks, drag to reorder and swipe on phones.' },
@@ -10721,7 +11052,7 @@ const CHANGELOG = [
   { v: '1.1', t: 'Accounts & sync', d: 'Log in and keep your sessions in sync on every device, even offline.' },
   { v: '1.0', t: 'Focus timer', d: 'Pomodoro timer with named sessions, presets, streaks and stats.' },
 ];
-const NEWS = ['🪑 Focus together: clan sessions where everyone runs their own timer at one table (the Synced timer is still an option)', '✨ Cosmetics fixes: Squad auras look different from Solo ones, and your look is the same on every screen', '🛡️ Clans: your study group — create one or join with a link or code', '🔴 Study live on one shared timer, at a study table with your clan (reactions, no chat)', '📅 Plan group sessions: RSVP, a reminder 5–30 min before, add to your calendar', '⭐ Clan levels, Clan Points and a cosmetic clan shop; clan tags, colours and auras in your bag', '🏆 A weekly clan quest, a monthly raid boss, a clan leaderboard and a trophy case', '☑️ A to-do list in Reminders: due dates, priorities, tags and a checklist that becomes subtasks', '🔒 Members-only clan data, approval by default, and leave / remove / disband any time'];
+const NEWS = ['⚔️ Much stronger monthly clan raid bosses from November: a new boss every month, with everyone’s hits and a rally bonus', '🧭 A cleaner menu: a sidebar on wide screens, ☰ on tablets, More on phones — no more cut-off tabs', '📋 Copy buttons that always work, plus Share on phones; fold the stats on your profile card', '🪑 Focus together: clan sessions where everyone runs their own timer at one table (the Synced timer is still an option)', '✨ Cosmetics fixes: Squad auras look different from Solo ones, and your look is the same on every screen', '🛡️ Clans: your study group — create one or join with a link or code', '🔴 Study live on one shared timer, at a study table with your clan (reactions, no chat)', '📅 Plan group sessions: RSVP, a reminder 5–30 min before, add to your calendar', '⭐ Clan levels, Clan Points and a cosmetic clan shop; clan tags, colours and auras in your bag', '🏆 A weekly clan quest, a monthly raid boss, a clan leaderboard and a trophy case', '☑️ A to-do list in Reminders: due dates, priorities, tags and a checklist that becomes subtasks', '🔒 Members-only clan data, approval by default, and leave / remove / disband any time'];
 
 /* ---------- Haptics ---------- */
 const HAPTIC_KEY = 'pomodorolist-haptics';
@@ -11147,7 +11478,7 @@ async function ptrRefresh(where) {
 /** Left/right swipes on the page move between the tabs in the bottom bar. */
 (() => {
   let sw = null;
-  const NO_SWIPE = 'input, textarea, select, button, .catrow, .chips, .rem, .sub-ed-list, .plist, .ib-item, .wrapped, dialog, .tabs, .park-pop, .garden, .hpbar, [data-noswipe], .shopgrid';
+  const NO_SWIPE = 'input, textarea, select, button, .catrow, .chips, .rem, .sub-ed-list, .plist, .ib-item, .wrapped, dialog, .tabs, .sidenav, .park-pop, .garden, .hpbar, [data-noswipe], .shopgrid';
   const scrollsX = el => { for (let n = el; n && n !== document.body; n = n.parentElement) { const s = getComputedStyle(n); if (/(auto|scroll)/.test(s.overflowX) && n.scrollWidth > n.clientWidth + 2) return true; } return false; };
   document.addEventListener('touchstart', e => {
     sw = null;
@@ -11162,7 +11493,7 @@ async function ptrRefresh(where) {
     const t = e.changedTouches[0], dx = t.clientX - sw.x, dy = t.clientY - sw.y, fast = Date.now() - sw.t < 650;
     sw = null;
     if (!fast || Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 2) return;
-    const order = $$('#tabs button').filter(b => b.offsetWidth && !b.classList.contains('hidden')).map(b => b.dataset.tab);
+    const order = navOrder();
     const i = order.indexOf(S.ui.tab);
     if (i < 0) return;
     const next = order[i + (dx < 0 ? 1 : -1)];
@@ -11292,12 +11623,6 @@ const hasAvatar = id => !!id && id !== 'av_default' && !!AVATAR_ART[id] && !mini
 const avatarSVG = (id, size = 32) => `<svg class="av" viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true">${avatarArt(id)}</svg>`;
 const myAvatar = () => equippedId('avatar');
 /** Someone's avatar id from what friends can read (publicProfiles first, then publicStats). Missing field = Default. */
-function avatarOf(uid) {
-  if (USER && uid === USER.uid) return myAvatar();
-  const p = cached('publicProfiles', uid), s = cached('publicStats', uid);
-  const v = (p && !p.denied && p.avatar) || (s && !s.denied && s.avatar) || 'av_default';
-  return AVATAR_ART[v] ? v : 'av_default';
-}
 /* ==========================================================================
    REWARD LOOKS — the art and styles behind boss and questline rewards, added to
    the existing systems: AVATAR_ART (profile pictures), POMEO_HATS/ACCS (+ skins),
@@ -11431,7 +11756,7 @@ Object.assign(SPECIAL_AURAS, {
   au_c_crown: { cols: ['#f2c14e', '#e3b341', '#fff3c4'], name: 'Clan crown aura', lv: 5, spin: true, shim: true },
   au_c_legend: { cols: ['#ff6b6b', '#ffd166', '#6ab8ff'], name: 'Clan legend aura', lv: 6, spin: true, shim: true, flare: true },
 });
-for (const r of RAID_BOSSES) SPECIAL_AURAS['au_cr_' + r.id] = { cols: [r.a, r.b, '#f2c14e'], name: `${r.name} raid aura`, lv: 4, spin: true };
+for (const r of RAID_BOSSES) SPECIAL_AURAS['au_cr_' + r.id] = { cols: [r.a, r.b, '#f2c14e'], name: `${r.name} raid aura`, lv: r.tier ? RAID_TIERS[r.tier].lv : 4, spin: true, shim: r.tier === 'elite' };
 
 // ---- Titles and session-complete effects ----
 const TITLE_TEXT = Object.fromEntries(EV_ITEMS.filter(x => x[1] === 'title').map(x => [x[0], x[2]]));
@@ -11835,13 +12160,52 @@ function defaultAuthMode() {
   if (h === '#signup' || h === '#login') { history.replaceState(null, '', location.pathname + location.search); return h.slice(1); }
   return readJSON(LAST_USER, null) || localStorage.getItem(TOUR_KEY) ? 'login' : 'signup';
 }
-function lpGoSignup() {
-  setAuthMode('signup');
-  $('#authCard').scrollIntoView({ block: 'center', behavior: motion() === 'full' ? 'smooth' : 'auto' });
-  setTimeout(() => $('#authUser').focus({ preventScroll: true }), motion() === 'full' ? 400 : 0);
+function lpGoSignup() { lpOpenAuth('signup'); }
+const BEEN_KEY = 'pomodorolist-been-here';   // someone has logged in on this device before (kept after logging out)
+const lpReturning = () => { try { return !!(localStorage.getItem(BEEN_KEY) || readJSON(LAST_USER, null) || localStorage.getItem(TOUR_KEY)); } catch (e) { return false; } };
+const lpWide = () => matchMedia('(min-width: 900px)').matches;
+let lpOpener = null;
+/** Open the sign-up / log-in card: beside the hero on wide screens, as a window or bottom sheet on smaller ones. */
+function lpOpenAuth(mode, focus = true) {
+  setAuthMode(mode);
+  const v = $('#authView'), was = v.classList.contains('auth-open');
+  if (!was) {
+    lpOpener = document.activeElement;
+    v.classList.add('auth-open');
+    $('#lpScrim').classList.add('on');
+    document.documentElement.classList.toggle('lp-modal', !lpWide());
+  }
+  if (lpWide() && window.scrollY > 40) window.scrollTo({ top: 0, behavior: motion() === 'full' ? 'smooth' : 'auto' });
+  if (focus) setTimeout(() => { if (v.classList.contains('auth-open')) $('#authUser').focus({ preventScroll: true }); }, was || motion() === 'off' ? 0 : 280);
 }
+function lpCloseAuth() {
+  const v = $('#authView');
+  if (!v.classList.contains('auth-open')) return;
+  v.classList.remove('auth-open');
+  $('#lpScrim').classList.remove('on');
+  document.documentElement.classList.remove('lp-modal');
+  authErr('');
+  if (lpOpener && lpOpener.isConnected && lpOpener.offsetWidth) lpOpener.focus({ preventScroll: true });
+  lpOpener = null;
+}
+/** The first screen: new visitors see Preview first; people who have logged in here before see Log in first (and the card already open on computers). */
+function lpSetup() {
+  const back = lpReturning();
+  $('#authView').classList.toggle('lp-back', back);
+  $('#lpLoginHero').classList.toggle('hidden', !back);
+  $('#previewBtn').classList.toggle('primary', !back);
+  $('#lpLoginTop').classList.toggle('primary', back);
+  $('#lpHi').textContent = back ? 'Welcome back!' : 'Hi, I’m Pomeo!';
+  $('#lpAlert').classList.toggle('hidden', !fbLoadError);
+  $('#lpAlert').textContent = fbLoadError || '';
+}
+$('#lpAuth').addEventListener('keydown', e => { if (e.key === 'Escape' && !lpWide()) { e.preventDefault(); lpCloseAuth(); } });
+$('#lpScrim').addEventListener('click', lpCloseAuth);
+$('#authClose').addEventListener('click', lpCloseAuth);
+matchMedia('(min-width: 900px)').addEventListener('change', () => document.documentElement.classList.toggle('lp-modal', $('#authView').classList.contains('auth-open') && !lpWide()));
 $('#authView').addEventListener('click', e => {
-  const th = e.target.closest('[data-lpth]'), gl = e.target.closest('[data-lpgl]');
+  const th = e.target.closest('[data-lpth]'), gl = e.target.closest('[data-lpgl]'), mode = e.target.closest('[data-mode]');
+  if (mode && !mode.closest('#authSeg')) lpOpenAuth(mode.dataset.mode);
   if (th) { landingSkin = th.dataset.lpth === 'th_default' ? '' : th.dataset.lpth; applyTheme(readJSON(THEME_KEY, 'auto')); lpMarkLook(); }
   if (gl) {
     const v = gl.dataset.lpgl, root = document.documentElement;
@@ -12880,20 +13244,27 @@ function maybeStartTour(cloud, tries = 0) {
     startTutorial();
   }, 700);
 }
+/** Where a tour step points: the bottom-bar button on phones, the sidebar on wide screens, else the item in the slide-in menu. */
+function tourTarget(tab) {
+  const bar = $(`#btmBar [data-tab="${tab}"]`);
+  if (bar && !bar.classList.contains('hidden') && bar.offsetWidth) return { el: bar, menu: false };
+  const item = $(`#tabs [data-tab="${tab}"]`);
+  if (!item || item.classList.contains('hidden')) return null;
+  return { el: item, menu: navMode() !== 'side' };
+}
 function tourSteps() {
   const on = S.settings.gamification;
-  const visible = sel => [...$$(sel)].find(el => el.getClientRects().length && el.offsetWidth);
   const steps = [
-    { sel: '#tabs [data-tab="timer"]', text: 'Timer: pick a preset, name your session and press Start.' },
-    { sel: '#tabs [data-tab="stats"]', text: on ? 'Stats: your streak, charts, garden and monthly Wrapped.' : 'Stats: your streak, charts and monthly Wrapped.' },
-    { sel: '#tabs [data-tab="reminders"]', text: 'Reminders: plan study blocks — I’ll pop up when it’s time.' },
-    { sel: '#tabs [data-tab="board"]', text: 'Leaderboard: see how your focus compares with friends.' },
-    on && { sel: '#tabs [data-tab="shop"], #coinPill', text: 'Shop: spend coins on themes, sounds and outfits for me.' },
-    { sel: '#tabs [data-tab="friends"]', text: 'Friends: add friends, send kudos, see who’s focusing.' },
-    { sel: '#tabs [data-tab="clan"]', text: 'Clan: your study group — plan sessions and study live on one shared timer.' },
-    on && { sel: '#tabs [data-tab="quests"]', text: 'Quests: a new boss every week — every focus minute is a hit.' },
+    { tab: 'timer', text: 'Timer: pick a preset, name your session and press Start.' },
+    { tab: 'stats', text: on ? 'Stats: your streak, charts, garden and monthly Wrapped.' : 'Stats: your streak, charts and monthly Wrapped.' },
+    { tab: 'reminders', text: 'Reminders: plan study blocks — I’ll pop up when it’s time.' },
+    { tab: 'board', text: 'Leaderboard: see how your focus compares with friends.' },
+    on && { tab: 'shop', text: 'Shop: spend coins on themes, sounds and outfits for me.' },
+    { tab: 'friends', text: 'Friends: add friends, send kudos, see who’s focusing.' },
+    { tab: 'clan', text: 'Clan: your study group — plan sessions and study live together.' },
+    on && { tab: 'quests', text: 'Quests: a new boss every week — every focus minute is a hit.' },
   ].filter(Boolean);
-  return steps.map(st => ({ ...st, el: () => visible(st.sel) })).filter(st => st.el());
+  return steps.map(st => ({ ...st, el: () => { const t = tourTarget(st.tab); return t && t.el; } })).filter(st => st.el());
 }
 function startTour() {
   TOUR.steps = tourSteps();
@@ -12910,9 +13281,15 @@ function startTour() {
   }));
   $('#tourNext').focus();
 }
-function placeTour() {
-  const st = TOUR.steps[TOUR.i], el = st && st.el();
+function placeTour(again = false) {
+  const st = TOUR.steps[TOUR.i], tg = st && tourTarget(st.tab), el = tg && tg.el;
   if (!el) { endTour(); return; }
+  // open the menu for a step that's in it (close it for one that isn't), then place the spotlight once it has slid in
+  if (!again && tg.menu !== document.body.classList.contains('nav-open')) {
+    navOpen(tg.menu, null, true);
+    setTimeout(() => { if (!$('#tour').classList.contains('hidden')) placeTour(true); }, motion() === 'off' ? 20 : 300);
+    return;
+  }
   const r = el.getBoundingClientRect(), pad = 6, spot = $('#tour .tour-spot'), tip = $('#tour .tour-tip');
   spot.style.width = r.width + pad * 2 + 'px';
   spot.style.height = r.height + pad * 2 + 'px';
@@ -12928,6 +13305,7 @@ function placeTour() {
 }
 function endTour() {
   $('#tour').classList.add('hidden');
+  navOpen(false);
   if (TUT.fromTour) { TUT.fromTour = false; TUT.i = 4; $('#tutDlg').showModal(); renderTut(); return; }   // back to the tutorial
   setTourDone(); setTimeout(maybeShowLogin, 400);
 }
@@ -12976,10 +13354,11 @@ $$('[data-toggle]').forEach(btn => btn.addEventListener('click', () => {
   btn.textContent = show ? 'Hide' : 'Show';
   btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
 }));
-$('#guestBtn').addEventListener('click', () => {
+$$('[data-guest]').forEach(b => b.addEventListener('click', () => {
   writeLS(GUEST_FLAG, '1');
+  lpCloseAuth();
   startSession({ guest: true }, false);
-});
+}));
 $('#logoutBtn').addEventListener('click', logout);
 
 // Name / colour / tag
@@ -13011,7 +13390,10 @@ $('#nameTag').addEventListener('change', e => {
 });
 
 // Timer controls
+let mainBtnAt = 0;
 $('#mainBtn').addEventListener('click', () => {
+  if (performance.now() - mainBtnAt < 400) return;   // a double-click (or a bounced tap) used to start and immediately pause
+  mainBtnAt = performance.now();
   if (liveButton('main')) return;
   if (S.timer.status === 'running') pauseTimer(); else startTimer();
 });
@@ -13052,7 +13434,7 @@ $('#clearRecent').addEventListener('click', () => {
 });
 
 // Tabs
-$('#tabs').addEventListener('click', e => { const b = e.target.closest('button'); if (b) showTab(b.dataset.tab); });
+$('#tabs').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) showTab(b.dataset.tab); });
 
 // Stats navigation
 $('#statsSeg').addEventListener('click', e => {
@@ -13168,7 +13550,8 @@ $('#tab-friends').addEventListener('click', e => {
   const seg = t.closest('#friendsSeg button');
   if (seg) { S.ui.friendsView = seg.dataset.view; SOC.friend = null; SOC.lbShown = null; saveLocal(); renderFriends(); viewIn($('#friendsBody')); animateIn($('#friendsBody')); return; }
   if (t.closest('#guestLogin')) { logout(); return; }
-  if (t.closest('#shareInvite')) { shareInvite(); return; }
+  if (t.closest('[data-copy-invite]')) { copyText(inviteLink(), { btn: t.closest('[data-copy-invite]'), what: 'Invite link' }); return; }
+  if (t.closest('[data-share-invite]')) { shareInvite(t.closest('[data-share-invite]')); return; }
   if (t.closest('#refreshFriends')) { loadFriendsPublic(true); return; }
   if (t.closest('#recapClose')) { writeLS(lsKey('recap'), SOC.recap ? SOC.recap.wk : ''); renderFriends(true); return; }
   if (t.closest('#recapShare')) { shareRecap(); return; }
@@ -13195,7 +13578,8 @@ $('#tab-friends').addEventListener('mouseover', showTip);
 for (const [id, key] of [['#setShareAct', 'shareActivity'], ['#setShareNames', 'shareNames'], ['#setGlobal', 'globalBoard']]) {
   $(id).addEventListener('change', e => { S.settings[key] = e.target.checked; save(); publishPresence(); SOC.lb = {}; });
 }
-$('#copyInvite').addEventListener('click', shareInvite);
+$('#copyInvite').addEventListener('click', e => copyText(inviteLink(), { btn: e.currentTarget, what: 'Invite link' }));
+$('#shareInvite2').addEventListener('click', () => shareInvite($('#copyInvite')));
 $('#blockedList').addEventListener('click', e => { const b = e.target.closest('[data-unblock]'); if (b) unblockUser(b.dataset.unblock); });
 
 // Header shortcuts: coins open the Shop, the level badge (or avatar) opens Profile
@@ -13364,6 +13748,9 @@ function tick() {
     renderToday();
     reconcileRewards('quiet');  // new day: goal bonus bookkeeping and Streak Freezes
     if (S.ui.tab === 'stats') renderStats();
+    if (S.ui.tab === 'quests') renderQuests();   // a new week's boss, a questline's next day
+    if (S.ui.tab === 'clan' && inClan()) renderClan();   // a new week's quest, a new month's raid boss
+    renderGreeting();
   }
 }
 setInterval(tick, 250);
@@ -13615,6 +14002,10 @@ function bannerLook(id, dark = pageDark()) {
     const b = BOSS_BY_ID[x], [a, c] = dark ? b.arena.d : b.arena.l;
     return { a, b: c, art: `<circle cx="330" cy="64" r="58" fill="${b.c}" opacity=".35"/><g transform="translate(270 4) scale(1)">${BOSS_ART[x].body}${BOSS_ART[x].calm}</g>`, name: `${b.short} arena` };
   }
+  if (k === 'rd' && RAID_BY_ID[x] && BOSS_ART[RAID_BY_ID[x].art]) {
+    const r = RAID_BY_ID[x];
+    return { a: dark ? r.b : r.a, b: dark ? '#0d0f14' : r.b, bg: WAVES, art: `<circle cx="330" cy="64" r="58" fill="#fff" opacity=".18"/><g transform="translate(270 4) scale(1)">${BOSS_ART[r.art].body}${BOSS_ART[r.art].calm}</g>`, name: `${raidShort(r)} rally` };
+  }
   if (k === 'ev' && EVENT_BY_ID[x]) {
     const ev = EVENT_BY_ID[x];
     return { a: ev.a, b: ev.b, bg: WAVES, art: `<text x="340" y="84" font-size="64" text-anchor="middle">${ev.emoji}</text>`, name: ev.name };
@@ -13627,7 +14018,8 @@ function bannerOptions() {
   return [...Object.keys(FREE_BANNERS),
     ...ITEMS.filter(it => it.cat === 'theme' && isOwned(it.id)).map(it => 'th:' + it.id),
     ...BOSSES.filter(b => bossRecord(b.id).wins).map(b => 'bs:' + b.id),
-    ...EVENTS.filter(ev => questClaimed(ev.id)).map(ev => 'ev:' + ev.id)];
+    ...EVENTS.filter(ev => questClaimed(ev.id)).map(ev => 'ev:' + ev.id),
+    ...(inClan() && CLAN.doc ? [...new Set(Object.values(CLAN.doc.raids || {}).filter(raidRallied).map(raidId))].filter(id => RAID_BY_ID[id]).map(id => 'rd:' + id) : [])];
 }
 function myBanner() {
   const want = cardPref('banner'), opts = bannerOptions();
@@ -13735,6 +14127,23 @@ function sanitizeCard(o) {
 }
 
 /* ---------- Drawing the card (HTML on screen) ---------- */
+const CARD_OPEN_KEY = 'pomodorolist-card-open';
+/** Is the stats board shown? Remembered per device; at first open on computers and tablets, folded on phones. */
+function cardOpen() {
+  try { const v = localStorage.getItem(CARD_OPEN_KEY); if (v === '1' || v === '0') return v === '1'; } catch (e) { /* private mode */ }
+  return !matchMedia('(max-width: 640px)').matches;
+}
+/** Show or hide the stats board on every folding card on the page (smoothly, unless Animations are off). */
+function setCardOpen(open) {
+  try { localStorage.setItem(CARD_OPEN_KEY, open ? '1' : '0'); } catch (e) { /* private mode */ }
+  for (const c of $$('.pcard.pc-fold')) {
+    c.classList.toggle('pc-closed', !open);
+    const b = c.querySelector('.pc-body'), t = c.querySelector('[data-pc-toggle]');
+    if (b) b.inert = !open;
+    if (t) { t.setAttribute('aria-expanded', String(open)); t.querySelector('span').textContent = open ? 'Hide stats' : 'Show stats'; }
+  }
+}
+document.addEventListener('click', e => { if (e.target.closest('[data-pc-toggle]')) { uiSound('tick'); setCardOpen(!cardOpen()); } });
 const PARTS = { Morning: '🌅', Afternoon: '☀️', Evening: '🌆', Night: '🌙' };
 function weekBars(d) {
   const max = Math.max(30, ...d.wk), start = parseDay(d.wd);
@@ -13771,6 +14180,22 @@ function cardHTML(d, ctx = 'own') {
   const feat = d.ft ? `<div class="pc-feat">${d.ft.map(f => { const fi = featureInfo(f); return `<div class="pc-chip"><span class="pc-fi">${fi.icon(26)}</span><span><b>${esc(fi.label)}</b>${esc(fi.sub)}</span></div>`; }).join('')}</div>` : '';
   const charts = (d.wk ? `<div class="pc-sec"><div class="pc-h">Last 7 days</div>${weekBars(d)}</div>` : '') + (d.hm ? `<div class="pc-sec"><div class="pc-h">12 weeks</div>${heatGrid(d)}</div>` : '');
   const empty = !tiles.length && !charts && !more.length && !subj && !feat;
+  // On Profile and a friend's card the stats board folds away under the header (remembered per device); shared and preview cards stay whole
+  const fold = ctx === 'own' || ctx === 'friend', open = !fold || cardOpen();
+  const body = `${tiles.length ? `<div class="pc-tiles">${tiles.join('')}</div>` : ''}
+    ${charts ? `<div class="pc-charts">${charts}</div>` : ''}
+    ${more.length || subj ? `<div class="pc-more">${more.join('')}${subj}</div>` : ''}
+    ${feat}
+    ${empty ? '<p class="pc-empty">Everything on this card is hidden.</p>' : ''}`;
+  if (fold) return `<article class="pcard cs-${style.slice(5)}${mini ? ' pc-mini' : ''} pc-${ctx} pc-fold${open ? '' : ' pc-closed'}" style="${vars}" aria-label="Player card of ${name}">
+    ${banner}
+    <div class="pc-id"><div class="pc-av">${pic}</div><div class="pc-who">
+      <div${nameAttrs(mini ? '' : d.c, 'pc-name')}>${name}</div>${!mini && /^[A-Z0-9]{2,5}$/.test(d.ct || '') ? `<div class="pc-clan">🛡️ [${esc(d.ct)}]${d.cr && Object.values(CLAN_ROLES).includes(d.cr) ? ' · ' + esc(d.cr) : ''}</div>` : ''}
+      ${!mini && d.t ? `<div class="pc-title">${esc(TITLE_TEXT[d.t])}</div>` : ''}
+      ${tier ? `<div class="pc-lv"><span class="pc-tier" style="--tc:${tier.color}">${badgeSVG(tier, { size: 16 })}${tier.name}</span><span>Level ${d.lv}</span></div>` : ''}</div></div>
+    <button type="button" class="pc-toggle" data-pc-toggle aria-expanded="${open}"><span>${open ? 'Hide stats' : 'Show stats'}</span><i aria-hidden="true">▾</i></button>
+    <div class="pc-body"${open ? '' : ' inert'}><div class="pc-body-in">${body}</div></div>
+  </article>`;
   return `<article class="pcard cs-${style.slice(5)}${mini ? ' pc-mini' : ''} pc-${ctx}" style="${vars}" aria-label="Player card of ${name}">
     ${banner}
     <div class="pc-id"><div class="pc-av">${pic}</div><div class="pc-who">
@@ -13994,6 +14419,7 @@ let shareSize = 'square', shareURL = '';
 async function openShareDlg() {
   shareSize = 'square';
   renderShareDlg();
+  syncShareButtons($('#shareDlg'));
   $('#shareDlg').showModal();
   uiSound('open');
 }
@@ -14022,15 +14448,8 @@ async function saveCardImage(share = false) {
   } catch (e) { if (e && e.name !== 'AbortError') toast('Couldn’t make the image — try again'); }
   finally { btn.disabled = false; }
 }
-async function copyCardLink() {
-  try { await navigator.clipboard.writeText(shareURL); }
-  catch (e) { const i = $('#shUrl'); i.focus(); i.select(); try { document.execCommand('copy'); } catch (er) { toast('Select the link and copy it'); return; } }
-  toast('Card link copied', 2000, true);
-}
-async function shareCardLink() {
-  if (navigator.share) { try { await navigator.share({ title: 'My Pomodorolist card', text: 'My focus stats on Pomodorolist', url: shareURL }); } catch (e) { /* cancelled */ } return; }
-  copyCardLink();
-}
+function copyCardLink() { return copyText(shareURL, { btn: $('#shCopy'), field: $('#shUrl'), what: 'Card link' }); }
+function shareCardLink() { return shareLink({ title: 'My Pomodorolist card', text: 'My focus stats on Pomodorolist', url: shareURL, btn: $('#shCopy'), field: $('#shUrl'), what: 'Card link' }); }
 
 /* ---------- Boss themes get richer with the boss: Hard and up add an arena glow behind the app,
    Elite a slowly drifting one, Legendary rising embers too (still while Animations are off). ---------- */
@@ -14524,12 +14943,81 @@ function clanQuestOf(d, wk = dayKey(weekMonday())) {
     name: kind === 'min' ? `Focus ${fmtNum(goal / 60)} hours together` : 'Hold 3 group study sessions', unit: kind === 'min' ? 'min' : 'sessions' };
 }
 const monthKeyNow = () => monthKeyOf(new Date());
-const raidOf = (mk = monthKeyNow()) => RAID_BOSSES[(+mk.slice(0, 4) * 12 + +mk.slice(5, 7)) % RAID_BOSSES.length];
-function clanRaidState(d, mk = monthKeyNow()) {
-  const boss = raidOf(mk), hp = d.monthKey === mk && d.raidHP ? d.raidHP : Math.max(1800, 600 * Math.max(1, d.members || 1));
-  const dmg = d.monthKey === mk ? d.monthMin || 0 : 0;
-  return { boss, hp, dmg: Math.min(dmg, hp), raw: dmg, mk, done: dmg >= hp, claimed: !!(d.raids || {})[mk] };
+/* ==========================================================================
+   MONTHLY RAID (v1.14.3). From November 2026 every month has its own raid boss
+   with a tier and an HP range: HP = min + (max − min) × (members − 1) / 29,
+   rounded to the nearest 100, using the member count when the month's first
+   focus minute lands. It's fixed for the rest of the month, so people joining
+   or leaving doesn't move it. October 2026 and earlier keep the old HP
+   (600 × members, at least 1,800). The security rules hold the same table.
+   ========================================================================== */
+const RAID_NEW_FROM = '2026-11';
+const RAID_CYCLE = ['behemoth', 'wyrm', 'hydra', 'phantom', 'swarm', 'goblin', 'sloth', 'kraken', 'wizard', 'gremlin', 'tyrant', 'pumpkin'];   // Nov, Dec, Jan … Oct
+const raidId = v => String(v || '').replace(/\+$/, '');          // "titan+" = beaten with the rally bonus (5+ members contributed)
+const raidRallied = v => /\+$/.test(String(v || ''));
+const raidsWon = d => Object.values((d && d.raids) || {}).map(raidId);
+const monthIdx = mk => +mk.slice(0, 4) * 12 + +mk.slice(5, 7);
+/** The raid boss of a month ('YYYY-MM'). */
+function raidOf(mk = monthKeyNow()) {
+  if (mk < RAID_NEW_FROM) return RAID_BOSSES[monthIdx(mk) % 3];    // the first three bosses, as before
+  return RAID_BY_ID[RAID_CYCLE[((monthIdx(mk) - monthIdx(RAID_NEW_FROM)) % 12 + 12) % 12]];
 }
+/** The month's raid HP for a clan of this many members (the same formula as the security rules). */
+function raidHPFor(mk, members) {
+  const n = Math.max(1, members || 1);
+  if (mk < RAID_NEW_FROM) return Math.max(1800, 600 * n);
+  const b = raidOf(mk), m = Math.min(30, n);
+  return Math.round((b.min * 29 + (b.max - b.min) * (m - 1)) / 2900) * 100;
+}
+const raidTier = b => RAID_TIERS[b.tier] || RAID_TIERS.normal;
+const raidShort = b => b.short || b.name.split(' ').pop();
+function clanRaidState(d, mk = monthKeyNow()) {
+  const boss = raidOf(mk), set = d.monthKey === mk && d.raidHP > 0, hp = set ? d.raidHP : raidHPFor(mk, d.members);
+  const dmg = d.monthKey === mk ? d.monthMin || 0 : 0, v = (d.raids || {})[mk];
+  return { boss, hp, set, dmg: Math.min(dmg, hp), raw: dmg, mk, done: dmg >= hp, claimed: !!v, rallied: raidRallied(v), newRule: mk >= RAID_NEW_FROM };
+}
+/** Members who hit this month's raid boss, most first (members only: the member list isn't public). */
+function raidContributors(mk = monthKeyNow()) {
+  return (CLAN.members || []).filter(m => m.moKey === mk && (m.moMin || 0) > 0).sort((a, b) => b.moMin - a.moMin);
+}
+const RAID_RALLY = 5;
+function daysLeftInMonth(now = new Date()) {
+  const end = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  return Math.max(1, Math.ceil((end - now) / 864e5));
+}
+const raidMonthName = (mk, opts = { month: 'long' }) => new Date(mk + '-01T00:00').toLocaleDateString([], opts);
+/** The raid card on the clan screen: boss, tier, HP and how it scales, the progress line, everyone's hits and what's coming. */
+function raidCardHTML(d) {
+  const r = clanRaidState(d), b = r.boss, t = raidTier(b), left = Math.max(0, r.hp - r.dmg), pct = Math.min(100, Math.floor(r.dmg / r.hp * 100));
+  const loaded = !!CLAN.members, who = raidContributors(r.mk), dl = daysLeftInMonth(), n = Math.max(1, d.members || 1);
+  const line = `${pct}% · ${loaded ? `${who.length} member${who.length === 1 ? '' : 's'} contributed` : '…'} · ${r.done ? 'defeated' : `${dl} day${dl === 1 ? '' : 's'} left`}`;
+  const scale = r.newRule
+    ? `HP scales with clan size: ${fmtNum(b.min)} for 1 member up to ${fmtNum(b.max)} for 30. ${r.set ? `Set at ${fmtNum(r.hp)} on the 1st` : `It will be ${fmtNum(r.hp)} for your ${n} member${n === 1 ? '' : 's'}, set when the month’s first focus minute lands`} — joining or leaving doesn’t change it this month.`
+    : `HP is 600 × members (at least 1,800), set on the 1st. From November the raid bosses get much stronger.`;
+  const sum = who.reduce((a, m) => a + m.moMin, 0), gone = Math.max(0, r.raw - sum);
+  const rows = who.slice(0, 30).map(m => `<li class="rc-row">${clanPic(m, 26)}<span class="rc-name">${clanName(m)}${m.id === USER.uid ? ' <span class="lbl">(you)</span>' : ''}</span>
+      <span class="rc-bar"><i style="width:${Math.max(3, m.moMin / Math.max(1, who[0].moMin) * 100).toFixed(0)}%"></i></span><span class="v">${fmtMin(m.moMin)}</span></li>`).join('');
+  const rallyNote = r.rallied ? '<span class="rc-rally on">★ Rally bonus earned</span>' : `<span class="rc-rally${who.length >= RAID_RALLY ? ' on' : ''}">Rally bonus at ${RAID_RALLY}+ contributors (${who.length}/${RAID_RALLY})</span>`;
+  const next = [1, 2].map(i => { const dt = new Date(+r.mk.slice(0, 4), +r.mk.slice(5, 7) - 1 + i, 1), mk = monthKeyOf(dt), nb = raidOf(mk), nt = raidTier(nb);
+    return `<li><span class="rc-mon">${esc(raidMonthName(mk, { month: 'short' }))}</span><b>${esc(nb.name)}</b><span class="rc-tier" style="--tc:${nt.c}">${nt.name}</span><span class="lbl">${fmtNum(raidHPFor(mk, n))} HP</span></li>`; }).join('');
+  return `<div class="card clan-raid" style="--rb:${b.b};--ra:${b.a}">
+      <div class="row between" style="gap:8px;flex-wrap:wrap"><h2 style="margin:0">Monthly raid boss</h2><span class="lbl">${esc(raidMonthName(r.mk))}</span></div>
+      <div class="raid-body"><div class="raid-art${r.done ? ' beaten' : ''}">${bossSVG(b.art, r.done ? 'bf beaten' : 'bf')}</div>
+        <div><div class="rc-head"><b>${esc(b.name)}</b>${b.tier ? `<span class="rc-tier" style="--tc:${t.c}">${t.name}</span>` : ''}</div><p class="lbl" style="margin:4px 0 8px">${esc(b.lore)}</p>
+          <div class="cp"><span class="bar hp"><i data-fill="${(left / r.hp * 100).toFixed(1)}" data-fill-key="craid"></i></span><span class="lbl">${r.done ? 'Defeated!' : `${fmtNum(left)} / ${fmtNum(r.hp)} HP`}</span></div>
+          <p class="rc-line" data-raid-line>${line}</p></div></div>
+      <p class="lbl rc-scale">${scale}</p>
+      <div class="rc-reward"><span>Reward: ${b.tier ? `<b class="r-${t.rar} rc-rar">${RARITY_LABEL[t.rar]}</b> ` : ''}${esc(raidShort(b))} emblem for the clan + raid aura for every member · +300 Clan Points</span>${b.tier ? rallyNote : ''}</div>
+      ${r.claimed ? `<p class="lbl" style="margin:8px 0 0">✓ Defeated — the emblem is in your clan shop and every member got the raid aura${r.rallied ? ', plus the rally banner for player cards' : ''}</p>`
+        : r.done ? '<button class="btn primary small" id="clanRaidClaim" style="margin-top:10px">Claim the raid trophy</button>'
+        : '<p class="lbl" style="margin:8px 0 0">Every clan focus minute this month is a hit. It takes the whole clan: no one can beat it alone.</p>'}
+      <details class="rc-more"${loaded && who.length ? ' open' : ''}><summary>Contributions${loaded ? ` <span class="lbl">${who.length}</span>` : ''}</summary>
+        ${!loaded ? skelRows(3) : who.length ? `<ul class="rc-list">${rows}</ul>${gone ? `<p class="lbl" style="margin:6px 0 0">+ ${fmtMin(gone)} from people who have since left${r.newRule ? '' : ' or from before contributions were tracked'}</p>` : ''}` : '<p class="lbl">No hits yet this month — the first focus session starts the fight.</p>'}
+      </details>
+      ${r.newRule || r.mk === '2026-10' ? `<div class="rc-next"><span class="lbl">Coming up</span><ul>${next}</ul></div>` : ''}
+    </div>`;
+}
+
 
 
 const clanKey = () => 'pomodorolist-clan:' + (USER && !USER.guest ? USER.uid : 'none');
@@ -14691,7 +15179,7 @@ async function clanCreate({ name, tag, desc }) {
   const b = FB.writeBatch(FB.db);
   b.set(FB.doc(FB.db, 'clanNames', lower), { clan: cid });
   b.set(cDoc(cid), { name, nameLower: lower, tag, desc, emblem: 'ce_tomato', banner: 'cb_default', theme: 'ct_default', frame: 'cf_none', joinMode: 'approval', members: 1,
-    xp: 0, level: 1, weekKey: wk, weekMin: 0, monthKey: mk, monthMin: 0, raidHP: 1800, weekGroups: 0, lastLive: 'none', spent: 0, owned: {}, lastBuy: '', tq: 0, tr: 0,
+    xp: 0, level: 1, weekKey: wk, weekMin: 0, monthKey: mk, monthMin: 0, raidHP: raidHPFor(mk, 1), weekGroups: 0, lastLive: 'none', spent: 0, owned: {}, lastBuy: '', tq: 0, tr: 0,
     quests: {}, raids: {}, gday: '', gstreak: 0, createdAt: ts, updatedAt: ts });
   b.set(cDoc(cid, 'private', 'info'), { leader: USER.uid, code, officerShop: false, memberSchedule: false });
   b.set(cDoc(cid, 'members', USER.uid), newMemberDoc('leader', USER.username));
@@ -14720,7 +15208,7 @@ async function clanJoinOpen(c) {
   const b = FB.writeBatch(FB.db);
   b.set(cDoc(c.id, 'members', USER.uid), newMemberDoc('member', USER.username));
   b.set(FB.doc(FB.db, 'clanOf', USER.uid), { clan: c.id, at: FB.serverTimestamp() });
-  b.update(cDoc(c.id), { members: FB.increment(1), updatedAt: FB.serverTimestamp() });
+  b.update(cDoc(c.id), { members: FB.increment(1), lastMember: USER.uid, updatedAt: FB.serverTimestamp() });
   await b.commit();
   await clanRefresh(true);
 }
@@ -14745,7 +15233,7 @@ async function clanAccept(uid) {
     avatar: '', color: 'col_default', aura: '', level: 1, tier: 'novice', shareNames: false, focusUntil: 0, updatedAt: ts });
   b.set(FB.doc(FB.db, 'clanOf', uid), { clan: CLAN.id, at: ts });
   b.delete(cDoc(CLAN.id, 'requests', uid));
-  b.update(cDoc(CLAN.id), { members: FB.increment(1), updatedAt: ts });
+  b.update(cDoc(CLAN.id), { members: FB.increment(1), lastMember: uid, updatedAt: ts });
   await b.commit();
   CLAN.requests = CLAN.requests.filter(x => x.id !== uid);
   await clanRefresh(true);
@@ -14773,7 +15261,7 @@ async function clanLeave() {
   }
   b.delete(cDoc(id, 'members', USER.uid));
   b.delete(FB.doc(FB.db, 'clanOf', USER.uid));
-  b.update(cDoc(id), { members: FB.increment(-1), updatedAt: ts });
+  b.update(cDoc(id), { members: FB.increment(-1), lastMember: USER.uid, updatedAt: ts });
   await b.commit();
   clanAfterLeft();
 }
@@ -14791,7 +15279,7 @@ async function clanRemove(uid) {
   const b = FB.writeBatch(FB.db);
   b.delete(cDoc(CLAN.id, 'members', uid));
   b.delete(FB.doc(FB.db, 'clanOf', uid));
-  b.update(cDoc(CLAN.id), { members: FB.increment(-1), updatedAt: FB.serverTimestamp() });
+  b.update(cDoc(CLAN.id), { members: FB.increment(-1), lastMember: uid, updatedAt: FB.serverTimestamp() });
   await b.commit();
   await clanLoadDetails(true);
   await clanRefresh();
@@ -14898,16 +15386,18 @@ async function flushContrib() {
           const d = Math.min(1440, items.reduce((a, x) => a + x.min, 0));
           if (!d) return { skipped: q.map(x => x.id) };
           const sameWeek = c.weekKey >= wkNow, sameMonth = c.monthKey >= mkNow, wk = sameWeek ? c.weekKey : wkNow, mwk = m.weekKey > wk ? m.weekKey : wk;
-          tx.update(mref, { contrib: m.contrib + d, weekKey: mwk, weekMin: m.weekKey === mwk ? m.weekMin + d : d, lastAt: Date.now(),
+          const mmk = sameMonth ? c.monthKey : mkNow;
+          tx.update(mref, { contrib: m.contrib + d, weekKey: mwk, weekMin: m.weekKey === mwk ? m.weekMin + d : d, ...(CLAN.noMo ? {} : { moKey: mmk, moMin: m.moKey === mmk ? (m.moMin || 0) + d : d }), lastAt: Date.now(),
             lastIds: [...items.map(x => x.id), ...(m.lastIds || [])].slice(0, 12), updatedAt: FB.serverTimestamp() });
           tx.update(cref, { xp: FB.increment(d), level: clanLevelFor(c.xp + d), updatedAt: FB.serverTimestamp(),
             ...(sameWeek ? { weekMin: FB.increment(d) } : { weekKey: wkNow, weekMin: d, weekGroups: 0 }),
-            ...(sameMonth ? { monthMin: FB.increment(d) } : { monthKey: mkNow, monthMin: d, raidHP: Math.max(1800, (c.members || 1) * 600) }) });
+            ...(sameMonth ? { monthMin: FB.increment(d) } : { monthKey: mkNow, monthMin: d, raidHP: raidHPFor(mkNow, c.members) }) });
           return { done: items.map(x => x.id), skipped: q.filter(x => seen.has(x.id)).map(x => x.id), d, levelFrom: c.level, level: clanLevelFor(c.xp + d), items };
         });
       } catch (e) {
         if (e && e.code !== 'permission-denied' && e.code !== 'aborted' && e.code !== 'failed-precondition') throw e;
         denied = e.code === 'permission-denied';
+        if (denied && !CLAN.noMo) { CLAN.noMo = true; denied = false; }   // older rules: try once more without the raid-hit fields
       }
     }
   } catch (e) { console.warn('clan contribution', e && e.code); }
@@ -14923,6 +15413,9 @@ async function flushContrib() {
   writeLS(clanQKey(), readJSON(clanQKey(), []).filter(x => !gone.has(x.id)));
   if (res.d) {
     Object.assign(CLAN.doc, { xp: (CLAN.doc.xp || 0) + res.d, level: Math.max(CLAN.doc.level, res.level), weekKey: wkNow > CLAN.doc.weekKey ? wkNow : CLAN.doc.weekKey });
+    if (CLAN.doc.monthKey >= mkNow) CLAN.doc.monthMin = (CLAN.doc.monthMin || 0) + res.d;
+    else Object.assign(CLAN.doc, { monthKey: mkNow, monthMin: res.d, raidHP: raidHPFor(mkNow, CLAN.doc.members) });
+    if (CLAN.me && !CLAN.noMo) { const mk = CLAN.doc.monthKey; CLAN.me.moMin = (CLAN.me.moKey === mk ? CLAN.me.moMin || 0 : 0) + res.d; CLAN.me.moKey = mk; }
     CLAN.doc.weekMin = (CLAN.doc.weekMin || 0) + res.d;
     if (CLAN.me) { CLAN.me.contrib = (CLAN.me.contrib || 0) + res.d; CLAN.me.weekMin = (CLAN.me.weekKey === wkNow ? CLAN.me.weekMin || 0 : 0) + res.d; CLAN.me.weekKey = wkNow; }
     for (const it of res.items || []) if (it.min >= 25) clanFeed('focus', it.min);
@@ -14989,8 +15482,10 @@ async function clanClaimQuest() {
 async function clanClaimRaid() {
   const r = clanRaidState(CLAN.doc);
   if (!r.done || r.claimed) return false;
-  await FB.updateDoc(cDoc(CLAN.id), { ['raids.' + r.mk]: r.boss.id, tr: FB.increment(1), updatedAt: FB.serverTimestamp() });
-  CLAN.doc.raids = { ...(CLAN.doc.raids || {}), [r.mk]: r.boss.id }; CLAN.doc.tr = (CLAN.doc.tr || 0) + 1;
+  const rally = !!r.boss.tier && raidContributors(r.mk).length >= RAID_RALLY && (CLAN.doc.members || 0) >= RAID_RALLY, v = r.boss.id + (rally ? '+' : '');
+  await FB.updateDoc(cDoc(CLAN.id), { ['raids.' + r.mk]: v, tr: FB.increment(1), updatedAt: FB.serverTimestamp() });
+  CLAN.doc.raids = { ...(CLAN.doc.raids || {}), [r.mk]: v }; CLAN.doc.tr = (CLAN.doc.tr || 0) + 1;
+  CLAN.rallied = rally;
   G = null;
   clanFeed('raid', 0);
   return true;
@@ -15180,7 +15675,7 @@ function liveListen() {
   }), e => console.warn('live people', e && e.code)));
   let first = true;
   LIVE.unsubs.push(FB.onSnapshot(FB.query(FB.collection(FB.db, ...base, 'reactions'), FB.orderBy('at', 'desc'), FB.limit(8)), safeSnap(qs => {
-    const fresh = first ? [] : qs.docChanges().filter(c => c.type === 'added').map(c => livePlain(c.doc));
+    const fresh = first ? [] : qs.docChanges().filter(c => (c.type === 'added' || c.type === 'modified') && !c.doc.metadata.hasPendingWrites).map(c => livePlain(c.doc));
     first = false;
     for (const r of fresh) if (r && SOC.blocked[r.from] === undefined && r.from !== USER.uid) showReaction(r.from, r.emoji);
   }), e => console.warn('live reactions', e && e.code)));
@@ -15339,7 +15834,8 @@ async function liveControl(kind) {
 async function liveMaybeCount() {
   const d = LIVE.doc;
   if (!d || d.counted || LIVE.counting || isPreview() || !inClan()) return;
-  if (livePeople().filter(p => ['focus', 'break', 'paused', 'idle'].includes(p.st)).length < 2) return;
+  const here = livePeople().filter(p => ['focus', 'break', 'paused', 'idle'].includes(p.st)), second = here.find(p => p.id !== USER.uid);
+  if (here.length < 2 || !second || !here.some(p => p.id === USER.uid)) return;   // the rules check both seats really exist
   LIVE.counting = true;
   const lref = FB.doc(FB.db, 'clans', LIVE.cid, 'live', LIVE.lid), cref = cDoc(LIVE.cid), today = dayKey(new Date()), wkNow = dayKey(weekMonday());
   try {
@@ -15349,7 +15845,7 @@ async function liveMaybeCount() {
       const c = cs.data(), yest = dayKey(addDays(new Date(), -1));
       const gstreak = c.gday === today ? c.gstreak : c.gday === yest ? c.gstreak + 1 : 1;
       const sameWeek = c.weekKey >= wkNow;
-      tx.update(lref, { counted: true, updatedAt: FB.serverTimestamp() });
+      tx.update(lref, { counted: true, second: second.id, updatedAt: FB.serverTimestamp() });
       tx.update(cref, { lastLive: LIVE.lid, weekGroups: sameWeek ? (c.weekGroups || 0) + 1 : 1, ...(sameWeek ? {} : { weekKey: wkNow, weekMin: 0 }),
         gday: today, gstreak, updatedAt: FB.serverTimestamp() });
     });
@@ -15364,7 +15860,7 @@ async function liveReact(emoji) {
   LIVE.lastReact = Date.now();
   showReaction(USER.uid, emoji);
   if (isPreview()) return;
-  FB.addDoc(FB.collection(FB.db, 'clans', LIVE.cid, 'live', LIVE.lid, 'reactions'), { from: USER.uid, emoji, at: FB.serverTimestamp() }).catch(() => {});
+  FB.setDoc(FB.doc(FB.db, 'clans', LIVE.cid, 'live', LIVE.lid, 'reactions', USER.uid), { from: USER.uid, emoji, at: FB.serverTimestamp() }).catch(() => {});
 }
 function showReaction(from, emoji) {
   const seat = document.querySelector(`.lv-seat[data-uid="${CSS.escape(from)}"]`);
@@ -15562,19 +16058,13 @@ function sessionsHTML() {
 
 /* ---------- Weekly quest, monthly raid boss ---------- */
 function questRaidHTML(d) {
-  const q = clanQuestOf(d), r = clanRaidState(d), hpLeft = Math.max(0, r.hp - r.dmg);
+  const q = clanQuestOf(d);
   return `<div class="card clan-quest"><div class="row between"><h2 style="margin:0">Weekly clan quest</h2><span class="lbl">+100 Clan Points</span></div>
       <p style="margin:8px 0 6px"><b>${esc(q.name)}</b></p>
       <div class="cp"><span class="bar"><i data-fill="${Math.min(100, q.prog / q.goal * 100).toFixed(1)}" data-fill-key="cq"></i></span><span class="lbl">${q.unit === 'min' ? `${fmtMin(q.prog)} / ${fmtMin(q.goal)}` : `${q.prog} / ${q.goal}`}</span></div>
       ${q.claimed ? '<p class="lbl" style="margin:8px 0 0">✓ Done this week — a trophy is in the case</p>' : q.done ? '<button class="btn primary small" id="clanQuestClaim" style="margin-top:10px">Claim quest reward</button>' : `<p class="lbl" style="margin:8px 0 0">${q.unit === 'min' ? 'Every focus minute from any member counts.' : 'A live session with 2+ people counts as a group session.'}</p>`}
     </div>
-    <div class="card clan-raid" style="--rb:${r.boss.b};--ra:${r.boss.a}">
-      <div class="row between"><h2 style="margin:0">Monthly raid boss</h2><span class="lbl">${new Date(r.mk + '-01T00:00').toLocaleDateString([], { month: 'long' })}</span></div>
-      <div class="raid-body"><div class="raid-art${r.done ? ' beaten' : ''}">${bossSVG(r.boss.art, r.done ? 'bf beaten' : 'bf')}</div>
-        <div><b>${esc(r.boss.name)}</b><p class="lbl" style="margin:4px 0 8px">${esc(r.boss.lore)}</p>
-          <div class="cp"><span class="bar hp"><i data-fill="${(hpLeft / r.hp * 100).toFixed(1)}" data-fill-key="craid"></i></span><span class="lbl">${r.done ? 'Defeated!' : `${fmtNum(hpLeft)} / ${fmtNum(r.hp)} HP`}</span></div></div></div>
-      ${r.claimed ? '<p class="lbl" style="margin:8px 0 0">✓ Defeated — the emblem is in your clan shop and every member got the raid aura</p>' : r.done ? '<button class="btn primary small" id="clanRaidClaim" style="margin-top:10px">Claim the raid trophy</button>' : '<p class="lbl" style="margin:8px 0 0">Every clan focus minute this month is a hit. Victory: an exclusive clan emblem, a raid aura for every member and +300 Clan Points.</p>'}
-    </div>`;
+    ${raidCardHTML(d)}`;
 }
 
 /* ---------- Members, contribution board, requests, feed, trophies ---------- */
@@ -15616,7 +16106,7 @@ function trophyHTML(d) {
   const raids = Object.entries(d.raids || {}).sort(), quests = Object.keys(d.quests || {}).length;
   const lvMarks = [5, 10, 20, 30].filter(l => (d.level || 1) >= l);
   const items = [
-    ...raids.map(([mk, id]) => { const r = RAID_BY_ID[id]; return r ? `<div class="ctro" title="${esc(r.name)} · ${mk}">${clanEmblemSVG({ emblem: 'ce_r_' + id }, 48)}<span>${esc(r.name.split(' ')[1])}<br><small>${new Date(mk + '-01T00:00').toLocaleDateString([], { month: 'short', year: 'numeric' })}</small></span></div>` : ''; }),
+    ...raids.map(([mk, v]) => { const id = raidId(v), r = RAID_BY_ID[id]; return r ? `<div class="ctro${raidRallied(v) ? ' rallied' : ''}" title="${esc(r.name)} · ${mk}${raidRallied(v) ? ' · rally bonus' : ''}">${clanEmblemSVG({ emblem: 'ce_r_' + id }, 48)}<span>${esc(raidShort(r))}${raidRallied(v) ? ' ★' : ''}<br><small>${new Date(mk + '-01T00:00').toLocaleDateString([], { month: 'short', year: 'numeric' })}</small></span></div>` : ''; }),
     quests ? `<div class="ctro"><span class="tro-ic">🏆</span><span>${quests} weekly quest${quests === 1 ? '' : 's'}</span></div>` : '',
     ...lvMarks.map(l => `<div class="ctro"><span class="tro-ic">⭐</span><span>Level ${l}</span></div>`),
   ].filter(Boolean);
@@ -15698,6 +16188,8 @@ function openClanInvite() {
   $('#ciCode').textContent = code || '—';
   $('#ciLink').value = code ? clanLink(code) : '';
   $('#ciRegen').classList.toggle('hidden', !isClanLeader());
+  $('#ciCodeCopy').classList.toggle('hidden', !code);
+  syncShareButtons($('#clanInviteDlg'));
   $('#ciMode').textContent = CLAN.doc.joinMode === 'open' ? 'Open: anyone with this link joins straight away.' : 'Approval: you’ll see their request and can accept or decline.';
   $('#clanInviteDlg').showModal();
 }
@@ -15707,7 +16199,7 @@ function renderClanShop() {
   const d = CLAN.doc, can = clanCanShop(), pts = clanPoints(d);
   const groups = { emblem: [CLAN_EMBLEMS, 'ce_tomato'], banner: [CLAN_BANNERS, 'cb_default'], theme: [CLAN_THEMES, 'ct_default'], frame: [CLAN_FRAMES, 'cf_none'] };
   const [cat, free] = groups[shopTab];
-  const ids = Object.keys(cat).filter(id => id === free || CLAN_SHOP[id] || (id.startsWith('ce_r_') && Object.values(d.raids || {}).includes(id.slice(5))));
+  const ids = Object.keys(cat).filter(id => id === free || CLAN_SHOP[id] || (id.startsWith('ce_r_') && raidsWon(d).includes(id.slice(5))));
   const pv = id => shopTab === 'emblem' ? clanEmblemSVG({ ...d, emblem: id }, 56) : shopTab === 'frame' ? clanEmblemSVG({ ...d, frame: id }, 56)
     : shopTab === 'banner' ? `<span class="cs-sw" style="background:${clanBanner({ banner: id }).css}"></span>` : `<span class="cs-sw" style="background:${clanAccent({ theme: id })}"></span>`;
   $('#csPts').textContent = `${fmtNum(pts)} Clan Points · clan level ${d.level}`;
@@ -15717,7 +16209,7 @@ function renderClanShop() {
     const p = CLAN_SHOP[id], owned = id === free || (d.owned || {})[id] || id.startsWith('ce_r_'), on = d[shopTab] === id, locked = p && d.level < p[1];
     const btn = on ? '<button class="btn small" disabled>In use</button>' : owned ? `<button class="btn small" data-cuse="${id}"${can ? '' : ' disabled'}>Use</button>`
       : locked ? `<button class="btn small" disabled>Level ${p[1]}</button>` : `<button class="btn primary small" data-cbuy="${id}"${can && pts >= p[0] ? '' : ' disabled'}>${fmtNum(p[0])} pts</button>`;
-    return `<div class="item r-${p ? clanShopRarity(id) : id.startsWith('ce_r_') ? 'legendary' : 'common'}${on ? ' equipped' : ''}"><div class="pv">${pv(id)}</div><div class="nm">${esc(id.startsWith('ce_r_') ? RAID_BY_ID[id.slice(5)].name + ' emblem' : clanShopName(id))}</div><div class="act">${btn}</div></div>`;
+    return `<div class="item r-${p ? clanShopRarity(id) : id.startsWith('ce_r_') ? (RAID_BY_ID[id.slice(5)].tier ? RAID_TIERS[RAID_BY_ID[id.slice(5)].tier].rar : 'legendary') : 'common'}${on ? ' equipped' : ''}"><div class="pv">${pv(id)}</div><div class="nm">${esc(id.startsWith('ce_r_') ? RAID_BY_ID[id.slice(5)].name + ' emblem' : clanShopName(id))}</div><div class="act">${btn}</div></div>`;
   }).join('');
 }
 let schedEdit = '', schedNow = false;
@@ -15803,7 +16295,7 @@ $('#tab-clan').addEventListener('click', async e => {
   if (b.dataset.react) return liveReact(b.dataset.react);
   if (b.dataset.cjoinlive) return clanAct(b, () => liveJoin(b.dataset.cjoinlive));
   if (b.id === 'clanQuestClaim') return clanAct(b, async () => { if (await clanClaimQuest()) { miniBurst(b); uiSound('coin'); toast('Weekly quest complete! +100 Clan Points 🏆', 3000, true, { now: true }); renderClan(); } });
-  if (b.id === 'clanRaidClaim') return clanAct(b, async () => { if (await clanClaimRaid()) { miniBurst(b); uiSound('coin'); toast('Raid boss defeated! A new emblem and aura are yours 🏆', 3600, true, { now: true }); renderClan(); updateBagDot(); } });
+  if (b.id === 'clanRaidClaim') return clanAct(b, async () => { if (await clanClaimRaid()) { miniBurst(b); uiSound('coin'); toast(CLAN.rallied ? 'Raid boss defeated with a rally! A new emblem, aura and card banner are yours 🏆' : 'Raid boss defeated! A new emblem and aura are yours 🏆', 3600, true, { now: true }); renderClan(); updateBagDot(); } });
   if (b.id === 'clanLeave') {
     const last = (CLAN.doc.members || 1) <= 1;
     const ok = await confirmDlg({ title: last ? 'Leave and delete the clan?' : 'Leave the clan?', body: last ? 'You’re the last member, so the clan will be deleted.' : isClanLeader() ? 'Leadership passes to your longest-serving officer (or member). Your contribution resets if you rejoin; clan cosmetics are unequipped.' : 'Your contribution resets if you rejoin. Clan cosmetics are unequipped (they come back if you rejoin).', ok: 'Leave', danger: true });
@@ -15846,7 +16338,7 @@ $('#ccSave').addEventListener('click', e => clanAct(e.currentTarget, async () =>
   try { await clanCreate({ name: $('#ccName').value, tag: $('#ccTag').value, desc: $('#ccDesc').value }); }
   catch (er) { $('#ccErr').textContent = er.code ? 'Couldn’t create the clan — check your connection' : er.message; return false; }
   $('#clanCreateDlg').close();
-  miniBurst($('#tabs [data-tab="clan"]') || document.body);
+  miniBurst(navEl('clan') || document.body);
   toast(`Welcome to ${CLAN.doc.name}! Invite your friends 🛡️`, 3000, true, { now: true });
   showTab('clan');
 }));
@@ -15868,7 +16360,10 @@ $('#clanCardGo').addEventListener('click', e => {
   if (b.dataset.mode === 'approval') return clanAct(b, async () => { await clanRequest(d); openClanCard(d); renderClanBits(); }, `Request sent to ${d.name}`);
 });
 $('#clanCardClose').addEventListener('click', () => $('#clanCardDlg').close());
-$('#ciCopy').addEventListener('click', async () => { try { await navigator.clipboard.writeText($('#ciLink').value); toast('Invite link copied', 2000, true, { now: true }); } catch (e) { $('#ciLink').select(); } });
+$('#ciCopy').addEventListener('click', e => copyText($('#ciLink').value, { btn: e.currentTarget, field: $('#ciLink'), what: 'Invite link' }));
+$('#ciCodeCopy').addEventListener('click', e => copyText((CLAN.info && CLAN.info.code) || '', { btn: e.currentTarget, what: 'Invite code' }));
+$('#ciShare').addEventListener('click', () => shareLink({ title: 'Pomodorolist clan invite', text: `Join ${CLAN.doc ? CLAN.doc.name : 'my clan'} on Pomodorolist (code ${(CLAN.info && CLAN.info.code) || ''})`,
+  url: $('#ciLink').value, btn: $('#ciCopy'), field: $('#ciLink'), what: 'Invite link' }));
 $('#ciRegen').addEventListener('click', async e => {
   if (!(await confirmDlg({ title: 'Make a new invite code?', body: 'The old code and link stop working.', ok: 'New code' }))) return;
   clanAct(e.currentTarget, async () => { await clanRegenCode(); openClanInvite(); }, 'New invite code ready');
@@ -15992,7 +16487,7 @@ const CLAN_RARITY = { common: 0, rare: 1, epic: 2, legendary: 3 };
 /** Clan cosmetics not unlocked yet (shown locked in the bag's Clan section, so the next one is always visible). */
 function clanLockedCards(g) {
   if (!inClan() || minimal()) return [];
-  return ITEMS.filter(it => (it.clanLv || it.clanRaid) && !clanOwns(it)).sort((a, b) => (a.clanLv || 99) - (b.clanLv || 99)).map(it => {
+  return ITEMS.filter(it => (it.clanLv || (it.clanRaid && it.clanRaid === raidOf().id)) && !clanOwns(it)).sort((a, b) => (a.clanLv || 99) - (b.clanLv || 99)).map(it => {
     const rar = itemRarity(it), how = it.clanLv ? `Clan level ${it.clanLv}` : `Beat the ${RAID_BY_ID[it.clanRaid].name}`;
     return `<div class="item bag-item r-${rar} locked" aria-label="${esc(it.name)} — ${esc(how)}"><div class="pv">${rewardPreview(it, g)}</div><div class="nm">${esc(it.name)}</div>
       <div class="bi-src"><span class="rar">${RARITY_LABEL[rar]}</span><span>${esc(how)}</span></div><div class="act"><button class="btn" disabled>${LOCK_SVG} ${it.clanLv ? 'Level ' + it.clanLv : 'Raid'}</button></div></div>`;
@@ -16062,14 +16557,14 @@ function demoClanDocs(ts, wk) {
   const docs = {
     'clanOf/demo': { clan: cid, at: ts(now - 40 * 864e5) },
     ['clans/' + cid]: { name: 'Night Owls', nameLower: 'night owls', tag: 'OWLS', desc: 'jee', emblem: 'ce_owl', banner: 'cb_galaxy', theme: 'ct_royal', frame: 'cf_silver', joinMode: 'approval', members: 5,
-      xp, level: clanLevelFor(xp), weekKey: wk, weekMin: 1310, monthKey: mk, monthMin: 2240, raidHP: 3000, weekGroups: 2, lastLive: 'demo_live', spent, owned, lastBuy: 'cf_silver', tq: 3, tr: 1,
+      xp, level: clanLevelFor(xp), weekKey: wk, weekMin: 1310, monthKey: mk, monthMin: Math.round(raidHPFor(mk, 5) * .62), raidHP: raidHPFor(mk, 5), weekGroups: 2, lastLive: 'demo_live', spent, owned, lastBuy: 'cf_silver', tq: 3, tr: 1,
       quests: {}, raids: { [prev]: 'leviathan' }, gday: dayKey(today), gstreak: 4, createdAt: ts(now - 60 * 864e5), updatedAt: ts(now) },
     [`clans/${cid}/private/info`]: { leader: 'demo_f1', code: 'OWLS2K26', officerShop: true, memberSchedule: true },
   };
   const mem = [['demo_f1', 'James', 'leader', 'av_fox', 'col_teal', 'au_c_bond', 3100, 420], ['demo', 'demo_scholar', 'officer', 'av_owl', 'col_c_steel', '', 2480, 380],
     ['demo_f4', 'Princess_cupcake', 'member', 'av_panda', 'col_rose', '', 2210, 310], ['demo_f5', 'lenvixty', 'member', 'av_cat', 'col_violet', '', 990, 150], ['demo_f2', 'siverieg', 'member', 'av_robot', '', '', 640, 50]];
   mem.forEach(([id, name, role, avatar, color, aura, contrib, weekMin], i) => {
-    docs[`clans/${cid}/members/${id}`] = { name, role, joinedAt: now - (60 - i * 9) * 864e5, contrib, weekKey: wk, weekMin, lastAt: now - i * 3600e3, lastIds: [], avatar, color, aura, level: 10 + i, tier: 'scholar', shareNames: i < 2, focusUntil: i === 2 ? now + 18 * 60000 : 0, updatedAt: ts(now) };
+    docs[`clans/${cid}/members/${id}`] = { name, role, joinedAt: now - (60 - i * 9) * 864e5, contrib, weekKey: wk, weekMin, moKey: mk, moMin: Math.round(raidHPFor(mk, 5) * .62 * [.33, .27, .2, .12, .08][i]), lastAt: now - i * 3600e3, lastIds: [], avatar, color, aura, level: 10 + i, tier: 'scholar', shareNames: i < 2, focusUntil: i === 2 ? now + 18 * 60000 : 0, updatedAt: ts(now) };
   });
   docs[`clans/${cid}/sessions/demo_s1`] = { mode: 'together', title: 'Night owls', start: at(21, 0) - 7 * 864e5, pattern: { focus: 50, short: 10, rounds: 2 }, repeat: 'daily', days: [], tag: 'JEE', max: 30, creator: 'demo_f1', creatorName: 'James', cancelled: false,
     rsvp: { demo_f1: 'going', demo: 'going', demo_f4: 'maybe' }, createdAt: ts(now - 8 * 864e5), updatedAt: ts(now) };
@@ -16218,6 +16713,192 @@ function togetherTableHTML(d, people, demo) {
     <p class="lbl lv-note">Everyone runs their own timer and preset — nobody controls yours. Stepping away or leaving only affects you, and your focus counts like any session. Session names show only for people who share them.</p>
   </div>`;
 }
+
+/* ==========================================================================
+   COPY AND SHARE (v1.14.3). Every Copy button goes through copyText: the
+   Clipboard API first, then the older select-and-copy way (for http pages,
+   pages embedded in another site, and browsers that block the Clipboard API),
+   and if both fail the text is selected so Ctrl/⌘ C works. The button reads
+   "Copied ✓" for 2 seconds and a small toast confirms it. Phones with the
+   Web Share API also get a Share button.
+   ========================================================================== */
+const IS_MAC = /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent || '');
+/** The old way: select the text in the page and copy it. Works where the Clipboard API is missing or blocked. */
+function execCopy(text) {
+  // inside an open dialog the rest of the page is inert, so the text has to sit inside the dialog to be selected
+  const host = [...document.querySelectorAll('dialog[open]')].filter(d => !d.classList.contains('closing')).pop() || document.body;
+  const span = document.createElement('span');
+  span.textContent = text;
+  span.setAttribute('aria-hidden', 'true');
+  span.style.cssText = 'position:fixed;top:0;left:0;clip:rect(0,0,0,0);white-space:pre;-webkit-user-select:text;user-select:text;font-size:16px';
+  host.appendChild(span);
+  const sel = document.getSelection(), keep = sel && sel.rangeCount ? sel.getRangeAt(0) : null, prev = document.activeElement;
+  let ok = false;
+  try {
+    const r = document.createRange();
+    r.selectNodeContents(span);
+    sel.removeAllRanges(); sel.addRange(r);
+    ok = document.execCommand('copy');
+  } catch (e) { ok = false; }
+  span.remove();
+  try { sel.removeAllRanges(); if (keep) sel.addRange(keep); } catch (e) { /* the old selection went away */ }
+  if (prev && prev !== document.body && prev.isConnected && prev.focus) prev.focus({ preventScroll: true });
+  return ok;
+}
+/** "Copied ✓" on the button for about 2 seconds. */
+function copiedFeedback(btn) {
+  if (!btn) return;
+  clearTimeout(btn._copyT);
+  if (!btn.classList.contains('copied')) btn.dataset.label = btn.innerHTML;
+  btn.classList.add('copied');
+  btn.textContent = 'Copied ✓';
+  btn._copyT = setTimeout(() => { btn.classList.remove('copied'); if (btn.dataset.label !== undefined) btn.innerHTML = btn.dataset.label; }, 2000);
+}
+/** Select a field's text so the person can copy it themselves. */
+function selectField(field) {
+  if (!field) return;
+  try { field.focus({ preventScroll: true }); field.select(); field.setSelectionRange(0, field.value.length); } catch (e) { /* not a text field */ }
+}
+/**
+ * Copy text. btn shows "Copied ✓"; field is the input holding the text (selected if copying fails);
+ * what names it in the toast ("Invite link copied").
+ */
+async function copyText(text, { btn = null, field = null, what = 'Link' } = {}) {
+  if (!text) return false;
+  let ok = false;
+  // Without the Clipboard API (http pages, older browsers) copy straight away, while the tap still counts as one
+  const api = navigator.clipboard && typeof navigator.clipboard.writeText === 'function' && window.isSecureContext !== false;
+  if (!api) ok = execCopy(text);
+  else {
+    try { await navigator.clipboard.writeText(text); ok = true; }
+    catch (e) { ok = execCopy(text); }   // blocked (embedded page, permissions): the older way
+  }
+  if (ok) {
+    copiedFeedback(btn);
+    toast(`${what} copied`, 2000, true, { now: true, log: false });
+    return true;
+  }
+  selectField(field);
+  toast(`Couldn’t copy automatically. ${field ? `The ${what.toLowerCase()} is selected: press` : 'Select it and press'} ${IS_MAC ? '⌘' : 'Ctrl'}+C to copy it.`, 4800, false, { now: true, log: false });
+  return false;
+}
+/** The Web Share API, offered on phones and tablets (on computers it often opens a small system menu, so Copy is enough). */
+const canShareNative = () => typeof navigator.share === 'function' && matchMedia('(pointer: coarse)').matches;
+/** Share a link with the system share sheet; falls back to copying if sharing isn't possible. */
+async function shareLink({ title = 'Pomodorolist', text = '', url, btn = null, field = null, what = 'Link' }) {
+  if (typeof navigator.share === 'function') {
+    try { await navigator.share({ title, text, url }); return true; }
+    catch (e) { if (e && e.name === 'AbortError') return false; }   // closed the share sheet: nothing to do
+  }
+  return copyText(url, { btn, field, what });
+}
+/** Show the Share buttons only where the share sheet is available. */
+function syncShareButtons(root = document) {
+  root.querySelectorAll('[data-native-share]').forEach(b => b.classList.toggle('hidden', !canShareNative()));
+}
+// A read-only link field selects all of its text on focus, so it's easy to copy by hand too
+document.addEventListener('focusin', e => { const f = e.target.closest && e.target.closest('input[readonly][data-copyfield]'); if (f) setTimeout(() => selectField(f), 0); });
+
+/* ==========================================================================
+   NAVIGATION (v1.14.3). One list of sections (#tabs), shown three ways:
+   - wide screens (1180px+): a sidebar with icons and full labels, which can be
+     collapsed to icons only (remembered on this device);
+   - tablets and small laptops: a ☰ menu button that slides the same list in;
+   - phones: a bottom bar with the five main sections plus More, which opens the list.
+   Badges live on the list's items; the bottom bar, More and ☰ mirror them.
+   ========================================================================== */
+const NAV_MINI_KEY = 'pomodorolist-nav-mini';
+const NAV_MQ = { phone: matchMedia('(max-width: 640px)'), side: matchMedia('(min-width: 1180px)') };
+const navMode = () => (NAV_MQ.phone.matches ? 'phone' : NAV_MQ.side.matches ? 'side' : 'drawer');
+const NAV_LABEL = { timer: 'Timer', reminders: 'Reminders', quests: 'Quests', stats: 'Stats', board: 'Leaderboard', shop: 'Shop', friends: 'Friends', clan: 'Clan', profile: 'Profile' };
+let navOpener = null;
+/** Is this element really on screen (not in the closed menu, not hidden)? */
+function navShown(el) {
+  if (!el || !el.getClientRects().length || !el.offsetWidth || el.classList.contains('hidden')) return false;
+  if (getComputedStyle(el).visibility === 'hidden') return false;
+  const r = el.getBoundingClientRect();
+  return r.right > 0 && r.left < innerWidth && r.bottom > 0 && r.top < innerHeight;
+}
+/** The visible control for a section: its bottom-bar or sidebar button, else the More / ☰ button that leads to it. */
+function navEl(tab, fallback = true) {
+  const own = [...$$(`#btmBar [data-tab="${tab}"], #tabs [data-tab="${tab}"]`)].find(navShown);
+  if (own || !fallback) return own || null;
+  return [$('#navMore'), $('#navBurger')].find(navShown) || null;
+}
+/** Open or close the slide-in menu (tablets: ☰, phones: More). */
+function navOpen(open, opener = null, quiet = false) {
+  if (open && navMode() === 'side') open = false;
+  const was = document.body.classList.contains('nav-open');
+  if (open === was) return;
+  document.body.classList.toggle('nav-open', open);
+  $('#navScrim').classList.toggle('on', open);
+  for (const b of [$('#navBurger'), $('#navMore')]) if (b) b.setAttribute('aria-expanded', String(open));
+  if (open) {
+    navOpener = opener || document.activeElement;
+    if (quiet) return;
+    uiSound('swoosh');
+    setTimeout(() => { const a = $('#tabs [data-tab].active:not(.hidden)') || $('#tabs [data-tab]:not(.hidden)'); if (a) a.focus({ preventScroll: true }); }, 30);
+  } else if (navOpener && navOpener.isConnected && navShown(navOpener)) { navOpener.focus({ preventScroll: true }); navOpener = null; }
+}
+/** Mark the current section on every nav (sidebar, bottom bar, More) and in the header. */
+function navMark(navTab) {
+  $$('#tabs [data-tab], #btmBar [data-tab]').forEach(b => { const on = b.dataset.tab === navTab; b.classList.toggle('active', on); b.setAttribute('aria-current', on ? 'page' : 'false'); });
+  const inBar = !!$(`#btmBar [data-tab="${navTab}"]:not(.hidden)`);
+  const more = $('#navMore');
+  if (more) { more.classList.toggle('active', !inBar); more.setAttribute('aria-current', inBar ? 'false' : 'page'); }
+  const cur = $('#navCur');
+  if (cur) cur.textContent = NAV_LABEL[navTab] || '';
+}
+/** Copy hidden states and badges from the list to the bottom bar, and light More / ☰ for badges they hide. */
+let navMirrorQ = false;
+function navMirror() {
+  navMirrorQ = false;
+  const dotOn = d => d && !d.classList.contains('hidden') && getComputedStyle(d).display !== 'none';
+  for (const b of $$('#btmBar [data-tab]')) {
+    const src = $(`#tabs [data-tab="${b.dataset.tab}"]`);
+    if (!src) continue;
+    b.classList.toggle('hidden', src.classList.contains('hidden'));
+    const sd = src.querySelector('.tbadge'), bd = b.querySelector('.tbadge');
+    if (bd) { bd.classList.toggle('hidden', !dotOn(sd)); if (sd) bd.setAttribute('aria-label', sd.getAttribute('aria-label') || ''); }
+  }
+  const barTabs = new Set($$('#btmBar [data-tab]:not(.hidden)').map(b => b.dataset.tab));
+  const lit = $$('#tabs [data-tab]:not(.hidden)').filter(b => dotOn(b.querySelector('.tbadge')));
+  $('#navMoreDot').classList.toggle('hidden', !lit.some(b => !barTabs.has(b.dataset.tab)));
+  $('#navBurgerDot').classList.toggle('hidden', !lit.length);
+}
+new MutationObserver(() => { if (!navMirrorQ) { navMirrorQ = true; requestAnimationFrame(navMirror); } })
+  .observe($('#tabs'), { subtree: true, attributes: true, attributeFilter: ['class'] });
+/** Sidebar collapsed to icons (wide screens), remembered per device. */
+function navMini(on) {
+  document.documentElement.classList.toggle('nav-mini', on);
+  try { localStorage.setItem(NAV_MINI_KEY, on ? '1' : '0'); } catch (e) { /* private mode */ }
+  const b = $('#navCollapse');
+  b.setAttribute('aria-expanded', String(!on));
+  b.setAttribute('aria-label', on ? 'Expand the sidebar' : 'Collapse the sidebar');
+  b.title = on ? 'Expand the sidebar' : 'Collapse the sidebar';
+  b.querySelector('.nv-l').textContent = on ? 'Expand' : 'Collapse';
+}
+/** The sections in the order a swipe moves through: the bottom bar on phones, else the list. */
+const navOrder = () => (navMode() === 'phone' ? $$('#btmBar [data-tab]') : $$('#tabs [data-tab]')).filter(b => !b.classList.contains('hidden')).map(b => b.dataset.tab);
+// The sidebar sits under the header: keep its top in step with the header's height
+new ResizeObserver(() => document.documentElement.style.setProperty('--hdrh', Math.round($('header.top').getBoundingClientRect().height) + 'px')).observe($('header.top'));
+try { if (localStorage.getItem(NAV_MINI_KEY) === '1') navMini(true); } catch (e) { /* private mode */ }
+$('#navBurger').addEventListener('click', e => navOpen(!document.body.classList.contains('nav-open'), e.currentTarget));
+$('#navMore').addEventListener('click', e => navOpen(!document.body.classList.contains('nav-open'), e.currentTarget));
+$('#navClose').addEventListener('click', () => navOpen(false));
+$('#navScrim').addEventListener('click', () => navOpen(false));
+$('#navCollapse').addEventListener('click', () => navMini(!document.documentElement.classList.contains('nav-mini')));
+$('#btmBar').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) showTab(b.dataset.tab); });
+$('#tabs').addEventListener('keydown', e => {
+  if (!document.body.classList.contains('nav-open')) return;
+  if (e.key === 'Escape') { e.preventDefault(); navOpen(false); return; }
+  if (e.key !== 'Tab') return;   // keep the keyboard inside the open menu
+  const f = $$('#tabs button').filter(navShown), i = f.indexOf(document.activeElement);
+  if (!f.length) return;
+  if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); }
+  else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); }
+});
+for (const mq of Object.values(NAV_MQ)) mq.addEventListener('change', () => { navOpen(false); navMirror(); if (USER) navMark(S.ui.tab === 'settings' || S.ui.tab === 'about' ? 'profile' : S.ui.tab); });
 
 async function boot() {
   captureInvite();
