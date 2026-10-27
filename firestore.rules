@@ -1,0 +1,710 @@
+rules_version = '2';
+
+// ============================================================================
+// Pomodorolist — Firestore security rules
+//
+// What other people can see lives OUTSIDE users/{uid}:
+//   usernames/{name}            { uid }               exact-username lookup only
+//   publicProfiles/{uid}        badge, level, flair, streak, hours, join date
+//   publicStats/{uid}           focus minutes per period (leaderboards)
+//   activity/{uid}              last 12 weeks + last 20 sessions (friends only)
+//   presence/{uid}              "focusing now" (friends only)
+//   friendships/{a_b}           a request or a friendship between two users
+//   inbox/{uid}/items/{id}      kudos and nudges (preset reactions, no text)
+//   challenges/{id}             weekly challenges between friends
+//   clans/… clanNames/… clanCodes/… clanOf/…   clans, the study-group system (v1.14, see CLANS below; session modes v1.14.2; raid HP table + security audit v1.14.3)
+//
+// HONEST NOTE ON CHEATING: there is no server here (no Cloud Functions on the
+// free plan), so every number is calculated on the user's own device. These
+// rules block obvious cheating — impossible jumps, decreasing totals, more
+// minutes than real time allows, other people's documents — but a determined
+// user could still write believable fake numbers for themselves.
+// ============================================================================
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function me() { return request.auth.uid; }
+    // Usernames are the login: "<username>@pomodorolist.app". This ties every
+    // public username to the account that really owns it.
+    function myName() { return request.auth.token.email.split('@')[0]; }
+    function path(col, id) { return /databases/$(database)/documents/$(col)/$(id); }
+
+    // Accepted friendship between me and uid (document id = smaller uid + "_" + larger uid): one read.
+    function friendDoc(a, b) { return path('friendships', a + '_' + b); }
+    function pairDoc(uid) { return me() < uid ? friendDoc(me(), uid) : friendDoc(uid, me()); }
+    function isFriend(uid) { return exists(pairDoc(uid)) && get(pairDoc(uid)).data.status == 'accepted'; }
+    // owner has blocked me
+    function blockedBy(owner) { return exists(/databases/$(database)/documents/users/$(owner)/blocked/$(me())); }
+
+    // ---------------- Private data: owner only (unchanged) ----------------
+    match /users/{uid} {
+      allow read, write: if signedIn() && me() == uid;
+      match /{document=**} {
+        allow read, write: if signedIn() && me() == uid;   // includes months/ and blocked/
+      }
+    }
+
+    // ---------------- Username lookup ----------------
+    match /usernames/{name} {
+      allow get: if signedIn();
+      allow list: if false;                                // no browsing all usernames
+      allow create: if signedIn()
+        && name == myName()
+        && request.resource.data.keys().hasOnly(['uid'])
+        && request.resource.data.uid == me();
+      allow update: if false;
+      allow delete: if signedIn() && resource.data.uid == me();
+    }
+
+    // ---------------- Public profile ----------------
+    match /publicProfiles/{uid} {
+      allow get: if signedIn() && (me() == uid || !blockedBy(uid));
+      allow list: if false;
+      allow create, update: if signedIn() && me() == uid && validProfile();
+      allow delete: if signedIn() && me() == uid;
+    }
+    function validProfile() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['username', 'level', 'tier', 'frame', 'color', 'avatar', 'aura', 'clanTag', 'streak', 'longest', 'hours', 'joined', 'big', 'updatedAt'])
+        && d.username == myName()
+        && validAvatar(d) && validAura(d) && validClanTag(d) && validBig(d)
+        && d.level is int && d.level >= 1 && d.level <= 1000
+        && d.tier is string && d.tier.size() <= 20
+        && d.frame is string && d.frame.size() <= 30
+        && d.color is string && d.color.size() <= 30
+        && d.streak is int && d.streak >= 0 && d.longest is int && d.longest >= d.streak && d.longest <= 100000
+        && d.hours is number && d.hours >= 0 && d.hours <= 60000
+        && d.joined is int && d.joined <= request.time.toMillis()
+        && d.updatedAt == request.time;
+    }
+
+    // Biggest harvest (optional, v1.16): 'species:kg' such as "pumpkin:12.4" — a species id and a weight up to 9999.99.
+    function validBig(d) {
+      return !('big' in d) || (d.big is string && d.big.size() <= 40 && d.big.matches('^[a-z]{2,20}:[0-9]{1,4}(\\.[0-9]{1,2})?$'));
+    }
+    // Profile picture id (optional, so older app versions keep working): a short string such as "av_cat".
+    function validAvatar(d) {
+      return !('avatar' in d) || (d.avatar is string && d.avatar.size() <= 30);
+    }
+    // Chosen special aura (optional, v1.12+): a short id such as "au_b_dragon_sq". Missing = the streak aura.
+    function validAura(d) {
+      return !('aura' in d) || (d.aura is string && d.aura.size() <= 30);
+    }
+    // Clan tag shown next to the name (optional, v1.14): must be the tag of the clan the user is really in.
+    function validClanTag(d) {
+      return !('clanTag' in d)
+        || (resource != null && 'clanTag' in resource.data && resource.data.clanTag == d.clanTag)      // unchanged: no reads
+        || (exists(/databases/$(database)/documents/clanOf/$(me()))
+            && d.clanTag == get(/databases/$(database)/documents/clans/$(get(/databases/$(database)/documents/clanOf/$(me())).data.clan)).data.tag);
+    }
+
+    // ---------------- Leaderboard stats ----------------
+    match /publicStats/{uid} {
+      allow get: if signedIn() && (me() == uid || ((resource.data.global == true || isFriend(uid)) && !blockedBy(uid)));
+      allow list: if signedIn() && resource.data.global == true;   // global leaderboard queries
+      allow create: if signedIn() && me() == uid && validStats() && createLimits();
+      allow update: if signedIn() && me() == uid && validStats() && updateLimits();
+      allow delete: if signedIn() && me() == uid;
+    }
+    function validStats() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['username', 'level', 'tier', 'frame', 'color', 'avatar', 'aura', 'clanTag', 'global',
+                               'dayKey', 'dayMin', 'weekKey', 'weekMin', 'weekKeySun', 'weekMinSun',
+                               'monthKey', 'monthMin', 'lifeMin', 'lastWeekKey', 'lastWeekMin', 'produce', 'harvests', 'updatedAt'])
+        && d.username == myName()
+        && validAvatar(d) && validAura(d) && validClanTag(d) && validGardenTotals(d)
+        && d.global is bool
+        && d.level is int && d.level >= 1 && d.level <= 1000
+        && d.tier is string && d.tier.size() <= 20 && d.frame is string && d.frame.size() <= 30 && d.color is string && d.color.size() <= 30
+        && d.dayKey is string && d.dayKey.size() == 10 && d.weekKey is string && d.weekKey.size() == 10
+        && d.weekKeySun is string && d.weekKeySun.size() == 10 && d.monthKey is string && d.monthKey.size() == 7
+        && d.lastWeekKey is string && d.lastWeekKey.size() == 10
+        && d.dayMin is int && d.dayMin >= 0 && d.dayMin <= 1440
+        && d.weekMin is int && d.weekMin >= 0 && d.weekMin <= 10080
+        && d.weekMinSun is int && d.weekMinSun >= 0 && d.weekMinSun <= 10080
+        && d.monthMin is int && d.monthMin >= 0 && d.monthMin <= 44640
+        && d.lastWeekMin is int && d.lastWeekMin >= 0 && d.lastWeekMin <= 10080
+        && d.lifeMin is int && d.lifeMin >= 0 && d.lifeMin <= 3600000
+        // today is inside this week and this month, and everything is inside the lifetime total
+        && d.dayMin <= d.weekMin && d.dayMin <= d.weekMinSun && d.dayMin <= d.monthMin
+        && d.weekMin <= d.lifeMin && d.weekMinSun <= d.lifeMin && d.monthMin <= d.lifeMin
+        && d.updatedAt == request.time;                          // server time: can't be in the future
+    }
+    // Garden leaderboards (optional, v1.16): produce ever harvested and plants harvested, whole numbers with a ceiling.
+    function validGardenTotals(d) {
+      return (!('produce' in d) || (d.produce is int && d.produce >= 0 && d.produce <= 10000000))
+          && (!('harvests' in d) || (d.harvests is int && d.harvests >= 0 && d.harvests <= 1000000));
+    }
+    // An all-time total that is new on the document (an older document, or an older app that stopped sending it)
+    // may take any value under its ceiling; while it stays on the document it never goes down and grows at most
+    // perMin per minute since the last write (plus one 4-hour session), plus slack. Like lifeMin's first upload,
+    // this is a self-reported stat: dropping and re-adding the field resets the bound (accepted; see the notes).
+    function growsTotal(f, perMin, slack) {
+      let n = request.resource.data;
+      let o = resource.data;
+      return !(f in n) || !(f in o) || (n[f] >= o[f] && n[f] - o[f] <= (elapsedMin() + 240) * perMin + slack);
+    }
+    function createLimits() { return true; }                  // first upload may include past history
+    // Minutes since this document was last written (server clock).
+    function elapsedMin() { return (request.time.toMillis() - resource.data.updatedAt.toMillis()) / 60000; }
+    // Within the same period a total can't go down, and can't grow by more than the real time
+    // that has passed since the last write plus one 4-hour session. A new period starts from 0.
+    function grows(keyField, minField) {
+      let n = request.resource.data;
+      let o = resource.data;
+      return (n[keyField] == o[keyField] && n[minField] >= o[minField] && n[minField] - o[minField] <= elapsedMin() + 240)
+          || (n[keyField] != o[keyField] && n[minField] <= elapsedMin() + 240);
+    }
+    function updateLimits() {
+      let n = request.resource.data;
+      let o = resource.data;
+      return grows('dayKey', 'dayMin') && grows('weekKey', 'weekMin') && grows('weekKeySun', 'weekMinSun') && grows('monthKey', 'monthMin')
+        && n.lifeMin >= o.lifeMin && n.lifeMin - o.lifeMin <= elapsedMin() + 240
+        && growsTotal('produce', 2.0, 0) && growsTotal('harvests', 0.034, 2);   // ≤ 2 produce per minute of focus; a harvest per ~30 minutes (v1.16)
+    }
+
+    // ---------------- Friend-visible activity + "focusing now" ----------------
+    match /activity/{uid} {
+      allow get: if signedIn() && (me() == uid || (resource.data.visible == true && isFriend(uid) && !blockedBy(uid)));
+      allow list: if false;
+      allow create, update: if signedIn() && me() == uid && validActivity();
+      allow delete: if signedIn() && me() == uid;
+    }
+    function validActivity() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['visible', 'shareNames', 'days', 'goalDays', 'recent', 'streak', 'longest', 'updatedAt'])
+        && d.visible is bool && d.shareNames is bool
+        && d.days is map && d.days.size() <= 90
+        && d.goalDays is list && d.goalDays.size() <= 90
+        && d.recent is list && d.recent.size() <= 20
+        // newest session: at most 4 hours long, not in the future
+        && (d.recent.size() == 0 || (d.recent[0].min is int && d.recent[0].min <= 240 && d.recent[0].t <= request.time.toMillis() + 600000))   // device clocks can be a few minutes ahead
+        && d.streak is int && d.longest is int
+        && d.updatedAt == request.time;
+    }
+    match /presence/{uid} {
+      allow get: if signedIn() && (me() == uid || (resource.data.visible == true && isFriend(uid) && !blockedBy(uid)));
+      allow list: if false;
+      allow create, update: if signedIn() && me() == uid
+        && request.resource.data.keys().hasOnly(['visible', 'now', 'updatedAt'])
+        && request.resource.data.visible is bool
+        && (request.resource.data.now == null || (request.resource.data.now is map
+            && request.resource.data.now.keys().hasOnly(['name', 'phase', 'status', 'endAt', 'left'])
+            && request.resource.data.now.name is string && request.resource.data.now.name.size() <= 80
+            && (!('phase' in request.resource.data.now) || (request.resource.data.now.phase is string && request.resource.data.now.phase.size() <= 20))
+            && (!('status' in request.resource.data.now) || (request.resource.data.now.status is string && request.resource.data.now.status.size() <= 20))
+            && (!('endAt' in request.resource.data.now) || request.resource.data.now.endAt is number)
+            && (!('left' in request.resource.data.now) || request.resource.data.now.left is number)))
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if signedIn() && me() == uid;
+    }
+
+    // ---------------- Friend requests / friendships ----------------
+    match /friendships/{pid} {
+      allow read: if signedIn() && me() in resource.data.users;   // only the two people involved
+      allow create: if signedIn() && validRequest(pid);            // only the sender creates
+      allow update: if signedIn() && acceptByRecipient();          // only the recipient accepts
+      allow delete: if signedIn() && me() in resource.data.users;  // decline, cancel or remove
+    }
+    function validRequest(pid) {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['users', 'from', 'to', 'status', 'fromName', 'toName', 'createdAt'])
+        && d.from == me() && d.to != me() && d.status == 'pending'
+        && d.users.size() == 2 && d.users[0] < d.users[1] && d.users.hasAll([d.from, d.to])
+        && pid == d.users[0] + '_' + d.users[1]
+        && d.fromName == myName()
+        && get(path('usernames', d.toName)).data.uid == d.to
+        && d.createdAt == request.time
+        // blocked users can't send requests (in either direction)
+        && !exists(/databases/$(database)/documents/users/$(d.to)/blocked/$(me()))
+        && !exists(/databases/$(database)/documents/users/$(me())/blocked/$(d.to));
+    }
+    function acceptByRecipient() {
+      return resource.data.status == 'pending' && resource.data.to == me()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'acceptedAt'])
+        && request.resource.data.status == 'accepted'
+        && request.resource.data.acceptedAt == request.time;
+    }
+
+    // ---------------- Kudos and nudges (preset reactions only, no free text) ----------------
+    match /inbox/{uid}/items/{id} {
+      allow read, delete: if signedIn() && me() == uid;
+      // create only: a second kudos for the same session, or a second nudge on the same day,
+      // has the same document id and is refused.
+      allow create: if signedIn() && uid != me() && isFriend(uid) && !blockedBy(uid) && validInboxItem(id);
+    }
+    function validInboxItem(id) {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['from', 'fromName', 'type', 'emoji', 'target', 'day', 'createdAt'])
+        && d.from == me() && d.fromName == myName() && d.createdAt == request.time
+        && ((d.type == 'kudos' && d.emoji in ['🔥', '👏', '💪', '⭐'] && d.target is string && d.target.matches('^[A-Za-z0-9_-]{1,40}$')
+              && id == 'k_' + me() + '_' + d.target)
+         || (d.type == 'nudge' && d.emoji == '👀' && d.day is string && d.day.size() == 10
+              && id == 'n_' + me() + '_' + d.day));
+    }
+
+    // ---------------- Weekly challenges ----------------
+    match /challenges/{cid} {
+      allow read: if signedIn() && (me() in resource.data.members || me() in resource.data.invited);
+      allow create: if signedIn() && validNewChallenge(cid);
+      allow update: if signedIn() && (joinChallenge() || updateMyProgress());
+      allow delete: if signedIn() && resource.data.creator == me() && resource.data.members.size() == 1;
+    }
+    function validNewChallenge(cid) {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['preset', 'weekKey', 'creator', 'members', 'invited', 'names', 'progress', 'createdAt'])
+        && d.creator == me() && d.preset in ['h5', 'h10', 'g5', 's20']
+        && d.weekKey is string && d.weekKey.size() == 10
+        && cid == d.weekKey + '_' + d.preset + '_' + me()
+        && d.members == [me()]
+        && d.invited is list && d.invited.size() <= 100
+        && d.names.keys().hasOnly([me()]) && d.names[me()] == myName()
+        && d.progress.keys().hasOnly([me()]) && d.progress[me()] is int && d.progress[me()] >= 0 && d.progress[me()] <= 10080
+        && d.createdAt == request.time;
+    }
+    function joinChallenge() {
+      let n = request.resource.data;
+      let o = resource.data;
+      return me() in o.invited && !(me() in o.members)
+        && n.diff(o).affectedKeys().hasOnly(['members', 'names', 'progress'])
+        && n.members == o.members.concat([me()])
+        && n.names.diff(o.names).affectedKeys().hasOnly([me()]) && n.names[me()] == myName()
+        && n.progress.diff(o.progress).affectedKeys().hasOnly([me()]) && n.progress[me()] is int
+        && n.progress[me()] >= 0 && n.progress[me()] <= 10080;
+    }
+    function updateMyProgress() {
+      let n = request.resource.data;
+      let o = resource.data;
+      return me() in o.members
+        && n.diff(o).affectedKeys().hasOnly(['progress'])
+        && n.progress.diff(o.progress).affectedKeys().hasOnly([me()])
+        && n.progress[me()] is int && n.progress[me()] >= o.progress[me()] && n.progress[me()] <= 10080;
+    }
+
+    // ============================================================================
+    // CLANS (v1.14) — the app's only group / study-group system.
+    //
+    //   clans/{cid}                      PUBLIC clan card + leaderboard numbers (no member data)
+    //   clans/{cid}/private/info         leader uid, invite code, permissions      (members only)
+    //   clans/{cid}/members/{uid}        role, name, contribution since joining    (members only)
+    //   clans/{cid}/requests/{uid}       join requests                             (the requester + leader/officers)
+    //   clans/{cid}/sessions/{sid}       planned study sessions + RSVPs           (members only)
+    //   clans/{cid}/live/{lid}           live session: shared timer from timestamps (members only)
+    //   clans/{cid}/live/{lid}/people/{uid}     presence (heartbeat ~1/min)       (members only)
+    //   clans/{cid}/live/{lid}/reactions/{rid}  preset emoji only                 (members only)
+    //   clans/{cid}/feed/{eid}           preset activity events only               (members only)
+    //   clanNames/{lowercase name}       { clan } — makes names unique (case-insensitive)
+    //   clanCodes/{code}                 { clan } — invite codes (get by code only, no listing)
+    //   clanOf/{uid}                     { clan } — one clan per user (owner reads; rules use it)
+    //
+    // There is no free text anywhere in clans: descriptions, reactions and feed
+    // events are presets; names, tags and session titles pass a word filter here
+    // and the fuller filter in the app.
+    // ============================================================================
+    function clanPath(c) { return /databases/$(database)/documents/clans/$(c); }
+    function memberPath(c, u) { return /databases/$(database)/documents/clans/$(c)/members/$(u); }
+    function infoPath(c) { return /databases/$(database)/documents/clans/$(c)/private/info; }
+    function clanOfPath(u) { return /databases/$(database)/documents/clanOf/$(u); }
+    function isMember(c) { return signedIn() && exists(memberPath(c, me())); }
+    function myRole(c) { return get(memberPath(c, me())).data.role; }
+    function isLeader(c) { return isMember(c) && myRole(c) == 'leader'; }
+    function isOfficer(c) { return isMember(c) && myRole(c) in ['leader', 'officer']; }
+    function leaderOf(c) { return get(infoPath(c)).data.leader; }
+    // the clan's leader has blocked me
+    function blockedByLeader(c) { return exists(/databases/$(database)/documents/users/$(leaderOf(c))/blocked/$(me())); }
+    // A basic word filter (the app has a fuller one with look-alike letters)
+    function cleanText(s) {
+      return !s.lower().matches('.*(fuck|shit|bitch|cunt|dick|cock|pussy|asshole|bastard|slut|whore|fag|nigg|retard|rape|nazi|hitler|porn|penis|vagina|boob|tits|wank|twat|jizz|chutiya|madarchod|bhenchod|behenchod|gandu|randi|lund|punda|thevidiya).*');
+    }
+    function validClanName(n) { return n is string && n.matches("^[A-Za-z0-9][A-Za-z0-9 ._'-]{1,22}[A-Za-z0-9.!']$") && cleanText(n); }
+    function validTag(t) { return t is string && t.matches('^[A-Z0-9]{2,5}$') && cleanText(t); }
+    // Clan levels 1–30: total clan focus minutes needed for each level (same table as the app)
+    function levelOk(xp, lv) {
+      let T = [0, 600, 1350, 2250, 3300, 4500, 5850, 7350, 9000, 10800, 12750, 14850, 17100, 19500, 22050, 24750, 27600, 30600, 33750, 37050, 40500, 44100, 47850, 51750, 55800, 60000, 64350, 68850, 73500, 78300];
+      return lv is int && lv >= 1 && lv <= 30 && xp >= T[lv - 1] && (lv == 30 || xp < T[lv]);
+    }
+    // Clan Points: earned from clan XP, levels, weekly quests and raids (never real money or personal coins)
+    function earned(d) { return math.floor(d.xp / 30) + (d.level - 1) * 25 + d.tq * 100 + d.tr * 300; }
+    // Clan shop: item -> [price in Clan Points, clan level needed]
+    function shopItem(k) {
+      return {
+        'ce_owl': [120, 1], 'ce_rocket': [180, 2], 'ce_flame': [250, 3], 'ce_crown': [400, 5], 'ce_dragon': [600, 10], 'ce_phoenix': [900, 15],
+        'cb_sunset': [100, 1], 'cb_ocean': [150, 2], 'cb_forest': [150, 2], 'cb_galaxy': [350, 8], 'cb_aurora': [700, 14],
+        'ct_ember': [100, 1], 'ct_mint': [100, 1], 'ct_royal': [250, 4], 'ct_gold': [500, 12],
+        'cf_silver': [150, 2], 'cf_gold': [300, 6], 'cf_laurel': [500, 12]
+      }.get(k, null);
+    }
+    function lookOk(d, field, free) {
+      return d[field] is string && (d[field] == free || d.owned.get(d[field], false) == true
+        || (field == 'emblem' && d.emblem.matches('ce_r_(titan|leviathan|colossus|behemoth|wyrm|hydra|phantom|swarm|goblin|sloth|kraken|wizard|gremlin|tyrant|pumpkin)')
+            && d.raids.values().hasAny([d.emblem.split('_')[2], d.emblem.split('_')[2] + '+'])));
+    }
+    // Monthly raid HP (v1.14.3, the same table as the app). Up to October 2026: 600 per member, at least 1,800.
+    // From November 2026 each month has a boss with an HP range [for 1 member, for 30 members], in a 12-month cycle
+    // starting in November; HP = min + (max - min) × (members - 1) / 29, rounded to the nearest 100.
+    function raidRange(mk) {
+      let i = ((int(mk[0:4]) * 12 + int(mk[5:7]) - 24323) % 12 + 12) % 12;
+      return [[7000, 9300], [7500, 10000], [5000, 6000], [6500, 8500], [8000, 10000], [5000, 6000],
+              [7000, 9300], [6500, 8500], [5000, 6000], [6000, 8000], [8500, 10000], [5500, 7500]][i];
+    }
+    function raidHPFor(mk, members) {
+      return mk < '2026-11'
+        ? (members * 600 > 1800 ? members * 600 : 1800)
+        : math.round((raidRange(mk)[0] * 29 + (raidRange(mk)[1] - raidRange(mk)[0]) * ((members > 30 ? 30 : (members < 1 ? 1 : members)) - 1)) / 2900.0) * 100;
+    }
+    function validClanDoc(d) {
+      return d.keys().hasOnly(['name', 'nameLower', 'tag', 'desc', 'emblem', 'banner', 'theme', 'frame', 'joinMode', 'members',
+                               'xp', 'level', 'weekKey', 'weekMin', 'monthKey', 'monthMin', 'raidHP', 'weekGroups', 'lastLive',
+                               'spent', 'owned', 'lastBuy', 'tq', 'tr', 'quests', 'raids', 'gday', 'gstreak', 'lastMember', 'createdAt', 'updatedAt'])
+        && validClanName(d.name) && d.nameLower == d.name.lower() && validTag(d.tag)
+        && d.desc in ['jee', 'neet', 'boards', 'college', 'coding', 'language', 'chill', 'upsc', 'school', 'work']
+        && d.joinMode in ['approval', 'open']
+        && d.members is int && d.members >= 0 && d.members <= 30
+        && d.xp is int && d.xp >= 0 && levelOk(d.xp, d.level)
+        && d.weekKey is string && d.weekKey.size() == 10 && d.weekMin is int && d.weekMin >= 0 && d.weekMin <= d.xp
+        && d.monthKey is string && d.monthKey.size() == 7 && d.monthMin is int && d.monthMin >= 0 && d.monthMin <= d.xp
+        && d.raidHP is int && d.weekGroups is int && d.weekGroups >= 0 && d.lastLive is string
+        && d.spent is int && d.spent >= 0 && d.spent <= earned(d) && d.owned is map && d.lastBuy is string
+        && d.tq is int && d.tr is int && d.quests is map && d.raids is map
+        && d.gday is string && d.gstreak is int && d.gstreak >= 0
+        && lookOk(d, 'emblem', 'ce_tomato') && lookOk(d, 'banner', 'cb_default') && lookOk(d, 'theme', 'ct_default') && lookOk(d, 'frame', 'cf_none')
+        && d.updatedAt == request.time;
+    }
+    function changed(keys) { return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys); }
+    // A day key ('YYYY-MM-DD') or month key ('YYYY-MM') that isn't ahead of the server's calendar (one day / one month of
+    // leeway for time zones). A far-future key would freeze the clan's counting for everyone, so it's refused.
+    function dayKeyOk(k) {
+      return k is string && k.matches('^20[0-9]{2}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$')
+        && int(k[0:4]) * 10000 + int(k[5:7]) * 100 + int(k[8:10]) <= request.time.year() * 10000 + request.time.month() * 100 + request.time.day() + 1;
+    }
+    function monthKeyOk(k) {
+      return k is string && k.matches('^20[0-9]{2}-(0[1-9]|1[0-2])$')
+        && int(k[0:4]) * 12 + int(k[5:7]) <= request.time.year() * 12 + request.time.month() + 1;
+    }
+
+    match /clans/{cid} {
+      // The public card + leaderboard: clan-level info only (no member list, names or stats)
+      allow get, list: if signedIn();
+      allow create: if signedIn() && validClanDoc(request.resource.data)
+        && !exists(clanOfPath(me()))                                            // one clan per user
+        && getAfter(clanOfPath(me())).data.clan == cid
+        && getAfter(memberPath(cid, me())).data.role == 'leader'
+        && getAfter(/databases/$(database)/documents/clanNames/$(request.resource.data.nameLower)).data.clan == cid
+        && request.resource.data.members == 1 && request.resource.data.xp == 0 && request.resource.data.spent == 0
+        && request.resource.data.owned.size() == 0 && request.resource.data.tq == 0 && request.resource.data.tr == 0
+        && request.resource.data.quests.size() == 0 && request.resource.data.raids.size() == 0                       // nothing won yet
+        && request.resource.data.weekMin == 0 && request.resource.data.monthMin == 0 && request.resource.data.weekGroups == 0 && request.resource.data.gstreak == 0
+        && dayKeyOk(request.resource.data.weekKey) && monthKeyOk(request.resource.data.monthKey) && request.resource.data.raidHP == raidHPFor(request.resource.data.monthKey, 1)
+        && request.resource.data.createdAt == request.time;
+      allow update: if signedIn() && clanUpdate(cid);
+      // disband (leader), or the last member leaving
+      allow delete: if isLeader(cid) || (isMember(cid) && resource.data.members <= 1);
+
+      // members only
+      match /private/info {
+        allow read: if isMember(cid);
+        allow create: if signedIn() && !exists(clanPath(cid)) && getAfter(clanPath(cid)) != null
+          && request.resource.data.keys().hasOnly(['leader', 'code', 'officerShop', 'memberSchedule'])
+          && request.resource.data.leader == me() && request.resource.data.code is string && request.resource.data.code.size() == 8
+          && request.resource.data.officerShop is bool && request.resource.data.memberSchedule is bool;
+        allow update: if isLeader(cid) && changed(['leader', 'code', 'officerShop', 'memberSchedule'])
+          && request.resource.data.code.size() == 8 && request.resource.data.officerShop is bool && request.resource.data.memberSchedule is bool
+          && (request.resource.data.leader == resource.data.leader || getAfter(memberPath(cid, request.resource.data.leader)).data.role == 'leader');
+        allow delete: if isLeader(cid) || (isMember(cid) && !existsAfter(clanPath(cid)));
+      }
+
+      match /members/{uid} {
+        allow read: if isMember(cid);
+        allow create: if signedIn() && validNewMember(cid, uid)
+          && (
+            // 1. founding the clan
+            (uid == me() && !exists(clanPath(cid)) && request.resource.data.role == 'leader' && request.resource.data.name == myName())
+            // 2. joining an open clan (not blocked by its leader)
+            || (uid == me() && request.resource.data.role == 'member' && request.resource.data.name == myName()
+                && get(clanPath(cid)).data.joinMode == 'open' && !blockedByLeader(cid))
+            // 3. a leader/officer accepting a request (the request is removed in the same write)
+            || (uid != me() && isOfficer(cid) && request.resource.data.role == 'member'
+                && exists(/databases/$(database)/documents/clans/$(cid)/requests/$(uid))
+                && !existsAfter(/databases/$(database)/documents/clans/$(cid)/requests/$(uid))
+                && request.resource.data.name == get(/databases/$(database)/documents/clans/$(cid)/requests/$(uid)).data.name)
+          );
+        allow update: if signedIn() && (memberFocus(cid, uid) || memberLook(cid, uid) || memberRole(cid, uid));
+        // leave, be removed (officers remove members; the leader removes anyone), or disband
+        allow delete: if signedIn() && (uid == me() || isLeader(cid) || (isOfficer(cid) && resource.data.role == 'member'));
+      }
+
+      match /requests/{uid} {
+        allow get: if signedIn() && (uid == me() || isOfficer(cid));
+        allow list: if isOfficer(cid);
+        allow create: if signedIn() && uid == me() && !exists(clanOfPath(me()))
+          && get(clanPath(cid)).data.joinMode == 'approval' && get(clanPath(cid)).data.members < 30
+          && !blockedByLeader(cid)                                       // requests from people the leader blocked are refused
+          && request.resource.data.keys().hasOnly(['name', 'at'])
+          && request.resource.data.name == myName() && request.resource.data.at == request.time;
+        allow delete: if signedIn() && (uid == me() || isOfficer(cid));
+      }
+
+      match /sessions/{sid} {
+        allow read: if isMember(cid);
+        allow create: if isMember(cid) && (isOfficer(cid) || get(infoPath(cid)).data.memberSchedule == true)
+          && validStudySession(request.resource.data) && request.resource.data.creator == me() && request.resource.data.creatorName == myName()
+          && request.resource.data.rsvp.size() == 0 && request.resource.data.cancelled == false
+          && request.resource.data.createdAt == request.time;
+        allow update: if isMember(cid) && (
+            // my own RSVP: going / maybe / can't
+            (changed(['rsvp', 'updatedAt']) && request.resource.data.rsvp.diff(resource.data.rsvp).affectedKeys().hasOnly([me()])
+              && (!(me() in request.resource.data.rsvp) || request.resource.data.rsvp[me()] in ['going', 'maybe', 'no'])
+              && request.resource.data.updatedAt == request.time)
+            // edit or cancel: its creator, the leader or an officer
+            || ((resource.data.creator == me() || isOfficer(cid)) && changed(['title', 'start', 'pattern', 'repeat', 'days', 'tag', 'max', 'cancelled', 'mode', 'updatedAt'])
+              && validStudySession(request.resource.data))
+          );
+        allow delete: if isMember(cid) && (resource.data.creator == me() || isOfficer(cid));
+      }
+
+      match /live/{lid} {
+        allow read: if isMember(cid);
+        allow create: if isMember(cid) && validLive(request.resource.data) && request.resource.data.host == me()
+          && request.resource.data.hostName == myName() && request.resource.data.open == true && request.resource.data.counted == false
+          && request.resource.data.createdAt == request.time;
+        allow update: if isMember(cid) && validLive(request.resource.data) && (
+            // host controls (start, pause, skip, end): the host, the leader or an officers
+            ((resource.data.host == me() || isOfficer(cid)) && changed(['startAt', 'pausedAt', 'pauseTotal', 'shift', 'open', 'endedAt', 'updatedAt']))
+            // anyone can close a session whose time is up
+            || (changed(['open', 'endedAt', 'updatedAt']) && request.resource.data.open == false)
+            // counted once as a group session (see clanGroup)
+            || (changed(['counted', 'second', 'updatedAt']) && resource.data.counted == false && request.resource.data.counted == true)
+          );
+        allow delete: if isMember(cid) && (resource.data.host == me() || isOfficer(cid));
+
+        match /people/{uid} {
+          allow read: if isMember(cid);
+          allow create, update: if isMember(cid) && uid == me()
+            && request.resource.data.keys().hasOnly(['name', 'avatar', 'color', 'aura', 'state', 'sname', 'min', 'beat', 'joinedAt', 'endAt', 'left'])
+            && request.resource.data.name == myName()
+            && request.resource.data.state in ['focus', 'break', 'paused', 'idle', 'away', 'left']
+            // Focus together (v1.14.2): my own countdown — when my phase ends (server ms), or what's left while paused
+            && (!('endAt' in request.resource.data) || (request.resource.data.endAt is int && request.resource.data.endAt >= 0))
+            && (!('left' in request.resource.data) || (request.resource.data.left is int && request.resource.data.left >= 0 && request.resource.data.left <= 86400000))
+            && request.resource.data.sname is string && request.resource.data.sname.size() <= 80
+            && request.resource.data.avatar is string && request.resource.data.avatar.size() <= 30
+            && request.resource.data.color is string && request.resource.data.color.size() <= 30
+            && request.resource.data.aura is string && request.resource.data.aura.size() <= 30
+            && request.resource.data.min is int && request.resource.data.min >= 0 && request.resource.data.min <= 1440
+            && request.resource.data.beat == request.time;
+          allow delete: if isMember(cid) && (uid == me() || get(/databases/$(database)/documents/clans/$(cid)/live/$(lid)).data.host == me() || isOfficer(cid));
+        }
+        match /reactions/{rid} {
+          allow read: if isMember(cid);
+          // v1.14.3: one document per person (its id is their uid), rewritten for each reaction, at most one every 2 seconds
+          allow create: if isMember(cid) && rid == me() && validReaction()
+            && exists(/databases/$(database)/documents/clans/$(cid)/live/$(lid)/people/$(me()));
+          allow update: if isMember(cid) && rid == me() && validReaction()
+            && request.time.toMillis() - resource.data.at.toMillis() >= 2000;
+          allow delete: if isMember(cid) && (rid == me() || isOfficer(cid));
+        }
+      }
+
+      match /feed/{eid} {
+        allow read: if isMember(cid);
+        allow create: if isMember(cid)
+          && request.resource.data.keys().hasOnly(['type', 'who', 'n', 'at'])
+          && request.resource.data.type in ['focus', 'join', 'level', 'sched', 'raid', 'quest', 'live', 'leader']
+          && request.resource.data.who == myName()
+          && request.resource.data.n is int && request.resource.data.n >= 0 && request.resource.data.n <= 100000
+          && request.resource.data.at == request.time;
+        allow delete: if isLeader(cid);
+      }
+    }
+
+    // ---------- Clan document updates: each kind of change is checked on its own ----------
+    // The changed fields are worked out once; each kind only allows (and checks) its own fields, so the
+    // fields it doesn't touch keep the values that were valid before.
+    function clanUpdate(cid) {
+      let n = request.resource.data;
+      let o = resource.data;
+      let k = n.diff(o).affectedKeys();
+      return n.updatedAt == request.time && k.hasAny(['updatedAt'])
+        && (
+          (k.hasOnly(['xp', 'level', 'weekKey', 'weekMin', 'monthKey', 'monthMin', 'raidHP', 'weekGroups', 'updatedAt']) && clanFocus(cid, n, o))
+          || (k.hasOnly(['members', 'lastMember', 'updatedAt']) && clanCount(cid, n, o))
+          || (k.hasOnly(['joinMode', 'emblem', 'banner', 'theme', 'frame', 'updatedAt']) && clanSettings(cid, n, k))
+          || (k.hasOnly(['owned', 'spent', 'lastBuy', 'updatedAt']) && clanBuy(cid, n, o))
+          || (k.hasOnly(['quests', 'tq', 'updatedAt']) && clanQuest(cid, n, o))
+          || (k.hasOnly(['raids', 'tr', 'updatedAt']) && clanRaid(cid, n, o))
+          || (k.hasOnly(['weekGroups', 'weekKey', 'weekMin', 'gday', 'gstreak', 'lastLive', 'updatedAt']) && clanGroup(cid, n, o))
+        );
+    }
+    // A member's completed focus adds to the clan, exactly as much as to their own contribution.
+    function clanFocus(cid, n, o) {
+      let d = n.xp - o.xp;
+      return isMember(cid) && n.xp is int && d > 0 && d <= 1440 && levelOk(n.xp, n.level)
+        && getAfter(memberPath(cid, me())).data.contrib - get(memberPath(cid, me())).data.contrib == d
+        && ((n.weekKey == o.weekKey && n.weekMin == o.weekMin + d && n.weekGroups == o.weekGroups)
+            || (dayKeyOk(n.weekKey) && n.weekKey > o.weekKey && n.weekMin == d && n.weekGroups == 0))
+        && ((n.monthKey == o.monthKey && n.monthMin == o.monthMin + d && n.raidHP == o.raidHP)
+            || (monthKeyOk(n.monthKey) && n.monthKey > o.monthKey && n.monthMin == d && n.raidHP == raidHPFor(n.monthKey, n.members)));
+    }
+    // Member count: +1 when someone joins (themselves in an open clan, or accepted by a leader/officer), −1 when someone leaves
+    // or is removed. lastMember names that person, and their member row must really appear or disappear in the same write.
+    function clanCount(cid, n, o) {
+      let who = n.lastMember;
+      return n.members is int && n.members >= 0 && n.members <= 30 && who is string && (
+        (n.members == o.members + 1 && !exists(memberPath(cid, who)) && existsAfter(memberPath(cid, who))
+          && ((who == me() && o.joinMode == 'open') || (who != me() && isOfficer(cid))))
+        || (n.members == o.members - 1 && exists(memberPath(cid, who)) && !existsAfter(memberPath(cid, who))
+          && ((who == me() && isMember(cid)) || (who != me() && isOfficer(cid))))
+      );
+    }
+    // Join mode and the clan's look: the leader (the look also by officers when the leader allows it). Only owned looks.
+    function clanSettings(cid, n, k) {
+      return n.joinMode in ['approval', 'open']
+        && lookOk(n, 'emblem', 'ce_tomato') && lookOk(n, 'banner', 'cb_default') && lookOk(n, 'theme', 'ct_default') && lookOk(n, 'frame', 'cf_none')
+        && (isLeader(cid) || (!k.hasAny(['joinMode']) && isOfficer(cid) && get(infoPath(cid)).data.officerShop == true));
+    }
+    // Clan shop: one item at a time, at its price, if the clan level allows it and the points cover it.
+    function clanBuy(cid, n, o) {
+      let key = n.lastBuy;
+      let item = shopItem(key);
+      return item != null && n.owned.diff(o.owned).affectedKeys() == [key].toSet() && !(key in o.owned) && n.owned[key] == true
+        && n.spent == o.spent + item[0] && n.level >= item[1] && n.spent <= earned(n)
+        && (isLeader(cid) || (isOfficer(cid) && get(infoPath(cid)).data.officerShop == true));
+    }
+    // Weekly quest: claimed once per week, when its goal is met.
+    function clanQuest(cid, n, o) {
+      let goal = n.members * 300 < 3000 ? n.members * 300 : 3000;
+      return isMember(cid) && n.tq == o.tq + 1
+        && n.quests.diff(o.quests).affectedKeys().hasOnly([n.weekKey]) && !(n.weekKey in o.quests)
+        && ((n.quests[n.weekKey] == 'min' && n.weekMin >= goal) || (n.quests[n.weekKey] == 'grp' && n.weekGroups >= 3));
+    }
+    // Monthly raid boss: defeated once per month, when the month's clan minutes reach its HP.
+    function clanRaid(cid, n, o) {
+      return isMember(cid) && n.tr == o.tr + 1
+        && n.raids.diff(o.raids).affectedKeys().hasOnly([n.monthKey]) && !(n.monthKey in o.raids)
+        && n.raids[n.monthKey] is string && n.raids[n.monthKey].matches('^(titan|leviathan|colossus|behemoth|wyrm|hydra|phantom|swarm|goblin|sloth|kraken|wizard|gremlin|tyrant|pumpkin)[+]?$')
+        && (!n.raids[n.monthKey].matches('.*[+]$') || n.members >= 5)        // the rally bonus: 5+ members contributed (v1.14.3)
+        && n.raidHP > 0 && n.monthMin >= n.raidHP;
+    }
+    // A live session with 2+ people: counted once (its live document flips "counted"), for the
+    // weekly group-session quest and the clan's study streak.
+    function clanGroup(cid, n, o) {
+      let live = /databases/$(database)/documents/clans/$(cid)/live/$(n.lastLive);
+      let other = getAfter(live).data.second;
+      return isMember(cid) && n.lastLive is string && n.lastLive != o.lastLive
+        && get(live).data.counted == false && getAfter(live).data.counted == true
+        // two different members with a seat at that table: me and the person named in "second" (v1.14.3)
+        && other is string && other != me()
+        && exists(/databases/$(database)/documents/clans/$(cid)/live/$(n.lastLive)/people/$(me()))
+        && exists(/databases/$(database)/documents/clans/$(cid)/live/$(n.lastLive)/people/$(other))
+        && ((n.weekKey == o.weekKey && n.weekMin == o.weekMin && n.weekGroups == o.weekGroups + 1)
+            || (dayKeyOk(n.weekKey) && n.weekKey > o.weekKey && n.weekMin == 0 && n.weekGroups == 1))     // the first group session of a new week
+        && dayKeyOk(n.gday) && n.gstreak is int && n.gstreak >= 0 && n.gstreak <= o.gstreak + 1;
+    }
+
+    function validNewMember(cid, uid) {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['name', 'role', 'joinedAt', 'contrib', 'weekKey', 'weekMin', 'lastAt', 'lastIds', 'avatar', 'color', 'aura', 'level', 'tier', 'shareNames', 'focusUntil', 'updatedAt'])
+        && d.contrib == 0 && d.weekMin == 0 && d.lastIds.size() == 0                 // contribution starts at zero on joining
+        && d.joinedAt == request.time && d.updatedAt == request.time
+        && d.name is string && d.name.size() <= 20
+        // one clan per user: their clanOf points here after this write, and pointed nowhere before
+        && !exists(clanOfPath(uid)) && getAfter(clanOfPath(uid)).data.clan == cid
+        && (exists(clanPath(cid)) ? (get(clanPath(cid)).data.members < 30) : true);
+    }
+    // My completed focus since I joined: grows by at most the real time that passed (+ one 4-hour session),
+    // never shrinks, and the clan document gains exactly the same minutes in the same write.
+    function memberFocus(cid, uid) {
+      let n = request.resource.data;
+      let o = resource.data;
+      let elapsed = (request.time.toMillis() - o.updatedAt.toMillis()) / 60000;
+      return uid == me() && isMember(cid)
+        && changed(['contrib', 'weekKey', 'weekMin', 'moKey', 'moMin', 'lastAt', 'lastIds', 'updatedAt'])
+        && n.contrib > o.contrib && n.contrib - o.contrib <= elapsed + 240
+        // this month's raid hits (v1.14.3; apps before it leave these two fields alone)
+        && ((n.get('moKey', '') == o.get('moKey', '') && n.get('moMin', 0) == o.get('moMin', 0))
+            || (n.moKey == getAfter(clanPath(cid)).data.monthKey && n.moMin is int
+                && ((n.moKey == o.get('moKey', '') && n.moMin == o.get('moMin', 0) + (n.contrib - o.contrib))
+                    || (n.moKey != o.get('moKey', '') && n.moMin == n.contrib - o.contrib))))
+        && getAfter(clanPath(cid)).data.xp - get(clanPath(cid)).data.xp == n.contrib - o.contrib
+        && ((n.weekKey == o.weekKey && n.weekMin == o.weekMin + (n.contrib - o.contrib)) || (n.weekKey > o.weekKey && n.weekMin == n.contrib - o.contrib))
+        && n.lastIds is list && n.lastIds.size() <= 12
+        && n.lastAt is int && n.lastAt <= request.time.toMillis() + 600000      // device clocks can be a little ahead
+        && n.updatedAt == request.time;
+    }
+    // My look in the member list (picture, name colour, aura, level) and whether others see my session names.
+    function memberLook(cid, uid) {
+      let n = request.resource.data;
+      return uid == me() && isMember(cid) && changed(['avatar', 'color', 'aura', 'level', 'tier', 'shareNames', 'focusUntil'])
+        && n.avatar is string && n.avatar.size() <= 30 && n.color is string && n.color.size() <= 30 && n.aura is string && n.aura.size() <= 30
+        && n.level is int && n.level >= 1 && n.level <= 1000 && n.tier is string && n.tier.size() <= 20
+        && n.shareNames is bool && n.focusUntil is int && n.focusUntil <= request.time.toMillis() + 4 * 3600000;
+    }
+    // Roles: only the leader promotes, demotes and hands over leadership.
+    function memberRole(cid, uid) {
+      return isLeader(cid) && changed(['role'])
+        && request.resource.data.role in ['leader', 'officer', 'member']
+        && (uid != me() || (request.resource.data.role != 'leader' && getAfter(infoPath(cid)).data.leader != me()))   // stepping down = handing over
+        // a new leader always comes with the private info pointing to them (transfer in one write)
+        && (request.resource.data.role != 'leader' || getAfter(infoPath(cid)).data.leader == uid);
+    }
+    function validReaction() {
+      return request.resource.data.keys().hasOnly(['from', 'emoji', 'at'])
+        && request.resource.data.from == me() && request.resource.data.emoji in ['🔥', '👏', '💪', '☕', '👋']
+        && request.resource.data.at == request.time;
+    }
+    function validStudySession(d) {
+      return d.keys().hasOnly(['title', 'start', 'pattern', 'repeat', 'days', 'tag', 'max', 'creator', 'creatorName', 'cancelled', 'rsvp', 'mode', 'createdAt', 'updatedAt'])
+        && (!('mode' in d) || d.mode in ['together', 'synced'])          // v1.14.2; no mode = Synced
+        && d.title is string && d.title.size() >= 2 && d.title.size() <= 40 && cleanText(d.title)
+        && d.start is int && d.pattern is map && d.pattern.keys().hasOnly(['focus', 'short', 'rounds'])
+        && d.pattern.focus is int && d.pattern.focus >= 5 && d.pattern.focus <= 120
+        && d.pattern.short is int && d.pattern.short >= 1 && d.pattern.short <= 30
+        && d.pattern.rounds is int && d.pattern.rounds >= 1 && d.pattern.rounds <= 8
+        && d.repeat in ['none', 'daily', 'weekdays', 'weekly'] && d.days is list && d.days.size() <= 7
+        && d.tag is string && d.tag.size() <= 30 && cleanText(d.tag)
+        && d.max is int && d.max >= 2 && d.max <= 30
+        && d.cancelled is bool && d.rsvp is map && d.rsvp.size() <= 30
+        && d.creatorName is string && d.creatorName.size() <= 20 && d.updatedAt == request.time;
+    }
+    function validLive(d) {
+      return d.keys().hasOnly(['title', 'host', 'hostName', 'pattern', 'startAt', 'pausedAt', 'pauseTotal', 'shift', 'open', 'counted', 'second', 'sid', 'mode', 'createdAt', 'endedAt', 'updatedAt'])
+        && (!('mode' in d) || d.mode in ['together', 'synced'])          // v1.14.2; no mode = Synced
+        && (!('second' in d) || d.second is string)                       // v1.14.3: the second person when counted as a group session
+        && d.title is string && d.title.size() >= 2 && d.title.size() <= 40 && cleanText(d.title)
+        && d.pattern is map && d.pattern.focus is int && d.pattern.focus >= 5 && d.pattern.focus <= 120
+        && d.pattern.short is int && d.pattern.short >= 1 && d.pattern.short <= 30 && d.pattern.rounds is int && d.pattern.rounds >= 1 && d.pattern.rounds <= 8
+        && d.startAt is timestamp && d.pausedAt is int && d.pausedAt >= 0 && d.endedAt is int && d.pauseTotal is int && d.pauseTotal >= 0 && d.shift is int && d.shift >= 0
+        && d.open is bool && d.counted is bool && d.sid is string && d.updatedAt == request.time;
+    }
+
+    match /clanNames/{name} {
+      allow get: if signedIn();                          // "is this name taken?"
+      allow list: if false;
+      allow create: if signedIn() && request.resource.data.keys().hasOnly(['clan'])
+        && getAfter(clanPath(request.resource.data.clan)).data.nameLower == name && !exists(clanPath(request.resource.data.clan))
+        && getAfter(memberPath(request.resource.data.clan, me())).data.role == 'leader';
+      allow delete: if signedIn() && isLeader(resource.data.clan) && !existsAfter(clanPath(resource.data.clan))
+        || (isMember(resource.data.clan) && !existsAfter(clanPath(resource.data.clan)));
+    }
+    match /clanCodes/{code} {
+      allow get: if signedIn();                          // by code only: nobody can list codes
+      allow list: if false;
+      allow create: if signedIn() && request.resource.data.keys().hasOnly(['clan'])
+        && getAfter(infoPath(request.resource.data.clan)).data.code == code
+        && getAfter(memberPath(request.resource.data.clan, me())).data.role == 'leader';
+      allow delete: if signedIn() && (isLeader(resource.data.clan) || (isMember(resource.data.clan) && !existsAfter(clanPath(resource.data.clan))));
+    }
+    match /clanOf/{uid} {
+      allow get: if signedIn() && uid == me();
+      allow list: if false;
+      allow create: if signedIn() && request.resource.data.keys().hasOnly(['clan', 'at']) && request.resource.data.at == request.time
+        && existsAfter(memberPath(request.resource.data.clan, uid))
+        && (uid == me() || (isOfficer(request.resource.data.clan) && exists(/databases/$(database)/documents/clans/$(request.resource.data.clan)/requests/$(uid))));
+      allow delete: if signedIn() && !existsAfter(memberPath(resource.data.clan, uid))                  // only when the member row goes too
+        && (uid == me() || isLeader(resource.data.clan) || (isOfficer(resource.data.clan) && get(memberPath(resource.data.clan, uid)).data.role == 'member'));
+    }
+
+    // Everything else is closed.
+  }
+}
