@@ -549,6 +549,32 @@ input[type="range"] { accent-color: var(--accent); width: 160px; }
 .lb .top3 .rk { background: rgba(176,112,58,.16); color: #a2662f; }
 .lb li.me { background: var(--accent-soft); }
 .lb.pinned { border-top: 1px dashed var(--line); margin-top: 8px; padding-top: 8px; }
+/* Leaderboard v2 (v1.16): podium, rank arrows, your own rank, Pomeo's empty states */
+.lb-head .seg { flex-wrap: wrap; }
+.lb-podium { display: grid; grid-template-columns: 1fr 1.18fr 1fr; gap: 8px; align-items: end; margin: 4px 0 14px; }
+.lb-pod { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; padding: 14px 6px 10px; border-radius: 14px; background: var(--bg); text-align: center; }
+.lb-pod.p1 { padding-top: 20px; background: linear-gradient(180deg, rgba(201, 162, 39, .18), var(--bg) 80%); }
+.lb-pod.p2 { background: linear-gradient(180deg, rgba(140, 150, 160, .2), var(--bg) 80%); }
+.lb-pod.p3 { background: linear-gradient(180deg, rgba(176, 112, 58, .18), var(--bg) 80%); }
+.lb-pod.me { box-shadow: inset 0 0 0 2px var(--accent); }
+.lb-pod[data-open] { cursor: pointer; }
+.lb-pod .lb-pr { position: absolute; top: 7px; left: 9px; font-size: 12px; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
+.lb-pod.p1 .lb-pr { color: #a8861d; } .lb-pod.p2 .lb-pr { color: #7d8790; } .lb-pod.p3 .lb-pr { color: #a2662f; }
+.lb-crown { height: 16px; line-height: 16px; font-size: 14px; }
+.lb-pod .lb-pn { max-width: 100%; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lb-pod .lb-pn .nm { font-size: 13px; }
+.lb-pod .lb-pv { font-weight: 700; font-size: 14px; font-variant-numeric: tabular-nums; display: inline-flex; align-items: center; gap: 4px; }
+.lb-delta { font-size: 11px; font-weight: 700; min-width: 26px; text-align: center; color: var(--muted); font-variant-numeric: tabular-nums; flex: none; }
+.lb-delta.up { color: #2f9e5f; } .lb-delta.down { color: #d9480f; } .lb-delta.new { color: var(--accent); font-size: 10px; text-transform: uppercase; letter-spacing: .04em; }
+.lb .v { display: inline-flex; align-items: center; gap: 4px; }
+.lb-you { position: sticky; bottom: 6px; display: flex; align-items: center; gap: 10px; margin-top: 12px; padding: 10px 12px; border-radius: 12px; background: var(--accent-soft); font-size: 14px; }
+.lb-you .rk { width: auto; min-width: 28px; height: 28px; padding: 0 8px; border-radius: 999px; display: grid; place-items: center; font-weight: 700; font-size: 13px; background: var(--surface); color: var(--accent); font-variant-numeric: tabular-nums; }
+.lb-you .lb-yt { flex: 1; min-width: 0; display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.lb-empty { text-align: center; padding: 18px 8px 10px; color: var(--muted); font-size: 14px; }
+.lb-empty svg { width: 72px; height: auto; display: block; margin: 0 auto 6px; }
+:root[data-motion="full"] .lb-pod { animation: popIn .45s var(--spring) both; }
+:root[data-motion="full"] .lb-pod.p2 { animation-delay: .08s; } :root[data-motion="full"] .lb-pod.p3 { animation-delay: .16s; }
+@media (max-width: 420px) { .lb-podium { gap: 6px; } .lb-pod { padding: 12px 4px 8px; } .lb-pod .lb-pn, .lb-pod .lb-pn .nm { font-size: 12px; } .lb-head .seg button { padding-left: 9px; padding-right: 9px; } }
 .lb-note { margin-top: 12px; font-size: 13px; color: var(--muted); }
 .lb-note .linkbtn { color: var(--accent); padding: 0; }
 .recap { margin-bottom: 16px; border-color: var(--accent); }
@@ -1420,6 +1446,99 @@ body.focus-dim :is(.top, .sidenav, .btmbar, #tab-timer .grid-2 > .stack:nth-chil
   .gd-say { max-width: calc(100% - 28px); }
 }
 
+/* Garden pets (v1.16) */
+.gd-egg { flex: 1 1 240px; padding: 10px 12px; display: flex; gap: 10px; align-items: center; }
+.gd-eggbtn { flex: none; width: 56px; height: 56px; border: 0; background: var(--bg); border-radius: 14px; padding: 6px; cursor: pointer; }
+.gd-eggbtn svg { width: 100%; height: 100%; display: block; }
+.gd-egg.k-rare .gd-eggbtn { background: rgba(127, 180, 232, .18); } .gd-egg.k-legendary .gd-eggbtn { background: rgba(232, 185, 60, .2); }
+.gd-eggtxt { flex: 1; min-width: 0; }
+.gd-eggtxt .xpbar.mini { height: 6px; margin: 5px 0 4px; }
+.gd-petsline { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; }
+.gd-petsline .linkbtn { color: var(--accent); padding: 0; min-height: 0; }
+.gd-pets { position: absolute; inset: 0; pointer-events: none; z-index: 4; }
+.gd-pet { pointer-events: auto; position: absolute; border: 0; background: none; padding: 4px; width: 46px; height: 46px; cursor: pointer; }
+.gd-pet svg { width: 100%; height: 100%; overflow: visible; display: block; }
+.gd-pet.n-0 { left: 27%; bottom: 4px; } .gd-pet.n-1 { left: 45%; bottom: 8px; } .gd-pet.n-2 { left: 63%; bottom: 3px; }
+:root[data-motion="full"] .gd-pet { animation: gd-idle 3.2s ease-in-out infinite; }
+:root[data-motion="full"] .gd-pet.n-1 { animation-delay: -1.1s; } :root[data-motion="full"] .gd-pet.n-2 { animation-delay: -2.2s; }
+@keyframes gd-idle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+:root[data-motion="full"] .gd-pet .wing { animation: gd-flap .25s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 100% 100%; }
+.gd-pet.poke { animation: gd-poke .7s ease-out; }
+.hearts { color: #e2576b; font-size: 12px; letter-spacing: 1px; } .hearts .dim { opacity: .3; }
+.pet-card .pv svg { height: 64px; }
+.gd-petgrid { margin-bottom: 12px; }
+.gd-eggq { margin: 14px 0 6px; font-size: 15px; }
+.gd-egglist { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.gd-egglist li { display: flex; gap: 10px; align-items: center; }
+.gd-egglist .eg svg { display: block; }
+.egg-dlg { width: min(400px, calc(100vw - 32px)); text-align: center; padding: 22px 20px 18px; }
+.eg-stage { position: relative; height: 120px; display: grid; place-items: center; margin-bottom: 6px; }
+.eg-egg, .eg-pet { position: absolute; width: 96px; height: 96px; display: grid; place-items: center; }
+.eg-egg svg, .eg-pet svg { width: 100%; height: 100%; }
+.eg-pet { opacity: 0; transform: scale(.6); }
+:root[data-motion="full"] .egg-dlg:not(.cracked) .eg-egg { animation: eg-wobble 1.4s ease-in-out; }
+.egg-dlg.cracked .eg-egg { opacity: 0; transform: scale(1.2); transition: opacity .35s, transform .35s; }
+.egg-dlg.cracked .eg-pet { opacity: 1; transform: scale(1); transition: opacity .4s .2s, transform .5s .2s cubic-bezier(.2, 1.4, .4, 1); }
+.egg-dlg.still .eg-egg, .egg-dlg.still .eg-pet { transition: none; }
+@keyframes eg-wobble { 0%, 100% { transform: rotate(0); } 15% { transform: rotate(-10deg); } 30% { transform: rotate(9deg); } 45% { transform: rotate(-7deg); } 60% { transform: rotate(6deg); } 75% { transform: rotate(-4deg); } 90% { transform: rotate(3deg); } }
+.egg-dlg h3 { margin: 4px 0 6px; }
+.eg-line { margin: 0 0 14px; font-size: 14px; }
+.eg-line .rar { font-weight: 700; }
+@media (max-width: 640px) { .gd-egg { flex-basis: 100%; } }
+
+/* Garden looks (v1.16) */
+.gd-lookgrid .pv { min-height: 72px; display: flex; align-items: center; justify-content: center; }
+.gd-lookgrid .bi-src span:last-child { color: var(--muted); }
+.gd-look .titlepv { font-size: 13px; }
+
+/* Focus-weather mutations (v1.16) */
+.gd-plant.wm-shocked { filter: drop-shadow(0 0 5px rgba(255, 220, 60, .95)); }
+.gd-plant.wm-moonlit { filter: drop-shadow(0 0 5px rgba(170, 200, 255, .95)); }
+.gd-plant.wm-frozen { filter: drop-shadow(0 0 4px rgba(120, 220, 255, .95)) saturate(.6) brightness(1.12); }
+.gd-plant.wm-blessed { filter: drop-shadow(0 0 5px rgba(170, 120, 255, .95)); }
+.gd-plant.wm-dawn { filter: drop-shadow(0 0 5px rgba(255, 160, 120, .95)); }
+.gd-plant.wm-streaked { filter: drop-shadow(0 0 5px rgba(255, 120, 40, .95)); }
+.gd-plant.wm-stormy { filter: drop-shadow(0 0 5px rgba(90, 120, 170, .95)) saturate(.8); }
+:root[data-motion="full"] .gd-plant.wm-shocked .sway { animation: wm-jitter 2.6s steps(2) infinite; }
+@keyframes wm-jitter { 0%, 92% { transform: translateX(0); } 94% { transform: translateX(-1px); } 96% { transform: translateX(1px); } 98% { transform: translateX(-.5px); } }
+.gd-wm { position: absolute; right: 2px; top: 2px; font-size: 11px; line-height: 1; font-style: normal; pointer-events: none; text-shadow: 0 1px 2px rgba(0, 0, 0, .25); }
+.gd-mutnote[class*="wm-"] { color: var(--text); }
+.gd-mut.wm-shocked { color: #b58a00; } .gd-mut.wm-moonlit { color: #4a63c9; } .gd-mut.wm-frozen { color: #2f8fbf; } .gd-mut.wm-blessed { color: #7a4fd1; }
+.gd-mut.wm-dawn { color: #d66a3c; } .gd-mut.wm-streaked { color: #d9480f; } .gd-mut.wm-stormy { color: #4a6a8a; }
+.gd-wmlist .wm-ic { font-size: 18px; width: 28px; text-align: center; }
+.gd-loglist .nm { font-weight: 600; }
+
+/* Crop weight (v1.16) */
+.gd-log { margin-top: 12px; }
+.gd-rec { font-size: 13px; color: var(--muted); }
+.gd-rec b { color: var(--text); }
+.gd-loglist { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 4px; }
+.gd-loglist li { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto auto auto; gap: 10px; align-items: center; padding: 5px 6px; border-radius: 10px; font-size: 13.5px; }
+.gd-loglist li.rec { background: var(--accent-soft); }
+.gd-loglist li.giant .kg { color: #a8861d; font-weight: 700; }
+.gd-loglist .pv svg { width: 30px; height: 30px; display: block; }
+.gd-loglist .nm { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.gd-loglist .gi { color: #a8861d; letter-spacing: .04em; font-size: 11px; }
+.gd-loglist .kg { font-variant-numeric: tabular-nums; }
+.gd-loglist .lbl { white-space: nowrap; }
+.gd-giant { text-align: center; }
+.gd-giant-art { width: 120px; height: 120px; margin: 0 auto 8px; display: grid; place-items: center; }
+.gd-giant-art svg { width: 100%; height: 100%; filter: drop-shadow(0 6px 14px rgba(201, 162, 39, .4)); }
+:root[data-motion="full"] .gd-giant-art svg { animation: gd-giant-pop .7s cubic-bezier(.2, 1.4, .4, 1); }
+@keyframes gd-giant-pop { from { transform: scale(.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@media (max-width: 480px) { .gd-loglist li { grid-template-columns: 30px minmax(0, 1fr) auto; } .gd-loglist .dt, .gd-loglist li > .lbl:not(.dt) { display: none; } }
+
+/* Rotating seed shop (v1.16) */
+.gd-shop-sec { margin-bottom: 20px; }
+.gd-shop-sec h2 { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; margin: 0 0 4px; font-size: 17px; }
+.gd-shop-sec > .lbl { margin: 0 0 10px; }
+.gd-shop-sec .count { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.gd-shop-sec .count b { color: var(--text); font-weight: 600; }
+.gd-one { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); max-width: 420px; }
+.gd-item .pv .tag.off { color: var(--accent); border-color: var(--accent); font-weight: 700; }
+.gd-item .bi-src s { color: var(--muted); margin-right: 2px; }
+.gd-item.excl .pv { background: linear-gradient(135deg, var(--accent-soft), transparent 70%); }
+
 /* ==========================================================================
    POMEO'S ROOM (v1.15)
    ========================================================================== */
@@ -1559,6 +1678,8 @@ body.focus-dim :is(.top, .sidenav, .btmbar, #tab-timer .grid-2 > .stack:nth-chil
 .tp.tp-stars { width: 8px; height: 8px; border-radius: 0; background: none; }
 .tp.tp-stars::before { content: ""; position: absolute; inset: 0; background: var(--tc); clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); }
 .tp.tp-embers { width: 5px; height: 5px; box-shadow: 0 0 8px var(--tc); }
+.tp.tp-leaves { width: 9px; height: 6px; border-radius: 0 70% 0 70%; }
+.tp.tp-fireflies { width: 5px; height: 5px; box-shadow: 0 0 7px 2px var(--tc); opacity: .9; }
 :root:not([data-motion="full"]) #ringTrail { display: none; }
 #themeFx.tfx-aurora { background: radial-gradient(60% 40% at 20% 10%, rgba(110, 231, 183, .16), transparent 70%), radial-gradient(50% 35% at 70% 0%, rgba(139, 92, 246, .16), transparent 70%), radial-gradient(45% 30% at 90% 25%, rgba(56, 189, 248, .12), transparent 70%); }
 #themeFx.tfx-aurora::before { content: ""; position: absolute; inset: -30% -10%; opacity: 1; background: linear-gradient(100deg, transparent 20%, rgba(110, 231, 183, .10) 35%, rgba(139, 92, 246, .10) 50%, rgba(56, 189, 248, .10) 65%, transparent 80%); filter: blur(30px); }
@@ -3915,6 +4036,10 @@ body.first-load #todayBar { opacity: 0; }
           <div><div>Flashcards on breaks</div><div class="desc">Pomeo offers up to 5 due cards when a break starts (never during focus)</div></div>
           <input type="checkbox" id="setBreakCards" aria-label="Flashcards on breaks">
         </div>
+        <div class="setting" data-k="garden seed shop restock dot featured">
+          <div><div>Dot when the seed shop restocks</div><div class="desc">A small dot on the Garden tab when new Featured seeds are in (never during focus)</div></div>
+          <input type="checkbox" id="setShopDot" aria-label="Dot when the seed shop restocks">
+        </div>
         <div class="setting" data-k="exams countdown test date">
           <div><div>Exams</div><div class="desc">Countdown on the Timer screen. You enter the dates.</div></div>
           <button class="btn small" id="examsBtn">Manage exams</button>
@@ -4179,6 +4304,13 @@ body.first-load #todayBar { opacity: 0; }
 </dialog>
 
 <!-- Boss and questline rewards -->
+<dialog id="eggDlg" class="egg-dlg" aria-labelledby="egTitle">
+  <div class="eg-stage" id="egStage"><div class="eg-egg" id="egEgg"></div><div class="eg-pet" id="egPet"></div></div>
+  <div class="rw-kicker" id="egKicker"></div>
+  <h3 id="egTitle"></h3>
+  <p class="eg-line" id="egLine"></p>
+  <div class="btn-row"><button class="btn" id="egOk">Keep it in the bag</button><button class="btn primary" id="egOut">Let it out</button></div>
+</dialog>
 <dialog id="rewardDlg" class="reward-dlg" aria-labelledby="rwTitle">
   <div class="rw-pomeo" id="rwPomeo"></div>
   <div class="rw-kicker" id="rwKicker"></div>
@@ -4435,6 +4567,12 @@ const USE_EMULATOR = /[?&]emulator=1\b/.test(location.search);
    33c. FLASHCARDS (v1.15) — decks, cards, review with spaced repetition, break offer.
    33d. WEEKLY SUBJECT PLAN (v1.15) — target hours per subject, progress from session names.
    33e. COSMETICS DROP (v1.15) — new themes, stamps, ring trails, room items, seeds, decor (items before ITEM_BY_ID, art near the end).
+   33f. ROTATING SEED SHOP (v1.16) — featured seeds per 4-hour UTC slot, the rare seed of the day, exclusives, gift seeds, restock dot (inside GARDEN).
+   33g. GARDEN PETS (v1.16) — eggs filled by focus, deterministic hatching, pets with capped boosts, slots by garden level, bag + almanac (inside GARDEN).
+   33h. CROP WEIGHT (v1.16) — every harvest weighs something (deterministic), Giant harvests, records, the harvest log, the player card stat (inside GARDEN).
+   33k. LEADERBOARD v2 (v1.16) — podium, rank arrows, your own rank pinned, Focus / Garden boards (Produce earned, Plants harvested from publicStats.produce / .harvests), Pomeo empty states, "You passed" (inside SOCIAL).
+   33j. GARDEN LOOKS (v1.16) — cosmetics the garden sells for produce (avatars, themes, titles, frames, colours, stamps, trails, room items): bought into gbuys, owned through the garden ledger, equipped like any item (inside GARDEN).
+   33i. FOCUS-WEATHER MUTATIONS (v1.16) — Shocked, Moonlit, Frozen, Clan-blessed, Dawn, Streak-touched, Stormy: from how the finishing block was studied, at most two, capped (inside GARDEN).
    34. WRAPPED — monthly (previous month, from the 1st) and yearly (from Dec 20)
    35. KEYBOARD SHORTCUTS (desktop). Off while typing, and switchable in Settings.
    36. SUBTASKS — an optional checklist for the current focus session.
@@ -4931,7 +5069,7 @@ function defaultState() {
     version: 2,
     settings: { goalMin: 60, weekStart: 1, sound: true, notify: true, theme: 'auto', autoStart: false, gamification: true, ambientVolume: 0.5,
                 shareActivity: true, shareNames: true, globalBoard: false,
-                pomeo: true, pomeoTalk: 'sometimes', waterNudge: true, breakCards: true, dailyTip: true,
+                pomeo: true, pomeoTalk: 'sometimes', waterNudge: true, breakCards: true, shopDot: true, dailyTip: true,
                 bossMode: 'solo', shortcuts: true, revIntervals: [1, 3, 7, 21, 45],
                 minPomeo: true, energy: 'always', useCase: '', atmosphere: true, ripen: true, festive: true, todRain: false },
     presets: [
@@ -4963,6 +5101,8 @@ function defaultState() {
     cardPrefs: {},  // player card: banner, featured, what it shows — { key: { v, u } } (see PLAYER CARD)
     roomPrefs: {},  // Pomeo's room: what sits in each slot — { slot: { v, u } } (see POMEO'S ROOM)
     roomSets: [],   // saved rooms (synced item by item)
+    eggs: [],       // garden pet eggs (v1.16): { id, v, kind, src, at, need, w:{sessionId: minutes}, h, pet } — water maps joined like plants
+    petPrefs: {},   // pets out in the garden: { p1..p3: { v: petId, u } } (merged like roomPrefs)
     decks: [],      // flashcard decks (see FLASHCARDS)
     cards: [],      // flashcards, synced item by item
     plan: [],       // weekly subject plan: { id, v, name, hrs } (see WEEKLY SUBJECT PLAN)
@@ -4989,7 +5129,7 @@ function hydrate(obj) {
   const out = { ...def, ...obj };
   for (const k of ['settings', 'timer', 'ui']) out[k] = { ...def[k], ...(obj[k] || {}) };
   if (!Array.isArray(out.presets) || !out.presets.length) out.presets = def.presets;
-  for (const k of ['sessions', 'recent', 'pinned', 'pendingSessions', 'reminders', 'revisions', 'exams', 'parked', 'abandoned', 'squad', 'subTemplates', 'loadouts', 'todos', 'plants', 'gbuys', 'roomSets', 'decks', 'cards', 'plan']) if (!Array.isArray(out[k])) out[k] = [];
+  for (const k of ['sessions', 'recent', 'pinned', 'pendingSessions', 'reminders', 'revisions', 'exams', 'parked', 'abandoned', 'squad', 'subTemplates', 'loadouts', 'todos', 'plants', 'gbuys', 'roomSets', 'decks', 'cards', 'plan', 'eggs']) if (!Array.isArray(out[k])) out[k] = [];
   if (!Array.isArray(out.timer.subtasks)) out.timer.subtasks = [];
   out.revisions = cleanRevisions(out.revisions);
   out.reminders = out.reminders.filter(r => r && r.id && typeof r.date === 'string' && typeof r.time === 'string');
@@ -5000,6 +5140,7 @@ function hydrate(obj) {
   out.game = normalizeGame(obj.game);
   out.cardPrefs = mergeCardPrefs({}, obj.cardPrefs).prefs;
   out.roomPrefs = mergeCardPrefs({}, obj.roomPrefs).prefs;
+  out.petPrefs = mergeCardPrefs({}, obj.petPrefs).prefs;
   out.clanRem = mergeCardPrefs({}, obj.clanRem).prefs;
   out.wipedAt = +obj.wipedAt || 0;
   return out;
@@ -5116,6 +5257,8 @@ function profileFromState() {
     gbuys: S.gbuys.slice(-1500),
     cardPrefs: S.cardPrefs,
     roomPrefs: S.roomPrefs,
+    eggs: eggsForProfile(),
+    petPrefs: S.petPrefs,
     roomSets: S.roomSets.slice(0, MAX_ROOM_SETS),
     decks: S.decks.slice(0, DECK_MAX),
     cards: S.cards.slice(0, CARD_MAX),
@@ -5152,6 +5295,9 @@ function pushProfile(force) {
   if (!force && json === lastProfileJSON) return;
   lastProfileJSON = json;
   if (SYNC.stale.length && FB.deleteField) { for (const [f, k] of SYNC.stale) p[f][k] = FB.deleteField(); SYNC.stale = []; }
+  // A merge write replaces a map with an empty one wholesale: keys another device set a moment ago would vanish.
+  // Nothing here is ever cleared except by Erase (a plain set), so an empty map is simply left out.
+  for (const k of ['cardPrefs', 'roomPrefs', 'petPrefs', 'clanRem', 'tomb', 'remFired', 'notes', 'energy']) if (p[k] && typeof p[k] === 'object' && !Object.keys(p[k]).length) delete p[k];
   trackWrite(FB.setDoc(userRef(), { ...p, updatedAt: FB.serverTimestamp() }, { merge: true }));
 }
 
@@ -5229,7 +5375,7 @@ function applyProfile(d) {
   S.settings = { ...def.settings, ...(d.settings || {}) };
   if ((+d.wipedAt || 0) > (+S.wipedAt || 0)) {   // erased on another device: take the cloud copy as it is, merge nothing back
     for (const f of SYNC_LISTS) S[f] = f === 'presets' ? defaultState().presets : [];
-    S.tomb = {}; S.game = normalizeGame(null); S.cardPrefs = {}; S.roomPrefs = {}; S.wipedAt = +d.wipedAt;
+    S.tomb = {}; S.game = normalizeGame(null); S.cardPrefs = {}; S.roomPrefs = {}; S.petPrefs = {}; S.wipedAt = +d.wipedAt;
     snapLists();
   }
   const ahead = mergeSyncFrom(d);   // reminders, revisions, exams, parked, presets, templates: item by item
@@ -5246,6 +5392,9 @@ function applyProfile(d) {
   const rp = mergeCardPrefs(S.roomPrefs, d.roomPrefs);   // Pomeo's room: newest wins, slot by slot
   S.roomPrefs = rp.prefs;
   if (rp.ahead) mg.ahead = true;
+  const pp = mergeCardPrefs(S.petPrefs, d.petPrefs);   // pets out in the garden (v1.16): newest wins, slot by slot
+  S.petPrefs = pp.prefs;
+  if (pp.ahead) mg.ahead = true;
   const cr = mergeCardPrefs(S.clanRem, d.clanRem);   // clan session reminders: newest wins, session by session
   S.clanRem = cr.prefs;
   if (cr.ahead) mg.ahead = true;
@@ -5595,14 +5744,15 @@ function mergeData(obj) {
   for (const [k, v] of Object.entries(sg.trophies)) if (!g.trophies[k]) g.trophies[k] = v;
   for (const f of ['decks', 'cards', 'plan']) for (const x of src[f]) { if (!x || !x.id) continue; const i = S[f].findIndex(y => y && y.id === x.id); if (i < 0) S[f].push({ ...x, u: +x.u || Date.now() }); else if ((+x.u || 0) > (+S[f][i].u || 0)) S[f][i] = x; }   // flashcards: by id, newer wins
   S.roomPrefs = mergeCardPrefs(S.roomPrefs, src.roomPrefs).prefs;   // Pomeo's room: the newer choice per slot
+  S.petPrefs = mergeCardPrefs(S.petPrefs, src.petPrefs).prefs;   // pets out (v1.16)
   for (const x of src.roomSets) if (x && x.id && x.name && !S.roomSets.some(y => y.id === x.id)) S.roomSets.push({ ...x, u: +x.u || Date.now() });
   // Garden (1.15): plants and purchases by id — a copy already here keeps the newer one (water maps are joined); nothing is doubled.
-  for (const f of ['plants', 'gbuys']) {
+  for (const f of ['plants', 'gbuys', 'eggs']) {
     for (const x of src[f]) {
       if (!x || !x.id || typeof x !== 'object') continue;
       const i = S[f].findIndex(y => y && y.id === x.id);
       if (i < 0) S[f].push({ ...x, u: +x.u || Date.now() });
-      else if (f === 'plants') S[f][i] = mergePlant((+x.u || 0) > (+S[f][i].u || 0) ? x : S[f][i], (+x.u || 0) > (+S[f][i].u || 0) ? S[f][i] : x);
+      else if (LIST_MERGE[f]) { const newer = (+x.u || 0) > (+S[f][i].u || 0); S[f][i] = LIST_MERGE[f](newer ? x : S[f][i], newer ? S[f][i] : x); }   // plants and eggs join their water maps
       else if ((+x.u || 0) > (+S[f][i].u || 0)) S[f][i] = x;
     }
   }
@@ -5875,7 +6025,8 @@ function logSession(focusedMs, end) {
   toast(`+${xpForSession(s)} XP · +${COINS_PER_SESSION + GOAL_BONUS * goalDays + subCoins} coins${goalDays ? ' · daily goal reached' : ''}`);
   setTimeout(() => uiSound('coin'), 900);
   floatUp([[`+${xpForSession(s)} XP`], [`+${COINS_PER_SESSION + GOAL_BONUS * goalDays + subCoins} coins`, 'coin'], ...(victoryOf(dayKey(weekMonday()), bossView()) ? [] : [[`⚔️ −${Math.round(focusedMs / 60000)} HP`]]), ...(gw && gw.mins ? [[`🌱 +${gw.mins} min water`]] : [])]);
-  if (gw && gw.ripe.length) setTimeout(() => toast(`${gw.ripe.length === 1 ? speciesOf(gw.ripe[0]).name + ' is' : gw.ripe.length + ' plants are'} ready to harvest 🌱`, 3600, true, { go: { tab: 'garden' } }), 1500);
+  if (gw && gw.ripe.length) setTimeout(() => toast(`${gw.ripe.length === 1 ? mutNames(gw.ripe[0]).map(n => n + ' ').join('') + speciesOf(gw.ripe[0]).name + ' is' : gw.ripe.length + ' plants are'} ready to harvest 🌱${gw.ripe.some(p => wmOf(p).length) && gw.ripe.length > 1 ? ' — with a focus-weather mutation' : ''}`, 3600, true, { go: { tab: 'garden' } }), 1500);
+  if (gw && gw.hatched && gw.hatched.length) announceHatched(gw.hatched);   // the reveal waits for the end-of-block feedback, then the focus queue (v1.16)
   announce(news, 'loud');
   socialAfterSession();
   const levelAfter = game().lv.level;
@@ -6376,6 +6527,7 @@ function renderSettings() {
   $('#setPomeoTalk').value = st.pomeoTalk || 'sometimes';
   $('#setWater').checked = st.waterNudge !== false;
   $('#setBreakCards').checked = st.breakCards !== false;
+  $('#setShopDot').checked = st.shopDot !== false;
   $('#setTip').checked = st.dailyTip !== false;
   $('#setKeys').checked = st.shortcuts !== false;
   renderUisSettings();
@@ -6497,6 +6649,10 @@ const FRAMES = {
   frame_hex: '<path d="M12 .7 21.8 6.35v11.3L12 23.3 2.2 17.65V6.35Z" stroke-width="1" opacity=".6"/>',
   frame_orbit: '<circle cx="12" cy="12" r="11.2" stroke-width="1" stroke-dasharray="1.2 2.2" opacity=".7"/><circle cx="12" cy=".8" r="1.1" stroke="none" fill="currentColor"/>',
 };
+Object.assign(FRAMES, {   // garden looks (v1.16)
+  frame_vine: '<circle cx="12" cy="12" r="11.1" stroke-width=".9" opacity=".55"/>' + [20, 110, 200, 290].map(a => `<path d="M12 .9q1.6 1.2 0 2.6-1.6-1.4 0-2.6Z" fill="currentColor" stroke="none" opacity=".85" transform="rotate(${a} 12 12)"/>`).join('') + [65, 155, 245, 335].map(a => `<path d="M12 1.4q1.1 1 0 2-1.1-1 0-2Z" fill="currentColor" stroke="none" opacity=".6" transform="rotate(${a} 12 12)"/>`).join(''),
+  frame_wreath: '<circle cx="12" cy="12" r="11" stroke-width="1.1" opacity=".45"/>' + [0, 60, 120, 180, 240, 300].map(a => `<g transform="rotate(${a} 12 12)" stroke="none"><circle cx="12" cy="1.3" r="1.25" fill="currentColor" opacity=".9"/><circle cx="12" cy="1.3" r=".45" fill="#fff" opacity=".9"/></g>`).join('') + [30, 90, 150, 210, 270, 330].map(a => `<path d="M12 .8q1.3 1 0 2.2-1.3-1.2 0-2.2Z" fill="currentColor" stroke="none" opacity=".55" transform="rotate(${a} 12 12)"/>`).join(''),
+});
 function badgeSVG(tier, { size = 24, frame = 'frame_none', locked = false, draw = false, avatar = '' } = {}) {
   const col = locked ? 'var(--muted)' : tier.color;
   // A profile picture replaces the tier symbol; the frame stays around it.
@@ -7124,9 +7280,34 @@ ITEMS.push(
   { id: 'pet_hamster',     cat: 'room', name: 'Hamster',          desc: 'Runs its wheel',               price: 160, lvl: 4, rarity: 'rare' },
   { id: 'pet_dog',         cat: 'room', name: 'Sleepy dog',       desc: 'Snoozes by the desk',          price: 220, lvl: 6, rarity: 'rare' },
 );
+/* Garden looks (v1.16): sold only in the garden, for produce. price -1 keeps them out of the coin shop (they show there
+   once owned, like rewards); gprice is the produce price, glvl the garden level needed. Owned through the garden ledger. */
+ITEMS.push(
+  { id: 'av_pumpkin',       cat: 'avatar', name: 'Pumpkin',        desc: 'A round autumn pumpkin',                 price: -1, gprice: 35,  glvl: 1, rarity: 'common' },
+  { id: 'av_sunflower',     cat: 'avatar', name: 'Sunflower',      desc: 'Always facing the light',                price: -1, gprice: 35,  glvl: 1, rarity: 'common' },
+  { id: 'av_strawberry',    cat: 'avatar', name: 'Strawberry',     desc: 'Sweet, with a leafy top',                price: -1, gprice: 90,  glvl: 3, rarity: 'rare' },
+  { id: 'av_lotus',         cat: 'avatar', name: 'Lotus',          desc: 'A calm pink lotus on still water',       price: -1, gprice: 200, glvl: 6, rarity: 'legendary' },
+  { id: 'th_orchard',       cat: 'theme',  name: 'Orchard',        desc: 'Leaf green and warm peach, day or night', price: -1, gprice: 120, glvl: 3, rarity: 'rare' },
+  { id: 'th_moonlit',       cat: 'theme',  name: 'Moonlit garden', desc: 'Pale lavender by day, deep indigo at night', price: -1, gprice: 220, glvl: 6, rarity: 'legendary' },
+  { id: 'ti_gardener',      cat: 'title',  name: 'Gardener',       desc: 'A title under your name',                price: -1, gprice: 40,  glvl: 1, rarity: 'common' },
+  { id: 'ti_greenthumb',    cat: 'title',  name: 'Green Thumb',    desc: 'A title under your name',                price: -1, gprice: 100, glvl: 3, rarity: 'rare' },
+  { id: 'ti_harvestmoon',   cat: 'title',  name: 'Harvest Moon',   desc: 'A title under your name',                price: -1, gprice: 200, glvl: 6, rarity: 'legendary' },
+  { id: 'frame_vine',       cat: 'frame',  name: 'Vine frame',     desc: 'A leafy vine around your badge',         price: -1, gprice: 90,  glvl: 3, rarity: 'rare' },
+  { id: 'frame_wreath',     cat: 'frame',  name: 'Flower wreath',  desc: 'A wreath of small blooms',               price: -1, gprice: 190, glvl: 6, rarity: 'legendary' },
+  { id: 'col_moss',         cat: 'color',  name: 'Moss',           desc: 'Deep garden green',                      price: -1, gprice: 30,  glvl: 1, rarity: 'common' },
+  { id: 'col_marigold',     cat: 'color',  name: 'Marigold',       desc: 'Warm orange-gold',                       price: -1, gprice: 30,  glvl: 1, rarity: 'common' },
+  { id: 'stamp_sprout',     cat: 'stamp',  name: 'Sprout stamp',   desc: 'A seedling seal that says GROWN',        price: -1, gprice: 85,  glvl: 3, rarity: 'rare' },
+  { id: 'stamp_basket',     cat: 'stamp',  name: 'Harvest stamp',  desc: 'A full basket seal',                     price: -1, gprice: 180, glvl: 6, rarity: 'legendary' },
+  { id: 'trail_leaves',     cat: 'trail',  name: 'Falling leaves', desc: 'Autumn leaves drift from the ring',      price: -1, gprice: 110, glvl: 3, rarity: 'rare' },
+  { id: 'trail_fireflies',  cat: 'trail',  name: 'Fireflies',      desc: 'Soft fireflies rise from the ring',      price: -1, gprice: 210, glvl: 6, rarity: 'legendary' },
+  { id: 'plant_sunflower',  cat: 'room',   name: 'Sunflower pot',  desc: 'A tall sunflower for the corner',        price: -1, gprice: 45,  glvl: 1, rarity: 'common' },
+  { id: 'poster_seeds',     cat: 'room',   name: 'Seed packets',   desc: 'A poster of seed packets',               price: -1, gprice: 45,  glvl: 1, rarity: 'common' },
+  { id: 'rug_grass',        cat: 'room',   name: 'Grass rug',      desc: 'A patch of lawn indoors',                price: -1, gprice: 95,  glvl: 3, rarity: 'rare' },
+);
+const GARDEN_LOOKS = ITEMS.filter(i => i.gprice);
 const ITEM_BY_ID = Object.fromEntries(ITEMS.map(i => [i.id, i]));
 const DEFAULTS = { avatar: 'av_default', pomhat: 'hat_none', pomacc: 'acc_none', pomskin: 'skin_none', sound: 'snd_chime', ambient: 'amb_none', theme: 'th_default', ring: 'ring_classic', font: 'font_system', effect: 'fx_none', frame: 'frame_none', color: 'col_default', aura: 'au_streak', title: 'ti_none', stamp: 'stamp_classic', card: 'card_minimal', trail: 'trail_none' };
-const NAME_COLORS = { col_teal: '#2f9e8f', col_sky: '#4a90c2', col_coral: '#e07a5f', col_violet: '#8a6fd1', col_rose: '#c95c84', col_gold: '#c9a227' };
+const NAME_COLORS = { col_teal: '#2f9e8f', col_sky: '#4a90c2', col_coral: '#e07a5f', col_violet: '#8a6fd1', col_rose: '#c95c84', col_gold: '#c9a227', col_moss: '#5a8f3c', col_marigold: '#e08a1e' };   // moss + marigold: garden looks (v1.16)
 
 /* ---------- Derived game state (cached; cleared whenever state is saved) ---------- */
 let G = null;
@@ -7185,6 +7366,7 @@ function computeGame() {
   }
   for (const id of Object.keys(S.game.grants)) if (ITEM_BY_ID[id]) owned.add(id);   // boss and questline rewards (free)
   for (const it of ITEMS) if ((it.clanLv || it.clanRaid) && clanOwns(it)) owned.add(it.id);   // clan cosmetics: while you're in the clan
+  for (const b of garden().valid) if (ITEM_BY_ID[b.item] && ITEM_BY_ID[b.item].gprice) owned.add(b.item);   // garden looks, bought with produce (v1.16; computeGarden never calls game())
   const earned = earnedAt(Infinity);
   return {
     idx, streak, xp, lv, tier: tierFor(lv.level), focusMs, earned, spent,
@@ -7244,6 +7426,7 @@ let knownInvalid = null;
 function reconcileRewards(mode = 'quiet') {
   if (!rewardsReady()) return [];
   gardenMigrate();   // once per account: the old session-derived garden becomes history + starting produce (see GARDEN)
+  gardenGifts();   // after the migration: exclusive seeds at garden levels 6, 8 and 9, the first egg, milestone eggs (v1.16)
   const now = Date.now(), cl = S.game.claims, news = [];
   if (!S.game.tierFrom) { S.game.tierFrom = dayKey(addDays(weekMonday(), 7)); save(); }   // fixed boss HP from next Monday
   G = null;
@@ -7642,6 +7825,16 @@ const systemDark = () => matchMedia('(prefers-color-scheme: dark)').matches;
 /** Light/dark/system setting + the equipped theme. Shop themes set CSS variables inline. */
 let themeReady = false, themeFadeTimer;
 let landingSkin = '';
+Object.assign(SKINS, {   // garden looks (v1.16)
+  th_orchard: {
+    light: { bg: '#f3f5ea', surface: '#fbfcf6', text: '#22301f', muted: '#5f6e58', line: '#dfe5d2', accent: '#5a8f3c', heat0: '#e7ecdc', 'accent-soft': 'rgba(90,143,60,.12)' },
+    dark:  { bg: '#121a10', surface: '#192218', text: '#e6ecdf', muted: '#93a28b', line: '#27322a', accent: '#8ec46d', heat0: '#20291f', 'on-accent': '#121a10' },
+  },
+  th_moonlit: {
+    light: { bg: '#f1f0fa', surface: '#faf9ff', text: '#23223a', muted: '#636282', line: '#dedcf0', accent: '#5b63c9', heat0: '#e5e3f3', 'accent-soft': 'rgba(91,99,201,.12)' },
+    dark:  { bg: '#0f1024', surface: '#171833', text: '#e7e6f7', muted: '#9c9cc0', line: '#272848', accent: '#a9b4ff', heat0: '#1f2040', 'on-accent': '#0f1024' },
+  },
+});
 function applyTheme(themeArg) {
   const root = document.documentElement;
   // Colours crossfade instead of snapping (skipped on the very first paint).
@@ -8198,6 +8391,7 @@ function writePublic(col, data) {
   if (lastPub[col] === json) return null;
   lastPub[col] = json;
   const p = FB.setDoc(FB.doc(FB.db, col, USER.uid), { ...data, updatedAt: FB.serverTimestamp() });
+  if (col === 'publicProfiles' && SOC.bigProbe && !('big' in data)) p.then(() => { SOC.bigProbe = false; console.warn('Firestore rules do not accept "big" yet — publishing without it. Update the rules so friends can see your biggest harvest.'); }, () => { SOC.bigProbe = false; SOC.bigRejected = false; });
   if (col === 'publicProfiles' && 'aura' in data) p.then(() => { writeLS('pomodorolist-auraok:' + USER.uid, 1); if (!SOC.auraOk) { SOC.auraOk = true; delete lastPub.publicStats; schedulePublish(); } }, () => {});
   trackWrite(p.catch(e => {
     // Rules from before special auras refuse the "aura" field: publish without it (friends see the streak aura).
@@ -8213,6 +8407,25 @@ function writePublic(col, data) {
       SOC.clanTagRejected = true;
       delete lastPub.publicProfiles; delete lastPub.publicStats;
       setTimeout(() => { publishPublic(); setTimeout(() => { SOC.clanTagRejected = false; }, 60000); }, 300);
+      return;
+    }
+    // Rules from before 1.16 refuse "produce" / "harvests" (the garden leaderboards): publish without them until the rules are updated.
+    // A denied stats write can also mean the minutes grew too fast (an import, a long offline stretch): try once without
+    // the fields — if that write goes through the rules refused them; if it is refused too, the fields were not the cause.
+    if (e.code === 'permission-denied' && col === 'publicStats' && 'produce' in data && !SOC.gardenStatsRejected && (SOC.gardenConfirm || (SOC.statRetries || 0) >= 2)) {
+      // the confirmation write (the same totals the probe just got through, plus the fields) was refused: it is the fields
+      if (SOC.gardenConfirm) { SOC.gardenConfirm = false; console.warn('Firestore rules do not accept "produce" / "harvests" yet — publishing without them. Update the rules for the garden leaderboards.'); }
+      else SOC.gardenProbe = true;
+      SOC.gardenStatsRejected = true;
+      delete lastPub.publicStats;
+      setTimeout(() => publishPublic(), 300);
+      return;
+    }
+    // Rules from before 1.16 refuse the "big" field (biggest harvest): publish without it until the rules are updated.
+    if (e.code === 'permission-denied' && 'big' in data && col === 'publicProfiles' && !SOC.bigRejected) {
+      SOC.bigRejected = true; SOC.bigProbe = true;   // the same probe: the next profile write goes without "big"
+      delete lastPub.publicProfiles; delete lastPub.publicStats;
+      setTimeout(() => publishPublic(), 300);
       return;
     }
     // Security rules from before profile pictures refuse the "avatar" field: publish without it (friends see Default).
@@ -8241,14 +8454,22 @@ function myPeriodStats() {
     monthKey: monthKeyOf(now), monthMin: Math.round(sum(m1, addDays(today, 1))),
     lifeMin: Math.round(life),
     lastWeekKey: dayKey(addDays(mon, -7)), lastWeekMin: Math.min(10080, Math.round(sum(addDays(mon, -7), mon))),
+    produce: Math.max(0, Math.round(garden().produceAll)), harvests: Math.max(0, Math.round(garden().grownTotal)),   // the garden boards (v1.16)
   };
 }
 /** Keep within what the security rules allow (e.g. after importing a big history, totals catch up over a few sessions). */
 function clampStats(n, o) {
   const cap = { dayMin: 1440, weekMin: 10080, weekMinSun: 10080, monthMin: 44640 };
+  // the garden totals (v1.16): never below what is published, growth bounded like the rules (2 produce per minute,
+  // a harvest per 30 minutes); a document from before 1.16 takes the whole total once
+  const gcap = { produce: 10000000, harvests: 1000000 };
+  const allow = o ? Math.floor(Math.max(0, (Date.now() - o.at) / 60000 - 1)) + 239 : 0;
+  for (const k of ['produce', 'harvests']) {
+    const room = k === 'produce' ? allow * 2 : Math.floor(allow / 30) + 2;
+    n[k] = !o || o[k] === undefined || o[k] === null ? Math.min(Math.max(0, Math.round(+n[k] || 0)), gcap[k]) : Math.max(+o[k], Math.min(Math.round(+n[k] || 0), +o[k] + room));
+  }
   if (!o) { for (const k in cap) n[k] = Math.min(n[k], cap[k]); n.lifeMin = Math.min(n.lifeMin, 3600000); }
   else {
-    const allow = Math.floor(Math.max(0, (Date.now() - o.at) / 60000 - 1)) + 239;
     for (const [kf, mf] of [['dayKey', 'dayMin'], ['weekKey', 'weekMin'], ['weekKeySun', 'weekMinSun'], ['monthKey', 'monthMin']]) {
       n[mf] = n[kf] === o[kf] ? Math.max(o[mf], Math.min(n[mf], o[mf] + allow)) : Math.min(n[mf], allow, cap[mf]);
     }
@@ -8266,13 +8487,19 @@ function publishPublic(first) {
   const aura = !SOC.auraRejected && SPECIAL_AURAS[myAura()] ? { aura: myAura() } : {};
   if (!SOC.auraOk && localStorage.getItem('pomodorolist-auraok:' + USER.uid)) SOC.auraOk = true;
   writePublic('publicProfiles', {
-    username: USER.username, ...flair, ...aura, streak: g.streak.cur, longest: g.streak.longest,
+    username: USER.username, ...flair, ...aura, ...(SOC.bigRejected ? {} : bigField()), streak: g.streak.cur, longest: g.streak.longest,
     hours: Math.round(g.focusMs / 3.6e5) / 10,
     joined: user && user.metadata.creationTime ? Date.parse(user.metadata.creationTime) : Date.now() - 3600e3,
   });
   const stats = clampStats({ username: USER.username, ...flair, ...(SOC.auraOk ? aura : {}), global: !!s.globalBoard, ...myPeriodStats() }, SOC.myStats);
-  const p = writePublic('publicStats', stats);
-  if (p) p.then(() => { SOC.myStats = { ...stats, at: Date.now() }; SOC.statRetries = 0; }, e => {
+  if (SOC.gardenStatsRejected) { delete stats.produce; delete stats.harvests; }
+  const p = writePublic('publicStats', stats), probing = !!SOC.gardenProbe && !('produce' in stats);   // this very write is the probe (without the fields)
+  if (p) p.then(() => {
+    SOC.myStats = { ...stats, at: Date.now() }; SOC.statRetries = 0;
+    if (probing) { SOC.gardenProbe = false; SOC.gardenConfirm = true; SOC.gardenStatsRejected = false; delete lastPub.publicStats; setTimeout(() => publishPublic(), 300); }   // the probe went through: confirm with the fields once more before giving them up
+    else if (SOC.gardenConfirm && 'produce' in stats) SOC.gardenConfirm = false;   // the fields are accepted after all (the earlier refusal was something else)
+  }, e => {
+    if (probing) { SOC.gardenProbe = false; SOC.gardenStatsRejected = false; }   // refused without the fields too: not their fault, send them again next time
     // Another device may have written newer totals: re-read what the server has, then try once more.
     if (e.code === 'permission-denied' && (SOC.statRetries = (SOC.statRetries || 0) + 1) <= 2) {
       delete lastPub.publicStats;
@@ -8465,7 +8692,16 @@ function presenceText(p) {
 }
 
 /* ---------- Leaderboards ---------- */
+/* Leaderboard v2 (v1.16): two kinds of board — Focus time (daily / weekly / monthly / lifetime) and Garden (produce
+   earned and plants harvested, both all-time, from the optional publicStats fields `produce` and `harvests`). */
+const BOARD_KINDS = { focus: [['day', 'Daily'], ['week', 'Weekly'], ['month', 'Monthly'], ['life', 'Lifetime']], garden: [['produce', 'Produce'], ['harvests', 'Harvests']] };
+const boardKindOf = period => (period === 'produce' || period === 'harvests' ? 'garden' : 'focus');
+const BOARD_NAME = { day: 'daily', week: 'weekly', month: 'monthly', life: 'lifetime', produce: 'produce', harvests: 'harvests' };
+/** A board value as text: focus minutes, produce or plants. */
+const fmtBoardVal = (period, v) => period === 'produce' ? `${PRODUCE_SVG} ${fmtNum(v)}` : period === 'harvests' ? `${fmtNum(v)} 🌱` : fmtMin(v);
 function periodField(period) {
+  if (period === 'produce') return { key: null, min: 'produce' };
+  if (period === 'harvests') return { key: null, min: 'harvests' };
   if (period === 'day') return { key: 'dayKey', min: 'dayMin' };
   if (period === 'week') return S.settings.weekStart === 0 ? { key: 'weekKeySun', min: 'weekMinSun' } : { key: 'weekKey', min: 'weekMin' };
   if (period === 'month') return { key: 'monthKey', min: 'monthMin' };
@@ -8486,6 +8722,8 @@ function minutesFor(d, period) {
   return d[f.min] || 0;
 }
 function resetText(period) {
+  if (period === 'produce') return 'All produce ever harvested in the garden';
+  if (period === 'harvests') return 'Plants harvested, all time';
   const now = new Date();
   let end;
   if (period === 'day') end = addDays(startOfDay(now), 1);
@@ -8508,6 +8746,7 @@ async function loadLeaderboard(scope, period, force) {
       const ids = friendsList().map(otherUid);
       const docs = await Promise.all(ids.map(id => getPublic('publicStats', id, force ? 0 : CACHE_MS)));
       rows = docs.map((d, i) => d && !d.denied ? { uid: ids[i], ...d, minutes: minutesFor(d, period) } : null).filter(Boolean);
+      if (boardKindOf(period) === 'garden') rows = rows.filter(r => r[periodField(period).min] !== undefined);   // friends on an app before 1.16 have no garden totals yet
       rows.push({ ...me, minutes: mine });
     } else {
       const f = periodField(period), col = FB.collection(FB.db, 'publicStats');
@@ -8744,13 +8983,42 @@ async function shareRecap() {
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
 
+/* Where everyone stood the last time each board was loaded (per account, on this device): rank arrows and "You passed". */
+const LB_PREV_KEY = () => 'pomodorolist-lbprev:' + (USER ? USER.uid : 'x');
+function lbRecord(key, res) {
+  if (!res || res.error || !res.at || !USER) return { prev: null, fresh: false };
+  const all = readJSON(LB_PREV_KEY(), {}), cur = all[key];
+  if (cur && cur.at === res.at) return { prev: cur.prev || null, fresh: false };   // the same load: the arrows stay as they were
+  const ranks = {};
+  for (const r of res.rows) ranks[r.uid] = r.rank;
+  if (res.myRow) ranks[res.myRow.uid] = res.myRow.rank;
+  const same = cur && JSON.stringify(cur.ranks) === JSON.stringify(ranks);
+  if (same) { all[key] = { ...cur, at: res.at }; if (!isPreview()) writeLS(LB_PREV_KEY(), all); return { prev: cur.prev || null, fresh: false }; }   // nothing moved: the arrows stay
+  const prev = cur ? cur.ranks : null;
+  all[key] = { at: res.at, ranks, prev };
+  const keys = Object.keys(all);
+  if (keys.length > 16) for (const k of keys.sort((a, b) => all[a].at - all[b].at).slice(0, keys.length - 16)) delete all[k];
+  if (!isPreview()) writeLS(LB_PREV_KEY(), all);
+  return { prev, fresh: !!prev };
+}
+const lbDeltaHTML = (prev, r) => { if (!prev) return ''; const p = prev[r.uid]; if (p === undefined) return '<span class="lb-delta new" title="New on the board">new</span>'; const d = p - r.rank; return d > 0 ? `<span class="lb-delta up" title="Up ${d}">▲${d}</span>` : d < 0 ? `<span class="lb-delta down" title="Down ${-d}">▼${-d}</span>` : '<span class="lb-delta same" aria-hidden="true">·</span>'; };
+/** Pomeo's empty states, one per situation. */
+function lbEmptyHTML(scope, period) {
+  const kind = boardKindOf(period);
+  const txt = scope === 'friends' && !friendsList().length ? 'No friends on the board yet — add one and race them.'
+    : kind === 'garden' ? (scope === 'friends' ? 'Nobody you know has harvested anything yet. Grow something!' : 'No harvests on the global board yet — yours could be the first.')
+    : scope === 'friends' ? 'No one has focused yet in this period. Start a block and take the lead.' : 'No one has focused yet in this period.';
+  return `<div class="lb-empty">${pomeoSVG({ state: 'idle', size: 72 })}<p>${txt}</p></div>`;
+}
 async function renderBoard(fromLoad) {
-  const scope = S.ui.lbScope || 'friends', period = S.ui.lbPeriod || 'week';
+  const scope = S.ui.lbScope || 'friends', period = S.ui.lbPeriod || 'week', kind = boardKindOf(period);
+  S.ui[kind === 'garden' ? 'lbGardenPeriod' : 'lbFocusPeriod'] = period;   // the kind buttons return to the last period of each kind
   if (scope === 'clans') return renderClanBoard(fromLoad);
   const head = `
     <div class="lb-head">
       <div class="seg" id="lbScope"><button data-scope="friends" class="${scope === 'friends' ? 'active' : ''}">Friends</button><button data-scope="global" class="${scope === 'global' ? 'active' : ''}">Global</button><button data-scope="clans">Clans</button></div>
-      <div class="seg" id="lbPeriod">${[['day', 'Daily'], ['week', 'Weekly'], ['month', 'Monthly'], ['life', 'Lifetime']].map(([p, n]) => `<button data-period="${p}" class="${p === period ? 'active' : ''}">${n}</button>`).join('')}</div>
+      <div class="seg lb-kind" id="lbKind"><button data-period="${S.ui.lbFocusPeriod || 'week'}" class="${kind === 'focus' ? 'active' : ''}">Focus time</button><button data-period="${S.ui.lbGardenPeriod || 'produce'}" class="${kind === 'garden' ? 'active' : ''}">Garden</button></div>
+      <div class="seg" id="lbPeriod">${BOARD_KINDS[kind].map(([p, n]) => `<button data-period="${p}" class="${p === period ? 'active' : ''}">${n}</button>`).join('')}</div>
     </div>`;
   const key = `${scope}|${period}|${periodKey(period)}|${S.settings.weekStart}`, c = SOC.lb[key];
   if (!c || Date.now() - c.at > CACHE_MS) {
@@ -8764,20 +9032,43 @@ async function renderBoard(fromLoad) {
   const res = c || { rows: [] };
   const rowSel = '#boardBody .lb:not(.pinned) li[data-uid]';
   const before = $('#boardBody .lb li[data-uid]') ? flipCapture(rowSel) : SOC.flipFrom;
+  const { prev, fresh } = lbRecord(key, res);
   const row = r => {
     const me = r.uid === USER.uid, L = personLook(r.uid, r.username, r);
     return `<li class="${me ? 'me' : ''}${r.rank <= 3 ? ' top' + r.rank : ''}" data-uid="${r.uid}"${!me && scope === 'friends' ? ` data-open="${r.uid}"` : ''}>
-      <span class="rk">${r.rank}</span>${lookPic(L, 26)}
+      <span class="rk">${r.rank}</span>${lbDeltaHTML(prev, r)}${lookPic(L, 26)}
       <span class="nm-row">${lookName(L)}${me ? ' <span class="lbl">(you)</span>' : ''}</span>
-      <span class="v">${fmtMin(r.minutes)}</span></li>`;
+      <span class="v">${fmtBoardVal(period, r.minutes)}</span></li>`;
   };
+  // the podium: the top three, the leader in the middle
+  const pod = r => {
+    const me = r.uid === USER.uid, L = personLook(r.uid, r.username, r);
+    return `<div class="lb-pod p${r.rank}${me ? ' me' : ''}" data-uid="${r.uid}"${!me && scope === 'friends' ? ` data-open="${r.uid}" role="button" tabindex="0"` : ''}>
+      <span class="lb-pr">${r.rank}</span><span class="lb-crown" aria-hidden="true">${r.rank === 1 ? '👑' : ''}</span>${lookPic(L, r.rank === 1 ? 52 : 40)}
+      <span class="lb-pn">${lookName(L)}${me ? ' <span class="lbl">(you)</span>' : ''}</span><span class="lb-pv">${fmtBoardVal(period, r.minutes)}</span>${lbDeltaHTML(prev, r)}</div>`;
+  };
+  const lonely = scope === 'friends' && !friendsList().length;   // only me on the board: Pomeo's empty state instead of a one-row list
+  const podium = !res.error && !lonely && res.rows.length >= 3 ? `<div class="lb-podium">${[res.rows[1], res.rows[0], res.rows[2]].map(pod).join('')}</div>` : '';
+  const rest = podium ? res.rows.slice(3) : res.rows;
+  // my own rank, always in view
+  const mine = res.rows.find(r => r.uid === USER.uid) || res.myRow;
+  const you = res.error ? '' : `<div class="lb-you">${mine && mine.minutes > 0
+    ? `<span class="rk">#${mine.rank}</span><span class="lb-yt"><b>You</b> · ${fmtBoardVal(period, mine.minutes)}</span>${lbDeltaHTML(prev, mine)}`
+    : scope === 'global' && !S.settings.globalBoard ? `<span class="lb-yt">You’re not on the global board. <button class="linkbtn" id="goPrivacy">Turn it on in Settings</button></span>`
+    : `<span class="lb-yt">${kind === 'garden' ? 'Harvest something to appear here' : 'Finish a block to appear here'}</span>`}</div>`;
+  // "You passed …": someone who stood above me last time is below me now
+  if (fresh && mine && prev && prev[USER.uid] !== undefined) {
+    const passed = res.rows.filter(r => r.uid !== USER.uid && prev[r.uid] !== undefined && prev[r.uid] < prev[USER.uid] && r.rank > mine.rank).map(r => '@' + r.username);
+    if (passed.length) toast(`You passed ${passed.slice(0, 2).join(' and ')}${passed.length > 2 ? ` and ${passed.length - 2} more` : ''} on the ${BOARD_NAME[period]} board 🎉`, 3400, true, { type: 'board' });
+  }
   let note = '';
-  if (scope === 'global' && !S.settings.globalBoard) note = `<div class="lb-note">You’re not on the global leaderboard. <button class="linkbtn" id="goPrivacy">Turn it on in Settings</button></div>`;
+  if (scope === 'global' && !S.settings.globalBoard && mine) note = `<div class="lb-note">You’re not on the global leaderboard. <button class="linkbtn" id="goPrivacy">Turn it on in Settings</button></div>`;
   $('#boardBody').innerHTML = head + `
-    <div class="card">
+    <div class="card lb-card">
       <div class="row between lb-meta"><span class="lbl">${resetText(period)}</span><span class="lbl">Updated ${Math.max(0, Math.round((Date.now() - (res.at || Date.now())) / 60000))} min ago <button class="linkbtn" id="lbRefresh" title="Refresh">↻</button></span></div>
-      ${res.error ? `<div class="empty">${esc(res.error)}</div>` : res.rows.length ? `<ol class="lb">${res.rows.map(row).join('')}</ol>` : '<div class="empty">No one has focused yet in this period.</div>'}
+      ${res.error ? `<div class="empty">${esc(res.error)}</div>` : res.rows.length && !lonely ? podium + (rest.length ? `<ol class="lb">${rest.map(row).join('')}</ol>` : '') : lbEmptyHTML(scope, period)}
       ${res.myRow ? `<ol class="lb pinned">${row(res.myRow)}</ol>` : ''}
+      ${you}
       ${note}
       ${scope === 'friends' && !friendsList().length && !res.error ? `<div class="cta-card"><p>Add friends to compete</p><button class="btn primary small" id="boardAddFriend">Add friend</button></div>` : ''}
     </div>`;
@@ -10741,6 +11032,31 @@ const GDECOR_BY_ID = Object.fromEntries(GDECOR.map(d => [d.id, d]));
 const GSPOTS = 6;   // decor spots around the beds
 const GSTAGES = ['Seed', 'Sprout', 'Leafy', 'Flowering', 'Fruiting'];
 const GMUT = { golden: { name: 'Golden', mult: 2, xp: 1.5 }, rainbow: { name: 'Rainbow', mult: 3, xp: 2 }, crystal: { name: 'Crystal', mult: 4, xp: 3 } };
+/* Focus-weather mutations (v1.16): decided once, when the plant ripens, from the block that finished it (and the
+   streak at that moment), each by a hash of the plant id — at most two per plant, on top of one colour mutation.
+   The produce multiplier of everything together is capped at ×8 (weight at ×6 in cropKg). */
+const WMUT = {
+  shocked:  { name: 'Shocked',        icon: '⚡', mult: 1.5, kg: 1.2, chance: .40, desc: 'ripened by a block of 90 minutes or more' },
+  moonlit:  { name: 'Moonlit',        icon: '🌙', mult: 1.4, kg: 1.1, chance: .35, desc: 'ripened by late-night focus (10 PM – 4 AM)' },
+  frozen:   { name: 'Frozen',         icon: '❄️', mult: 1.6, kg: 1.2, chance: .30, desc: 'ripened in December' },
+  blessed:  { name: 'Clan-blessed',   icon: '🛡️', mult: 1.8, kg: 1.2, chance: .45, desc: 'ripened during a clan live study session' },
+  dawn:     { name: 'Dawn',           icon: '🌅', mult: 1.3, kg: 1.1, chance: .35, desc: 'ripened by early-morning focus (4 – 7 AM)' },
+  streaked: { name: 'Streak-touched', icon: '🔥', mult: 1.4, kg: 1.1, chance: .30, desc: 'ripened on a streak of 14 days or more' },
+  stormy:   { name: 'Stormy',         icon: '⛈️', mult: 1.5, kg: 1.2, chance: .30, desc: 'ripened during a monsoon questline, or on a rainy monsoon day' },
+};
+const WMUT_MAX = 2, MUT_CAP = 8, STORMY_EVENTS = ['mon26', 'rn27a', 'rn27b', 'rn27c', 'rn27d'];
+const wmOf = p => (Array.isArray(p.wm) ? p.wm.filter(k => WMUT[k]) : []);
+/** Produce multiplier of every mutation on the plant together (colour × weather), capped. */
+const mutMult = p => Math.min(MUT_CAP, (GMUT[p.m] ? GMUT[p.m].mult : 1) * wmOf(p).reduce((a, k) => a * WMUT[k].mult, 1));
+const mutNames = p => [...wmOf(p).map(k => WMUT[k].name), ...(GMUT[p.m] ? [GMUT[p.m].name] : [])];
+const mutIcons = p => wmOf(p).map(k => WMUT[k].icon).join('');
+const stormyAt = t => STORMY_EVENTS.some(id => EVENT_BY_ID[id] && t >= evStart(EVENT_BY_ID[id]) && t < evEnd(EVENT_BY_ID[id])) || (gardenSeason(new Date(t)) === 'monsoon' && gardenWeather(new Date(t)) === 'rain');
+/** Which weather mutations the finishing block gives: every condition it meets rolls once (hash of plant id + kind); the two lowest rolls win. */
+function weatherMutations(p, s, streak = 0) {
+  const d = new Date(+s.start || 0), h = d.getHours(), mins = Math.floor((+s.duration || 0) / 60000);
+  const cond = { shocked: mins >= 90, moonlit: h >= 22 || h < 4, frozen: d.getMonth() === 11, blessed: !!s.live, dawn: h >= 4 && h < 7, streaked: streak >= 14, stormy: stormyAt(+s.start || 0) };
+  return Object.keys(WMUT).filter(k => cond[k]).map(k => [k, hash01(p.id + ':wm:' + k)]).filter(([k, r]) => r < WMUT[k].chance).sort((a, b) => a[1] - b[1]).slice(0, WMUT_MAX).map(([k]) => k);
+}
 const GXP_LEVELS = [0, 150, 400, 800, 1400, 2200, 3300, 4700, 6500, 9000, 12000];   // XP needed to be level 1, 2, …
 const GPLOTS_AT = [4, 6, 8, 10, 12, 14, 16];   // plots at level 1, 2, … 7 (16 is the most)
 const GHARVEST_XP = { common: 40, rare: 120, legendary: 300 };
@@ -10761,7 +11077,7 @@ function hash01(str) { let h = 2166136261; for (const c of String(str)) { h ^= c
 /** Chance of any mutation: species rarity, the streak when it was planted and a long finishing session. */
 function mutationChance(p) {
   const base = { common: .06, rare: .1, legendary: .16 }[speciesOf(p).rarity] || .06;
-  return base + Math.min(+p.sk || 0, 30) / 30 * .06 + ((+p.fd || 0) >= 90 ? .06 : (+p.fd || 0) >= 50 ? .03 : 0);
+  return base + Math.min(+p.sk || 0, 30) / 30 * .06 + ((+p.fd || 0) >= 90 ? .06 : (+p.fd || 0) >= 50 ? .03 : 0) + petBoost().mut;   // pets out add a little (capped at +8%, v1.16)
 }
 /** Decided from stored data only (plant id, species, sk, fd), so every device gets the same answer and it can't be re-rolled. */
 function mutationOf(p) {
@@ -10771,8 +11087,8 @@ function mutationOf(p) {
   return f < .12 ? 'crystal' : f < .4 ? 'rainbow' : 'golden';
 }
 function yieldOf(p) {
-  const [lo, hi] = GYIELD[speciesOf(p).rarity] || GYIELD.common, m = GMUT[p.m];
-  return Math.round((lo + Math.floor(hash01(p.id + ':y') * (hi - lo + 1))) * (m ? m.mult : 1));
+  const [lo, hi] = GYIELD[speciesOf(p).rarity] || GYIELD.common;
+  return Math.round((lo + Math.floor(hash01(p.id + ':y') * (hi - lo + 1))) * mutMult(p));
 }
 const harvestXP = p => Math.round((GHARVEST_XP[speciesOf(p).rarity] || 40) * (GMUT[p.m] ? GMUT[p.m].xp : 1));
 const gardenLevelOf = xp => GXP_LEVELS.filter(x => xp >= x).length;
@@ -10795,9 +11111,11 @@ function computeGarden() {
   const used = new Set(plants.map(p => p.seed));   // a seed a plant grew from is settled whatever the clocks said
   let spent = 0;
   const valid = [], invalid = [];
+  const looks = new Set();   // garden looks (v1.16): one copy each
   for (const b of buys) {
     const price = Math.max(0, Math.round(+b.price || 0));
-    if (b.ok || used.has(b.id) || earnedAt(+b.at || 0) - spent >= price) { spent += price; valid.push(b); } else invalid.push(b.id);
+    if (ITEM_BY_ID[b.item] && ITEM_BY_ID[b.item].gprice && looks.has(b.item)) { invalid.push(b.id); continue; }
+    if (b.ok || used.has(b.id) || earnedAt(+b.at || 0) - spent >= price) { spent += price; valid.push(b); if (ITEM_BY_ID[b.item] && ITEM_BY_ID[b.item].gprice) looks.add(b.item); } else invalid.push(b.id);
   }
   const produce = Math.max(0, earnedAt(Infinity) - spent);
   const seeds = {};   // species -> [unplanted seed buys]
@@ -10820,7 +11138,9 @@ function computeGarden() {
   const harvestsN = harvested.length + (fold ? +fold.grown || 0 : 0);
   const harvSpecies = new Set([...harvested.map(p => p.sp), ...Object.keys((fold && fold.sp) || {})]);
   const muts = {}; for (const m of Object.keys(GMUT)) muts[m] = harvested.filter(p => p.m === m).length + (fold ? +fold[m] || 0 : 0) + (m === 'golden' && sum ? +sum.golden || 0 : 0);
-  return { sum, fold, plants, growing, harvested, harvestsN, harvSpecies, muts, xp, level, next, into, need: next ? next - GXP_LEVELS[level - 1] : 0, produce, spent, valid, invalid, seeds, decor, placed, discovered, plots, byPlot,
+  const wmuts = {}; for (const k of Object.keys(WMUT)) wmuts[k] = harvested.filter(p => wmOf(p).includes(k)).length + (fold && fold.wm ? +fold.wm[k] || 0 : 0);   // focus-weather mutations (v1.16)
+  const produceAll = sums.reduce((a, x) => a + (+x.y || 0), 0) + harvested.reduce((a, p) => a + (+p.y || 0), 0);   // every produce ever harvested (leaderboards, v1.16)
+  return { sum, fold, plants, growing, harvested, harvestsN, harvSpecies, muts, wmuts, xp, produceAll, level, next, into, need: next ? next - GXP_LEVELS[level - 1] : 0, produce, spent, valid, invalid, seeds, decor, placed, discovered, plots, byPlot,
     ready: growing.filter(plantReady), grownTotal: sums.reduce((a, x) => a + (+x.grown || 0), 0) + harvested.length };
 }
 const GFOLD_AT = 500, GFOLD_KEEP = 300;
@@ -10840,6 +11160,8 @@ function gardenFold() {
   for (const p of old) {
     f.grown = (+f.grown || 0) + 1; if (GMUT[p.m]) f[p.m] = (+f[p.m] || 0) + 1; f.y = (+f.y || 0) + (+p.y || 0); f.xp = (+f.xp || 0) + harvestXP(p) + waterOf(p);   // its water minutes and harvest bonus
     const st = (f.sp[p.sp] ||= { n: 0, y: 0, best: '' }); st.n++; st.y += +p.y || 0; if (rank.indexOf(p.m || '') > rank.indexOf(st.best || '')) st.best = p.m;
+    const kg = kgOf(p); if (kg > (+st.kg || 0)) st.kg = kg; if (kg > (+f.kg || 0)) { f.kg = kg; f.kgSp = p.sp; f.kgM = p.m || ''; f.kgG = p.giant ? 1 : 0; }   // record weights (v1.16)
+    for (const k of wmOf(p)) (f.wm ||= {})[k] = (+(f.wm || {})[k] || 0) + 1;   // weather mutation counts (v1.16)
   }
   f.at = Math.max(+f.at || 0, cutoff);
   S.plants = S.plants.filter(p => !(p && gone.has(p.id)));
@@ -10859,7 +11181,7 @@ function gardenNextUnlock(g) {
   if (!g.next) return 'Top level — every plot is yours';
   const lv = g.level + 1, bits = [];
   if (plotsForLevel(lv) > plotsForLevel(g.level)) bits.push(`${plotsForLevel(lv)} plots`);
-  for (const s of GSPECIES) if (s.lvl === lv) bits.push(s.name + ' seeds');
+  for (const s of GSPECIES) if (s.lvl === lv && !s.shop) bits.push(s.name + ' seeds');
   for (const d of GDECOR) if (d.lvl === lv) bits.push(d.name.toLowerCase());
   return `Level ${lv}: ${bits.length ? bits.slice(0, 3).join(', ') : 'a new title for your garden'}`;
 }
@@ -10882,7 +11204,7 @@ function gardenWilted(now = Date.now()) {
   const ab = (S.abandoned || []).length ? Math.max(...S.abandoned.slice(-20).map(a => +a.end || 0)) : 0;
   if (ab > last && ab > now - 2 * DAY_MS) return true;
   const since = Math.max(last, gardenMigAt() === Infinity ? 0 : gardenMigAt(), ...garden().growing.map(p => +p.at || 0));
-  return since > 0 && now - since > 3 * DAY_MS;
+  return since > 0 && now - since > (3 + petBoost().wilt) * DAY_MS;   // a hedgehog out keeps the beds damp longer (v1.16)
 }
 /** Who is visiting: butterflies and bees for this week's sessions and blooms, a bird, a frog and a cat for streaks. */
 function gardenVisitors() {
@@ -10927,15 +11249,20 @@ function mergePlant(win, lose) {
   if (lose.sum || win.sum) return lose.sum && win.sum && (+lose.grown || 0) + (+lose.xp || 0) > (+win.grown || 0) + (+win.xp || 0) ? lose : win;
   if (!win.h && lose.h) return lose;
   if (win.h) return win;
-  return { ...win, w: { ...(lose.w || {}), ...(win.w || {}) } };
+  if (!win.fin && lose.fin) [win, lose] = [lose, win];   // the copy that ripened keeps fin / fd / m / wm (v1.16)
+  return { ...win, w: sortedMap({ ...(lose.w || {}), ...(win.w || {}) }) };
 }
+/** A map with its keys in a fixed order: two devices joining the same water maps end up with identical copies (v1.16). */
+function sortedMap(m) { const o = {}; for (const k of Object.keys(m || {}).sort()) o[k] = m[k]; return o; }
 
 /* ---------- Watering: every finished focus block waters the growing plants ---------- */
 function gardenAfterSession(s) {
-  const mins = Math.floor((+s.duration || 0) / 60000);
-  if (mins < 1 || !gardenMig()) return null;
+  const raw = Math.floor((+s.duration || 0) / 60000);
+  if (raw < 1 || !gardenMig()) return null;
+  const hatched = eggAfterSession(s, raw);   // the egg in the slot drinks the block's minutes too (v1.16)
+  const mins = Math.floor(raw * (1 + petBoost().water));   // pets out add a little water (capped at +25%)
   const g = garden(), alive = g.growing.filter(p => !plantReady(p) && !(p.w && p.w[s.id] !== undefined));   // a block waters each plant once, whatever device replays it
-  if (!alive.length) return null;
+  if (!alive.length) { GD = null; save(); return { watered: 0, mins: 0, stagesUp: [], ripe: [], hatched, egg: raw }; }
   const give = {}, room = p => needOf(p) - waterOf(p) - (give[p.id] || 0);
   let left = mins;
   const pour = targets => {
@@ -10954,13 +11281,340 @@ function gardenAfterSession(s) {
     const amt = give[p.id];
     if (!amt) continue;
     (p.w ||= {})[s.id] = amt;
-    if (plantReady(p) && !p.fin) { p.fin = s.id; p.fd = mins; p.m = mutationOf(p); p.fc = 0; ripe.push(p); }
+    (p.b ||= {})[s.id] = raw;   // the block's own length, unboosted and unsplit: crop size and Giants read this (v1.16)
+    if (plantReady(p) && !p.fin) { p.fin = s.id; p.fd = raw; p.m = mutationOf(p); const wm = weatherMutations(p, s, computeStreaks(buildIndex()).cur); if (wm.length) p.wm = wm; p.fc = 0; ripe.push(p); }
     if (plantStage(p) > before[p.id]) stagesUp.push(p);
   }
   GD = null;
   save();
   updateGardenDot();
-  return { watered: Object.keys(give).length, mins: mins - left, stagesUp, ripe };
+  return { watered: Object.keys(give).length, mins: mins - left, stagesUp, ripe, hatched, egg: raw };
+}
+
+/* ---------- GARDEN PETS (v1.16) ----------
+   Eggs come only from focus. The egg in the slot (the oldest unhatched one) drinks every finished block's minutes
+   and hatches at 300 (common), 420 (rare) or 600 (legendary) minutes; what is left over flows into the next egg.
+   Which pet hatches is decided from the egg's id alone (hash), so every device agrees and nothing re-rolls.
+   Garden levels 4 and 8 and questline finals (from November 2026) add rarer eggs with fixed ids. Pets give small,
+   capped boosts; 1 / 2 / 3 can be out at garden level 1 / 5 / 8. A duplicate hatch raises that pet's level
+   (hearts, up to 3), which strengthens its boost by 25% per heart. */
+const PETS = [
+  { id: 'bunny',       name: 'Bunny',        rarity: 'common',    boost: { water: .06 },                        line: 'nibbles the clover and hops after every block' },
+  { id: 'hedgehog',    name: 'Hedgehog',     rarity: 'common',    boost: { wilt: 1 },                           line: 'keeps the beds damp a day longer' },
+  { id: 'frog',        name: 'Frog',         rarity: 'common',    boost: { bonus: .06 },                        line: 'sometimes finds extra produce in the mud' },
+  { id: 'turtle',      name: 'Turtle',       rarity: 'common',    boost: { weight: .05 },                       line: 'slow and steady — the crops grow bigger' },
+  { id: 'bee',         name: 'Bee',          rarity: 'rare',      boost: { mut: .02 },                          line: 'pollinates the beds — mutations come more often' },
+  { id: 'owl',         name: 'Owl',          rarity: 'rare',      boost: { mut: .025, water: .03 },             line: 'watches over the night-time blocks' },
+  { id: 'deer',        name: 'Deer',         rarity: 'rare',      boost: { weight: .08, water: .04 },           line: 'grazes gently; the fruit swells' },
+  { id: 'fox',         name: 'Fox',          rarity: 'rare',      boost: { bonus: .10 },                        line: 'a clever forager — extra produce turns up' },
+  { id: 'hummingbird', name: 'Hummingbird',  rarity: 'legendary', boost: { water: .12, mut: .02 },              line: 'a blur of wings; every block waters more' },
+  { id: 'snail',       name: 'Golden snail', rarity: 'legendary', boost: { weight: .12, bonus: .08, mut: .02 }, line: 'leaves a golden trail — luck follows it' },
+];
+const PET_BY_ID = Object.fromEntries(PETS.map(p => [p.id, p]));
+const BOOST_CAP = { water: .25, mut: .08, wilt: 2, bonus: .20, weight: .25 };
+const BOOST_TEXT = { water: v => `+${Math.round(v * 100)}% water from sessions`, mut: v => `+${(v * 100).toFixed(1).replace(/\.0$/, '')}% mutation chance`, wilt: v => `wilts ${v % 1 ? v.toFixed(1) : v} day${v === 1 ? '' : 's'} later`, bonus: v => `${Math.round(v * 100)}% chance of bonus produce`, weight: v => `+${Math.round(v * 100)}% crop weight` };
+const EGG_NEED = { common: 300, rare: 420, legendary: 600 };
+const EGG_ODDS = { common: [.70, .95], rare: [.20, .80], legendary: [0, .40] };   // cumulative: below [0] common, below [1] rare, else legendary
+const PET_LEVEL_MAX = 3, PET_SLOTS_AT = [1, 5, 8];
+const EGG_EVENT_FROM = Date.UTC(2026, 10, 1);   // questline finals from the November 2026 questline on add a rare egg
+/** Which pet an egg holds — from its id only, so every device gets the same answer. */
+function petFor(egg) {
+  const [c, r] = EGG_ODDS[egg.kind] || EGG_ODDS.common, x = hash01(egg.id + ':pet'), tier = x < c ? 'common' : x < r ? 'rare' : 'legendary';
+  const pool = PETS.filter(p => p.rarity === tier);
+  return pool[Math.floor(hash01(egg.id + ':sp') * pool.length) % pool.length].id;
+}
+const eggList = () => (S.eggs || []).filter(e => e && typeof e === 'object' && e.id && e.kind);
+const eggFill = e => Object.values(e.w || {}).reduce((a, v) => a + (+v || 0), 0);
+const eggNeed = e => +e.need || EGG_NEED[e.kind] || EGG_NEED.common;
+const eggActive = () => eggList().filter(e => !e.h).sort((a, b) => (a.at - b.at) || (a.id < b.id ? -1 : 1))[0] || null;
+const eggsWaiting = () => eggList().filter(e => !e.h).length;
+/** Two copies of one egg: a hatched copy is final; otherwise the newer one with both water maps joined. */
+function mergeEgg(win, lose) {
+  if (!lose || lose === win) return win;
+  if (win.sum || lose.sum) return (+lose.n || 0) > (+win.n || 0) ? lose : win;   // the folded history: the richer record wins
+  const base = win.h ? win : lose.h ? lose : win;
+  if (base.h) { const { w, ...rest } = base; return rest; }   // hatched: the water map is spent and never uploaded, so both copies match
+  return { ...base, w: sortedMap({ ...(lose.w || {}), ...(win.w || {}) }) };
+}
+/** Egg history stays small: once more than 400 hatched eggs are stored, the oldest beyond the newest 300 fold into one
+ *  record ('eggfold': how many, and how many copies of each pet), so the upload cap never cuts a copy this device still
+ *  holds — the two copies would differ for good and the profile would be re-uploaded forever. Both devices fold the
+ *  same way; the richer record wins in mergeEgg. */
+const EGGFOLD_AT = 400, EGGFOLD_KEEP = 300;
+const eggFoldRec = () => (S.eggs || []).find(e => e && e.id === 'eggfold' && e.sum) || null;
+const eggOrder = (a, b) => a.h - b.h || (a.id < b.id ? -1 : 1);   // oldest hatch first; the same order on every device
+/** A hatched egg the fold already counted (older than its cut): a copy a long-closed device brings back is dropped, not counted twice. */
+const eggFolded = (e, f) => !!(f && e && e.h && e.kind && (e.h < (+f.at || 0) || (e.h === +f.at && !!f.top && e.id <= f.top)));
+function eggFold() {
+  const f0 = eggFoldRec();
+  if (f0 && (S.eggs || []).some(e => eggFolded(e, f0))) S.eggs = S.eggs.filter(e => !eggFolded(e, f0));
+  if (eggList().length <= EGGFOLD_AT) return false;   // the stored list never grows past what the upload carries
+  const hatched = eggList().filter(e => e.h).sort(eggOrder);
+  const old = hatched.slice(0, Math.max(0, hatched.length - EGGFOLD_KEEP));
+  if (!old.length) return false;
+  let f = f0;
+  if (!f) { f = { id: 'eggfold', v: 1, sum: 1, n: 0, pets: {}, at: 0, top: '', u: 0 }; S.eggs.unshift(f); }
+  f.pets ||= {};
+  const gone = new Set(old.map(e => e.id)), last = old[old.length - 1];
+  for (const e of old) { f.n = (+f.n || 0) + 1; if (e.pet) f.pets[e.pet] = (+f.pets[e.pet] || 0) + 1; }
+  f.at = +last.h; f.top = last.id;
+  f.topN = Math.max(+f.topN || 0, ...old.filter(e => /^egg\d+$/.test(e.id)).map(e => +e.id.slice(3)));
+  f.u = Date.now();
+  S.eggs = S.eggs.filter(e => !(e && gone.has(e.id)));
+  return true;
+}
+/** What the profile document carries: the folded history first, then the newest eggs — hatched ones without their spent water map. */
+function eggsForProfile() {
+  const f = eggFoldRec();
+  const rest = (S.eggs || []).filter(e => e && e !== f).map(e => e.h ? { id: e.id, v: e.v, kind: e.kind, src: e.src, at: e.at, need: e.need, h: e.h, pet: e.pet, ...(e.hs ? { hs: e.hs } : {}), ...(e.u ? { u: e.u } : {}) } : e);
+  return [...(f ? [f] : []), ...rest.slice(-EGGFOLD_AT)];   // hatched eggs are final, so 400 fit easily (v1.16)
+}
+/** One focus egg in the queue at all times: 'egg1', then 'egg' + (focus eggs so far + 1) — the same id on every device. */
+function ensureEgg() {
+  if (!USER || isPreview() || !gardenMig()) return false;
+  if (eggList().some(e => e.src === 'focus' && !e.h)) return false;
+  const f = eggFoldRec(), top = Math.max(0, f && +f.topN || 0, ...eggList().filter(e => /^egg\d+$/.test(e.id)).map(e => +e.id.slice(3)));
+  const id = 'egg' + (top + 1);   // after the highest so far (folded ones are gone from the list), the same on every device
+  if (eggList().some(e => e.id === id)) return false;
+  S.eggs.push({ id, v: 1, kind: 'common', src: 'focus', at: Date.now(), u: Date.now(), need: EGG_NEED.common, w: {} });
+  return true;
+}
+/** Rarer eggs with fixed ids: garden level 4 (rare) and 8 (legendary). */
+function eggGifts() {
+  if (!USER || isPreview() || !gardenMig()) return 0;
+  const lv = garden().level, made = [];
+  for (const [id, at, kind] of [['egg_lv4', 4, 'rare'], ['egg_lv8', 8, 'legendary']]) if (lv >= at && !eggList().some(e => e.id === id)) { S.eggs.push({ id, v: 1, kind, src: 'lv' + at, at: Date.now(), u: Date.now(), need: EGG_NEED[kind], w: {} }); made.push(kind); }
+  return made;
+}
+/** An egg that is full but not marked hatched (water joined from two devices) hatches now. */
+function eggSettle() {
+  const out = [];
+  for (const e of eggList()) if (!e.h && eggFill(e) >= eggNeed(e)) { e.h = Date.now(); e.pet = petFor(e); out.push(e); }
+  return out;
+}
+/** A finished block fills the egg in the slot; what is left flows into the next egg. Returns the eggs that hatched. */
+function eggAfterSession(s, mins) {
+  const out = [...eggSettle()];
+  let left = mins, guard = 0;
+  while (left > 0 && guard++ < 4) {
+    ensureEgg();
+    const e = eggActive();
+    if (!e || (e.w && e.w[s.id] !== undefined)) break;   // this block already counted here (another device replayed it)
+    const amt = Math.min(left, Math.max(0, eggNeed(e) - eggFill(e)));
+    if (amt <= 0) break;
+    (e.w ||= {})[s.id] = amt;
+    left -= amt;
+    if (eggFill(e) >= eggNeed(e)) { e.h = Date.now(); e.pet = petFor(e); e.hs = s.id; out.push(e); } else break;
+  }
+  ensureEgg();
+  return out;
+}
+/** Owned pets, from hatched eggs: level = copies hatched (max 3). */
+function petsOwned() {
+  const m = {};
+  const f = eggFoldRec();   // copies hatched long ago live in the folded record
+  for (const e of eggList()) if (e.h && e.pet && PET_BY_ID[e.pet] && !eggFolded(e, f)) { const x = (m[e.pet] ||= { id: e.pet, pet: PET_BY_ID[e.pet], n: 0, at: e.h }); x.n++; x.at = Math.min(x.at, e.h); }
+  for (const [id, n] of Object.entries((f && f.pets) || {})) if (PET_BY_ID[id] && +n > 0) { const x = (m[id] ||= { id, pet: PET_BY_ID[id], n: 0, at: +f.at || 0 }); x.n += Math.round(+n); x.at = Math.min(x.at, +f.at || x.at); }
+  for (const x of Object.values(m)) x.level = Math.min(PET_LEVEL_MAX, x.n);
+  return Object.values(m).sort((a, b) => a.at - b.at);
+}
+const petSlots = () => PET_SLOTS_AT.filter(lv => garden().level >= lv).length;
+/** Pets out in the garden: each pet at most once, only owned ones, only the slots this level allows. */
+function petsOut() {
+  const own = Object.fromEntries(petsOwned().map(x => [x.id, x])), seen = new Set(), out = [];
+  for (let i = 1; i <= petSlots(); i++) { const p = (S.petPrefs || {})['p' + i], v = p && p.v; if (v && own[v] && !seen.has(v)) { seen.add(v); out.push({ slot: 'p' + i, ...own[v] }); } }
+  return out;
+}
+/** Combined boosts of the pets out, capped; a pet's level strengthens it (+25% per heart). */
+function petBoost() {
+  const b = { water: 0, mut: 0, wilt: 0, bonus: 0, weight: 0 };
+  for (const x of petsOut()) for (const [k, v] of Object.entries(x.pet.boost)) b[k] += v * (1 + .25 * (x.level - 1));
+  for (const k in b) b[k] = Math.min(BOOST_CAP[k], Math.round(b[k] * 1000) / 1000);
+  return b;
+}
+const petBoostText = (pet, level = 1) => Object.entries(pet.boost).map(([k, v]) => BOOST_TEXT[k](Math.round(v * (1 + .25 * (level - 1)) * 1000) / 1000)).join(' · ');
+function petEquip(petId) {
+  if (isPreview() || !petsOwned().some(x => x.id === petId)) return false;
+  const out = petsOut();
+  if (out.some(x => x.id === petId)) return true;
+  const n = petSlots(), free = Array.from({ length: n }, (_, i) => 'p' + (i + 1)).find(k => !out.some(x => x.slot === k));
+  if (!free) { toast(`Up to ${n} pet${n === 1 ? '' : 's'} out at a time${n < 3 ? ` — one more at garden level ${PET_SLOTS_AT[n]}` : ''}`); return false; }
+  (S.petPrefs ||= {})[free] = { v: petId, u: Date.now() };
+  GD = null;
+  save();
+  return true;
+}
+function petUnequip(petId) {
+  if (isPreview()) return false;
+  const x = petsOut().find(p => p.id === petId);
+  if (!x) return false;
+  S.petPrefs[x.slot] = { v: '', u: Date.now() };
+  GD = null;
+  save();
+  return true;
+}
+const petHearts = lv => '♥'.repeat(lv) + '<span class="dim">' + '♥'.repeat(Math.max(0, PET_LEVEL_MAX - lv)) + '</span>';
+/* Pet and egg art (30×24 like the visitors) */
+const PET_ART = {
+  bunny: '<svg viewBox="0 0 30 24" aria-hidden="true"><ellipse cx="15" cy="16" rx="9" ry="6.5" fill="#f3efe8"/><ellipse cx="10" cy="6" rx="2.2" ry="6" fill="#f3efe8"/><ellipse cx="10" cy="6" rx="1" ry="4" fill="#f4b6c2"/><ellipse cx="15" cy="7" rx="2.2" ry="6" fill="#f3efe8"/><ellipse cx="15" cy="7" rx="1" ry="4" fill="#f4b6c2"/><circle cx="12" cy="14" r="1" fill="#333"/><circle cx="17" cy="14" r="1" fill="#333"/><ellipse cx="14.5" cy="16.5" rx="1.2" ry=".8" fill="#e58aa0"/><circle cx="25" cy="18" r="2.4" fill="#fff"/></svg>',
+  hedgehog: '<svg viewBox="0 0 30 24" aria-hidden="true"><path d="M5 18q2-11 12-11 9 0 11 11Z" fill="#6b4a2e"/><path d="M7 16l2-6 2 5 2-7 2 6 2-7 2 6 2-6 2 6 2-5 1 6" stroke="#4a311c" stroke-width="1.6" fill="none" stroke-linecap="round"/><ellipse cx="9" cy="17" rx="6" ry="4" fill="#e9c9a8"/><circle cx="4.5" cy="17" r="1.2" fill="#333"/><circle cx="8" cy="15.5" r=".9" fill="#333"/></svg>',
+  frog: '<svg viewBox="0 0 30 24" aria-hidden="true"><ellipse cx="15" cy="16" rx="10" ry="6" fill="#5fb55a"/><circle cx="10" cy="9" r="3.2" fill="#5fb55a"/><circle cx="20" cy="9" r="3.2" fill="#5fb55a"/><circle cx="10" cy="9" r="1.4" fill="#222"/><circle cx="20" cy="9" r="1.4" fill="#222"/><path d="M10 17q5 3 10 0" stroke="#2e6b2a" stroke-width="1.4" fill="none" stroke-linecap="round"/><ellipse cx="7" cy="21" rx="3" ry="1.4" fill="#4a9a46"/><ellipse cx="23" cy="21" rx="3" ry="1.4" fill="#4a9a46"/></svg>',
+  turtle: '<svg viewBox="0 0 30 24" aria-hidden="true"><ellipse cx="15" cy="13" rx="10" ry="7" fill="#4f8a5a"/><path d="M8 13h14M11 8l2 10M17 8l2 10M9 10q6-3 12 0M9 16q6 3 12 0" stroke="#3a6b42" stroke-width="1.2" fill="none"/><ellipse cx="25" cy="16" rx="3.4" ry="2.6" fill="#7bb37a"/><circle cx="26.5" cy="15.5" r=".8" fill="#222"/><ellipse cx="8" cy="20" rx="2.6" ry="1.4" fill="#7bb37a"/><ellipse cx="21" cy="20" rx="2.6" ry="1.4" fill="#7bb37a"/></svg>',
+  bee: '<svg viewBox="0 0 30 24" aria-hidden="true"><ellipse cx="15" cy="14" rx="8" ry="5.5" fill="#f2c14e"/><path d="M11 10v8M15 9v10M19 10v8" stroke="#3a2a1a" stroke-width="2"/><ellipse cx="11" cy="7" rx="5" ry="3" fill="#fff" opacity=".8"/><ellipse cx="19" cy="7" rx="5" ry="3" fill="#fff" opacity=".8"/><circle cx="23" cy="13" r="1" fill="#3a2a1a"/></svg>',
+  owl: '<svg viewBox="0 0 30 24" aria-hidden="true"><ellipse cx="15" cy="14" rx="8.5" ry="9" fill="#8a6a4a"/><path d="M8 7l2-4 3 3M22 7l-2-4-3 3" fill="#8a6a4a"/><circle cx="11.5" cy="12" r="3.2" fill="#f7efd8"/><circle cx="18.5" cy="12" r="3.2" fill="#f7efd8"/><circle cx="11.5" cy="12" r="1.6" fill="#222"/><circle cx="18.5" cy="12" r="1.6" fill="#222"/><path d="M15 14l-1.5 2.5h3Z" fill="#f2b632"/><ellipse cx="15" cy="19" rx="4.5" ry="3" fill="#b89a78"/></svg>',
+  deer: '<svg viewBox="0 0 30 24" aria-hidden="true"><ellipse cx="13" cy="16" rx="8" ry="5" fill="#c99a6a"/><rect x="18" y="8" width="5" height="7" rx="2.5" fill="#c99a6a"/><circle cx="21" cy="7" r="3" fill="#c99a6a"/><path d="M20 4l-2-3M20 4l-1-4M22 4l2-3M22 4l1-4" stroke="#8a6a4a" stroke-width="1.3" fill="none" stroke-linecap="round"/><circle cx="22" cy="6.5" r=".8" fill="#222"/><path d="M8 20v3M11 20v3M15 20v3M18 20v3" stroke="#a8784a" stroke-width="1.6"/><circle cx="10" cy="14" r="1" fill="#fff" opacity=".7"/><circle cx="14" cy="13" r="1" fill="#fff" opacity=".7"/></svg>',
+  fox: '<svg viewBox="0 0 30 24" aria-hidden="true"><ellipse cx="14" cy="16" rx="8" ry="5" fill="#e8823a"/><path d="M22 18q6-2 5-8" stroke="#e8823a" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="26.3" cy="10.5" r="2" fill="#fff"/><path d="M6 15l0-7 4 3h3l4-3v7Z" fill="#e8823a"/><ellipse cx="9" cy="15" rx="4" ry="3" fill="#fff"/><circle cx="7.5" cy="13" r=".9" fill="#222"/><circle cx="11" cy="13" r=".9" fill="#222"/><circle cx="9" cy="16" r="1" fill="#333"/></svg>',
+  hummingbird: '<svg viewBox="0 0 30 24" aria-hidden="true"><ellipse cx="16" cy="13" rx="6" ry="4" fill="#3fb28a"/><circle cx="21" cy="10" r="3" fill="#2f9ad0"/><path d="M24 10l6-1" stroke="#333" stroke-width="1.4" stroke-linecap="round"/><circle cx="22" cy="9.5" r=".8" fill="#222"/><g class="wing wl"><path d="M14 11q-4-9-10-6 2 6 10 6Z" fill="#6ad2a8" opacity=".85"/></g><g class="wing wr"><path d="M16 11q2-9 9-7-1 6-9 7Z" fill="#6ad2a8" opacity=".85"/></g><path d="M10 15l-6 4 7-1Z" fill="#2f9ad0"/></svg>',
+  snail: '<svg viewBox="0 0 30 24" aria-hidden="true"><ellipse cx="13" cy="19" rx="11" ry="3.5" fill="#e6c266"/><circle cx="17" cy="12" r="7" fill="#f2c14e"/><path d="M17 12m-4 0a4 4 0 1 0 8 0a4 4 0 1 0-8 0M17 12m-1.5 0a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0-3 0" stroke="#c9981e" stroke-width="1.3" fill="none"/><path d="M4 16q0-4 3-6M6 17q0-4 2-5" stroke="#c9981e" stroke-width="1.6" stroke-linecap="round" fill="none"/><circle cx="7" cy="9.5" r="1.1" fill="#333"/><circle cx="8.5" cy="11.5" r="1.1" fill="#333"/><path d="M2 20q6-2 12 0" stroke="#fff3b0" stroke-width="1.5" opacity=".8" fill="none"/></svg>',
+};
+const petArt = (id, size = 0) => PET_ART[id] ? (size ? PET_ART[id].replace('<svg ', `<svg width="${Math.round(size * 1.25)}" height="${size}" style="vertical-align:-3px" `) : PET_ART[id]) : '';
+const EGG_COLORS = { common: ['#f6efe0', '#d9c9a8'], rare: ['#d8ecff', '#7fb4e8'], legendary: ['#fff1c2', '#e8b93c'] };
+function eggArt(kind = 'common', pct = 0, size = 0) {
+  const [a, b] = EGG_COLORS[kind] || EGG_COLORS.common, crack = pct >= 100 ? '<path d="M15 4l2 5-3 4 3 4-2 4" stroke="#6b5a3a" stroke-width="1.3" fill="none" stroke-linecap="round"/>' : pct >= 60 ? '<path d="M15 4l2 5-3 4" stroke="#6b5a3a" stroke-width="1.2" fill="none" stroke-linecap="round" opacity=".7"/>' : '';
+  return `<svg viewBox="0 0 30 30" aria-hidden="true"${size ? ` width="${size}" height="${size}"` : ''}><ellipse cx="15" cy="16" rx="10" ry="12.5" fill="${a}" stroke="${b}" stroke-width="1.5"/><circle cx="11" cy="12" r="1.8" fill="${b}" opacity=".6"/><circle cx="19" cy="18" r="2.2" fill="${b}" opacity=".6"/><circle cx="13" cy="22" r="1.4" fill="${b}" opacity=".6"/>${crack}</svg>`;
+}
+/* The egg card in the garden head */
+function eggCardHTML(g) {
+  const e = eggActive(), out = petsOut(), waiting = eggsWaiting(), own = petsOwned();
+  const fill = e ? Math.min(eggFill(e), eggNeed(e)) : 0, need = e ? eggNeed(e) : 0, pct = e ? Math.min(100, Math.round(fill / need * 100)) : 0;
+  return `<div class="gd-egg card${e ? ' k-' + e.kind : ''}"><button type="button" class="gd-eggbtn" data-pets aria-label="Pets and eggs">${e ? eggArt(e.kind, pct) : out[0] ? petArt(out[0].id) : eggArt('common', 0)}</button>
+    <div class="gd-eggtxt"><div class="row between"><b>${e ? `${e.kind === 'common' ? '' : RARITY_LABEL[e.kind] + ' '}Egg` : 'Pets'}</b><span class="lbl">${petSlots()} slot${petSlots() === 1 ? '' : 's'}</span></div>
+      <div class="lbl">${e ? `${fmtNum(fill)} / ${need} min of focus${fill >= need ? ' — hatching' : ''}${waiting > 1 ? ` · ${waiting - 1} more waiting` : ''}` : 'Every finished block fills the egg'}</div>
+      <div class="xpbar mini" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100" aria-label="Egg"><i data-fill="${pct}" data-fill-key="egg"></i></div>
+      <div class="lbl gd-petsline">${out.length ? out.map(x => `<span>${petArt(x.id, 16)} ${esc(x.pet.name)}</span>`).join(' ') : `<span>${own.length ? 'No pet out — choose one' : 'No pet yet — the first egg hatches after 5 hours of focus'}</span>`} <button class="linkbtn" data-pets>Pets</button></div></div></div>`;
+}
+/* Pets in the scene */
+const petsSceneHTML = () => `<div class="gd-pets">${petsOut().map((x, i) => `<button type="button" class="gd-pet pet-${x.id} n-${i}" data-pet="${x.id}" aria-label="${esc(x.pet.name)} — ${esc(petBoostText(x.pet, x.level))}">${petArt(x.id)}</button>`).join('')}</div>`;
+/* The Pets dialog: pets out, pets in the bag, the egg queue */
+function openPetsDlg() {
+  const own = petsOwned(), out = petsOut(), outIds = new Set(out.map(x => x.id)), n = petSlots(), eggs = eggList().filter(e => !e.h).sort((a, b) => (a.at - b.at) || (a.id < b.id ? -1 : 1));
+  const card = x => `<div class="item gd-item pet-card r-${x.pet.rarity}${outIds.has(x.id) ? ' equipped' : ''}"><div class="pv">${petArt(x.id)}${outIds.has(x.id) ? `<span class="tag">${CHECK_SVG}Out</span>` : ''}</div>
+      <div class="nm">${esc(x.pet.name)} <span class="hearts" aria-label="Level ${x.level}">${petHearts(x.level)}</span></div><div class="ds">${esc(petBoostText(x.pet, x.level))}</div>
+      <div class="bi-src"><span class="rar">${RARITY_LABEL[x.pet.rarity]}</span><span>${x.n > 1 ? `×${x.n}` : ''}</span></div>
+      <div class="act">${outIds.has(x.id) ? `<button class="btn" data-petunequip="${x.id}">Bring in</button>` : `<button class="btn primary" data-petequip="${x.id}"${out.length >= n ? ' disabled' : ''}>Let out</button>`}</div></div>`;
+  const b = petBoost(), active = Object.entries(b).filter(([, v]) => v > 0);
+  gdDialog(`<h2 id="gdTitle">Pets</h2>
+    <p class="lbl">${out.length} of ${n} out${n < 3 ? ` · one more slot at garden level ${PET_SLOTS_AT[n]}` : ''}${active.length ? ` · now: ${active.map(([k, v]) => BOOST_TEXT[k](v)).join(', ')}` : ''}</p>
+    ${own.length ? `<div class="shopgrid gd-grid gd-petgrid">${own.map(card).join('')}</div>` : `<p class="muted">No pets yet. Your first egg hatches after 5 hours of finished focus.</p>`}
+    <h3 class="gd-eggq">Eggs</h3>
+    ${eggs.length ? `<ul class="gd-egglist">${eggs.map((e, i) => `<li><span class="eg">${eggArt(e.kind, Math.round(Math.min(eggFill(e), eggNeed(e)) / eggNeed(e) * 100), 28)}</span><span><b>${RARITY_LABEL[e.kind]} egg</b>${i === 0 ? ' · in the slot' : ' · waiting'}<br><span class="lbl">${fmtNum(Math.min(eggFill(e), eggNeed(e)))} / ${eggNeed(e)} min${e.src === 'focus' ? '' : String(e.src || '').startsWith('lv') ? ` · from garden level ${e.src.slice(2)}` : ' · questline reward'}</span></span></li>`).join('')}</ul>` : '<p class="lbl">No eggs waiting.</p>'}
+    <p class="lbl">Eggs come only from focus: every finished block fills the egg in the slot. Garden levels 4 and 8 and questline finals add rarer eggs. Boosts are capped (${Object.entries(BOOST_CAP).map(([k, v]) => BOOST_TEXT[k](v)).join('; ')}).</p>
+    <div class="btn-row"><button class="btn" data-gclose>Close</button></div>`);
+}
+/* The hatch reveal (queued after a focus block) */
+let hatchQueue = [];
+function showHatch(e) {
+  if (holdForFocus('reveal', 'egg:' + e.id, () => showHatch(e))) return;   // never during a block, whatever the user just tapped
+  const dlg = $('#eggDlg'), pet = PET_BY_ID[e.pet];
+  if (!dlg || !pet) return;
+  if (dlg.open) { if (!hatchQueue.some(x => x.id === e.id)) hatchQueue.push(e); return; }   // one reveal at a time: the next egg waits for this one to close
+  const lv = (petsOwned().find(x => x.id === e.pet) || { level: 1 }).level, dup = eggList().filter(x => x.h && x.pet === e.pet).length > 1;
+  dlg.className = 'egg-dlg k-' + e.kind + ' r-' + pet.rarity;
+  dlg.dataset.pet = e.pet;
+  $('#egEgg').innerHTML = eggArt(e.kind, 100);
+  $('#egPet').innerHTML = petArt(e.pet);
+  $('#egKicker').textContent = `${RARITY_LABEL[e.kind]} egg · ${eggNeed(e)} minutes of focus`;
+  $('#egTitle').textContent = dup ? `${pet.name} again — level ${lv}` : `A ${pet.name} hatched!`;
+  $('#egLine').innerHTML = `<span class="rar r-${pet.rarity}">${RARITY_LABEL[pet.rarity]}</span> · ${esc(petBoostText(pet, lv))}<br><span class="lbl">It ${esc(pet.line)}.</span>`;
+  const canOut = !petsOut().some(x => x.id === e.pet) && petsOut().length < petSlots();
+  $('#egOut').classList.toggle('hidden', !canOut);
+  dlg.classList.toggle('still', motion() === 'off');
+  if (!dlg.open) dlg.showModal();
+  dlg.classList.remove('cracked');
+  const reveal = () => { dlg.classList.add('cracked'); uiSound('reward', { always: true }); if (motion() !== 'off') burstParticles($('#egStage'), motion() === 'full' ? 22 : 8); haptic([10, 30, 10]); };
+  if (motion() === 'full') setTimeout(reveal, 1400); else reveal();
+  uiClaim();
+}
+$('#egOk').addEventListener('click', () => $('#eggDlg').close());
+$('#eggDlg').addEventListener('close', () => { const next = hatchQueue.shift(); if (next) setTimeout(() => showHatch(next), 450); });   // the next hatched egg follows
+$('#egOut').addEventListener('click', () => { const id = $('#eggDlg').dataset.pet; $('#eggDlg').close(); if (petEquip(id)) { toast(`${PET_BY_ID[id].name} is out in the garden`, 2000, true); if (S.ui.tab === 'garden') renderGarden(); } });
+/** After a session: announce hatched eggs (toast + inbox now, the reveal through the focus queue). */
+function announceHatched(list) {
+  for (const e of list) {
+    const pet = PET_BY_ID[e.pet];
+    if (!pet) continue;
+    inboxAdd({ type: 'event', key: 'egg:' + e.id, title: `🐣 A ${pet.name} hatched in your garden`, go: { tab: 'garden' }, read: true });
+    setTimeout(() => showHatch(e), 5200);   // several hatches in one block queue behind the open dialog
+  }
+}
+/* Bag cards for pets */
+function petBagCards(q = '') {
+  const out = petsOut(), outIds = new Set(out.map(x => x.id)), n = petSlots(), list = [];
+  for (const x of petsOwned()) {
+    if (q && !`${x.pet.name} pet garden`.toLowerCase().includes(q)) continue;
+    list.push(`<div class="item bag-item gd-item pet-card r-${x.pet.rarity}${outIds.has(x.id) ? ' equipped' : ''}" tabindex="0" aria-label="${esc(x.pet.name)} · Garden pet"><div class="pv">${petArt(x.id)}${outIds.has(x.id) ? `<span class="tag">${CHECK_SVG}Out</span>` : ''}</div>
+      <div class="nm">${esc(x.pet.name)} <span class="hearts">${petHearts(x.level)}</span></div><div class="ds">${esc(petBoostText(x.pet, x.level))}</div><div class="bi-src"><span class="rar">${RARITY_LABEL[x.pet.rarity]}</span><span>Hatched</span></div>
+      <div class="act">${outIds.has(x.id) ? `<button class="btn" data-petunequip="${x.id}">Bring in</button>` : `<button class="btn primary" data-petequip="${x.id}"${out.length >= n ? ' disabled' : ''}>Let out</button>`}</div></div>`);
+  }
+  const e = eggActive();
+  if (e && (!q || 'egg pet garden'.includes(q))) list.push(`<div class="item bag-item gd-item k-${e.kind}" tabindex="0" aria-label="${RARITY_LABEL[e.kind]} egg"><div class="pv">${eggArt(e.kind, Math.round(Math.min(eggFill(e), eggNeed(e)) / eggNeed(e) * 100))}</div>
+      <div class="nm">${RARITY_LABEL[e.kind]} egg</div><div class="ds">${fmtNum(Math.min(eggFill(e), eggNeed(e)))} / ${eggNeed(e)} min of focus${eggsWaiting() > 1 ? ` · ${eggsWaiting() - 1} more waiting` : ''}</div><div class="bi-src"><span class="rar">${RARITY_LABEL[e.kind]}</span><span>Hatches with focus</span></div>
+      <div class="act"><button class="btn" data-gotab="garden">Open the garden</button></div></div>`);
+  return list;
+}
+/* Pets in the almanac */
+function petsAlmanacHTML() {
+  const own = Object.fromEntries(petsOwned().map(x => [x.id, x]));
+  return `<h2 style="margin:18px 0 8px">Pets <span class="lbl">${Object.keys(own).length} of ${PETS.length}</span></h2><div class="shopgrid gd-grid gd-petgrid">${PETS.map(pet => { const x = own[pet.id]; return `<div class="item gd-item pet-card r-${pet.rarity}${x ? '' : ' silhouette'}"><div class="pv">${petArt(pet.id)}</div>
+      <div class="nm">${x ? esc(pet.name) + ` <span class="hearts">${petHearts(x.level)}</span>` : '???'}</div><div class="ds">${x ? esc(petBoostText(pet, x.level)) : esc(BOOST_TEXT[Object.keys(pet.boost)[0]](Object.values(pet.boost)[0])) + ' · hatch it from an egg'}</div>
+      <div class="bi-src"><span class="rar">${RARITY_LABEL[pet.rarity]}</span><span>${x ? `hatched ×${x.n}` : ''}</span></div></div>`; }).join('')}</div>`;
+}
+
+/* ---------- CROP WEIGHT (v1.16) ----------
+   Every harvest weighs something, worked out from the plant's own data: the species' range, a spread from the
+   plant id, the average length of the blocks that watered it (25-minute blocks → ×1, 90-minute blocks → ×1.5),
+   the colour mutation (Golden ×1.4, Rainbow ×1.7, Crystal ×2), the pets out at harvest (up to +25%) and, for a
+   lucky 3% (5% when grown with hour-long blocks), Giant ×3 — the whole multiplier capped at ×6. The weight is
+   stored on the harvest (`kg`, `giant`), so every device shows the same number; harvests from before 1.16 get
+   the same formula on the fly (no pets, no giants). Records (per species and overall) and the log are derived. */
+const GKG = { tomato: [.12, .35], sunflower: [.3, .9], basil: [.05, .15], marigold: [.04, .1], strawberry: [.02, .06], chilli: [.02, .05], mint: [.04, .1], radish: [.1, .3],
+  lavender: [.1, .3], blueberry: [.2, .5], rose: [.1, .25], pumpkin: [3, 9], dahlia: [.15, .4], orchid: [.1, .3], bamboo: [1, 3], pineapple: [1, 2.5],
+  lotus: [.4, 1.2], moonflower: [.2, .6], starfruit: [.3, .8], dragonfruit: [.4, 1], sakura: [.3, .9] };
+const GKG_BY_RARITY = { common: [.1, .3], rare: [.2, .6], legendary: [.4, 1.2] };
+const KG_MUT = { golden: 1.4, rainbow: 1.7, crystal: 2 };
+const KG_CAP = 6, GIANT_CHANCE = .03, GIANT_LONG_BONUS = .02, GIANT_MULT = 3;
+/** Average minutes per watering block (long blocks grow bigger crops). */
+const plantAvgMin = p => { const v = Object.values(p.b || p.w || {}).map(Number).filter(x => x > 0); return v.length ? v.reduce((a, x) => a + x, 0) / v.length : (+p.fd || 25); };   // p.b: block lengths (1.16); older plants fall back to their water shares
+const isGiantRoll = p => hash01(p.id + ':giant') < GIANT_CHANCE + (plantAvgMin(p) >= 60 ? GIANT_LONG_BONUS : 0);
+function cropKg(p, petW = 0) {
+  const [lo, hi] = GKG[p.sp] || GKG_BY_RARITY[speciesOf(p).rarity] || GKG_BY_RARITY.common;
+  const base = lo + hash01(p.id + ':kg') * (hi - lo);
+  const f = 1 + Math.min(1, Math.max(0, (plantAvgMin(p) - 25) / 65)) * .5;
+  const mult = Math.min(KG_CAP, f * (KG_MUT[p.m] || 1) * wmOf(p).reduce((a, k) => a * WMUT[k].kg, 1) * (1 + petW) * (p.giant ? GIANT_MULT : 1));
+  return Math.round(base * mult * 1000) / 1000;
+}
+const kgOf = p => (p.kg !== undefined && p.kg !== null ? +p.kg : cropKg(p));
+const fmtKg = kg => (kg >= 1 ? `${(Math.round(kg * 10) / 10).toFixed(1).replace(/\.0$/, '')} kg` : `${Math.round(kg * 1000)} g`);
+/** Records: the heaviest harvest per species and overall (stored harvests + the folded history). */
+function gardenRecords() {
+  const g = garden(), bySp = {}, f = g.fold;
+  let best = null;
+  for (const p of g.harvested) { const kg = kgOf(p); if (kg > (bySp[p.sp] || 0)) bySp[p.sp] = kg; if (!best || kg > best.kg) best = { sp: p.sp, kg, id: p.id, at: p.h, m: p.m || '', giant: !!p.giant }; }
+  if (f) {
+    for (const [sp, st] of Object.entries(f.sp || {})) if (+st.kg > (bySp[sp] || 0)) bySp[sp] = +st.kg;
+    if (+f.kg > 0 && (!best || +f.kg > best.kg)) best = { sp: f.kgSp || '', kg: +f.kg, id: '', at: f.at, m: f.kgM || '', giant: !!f.kgG };
+  }
+  return { best, bySp };
+}
+const bigField = () => { const r = gardenRecords().best; return r && r.sp ? { big: `${r.sp}:${Math.round(r.kg * 100) / 100}` } : {}; };
+/** The latest harvests with their weights (the Garden view) and the record line. */
+function harvestLogHTML(g) {
+  const list = g.harvested.slice().sort((a, b) => b.h - a.h).slice(0, 12), rec = gardenRecords();
+  if (!list.length && !(rec.best && rec.best.sp)) return '';
+  const row = p => { const sp = speciesOf(p), kg = kgOf(p); return `<li class="${p.giant ? 'giant' : ''}${rec.best && rec.best.id === p.id ? ' rec' : ''}"><span class="pv">${plantArt(sp, 4, p.m || '')}</span><span class="nm">${p.giant ? '<b class="gi">GIANT</b> ' : ''}${mutIcons(p)}${mutNames(p).map(n => n + ' ').join('')}${esc(sp.name)}</span><span class="kg">${fmtKg(kg)}</span><span class="lbl">${PRODUCE_SVG} ${p.y}${p.pb ? ' +' : ''}</span><span class="lbl dt">${fmtShort(new Date(p.h))}</span></li>`; };
+  return `<div class="card gd-log"><div class="row between" style="flex-wrap:wrap;gap:6px"><h2 style="margin:0">Recent harvests</h2>${rec.best && rec.best.sp ? `<span class="gd-rec">🏆 Biggest: <b>${fmtKg(rec.best.kg)} ${esc(GSP_BY_ID[rec.best.sp] ? GSP_BY_ID[rec.best.sp].name : rec.best.sp)}</b>${rec.best.giant ? ' (Giant)' : ''}</span>` : ''}</div>
+    ${list.length ? `<ul class="gd-loglist">${list.map(row).join('')}</ul>` : '<p class="lbl">Harvests you make from now on are listed here with their weight.</p>'}</div>`;
+}
+let lastHarvestRec = null;   // the records before the latest harvest (for the "new record" moment)
+/** The Giant reveal (held during a focus block). */
+function showGiant(p, rec = lastHarvestRec) {
+  if (holdForFocus('reveal', 'giant:' + p.id, () => showGiant(p, rec))) return;   // during a focus block the harvest toast is enough; the reveal waits
+  const sp = speciesOf(p);
+  gdDialog(`<div class="gd-giant"><div class="gd-giant-art">${plantArt(sp, 4, p.m || '')}</div><div class="rw-kicker">A Giant harvest!</div><h2 id="gdTitle">${fmtKg(kgOf(p))} ${esc(sp.name)}</h2>
+    <p class="lbl">About three times the usual size${rec && (!rec.best || kgOf(p) > rec.best.kg) ? ' — your biggest harvest yet' : ''}. Giants come to about 3 in 100 harvests, 5 in 100 when grown with hour-long blocks.</p>
+    <div class="btn-row"><button class="btn primary" data-gclose>Nice!</button></div></div>`);
+  if (motion() !== 'off') setTimeout(() => burstParticles($('#gdDlg .gd-giant-art'), motion() === 'full' ? 24 : 8), 120);
+  uiSound('reward', { always: true });
 }
 
 /* ---------- Actions: plant, focus, harvest, buy, place ---------- */
@@ -10989,32 +11643,62 @@ function gardenFocus(id) {
 function gardenHarvest(id) {
   const p = garden().growing.find(x => x.id === id);
   if (!p || !plantReady(p) || gardenBusy()) return null;
+  lastHarvestRec = gardenRecords();   // before this one (v1.16)
   if (!p.m && p.m !== '') p.m = mutationOf(p);
   p.wt = waterOf(p);
   p.h = Date.now();
   p.y = yieldOf(p);
+  const bb = petBoost().bonus;   // a foraging pet: bonus produce, decided from the plant id (stored in y, so every device shows the same)
+  if (bb > 0 && hash01(p.id + ':bonus') < bb) { p.y += Math.max(1, Math.round(p.y * .5)); p.pb = 1; }
+  if (isGiantRoll(p)) p.giant = 1;   // weight (v1.16): decided from stored data, then stored
+  p.kg = cropKg(p, petBoost().weight);
   p.plot = -1;
   p.fc = 0;
   delete p.w;
   GD = null;
   gardenFold();
   save();
+  gardenGifts();
   updateGardenDot();
   return p;
 }
-function gardenBuy(item) {
-  const g = garden(), sp = item.startsWith('seed_') ? GSP_BY_ID[item.slice(5)] : null, dc = GDECOR_BY_ID[item];
+/** Buy a seed or decor piece with produce. how: '' (always-available grid), 'feat' (this slot's featured seed, 20% off) or 'daily' (the rare seed of the day). */
+function gardenBuy(item, how = '') {
+  const g = garden(), sp = item.startsWith('seed_') ? GSP_BY_ID[item.slice(5)] : null, dc = GDECOR_BY_ID[item], look = ITEM_BY_ID[item] && ITEM_BY_ID[item].gprice ? ITEM_BY_ID[item] : null;
+  if (look) return gardenBuyLook(look);
   const it = sp || dc;
   if (!it || gardenBusy()) return false;
-  if (g.level < it.lvl) { toast(`Unlocks at garden level ${it.lvl}`); return false; }
-  if (sp && !sp.price && (g.seeds[sp.id] || []).length >= GFREE_MAX) { toast(`You already hold ${GFREE_MAX} ${sp.name} seeds — plant one first`); return false; }
+  if (how && (!sp || (how === 'feat' && !featuredSeeds().some(x => x.id === sp.id)) || (how === 'daily' && dailySeed().id !== sp.id))) { toast('The shop has restocked — that seed has moved on'); renderGarden(); return false; }
+  if (sp && sp.shop && !how) { toast(`${sp.name} seeds only come round in the Featured and Rare-seed-of-the-day slots`); return false; }
+  if (g.level < it.lvl - (how ? 1 : 0)) { toast(`Unlocks at garden level ${it.lvl - (how ? 1 : 0)}`); return false; }
+  if (how === 'daily' && dailyBought() >= SEED_DAILY_MAX) { toast(`You have today’s ${SEED_DAILY_MAX} rare seeds — more after midnight UTC`); return false; }
+  if (sp && !sp.price && !how && (g.seeds[sp.id] || []).length >= GFREE_MAX) { toast(`You already hold ${GFREE_MAX} ${sp.name} seeds — plant one first`); return false; }
   if (dc && g.decor.some(d => d.it.id === dc.id)) { toast('You already have one — place it from the Decor shop or your bag'); return false; }
-  if (g.produce < it.price) { toast(`You need ${it.price - g.produce} more produce — harvest something`); return false; }
-  S.gbuys.push({ id: 'gb' + uid(), v: 1, item, price: it.price, at: Date.now(), slot: '' });
+  const price = how === 'feat' ? featPrice(sp) : it.price;
+  if (g.produce < price) { toast(`You need ${price - g.produce} more produce — harvest something`); return false; }
+  S.gbuys.push({ id: 'gb' + uid(), v: 1, item, price, at: Date.now(), slot: '', ...(how ? { src: how } : {}), ...(how === 'daily' ? { day: seedDayKey() } : {}) });
   GD = null;
   save();
   uiClaim(); uiSound('coin');
-  toast(sp ? `${sp.name} seed${sp.price ? ' bought' : ' added'}` : `${dc.name} is yours — place it in the garden`, 2200, true);
+  toast(sp ? `${sp.name} seed${price ? ' bought' : ' added'}${how === 'feat' ? ' — featured, 20% off' : how === 'daily' ? ` — ${Math.max(0, SEED_DAILY_MAX - dailyBought())} left today` : ''}` : `${dc.name} is yours — place it in the garden`, 2200, true);
+  return true;
+}
+/** A garden look (v1.16): paid with produce, recorded in gbuys, owned through the garden ledger, equipped at once. */
+function gardenBuyLook(it) {
+  const g = garden();
+  if (gardenBusy() || !rewardsReady()) { toast('Still syncing — try again in a moment'); return false; }
+  if (isOwned(it.id)) { toast(`${it.name} is already yours — it is in your bag`); return false; }
+  if (g.level < (it.glvl || 1)) { toast(`Unlocks at garden level ${it.glvl}`); return false; }
+  if (g.produce < it.gprice) { toast(`You need ${it.gprice - g.produce} more produce — harvest something`); return false; }
+  S.gbuys.push({ id: 'gb' + uid(), v: 1, item: it.id, price: it.gprice, at: Date.now(), slot: '' });
+  GD = null; G = null;
+  markEquipped(it.id);
+  if (it.cat === 'room') roomPlace(it.id); else eqSet(it.cat, it.id);
+  save();
+  applyCosmetics();
+  uiClaim(); uiSound('coin');
+  toast(`${it.name} is yours${it.cat === 'room' ? ' — placed in Pomeo’s room' : ' — equipped'}`, 2400, true);
+  if (S.ui.tab === 'bag') renderBag();
   return true;
 }
 /** Put a decor item in a slot ('border', 'path', 's1'…'s6'); anything already there goes back to the bag. */
@@ -11085,7 +11769,8 @@ function plantArt(sp, stage, mut = '', uidKey = '') {
   const spark = mut && stage === 4 ? `<g class="spk" fill="${crystal ? '#e8f7ff' : '#fff6c4'}"><path d="M10 14l1.2 3 3 1.2-3 1.2-1.2 3-1.2-3-3-1.2 3-1.2Z"/><path d="M50 10l1 2.4 2.4 1-2.4 1-1 2.4-1-2.4-2.4-1 2.4-1Z"/><path d="M48 44l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8Z"/></g>` : '';
   return `<svg viewBox="0 0 60 72" class="gd-plant${mut ? ' m-' + mut : ''}" aria-hidden="true">${defs}<g class="sway">${body}${spark}</g></svg>`;
 }
-const plantArtOf = p => plantArt(speciesOf(p), p.h ? 4 : plantStage(p), plantStage(p) === 4 || p.h ? (p.m || '') : '', p.id);
+/** The plant's art; a ripe plant with focus-weather mutations glows in their colours and (on the plot) wears their icons. */
+const plantArtOf = (p, badge = true) => { const ripe = plantStage(p) === 4 || !!p.h, wm = ripe ? wmOf(p) : [], art = plantArt(speciesOf(p), p.h ? 4 : plantStage(p), ripe ? (p.m || '') : '', p.id); return wm.length ? art.replace('class="gd-plant', 'class="gd-plant ' + wm.map(k => 'wm-' + k).join(' ')) + (badge ? `<i class="gd-wm" aria-hidden="true">${mutIcons(p)}</i>` : '') : art; };
 
 /* ---------- Decor and visitor art ---------- */
 const DECOR_ART = {
@@ -11116,7 +11801,7 @@ let gdTip = { id: '', timer: 0 };
 function updateGardenDot() {
   const dot = $('#gardenDot');
   if (!dot) return;
-  dot.classList.toggle('hidden', !USER || minimal() || isPreview() || !rewardsReady() || !garden().ready.length);
+  dot.classList.toggle('hidden', !USER || minimal() || isPreview() || !rewardsReady() || !(garden().ready.length || seedRestocked()));
 }
 function gardenHeadHTML(g) {
   const pct = g.next ? Math.min(100, Math.round(g.into / g.need * 100)) : 100;
@@ -11124,7 +11809,8 @@ function gardenHeadHTML(g) {
     <div class="gd-title"><h1>Garden</h1><div class="lbl">${SEASON_TEXT[gardenSeason()]} · ${WX_TEXT[gardenWeather()]} · ${gardenTod() === 'night' ? 'night' : gardenTod()}</div></div>
     <div class="gd-level card"><div class="row between"><b>Garden level ${g.level}</b><span class="gd-produce" title="Produce — harvest plants to earn it">${PRODUCE_SVG}<span data-count="produce" data-val="${g.produce}">${fmtNum(g.produce)}</span></span></div>
       <div class="xpbar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100" aria-label="Garden XP"><i data-fill="${pct}" data-fill-key="gxp"></i></div>
-      <div class="lbl">${g.next ? `${fmtNum(g.into)} / ${fmtNum(g.need)} XP · next: ${esc(gardenNextUnlock(g))}` : `${fmtNum(g.xp)} XP · ${esc(gardenNextUnlock(g))}`}</div></div></div>
+      <div class="lbl">${g.next ? `${fmtNum(g.into)} / ${fmtNum(g.need)} XP · next: ${esc(gardenNextUnlock(g))}` : `${fmtNum(g.xp)} XP · ${esc(gardenNextUnlock(g))}`}</div></div>
+    ${eggCardHTML(g)}</div>
     <div class="seg gd-seg" id="gardenSeg" role="group" aria-label="Show">${[['garden', 'Garden'], ['seeds', 'Seeds'], ['decor', 'Decor'], ['almanac', 'Almanac']].map(([v, n]) => `<button data-gview="${v}" class="${gardenView() === v ? 'active' : ''}" aria-pressed="${gardenView() === v}">${n}</button>`).join('')}</div>`;
 }
 const gardenView = () => (['garden', 'seeds', 'decor', 'almanac'].includes(S.ui.gardenView) ? S.ui.gardenView : 'garden');
@@ -11157,6 +11843,7 @@ function sceneHTML(g) {
       <div class="gd-path" aria-hidden="true"></div>
       <button type="button" class="gd-pomeo" id="gdPomeo" aria-label="Pomeo">${pomeoOn() ? pomeoSVG({ state: pomeoState, ...pomeoOutfit() }) : ''}</button>
       <div class="gd-visitors">${vis}</div>
+      ${petsSceneHTML()}
     </div>
     <div class="gd-say hidden" id="gdSay" aria-live="polite"></div>
   </div>`;
@@ -11166,21 +11853,97 @@ function gardenInfoHTML(g) {
   const tip = wilted ? 'Your plants are thirsty — finish a focus block and they perk up again.'
     : !g.growing.length ? (Object.keys(g.seeds).length ? 'Tap an empty plot to plant a seed.' : 'Get a seed from the Seeds shop — Tomato and Sunflower are free.')
     : g.ready.length ? `${g.ready.length === 1 ? speciesOf(g.ready[0]).name + ' is' : g.ready.length + ' plants are'} ready — tap to harvest.`
+    : seedRestocked() ? 'The seed shop has restocked — new Featured seeds are in.'
     : `Every finished focus block waters your plants${g.growing.length > 1 ? ' — evenly, or tap one to water it first' : ''}.`;
   return `<div class="card gd-info"><div class="gd-tipline">${esc(tip)}</div>
     <div class="garden-stats"><span><b>${g.growing.length}</b> growing</span><span><b>${g.ready.length}</b> ready</span><span><b data-count="g-harv" data-val="${g.grownTotal}">${fmtNum(g.grownTotal)}</b> harvested</span><span><b>${g.plots}</b> plots</span>${vis.length ? `<span><b>${vis.length}</b> visitor${vis.length === 1 ? '' : 's'}</span>` : ''}</div>
     ${!g.growing.length && !Object.keys(g.seeds).length ? '<button class="btn small" data-gview="seeds">Get seeds</button>' : ''}</div>`;
 }
-function seedShopHTML(g) {
-  return `<div class="shopgrid gd-grid">${GSPECIES.map(sp => {
-    const owned = (g.seeds[sp.id] || []).length, locked = g.level < sp.lvl, free = !sp.price, rar = sp.rarity;
-    const can = !locked && (free ? owned < GFREE_MAX : g.produce >= sp.price);
-    return `<div class="item gd-item r-${rar}${locked ? ' locked' : ''}" data-id="seed_${sp.id}"><div class="pv">${plantArt(sp, 4)}${owned ? `<span class="tag">×${owned}</span>` : ''}</div>
-      <div class="nm">${esc(sp.name)}</div><div class="ds">${esc(sp.hint)} · ${sp.need} min to grow</div>
-      <div class="bi-src"><span class="rar">${RARITY_LABEL[rar]}</span><span>${free ? 'Free' : PRODUCE_SVG + ' ' + sp.price}</span></div>
-      <div class="act">${locked ? `<button class="btn" disabled>${LOCK_SVG} Level ${sp.lvl}</button>` : `<button class="btn buy" data-gbuy="seed_${sp.id}"${can ? '' : ' disabled'}>${free ? (owned >= GFREE_MAX ? 'Plant one first' : 'Take a seed') : 'Buy'}</button>`}</div></div>`;
-  }).join('')}</div>`;
+/* ---------- ROTATING SEED SHOP (v1.16) ----------
+   The same shop for everyone, worked out from the UTC clock (no server): four Featured seeds change every 4 hours
+   (20% off, one level early), the Rare seed of the day changes at 00:00 UTC (2 per person per UTC day, one level
+   early; every third day it is one of the three exclusive species in turn, so each comes round within 9 days), and
+   the "Always available" grid is the old shop without the exclusives. A daily purchase stores the UTC day it was
+   made on, so the limit is counted from stored data on every device. Garden levels 6, 8 and 9 gift one exclusive
+   seed each (fixed ids, created once). The restock dot compares the current slot with the last one seen here. */
+const SEED_SLOT_MS = 4 * 3600e3, SEED_FEATURED = 4, SEED_DAILY_MAX = 2, SEED_FEAT_OFF = 0.2, SEEDSLOT_KEY = 'pomodorolist-seedslot';
+const seedSlot = (now = Date.now()) => Math.floor(now / SEED_SLOT_MS);
+const seedDayN = (now = Date.now()) => Math.floor(now / 864e5);                              // UTC day number
+const seedDayKey = (now = Date.now()) => new Date(now).toISOString().slice(0, 10);          // UTC day, stored on a daily purchase
+const seedExclusives = () => GSPECIES.filter(sp => sp.shop === 'rotating');
+/** The four paid seeds of this 4-hour slot, in hash order (every device agrees); at least one rare or better. */
+function featuredSeeds(now = Date.now()) {
+  const slot = seedSlot(now), h = sp => hash01('feat:' + slot + ':' + sp.id);
+  const pool = GSPECIES.filter(sp => sp.price > 0).sort((a, b) => h(a) - h(b));
+  const pick = pool.slice(0, SEED_FEATURED);
+  if (!pick.some(sp => sp.rarity !== 'common')) pick[SEED_FEATURED - 1] = pool.find(sp => sp.rarity !== 'common') || pick[SEED_FEATURED - 1];
+  return pick;
 }
+/** The rare seed of the day (00:00 UTC): every third day an exclusive species in turn, otherwise a rare or legendary one by hash. */
+function dailySeed(now = Date.now()) {
+  const d = seedDayN(now), ex = seedExclusives();
+  if (ex.length && d % 3 === 0) return ex[Math.floor(d / 3) % ex.length];
+  const h = sp => hash01('daily:' + d + ':' + sp.id);
+  return GSPECIES.filter(sp => sp.rarity !== 'common' && !sp.shop).sort((a, b) => h(a) - h(b))[0];
+}
+const featPrice = sp => Math.max(1, Math.round(sp.price * (1 - SEED_FEAT_OFF)));
+const dailyBought = (now = Date.now()) => garden().valid.filter(b => b.src === 'daily' && b.day === seedDayKey(now)).length;   // the ledger's verdict: a refunded buy does not count
+const untilRestock = (now = Date.now()) => (seedSlot(now) + 1) * SEED_SLOT_MS - now;
+const untilDailySeed = (now = Date.now()) => (seedDayN(now) + 1) * 864e5 - now;
+const fmtCountdown = ms => { const m = Math.max(0, Math.ceil(ms / 60000)), h = Math.floor(m / 60); return h ? `${h}h ${pad(m % 60)}m` : `${m} min`; };
+const seedSeenSlot = () => { const v = localStorage.getItem(SEEDSLOT_KEY); return v === null || v === '' ? null : +v; };
+/** The seed shop restocked since this device last looked (never shown during a focus block). */
+const seedRestocked = () => S.settings.shopDot !== false && !guardOn() && seedSeenSlot() !== null && seedSlot() > seedSeenSlot();
+const GARDEN_GIFTS = [['gift_lv6', 6, 'bamboo'], ['gift_lv8', 8, 'pineapple'], ['gift_lv9', 9, 'sakura']];
+/** One exclusive seed at garden levels 6, 8 and 9 — fixed ids, so two devices create the same record once. */
+function gardenGifts() {
+  if (!USER || isPreview() || !gardenMig()) return 0;
+  const lv = garden().level;
+  const given = [];
+  for (const [id, at, sp] of GARDEN_GIFTS) if (lv >= at && !S.gbuys.some(b => b && b.id === id)) { S.gbuys.push({ id, v: 1, item: 'seed_' + sp, price: 0, at: Date.now(), slot: '', src: 'gift' }); given.push(GSP_BY_ID[sp].name); }
+  const newEggs = eggGifts(), first = ensureEgg(), settled = eggSettle(), folded = eggFold();   // pets (v1.16): milestone eggs, the first egg, eggs filled on two devices, old hatches folded
+  if (given.length || newEggs.length || first || settled.length || folded) { GD = null; save(); }
+  if (given.length) toast(`🎁 Garden level ${lv}: ${given.join(' and ')} seed${given.length > 1 ? 's' : ''} — plant ${given.length > 1 ? 'them' : 'it'} from an empty plot`, 3400, true, { type: 'garden' });
+  if (newEggs.length) toast(`🥚 Garden level ${lv}: a ${newEggs.join(' and a ')} egg joined your garden’s queue`, 3400, true, { type: 'garden' });
+  if (settled.length) announceHatched(settled);
+  return given.length + newEggs.length + (first ? 1 : 0);
+}
+function seedCardHTML(g, sp, how = '') {
+  const owned = (g.seeds[sp.id] || []).length, free = !sp.price && !how, rar = sp.rarity;
+  const locked = how ? g.level < sp.lvl - 1 : g.level < sp.lvl;
+  const price = how === 'feat' ? featPrice(sp) : sp.price;
+  const soldOut = how === 'daily' && dailyBought() >= SEED_DAILY_MAX;
+  const can = !locked && !soldOut && (free ? owned < GFREE_MAX : g.produce >= price);
+  const tag = how === 'feat' ? `<span class="tag off">−${Math.round(SEED_FEAT_OFF * 100)}%</span>` : how === 'daily' ? `<span class="tag off">${SEED_DAILY_MAX - dailyBought()} left today</span>` : owned ? `<span class="tag">×${owned}</span>` : '';
+  const btn = locked ? `<button class="btn" disabled>${LOCK_SVG} Level ${how ? sp.lvl - 1 : sp.lvl}</button>`
+    : `<button class="btn buy" data-gbuy="seed_${sp.id}"${how ? ` data-ghow="${how}"` : ''}${can ? '' : ' disabled'}>${soldOut ? 'Sold out today' : free ? (owned >= GFREE_MAX ? 'Plant one first' : 'Take a seed') : 'Buy'}</button>`;
+  return `<div class="item gd-item r-${rar}${locked ? ' locked' : ''}${sp.shop ? ' excl' : ''}" data-id="seed_${sp.id}"${how ? ` data-how="${how}"` : ''}><div class="pv">${plantArt(sp, 4)}${tag}</div>
+      <div class="nm">${esc(sp.name)}</div><div class="ds">${esc(sp.hint)} · ${sp.need} min to grow${how && owned ? ` · you hold ×${owned}` : ''}</div>
+      <div class="bi-src"><span class="rar">${RARITY_LABEL[rar]}</span><span>${free ? 'Free' : how === 'feat' ? `<s>${sp.price}</s> ${PRODUCE_SVG} ${price}` : PRODUCE_SVG + ' ' + price}</span></div>
+      <div class="act">${btn}</div></div>`;
+}
+function seedShopHTML(g) {
+  const now = Date.now(), feat = featuredSeeds(now), daily = dailySeed(now);
+  return `<section class="gd-shop-sec gd-feat"><h2><span>✨ Featured</span><span class="lbl count">Restocks in <b data-restock="slot">${fmtCountdown(untilRestock(now))}</b></span></h2>
+      <p class="lbl">Four seeds every 4 hours, 20% off and one level early — the same for every gardener.</p>
+      <div class="shopgrid gd-grid">${feat.map(sp => seedCardHTML(g, sp, 'feat')).join('')}</div></section>
+    <section class="gd-shop-sec gd-daily"><h2><span>🌟 Rare seed of the day</span><span class="lbl count">Changes in <b data-restock="daily">${fmtCountdown(untilDailySeed(now))}</b></span></h2>
+      <p class="lbl">Up to ${SEED_DAILY_MAX} a day, one level early. Every third day it is a seed you can only get here.</p>
+      <div class="shopgrid gd-grid gd-one">${seedCardHTML(g, daily, 'daily')}</div></section>
+    <section class="gd-shop-sec"><h2><span>Always available</span></h2>
+      <div class="shopgrid gd-grid">${GSPECIES.filter(sp => !sp.shop).map(sp => seedCardHTML(g, sp)).join('')}</div></section>`;
+}
+/** Live countdowns while the Seeds view is open; a new slot re-renders the shop. */
+let seedShownSlot = -1;
+function seedShopTick() {
+  if (S.ui.tab !== 'garden' || gardenView() !== 'seeds' || !$('#gardenBody [data-restock]')) return;
+  const now = Date.now();
+  if (seedSlot(now) !== seedShownSlot) { renderGarden(); return; }
+  const a = $('#gardenBody [data-restock="slot"]'), b = $('#gardenBody [data-restock="daily"]');
+  if (a) a.textContent = fmtCountdown(untilRestock(now));
+  if (b) b.textContent = fmtCountdown(untilDailySeed(now));
+}
+setInterval(seedShopTick, 1000);
 function decorShopHTML(g) {
   return `<div class="shopgrid gd-grid">${GDECOR.map(it => {
     const own = g.decor.find(d => d.it.id === it.id), locked = g.level < it.lvl, rar = it.rarity;
@@ -11192,7 +11955,24 @@ function decorShopHTML(g) {
       <div class="nm">${esc(it.name)}</div><div class="ds">${esc(it.desc)}</div>
       <div class="bi-src"><span class="rar">${RARITY_LABEL[rar]}</span><span>${own ? 'Yours' : PRODUCE_SVG + ' ' + it.price}</span></div>
       <div class="act">${btn}</div></div>`;
-  }).join('')}</div>`;
+  }).join('')}</div>${gardenLooksHTML(g)}`;
+}
+/** Garden looks for sale (v1.16): a section under the decor, paid with produce. */
+function gardenLooksHTML(g) {
+  const gm = game();
+  const card = it => {
+    const own = isOwned(it.id), eq = own && isEquippedItem(it), locked = !own && g.level < (it.glvl || 1), rar = itemRarity(it);
+    const btn = locked ? `<button class="btn" disabled>${LOCK_SVG} Garden level ${it.glvl}</button>`
+      : eq ? `<button class="btn" disabled>${it.cat === 'room' ? 'Placed' : 'Equipped'}</button>`
+      : own ? `<button class="btn primary" data-gequip="${it.id}">${it.cat === 'room' ? 'Place' : 'Equip'}</button>`
+      : `<button class="btn buy" data-gbuy="${it.id}"${g.produce >= it.gprice ? '' : ' disabled'}>Buy</button>`;
+    return `<div class="item gd-item gd-look r-${rar}${locked ? ' locked' : ''}${eq ? ' equipped' : ''}" data-id="${it.id}"><div class="pv">${rewardPreview(it, gm)}${eq ? `<span class="tag">${CHECK_SVG}${it.cat === 'room' ? 'Placed' : 'Equipped'}</span>` : own ? '<span class="tag">Owned</span>' : ''}</div>
+      <div class="nm">${esc(it.name)}</div><div class="ds">${esc(it.desc)}</div>
+      <div class="bi-src"><span class="rar">${RARITY_LABEL[rar]}</span><span>${own ? 'Yours' : PRODUCE_SVG + ' ' + it.gprice}</span><span>· ${esc(CAT_LABEL[it.cat] || it.cat)}</span></div>
+      <div class="act">${btn}</div></div>`;
+  };
+  return `<h2 class="gd-looks-h" style="margin:18px 0 4px">Garden looks</h2><p class="lbl" style="margin:0 0 10px">Profile pictures, themes, titles, frames, name colours, stamps, ring trails and room pieces that only the garden sells — paid with produce, never coins. They go to your bag like any other item.</p>
+    <div class="shopgrid gd-grid gd-lookgrid">${GARDEN_LOOKS.map(card).join('')}</div>`;
 }
 function decorPreview(it) {
   if (DECOR_ART[it.id]) return DECOR_ART[it.id];
@@ -11211,27 +11991,39 @@ const GARDEN_ACH = [
   { id: 'g_lv5', name: 'Growing up', desc: 'Reach garden level 5', ok: g => g.level >= 5 },
   { id: 'g_plots', name: 'Full acre', desc: 'Unlock all 16 plots', ok: g => g.plots >= 16 },
   { id: 'g_decor', name: 'Decorator', desc: 'Place 5 decor items', ok: g => Object.keys(g.placed).length >= 5 },
+  { id: 'g_pet', name: 'Company', desc: 'Hatch your first pet', ok: () => petsOwned().length >= 1 },
+  { id: 'g_pets5', name: 'Menagerie', desc: 'Hatch 5 different pets', ok: () => petsOwned().length >= 5 },
+  { id: 'g_petlv', name: 'Best friends', desc: 'Raise a pet to level 3', ok: () => petsOwned().some(x => x.level >= 3) },
+  { id: 'g_giant', name: 'Giant', desc: 'Harvest a Giant crop', ok: g => g.harvested.some(p => p.giant) || !!(g.fold && g.fold.kgG) },
+  { id: 'g_weather', name: 'Weatherproof', desc: 'Harvest a plant with a focus-weather mutation', ok: g => Object.values(g.wmuts).some(n => n > 0) },
+  { id: 'g_allwm', name: 'Every season', desc: 'Harvest all seven focus-weather mutations', ok: g => Object.keys(WMUT).every(k => g.wmuts[k] > 0) },
+  { id: 'g_heavy', name: 'Heavyweight', desc: 'A harvest over 5 kg', ok: () => { const r = gardenRecords().best; return !!r && r.kg >= 5; } },
 ];
 function almanacHTML(g) {
-  const stats = {};
+  const stats = {}, rec = gardenRecords();
   for (const p of g.harvested) { const s = (stats[p.sp] ||= { n: 0, y: 0, best: '' }); s.n++; s.y += +p.y || 0; if (p.m && (!s.best || ['golden', 'rainbow', 'crystal'].indexOf(p.m) > ['golden', 'rainbow', 'crystal'].indexOf(s.best))) s.best = p.m; }
   for (const [id, f] of Object.entries((g.fold && g.fold.sp) || {})) { if (!GSP_BY_ID[id]) continue; const s = (stats[id] ||= { n: 0, y: 0, best: '' }); s.n += +f.n || 0; s.y += +f.y || 0; if (f.best && (!s.best || ['golden', 'rainbow', 'crystal'].indexOf(f.best) > ['golden', 'rainbow', 'crystal'].indexOf(s.best))) s.best = f.best; }
   if (g.sum && g.sum.grown) { const s = (stats.tomato ||= { n: 0, y: 0, best: '' }); s.n += g.sum.grown; s.legacy = g.sum.grown; if (g.sum.golden && !s.best) s.best = 'golden'; s.lgold = g.sum.golden; }
   const planted = {};
   for (const p of g.plants) planted[p.sp] = (planted[p.sp] || 0) + 1;
   const pct = Math.round(g.discovered.size / GSPECIES.length * 100);
-  const muts = ['golden', 'rainbow', 'crystal'].map(m => { const n = g.muts[m]; return `<span class="gd-mut m-${m}${n ? '' : ' none'}">${GMUT[m].name}${n ? ` ×${n}` : ''}</span>`; }).join('');
+  const muts = ['golden', 'rainbow', 'crystal'].map(m => { const n = g.muts[m]; return `<span class="gd-mut m-${m}${n ? '' : ' none'}">${GMUT[m].name}${n ? ` ×${n}` : ''}</span>`; }).join('')
+    + Object.keys(WMUT).map(k => { const n = g.wmuts[k]; return `<span class="gd-mut wm-${k}${n ? '' : ' none'}" title="${esc(WMUT[k].desc)}">${WMUT[k].icon} ${WMUT[k].name}${n ? ` ×${n}` : ''}</span>`; }).join('');
   const cards = GSPECIES.map(sp => {
     const got = g.discovered.has(sp.id), st = stats[sp.id];
     return `<div class="item gd-item r-${sp.rarity}${got ? '' : ' silhouette'}"><div class="pv">${plantArt(sp, 4, st && st.best ? st.best : '')}</div>
       <div class="nm">${got ? esc(sp.name) : '???'}</div>
-      ${got ? `<div class="ds">Planted ${planted[sp.id] || 0} · harvested ${st ? st.n : 0}${st && st.legacy ? ` (${st.legacy} before 1.15${st.lgold ? `, ${st.lgold} golden` : ''})` : ''}${st && st.y ? ` · ${st.y} produce` : ''}${st && st.best ? ` · best: ${GMUT[st.best].name}` : ''}</div>` : `<div class="ds">${esc(sp.hint)}</div>`}
+      ${got ? `<div class="ds">Planted ${planted[sp.id] || 0} · harvested ${st ? st.n : 0}${st && st.legacy ? ` (${st.legacy} before 1.15${st.lgold ? `, ${st.lgold} golden` : ''})` : ''}${st && st.y ? ` · ${st.y} produce` : ''}${rec.bySp[sp.id] ? ` · heaviest ${fmtKg(rec.bySp[sp.id])}` : ''}${st && st.best ? ` · best: ${GMUT[st.best].name}` : ''}</div>` : `<div class="ds">${esc(sp.hint)}</div>`}
       <div class="bi-src"><span class="rar">${RARITY_LABEL[sp.rarity]}</span><span>${sp.need} min</span></div></div>`;
   }).join('');
   const achs = GARDEN_ACH.map(a => { const ok = a.ok(g); return `<div class="ach${ok ? ' done' : ''}"><div class="ic">${iconSVG(ok ? '<path d="M5 12l5 5L20 7"/>' : '<circle cx="12" cy="12" r="8"/>')}</div><div><div class="an">${esc(a.name)}</div><div class="lbl">${esc(a.desc)}</div></div></div>`; }).join('');
-  return `<div class="card gd-alm-head"><div class="row between" style="flex-wrap:wrap;gap:8px"><div><b>${g.discovered.size} of ${GSPECIES.length} species</b> discovered · ${pct}%</div><div class="gd-muts">${muts}</div></div>
+  return `<div class="card gd-alm-head"><div class="row between" style="flex-wrap:wrap;gap:8px"><div><b>${g.discovered.size} of ${GSPECIES.length} species</b> discovered · ${pct}%${rec.best && rec.best.sp ? ` · 🏆 biggest harvest <b>${fmtKg(rec.best.kg)} ${esc((GSP_BY_ID[rec.best.sp] || {}).name || rec.best.sp)}</b>` : ''}</div><div class="gd-muts">${muts}</div></div>
     <div class="xpbar"><i data-fill="${pct}" data-fill-key="galm"></i></div></div>
     <div class="shopgrid gd-grid">${cards}</div>
+    ${petsAlmanacHTML()}
+    <h2 style="margin:18px 0 8px">Focus-weather mutations <span class="lbl">${Object.keys(WMUT).filter(k => g.wmuts[k]).length} of ${Object.keys(WMUT).length}</span></h2>
+    <div class="achlist gd-wmlist">${Object.keys(WMUT).map(k => `<div class="ach${g.wmuts[k] ? ' done' : ''}"><div class="ic wm-ic">${WMUT[k].icon}</div><div><div class="an">${WMUT[k].name} <span class="lbl">×${WMUT[k].mult} produce</span></div><div class="lbl">A plant ${esc(WMUT[k].desc)} — ${Math.round(WMUT[k].chance * 100)}% chance${g.wmuts[k] ? ` · harvested ×${g.wmuts[k]}` : ''}</div></div></div>`).join('')}</div>
+    <p class="lbl">Up to two weather mutations on top of a Golden, Rainbow or Crystal one; everything together gives at most ×8 produce.</p>
     <h2 style="margin:18px 0 8px">Garden achievements</h2><div class="achlist">${achs}</div>`;
 }
 let gdSeenAt = 0;
@@ -11240,14 +12032,15 @@ function renderGarden() {
   if (!el || !USER) return;
   if (minimal()) { el.innerHTML = ''; return; }
   const g = garden(), view = gardenView();
-  el.innerHTML = gardenHeadHTML(g) + (view === 'garden' ? sceneHTML(g) + gardenInfoHTML(g) : view === 'seeds' ? seedShopHTML(g) : view === 'decor' ? decorShopHTML(g) : almanacHTML(g));
+  el.innerHTML = gardenHeadHTML(g) + (view === 'garden' ? sceneHTML(g) + gardenInfoHTML(g) + harvestLogHTML(g) : view === 'seeds' ? seedShopHTML(g) : view === 'decor' ? decorShopHTML(g) : almanacHTML(g));
   animateCounts(el);
   animateFills(el);
+  if (view === 'seeds') { seedShownSlot = seedSlot(); if (!isPreview()) writeLS(SEEDSLOT_KEY, String(seedShownSlot)); }
   if (view === 'garden') {
     const seen = readJSON(GSEEN_KEY, {}), now = {};
     for (const p of g.growing) now[p.id] = plantStage(p);
     if (el.querySelector('.gd-plot.grow')) { uiSound('grow'); if (motion() === 'full') haptic(12); }
-    writeLS(GSEEN_KEY, now);
+    if (!isPreview()) writeLS(GSEEN_KEY, now);
     gdSeenAt = Date.now();
   }
   updateGardenDot();
@@ -11284,12 +12077,13 @@ function openPlantDlg(id) {
   if (!p) return;
   const sp = speciesOf(p), st = plantStage(p), w = waterOf(p), n = needOf(p), ready = plantReady(p), m = ready ? (p.m || mutationOf(p)) : '';
   const since = Math.max(1, Math.round((Date.now() - p.at) / DAY_MS));
-  gdDialog(`<div class="gd-dlg-plant"><div class="gd-dlg-art r-${sp.rarity}">${plantArtOf(p)}</div>
-    <h2 id="gdTitle">${m ? GMUT[m].name + ' ' : ''}${esc(sp.name)}</h2>
+  gdDialog(`<div class="gd-dlg-plant"><div class="gd-dlg-art r-${sp.rarity}">${plantArtOf(p, false)}</div>
+    <h2 id="gdTitle">${ready ? mutNames({ ...p, m }).map(n => n + ' ').join('') : ''}${esc(sp.name)}</h2>
     <div class="desc">${GSTAGES[st]} · ${w}/${n} min${ready ? ' · ready to harvest' : ''} · planted ${since === 1 ? 'today' : since + ' days ago'}</div>
     <div class="xpbar" aria-hidden="true"><i data-fill="${Math.min(100, Math.round(w / n * 100))}" data-fill-key="gplant"></i></div>
     <div class="gd-stages" aria-hidden="true">${GSTAGES.map((s, i) => `<span class="${i <= st ? 'on' : ''}">${s}</span>`).join('')}</div>
     ${m ? `<p class="gd-mutnote m-${m}">✨ A ${GMUT[m].name} mutation — ${GMUT[m].mult}× produce.</p>` : ready ? '' : `<p class="lbl">Mutation chance at harvest: ${Math.round(mutationChance(p) * 100)}% (longer streaks and long sessions raise it).</p>`}
+    ${ready && wmOf(p).length ? wmOf(p).map(k => `<p class="gd-mutnote wm-${k}">${WMUT[k].icon} ${WMUT[k].name} — ${WMUT[k].desc}: ${WMUT[k].mult}× produce.</p>`).join('') + (mutMult(p) >= MUT_CAP ? '<p class="lbl">Together: ×8, the most a plant can give.</p>' : '') : ''}
     <div class="btn-row">${ready ? `<button class="btn primary" data-gharvest="${esc(p.id)}">Harvest</button>` : `<button class="btn${p.fc ? ' primary' : ''}" data-gfocus="${esc(p.id)}" aria-pressed="${!!p.fc}">${p.fc ? '💧 Watered first' : 'Water this one first'}</button>`}<button class="btn" data-gclose>Close</button></div></div>`);
 }
 function openPlotDlg(plot) {
@@ -11329,8 +12123,12 @@ function harvestMoment(p, host) {
   }
   uiSound('harvest', { always: true });
   if (motion() === 'full') haptic(m ? [20, 40, 20] : 16);
-  toast(`${m ? '✨ ' + GMUT[m].name + ' ' : ''}${sp.name} harvested · +${p.y} produce`, 3000, true, { type: 'garden' });
-  inboxAdd({ type: 'info', key: 'gh:' + p.id, title: `${m ? GMUT[m].name + ' ' : ''}${sp.name} harvested · +${p.y} produce`, go: { tab: 'garden' }, read: true });
+  const kg = kgOf(p), rec = lastHarvestRec, newSp = rec && (rec.bySp[p.sp] || 0) > 0 && kg > rec.bySp[p.sp], newAll = rec && rec.best && kg > rec.best.kg;
+  const mn = mutNames(p).join(' ');
+  toast(`${p.giant ? '🏆 GIANT ' : mn ? '✨ ' : ''}${mn ? mn + ' ' : ''}${sp.name} harvested · ${fmtKg(kg)} · +${p.y} produce${p.pb ? ' (bonus from your pet!)' : ''}`, 3000, true, { type: 'garden' });
+  inboxAdd({ type: 'info', key: 'gh:' + p.id, title: `${p.giant ? 'Giant ' : ''}${mn ? mn + ' ' : ''}${sp.name} harvested · ${fmtKg(kg)} · +${p.y} produce`, go: { tab: 'garden' }, read: true });
+  if (newAll || newSp) setTimeout(() => toast(`🏆 New record: ${fmtKg(kg)} ${sp.name}${newAll ? ' — your biggest harvest' : ''}`, 3200, true, { type: 'garden' }), 900);
+  if (p.giant) { const rec = lastHarvestRec; setTimeout(() => showGiant(p, rec), host && motion() !== 'off' ? 900 : 200); }
   setTimeout(renderGarden, host && motion() !== 'off' ? 720 : 0);
 }
 function gdSay(text) {
@@ -11347,10 +12145,13 @@ const GD_POMEO_LINES = ['Every focus block is a watering can 💧', 'I love it h
   tab.addEventListener('click', e => {
     const t = e.target;
     const v = t.closest('[data-gview]'); if (v) { S.ui.gardenView = v.dataset.gview; saveLocal(); uiSound('tap'); renderGarden(); return; }
-    const buy = t.closest('[data-gbuy]'); if (buy) { if (gardenBuy(buy.dataset.gbuy)) renderGarden(); return; }
+    const buy = t.closest('[data-gbuy]'); if (buy) { if (gardenBuy(buy.dataset.gbuy, buy.dataset.ghow || '')) renderGarden(); return; }
+    const ge = t.closest('[data-gequip]'); if (ge) { if (isOwned(ge.dataset.gequip)) { equipItem(ge.dataset.gequip); uiSound('on'); renderGarden(); } return; }
     const pl = t.closest('[data-gplace]'); if (pl) { openPlaceDlg(pl.dataset.gplace); return; }
     const rm = t.closest('[data-gremove]'); if (rm) { if (gardenRemove(rm.dataset.gremove)) { toast('Back in your bag', 1600, true); renderGarden(); } return; }
     const vis = t.closest('[data-visitor]'); if (vis) { restartClass(vis, 'poke', 700); uiSound('chirp'); gdSay(`The ${VISITOR_NAME[vis.dataset.visitor].toLowerCase()} ${VISITOR_SAY[vis.dataset.visitor]}`); return; }
+    const pet = t.closest('[data-pet]'); if (pet) { restartClass(pet, 'poke', 700); uiSound('chirp'); const P = PET_BY_ID[pet.dataset.pet]; if (P) gdSay(`${P.name} ${P.line}.`); return; }
+    if (t.closest('[data-pets]')) { uiSound('open'); openPetsDlg(); return; }
     if (t.closest('#gdPomeo')) { restartClass($('#gdPomeo'), 'poke', 700); uiSound('tap'); gdSay(pick(GD_POMEO_LINES)); return; }
     const spot = t.closest('[data-spot]'); if (spot) { openSpotDlg(spot.dataset.spot); return; }
     const plot = t.closest('[data-plot]');
@@ -11372,6 +12173,8 @@ const GD_POMEO_LINES = ['Every focus block is a watering can 💧', 'I love it h
     const hv = t.closest('[data-gharvest]'); if (hv) { dlg.close(); const h = gardenHarvest(hv.dataset.gharvest); if (h) harvestMoment(h, $(`.gd-plot[data-pid="${CSS.escape(h.id)}"]`)); return; }
     const at = t.closest('[data-gplaceat]'); if (at) { dlg.close(); if (gardenPlace(at.dataset.buy, at.dataset.gplaceat)) { toast('Placed', 1600, true); renderGarden(); if (S.ui.tab === 'bag') renderBag(); } return; }
     const rm = t.closest('[data-gremove]'); if (rm) { dlg.close(); if (gardenRemove(rm.dataset.gremove)) { toast('Back in your bag', 1600, true); renderGarden(); } return; }
+    const pe = t.closest('[data-petequip]'); if (pe) { if (petEquip(pe.dataset.petequip)) { uiSound('on'); openPetsDlg(); renderGarden(); } return; }
+    const pu = t.closest('[data-petunequip]'); if (pu) { if (petUnequip(pu.dataset.petunequip)) { uiSound('off'); openPetsDlg(); renderGarden(); } return; }
     if (t.closest('[data-gclose]')) { dlg.close(); if (v) renderGarden(); }
   });
 })();
@@ -11522,6 +12325,11 @@ function roomSVG(layout = roomLayout(), { pomeo = true, state = 'happy', self = 
   return `<svg class="rm-svg" viewBox="0 0 400 250" role="img" aria-label="Pomeo’s room">${style}${rmWall(layout.wall)}${art(layout.window)}${art(layout.poster)}${art(layout.shelf)}${rmFloor(layout.floor)}${art(layout.rug)}${art(layout.lamp)}${art(layout.desk)}${art(layout.plant)}${art(layout.pet)}${pomeoG}</svg>`;
 }
 /** A single item drawn in a small card preview. */
+Object.assign(RM_ART, {   // garden looks (v1.16)
+  plant_sunflower: '<path d="M352 206h30l-3 20h-24Z" fill="#b0603a"/><path d="M367 206v-44" stroke="#4e8a4a" stroke-width="3"/><path d="M367 190q-14-2-16-16 12 2 16 16Zm0-8q14-2 16-16-12 2-16 16Z" fill="#5c9b57"/>' + [0, 45, 90, 135, 180, 225, 270, 315].map(a => `<ellipse cx="367" cy="152" rx="4.5" ry="8" fill="#f4c430" transform="rotate(${a} 367 162)"/>`).join('') + '<circle cx="367" cy="162" r="7" fill="#7a4a22"/>',
+  poster_seeds: '<rect x="250" y="30" width="80" height="70" rx="3" fill="#fbf6ea" stroke="#b8865a" stroke-width="3"/><g><rect x="258" y="40" width="20" height="26" rx="2" fill="#fde3dc" stroke="#e5654f" stroke-width="1.2"/><circle cx="268" cy="54" r="5" fill="#e5654f"/><rect x="280" y="40" width="20" height="26" rx="2" fill="#fff4cf" stroke="#d9a21b" stroke-width="1.2"/><circle cx="290" cy="54" r="5" fill="#f4c430"/><rect x="302" y="40" width="20" height="26" rx="2" fill="#e8f0e4" stroke="#5a8f3c" stroke-width="1.2"/><path d="M312 60q-6-4-5-12 7 2 5 12Z" fill="#6fb162"/><rect x="258" y="70" width="64" height="22" rx="2" fill="#efe4cf"/><path d="M264 78h52M264 84h36" stroke="#b8865a" stroke-width="1.6" stroke-linecap="round"/></g>',
+  rug_grass: '<ellipse cx="200" cy="228" rx="102" ry="17" fill="#6a9e49"/><ellipse cx="200" cy="228" rx="88" ry="12" fill="#7fb069"/>' + [[120, 226], [150, 232], [185, 222], [220, 234], [250, 224], [280, 230], [205, 228], [165, 236]].map(([x, y]) => `<path d="M${x} ${y}l2-6 2 6M${x + 5} ${y}l1.5-5 1.5 5" stroke="#4e8a4a" stroke-width="1.4" fill="none" stroke-linecap="round"/>`).join('') + '<circle cx="140" cy="228" r="2" fill="#f4c430"/><circle cx="262" cy="233" r="2" fill="#f2a0c2"/>',
+});
 function roomItemPreview(it) {
   const slot = roomSlotOf(it.id);
   if (slot === 'wall') return `<svg viewBox="0 0 400 250" class="rm-pv" aria-hidden="true">${rmWall(it.id)}${rmFloor('floor_wood')}</svg>`;
@@ -12054,7 +12862,7 @@ function wrappedData(p) {
   const active = Object.keys(byDay).length;
   const bosses = Object.entries(S.game.trophies).filter(([wk]) => S.game.claims.bosses[wk] && parseDay(wk) >= startOfDay(addDays(p.from, -6)) && parseDay(wk) < p.to).map(([, t]) => t);
   const garden = gardenPeriod(p.from.getTime(), p.to.getTime());
-  const gArt = [...gardenItems(p.from.getTime(), Math.min(p.to.getTime(), gardenMigAt())).map(it => plantSVG(plantKind(it))), ...garden.harvests.map(x => plantArtOf(x))].slice(-40).join('');
+  const gArt = [...gardenItems(p.from.getTime(), Math.min(p.to.getTime(), gardenMigAt())).map(it => plantSVG(plantKind(it))), ...garden.harvests.map(x => plantArtOf(x, false))].slice(-40).join('');
   const avgLen = mins / ss.length, early = (hours.slice(4, 9).reduce((a, b) => a + b, 0)) / mins, night = (hours.slice(21).reduce((a, b) => a + b, 0) + hours.slice(0, 4).reduce((a, b) => a + b, 0)) / mins;
   const weekend = ss.filter(s => [0, 6].includes(new Date(s.start).getDay())).reduce((a, s) => a + s.duration, 0) / 60000 / mins;
   const persona = night > 0.35 ? { t: 'Night Owl Scholar', e: '🦉', d: 'Your best ideas arrive after dark.' }
@@ -12796,9 +13604,10 @@ addEventListener('resize', () => $$('.catrow').forEach(updateFades));
    command palette, offline banner, pull to refresh, tab swipes, haptics.
    Everything here is stored on this device (localStorage); no new cloud data.
    ========================================================================== */
-const APP_VERSION = '1.15';
+const APP_VERSION = '1.16';
 const VER_KEY = 'pomodorolist-seen-version';
 const CHANGELOG = [
+  { v: '1.16', t: 'Garden pets, a rotating seed shop, crop weights, focus-weather mutations, garden looks and new leaderboards', d: 'The garden grew up: every finished focus block also fills the egg in the garden head, and after 5 hours it hatches one of ten pets (bunny to golden snail) that help the garden a little — more water from your blocks, better mutation odds, slower wilting, bonus produce, heavier crops (all capped); duplicates level a pet up, and garden levels 4 and 8 and questline finals add rarer eggs. The Seeds shop restocks every 4 hours UTC with featured seeds at 20% off and a rare seed of the day (two a day; bamboo, pineapple and sakura come only this way or as level gifts). Every harvest now weighs something — long blocks, mutations and pets make it heavier, and 3 in 100 harvests are Giants — with records, a harvest log and a biggest-harvest line on your player card. Seven focus-weather mutations (Shocked for 90-minute blocks, Moonlit after 10 PM, Dawn before 7 AM, Frozen in December, Clan-blessed in a live clan session, Streak-touched at a 14-day streak, Stormy in monsoon questlines) stack up to two on a plant, capped at ×8 produce. The garden sells twenty looks for produce — avatars, themes, titles, frames, name colours, stamps, ring trails, room pieces. And the leaderboard got a podium, rank arrows, your own rank pinned, Pomeo empty states, a "You passed…" moment and two garden boards: produce earned and plants harvested, for friends and for everyone.' },
   { v: '1.15', t: 'A real garden, Pomeo’s room, flashcards, a weekly plan and new looks', d: 'The garden is now its own tab: plant seeds in up to 16 plots, every completed focus block waters them (the plant you choose gets the most), harvest ripe plants for produce, spend it on seeds and decor, discover 18 species with golden, rainbow and crystal mutations, visitors, weather, seasons and an almanac — the plants your past sessions grew are credited as a head start. Pomeo has a room you furnish from the coin shop (walls, floors, rugs, desks, lamps, shelves, plants, posters, windows, pets), with saved rooms and a share picture; questline finals and boss wins add room rewards from now on. Break-time flashcards: decks and cards in Reminders, a flip-and-grade review with spaced repetition, and Pomeo offers a few due cards during breaks (never during focus). A weekly subject plan in Stats: hours per subject, progress from your session names and tags, on-track / behind hints and carry-over. Plus 8 themes (Lavender, Mint, Coffee, Slate, Peach, Candy, Monsoon, Aurora), 10 stamps, 6 ring trails, 22 room items, 5 garden species and 6 decor pieces. Everything syncs across devices, works as a guest and is in your backup.' },
   { v: '1.14.3', t: 'Stronger raids, cleaner menu', d: 'Monthly clan raid bosses are much stronger from November: every month has its own boss, tier and HP (about 5,000–10,000 depending on the boss and clan size), with everyone’s hits, a rally bonus for 5+ contributors and rarer rewards in harder months. The navigation never cuts labels off any more: a sidebar on wide screens, a ☰ menu on tablets and a bottom bar with More on phones. Copy buttons work everywhere (with a Share button on phones), your profile card can fold its stats away, and the welcome page shows what’s inside before asking you to sign up.' },
   { v: '1.14.2', t: 'Focus together', d: 'Clan sessions now start as Focus together by default: everyone runs their own timer and preset at one study table, sees each other’s countdowns and states, and stepping away or leaving only affects you. The shared Synced timer with host controls is still there when you want it, and planned sessions show which mode they use.' },
@@ -12823,7 +13632,7 @@ const CHANGELOG = [
   { v: '1.1', t: 'Accounts & sync', d: 'Log in and keep your sessions in sync on every device, even offline.' },
   { v: '1.0', t: 'Focus timer', d: 'Pomodoro timer with named sessions, presets, streaks and stats.' },
 ];
-const NEWS = ['🌱 A real garden: plant seeds in up to 16 plots, water them with focus blocks, harvest produce, mutations, visitors, weather and an almanac', '🛋️ Pomeo’s room: furnish it from the coin shop, save rooms, share a picture; questline and boss rewards now include room items', '🃏 Break-time flashcards with spaced repetition — Pomeo offers a few due cards in your breaks, never during focus', '📊 A weekly subject plan in Stats: hours per subject, progress from your session names and tags, carry-over', '🎨 8 themes, 10 stamps, 6 ring trails, 22 room items, 5 garden species and 6 decor pieces', '⚔️ Much stronger monthly clan raid bosses from November: a new boss every month, with everyone’s hits and a rally bonus', '🧭 A cleaner menu: a sidebar on wide screens, ☰ on tablets, More on phones — no more cut-off tabs', '📋 Copy buttons that always work, plus Share on phones; fold the stats on your profile card', '🪑 Focus together: clan sessions where everyone runs their own timer at one table (the Synced timer is still an option)', '✨ Cosmetics fixes: Squad auras look different from Solo ones, and your look is the same on every screen', '🛡️ Clans: your study group — create one or join with a link or code', '🔴 Study live on one shared timer, at a study table with your clan (reactions, no chat)', '📅 Plan group sessions: RSVP, a reminder 5–30 min before, add to your calendar', '⭐ Clan levels, Clan Points and a cosmetic clan shop; clan tags, colours and auras in your bag', '🏆 A weekly clan quest, a monthly raid boss, a clan leaderboard and a trophy case', '☑️ A to-do list in Reminders: due dates, priorities, tags and a checklist that becomes subtasks', '🔒 Members-only clan data, approval by default, and leave / remove / disband any time'];
+const NEWS = ['🥚 Garden pets: every focus block fills the egg; ten pets that water, protect and fatten your plants (capped boosts), hearts for duplicates', '🏪 The Seeds shop restocks every 4 hours: featured seeds at 20% off and a rare seed of the day — bamboo, pineapple and sakura come only this way', '⚖️ Every harvest has a weight: long blocks, mutations and pets make it heavier; Giants (3 in 100), records, a harvest log and a card stat', '⚡ Focus-weather mutations: Shocked, Moonlit, Dawn, Frozen, Clan-blessed, Streak-touched, Stormy — up to two per plant, ×8 produce at most', '🎁 Twenty garden looks for produce: avatars, themes, titles, frames, colours, stamps, trails and room pieces', '🏆 Leaderboard v2: a podium, rank arrows, your rank pinned, “You passed…”, and garden boards for produce and harvests', '🌱 A real garden: plant seeds in up to 16 plots, water them with focus blocks, harvest produce, mutations, visitors, weather and an almanac', '🛋️ Pomeo’s room: furnish it from the coin shop, save rooms, share a picture; questline and boss rewards now include room items', '🃏 Break-time flashcards with spaced repetition — Pomeo offers a few due cards in your breaks, never during focus', '📊 A weekly subject plan in Stats: hours per subject, progress from your session names and tags, carry-over', '🎨 8 themes, 10 stamps, 6 ring trails, 22 room items, 5 garden species and 6 decor pieces', '⚔️ Much stronger monthly clan raid bosses from November: a new boss every month, with everyone’s hits and a rally bonus', '🧭 A cleaner menu: a sidebar on wide screens, ☰ on tablets, More on phones — no more cut-off tabs', '📋 Copy buttons that always work, plus Share on phones; fold the stats on your profile card', '🪑 Focus together: clan sessions where everyone runs their own timer at one table (the Synced timer is still an option)', '✨ Cosmetics fixes: Squad auras look different from Solo ones, and your look is the same on every screen', '🛡️ Clans: your study group — create one or join with a link or code', '🔴 Study live on one shared timer, at a study table with your clan (reactions, no chat)', '📅 Plan group sessions: RSVP, a reminder 5–30 min before, add to your calendar', '⭐ Clan levels, Clan Points and a cosmetic clan shop; clan tags, colours and auras in your bag', '🏆 A weekly clan quest, a monthly raid boss, a clan leaderboard and a trophy case', '☑️ A to-do list in Reminders: due dates, priorities, tags and a checklist that becomes subtasks', '🔒 Members-only clan data, approval by default, and leave / remove / disband any time'];
 
 /* ---------- Haptics ---------- */
 const HAPTIC_KEY = 'pomodorolist-haptics';
@@ -13393,6 +14202,13 @@ const AVATAR_ART = {
 /** The avatar art for use inside another SVG (expects the 24×24 grid). */
 const avatarArt = id => { const a = AVATAR_ART[id]; return a ? `<g clip-path="url(#avClip)"${a.anim ? ' class="av-anim"' : ''}><circle cx="12" cy="12" r="12" fill="${a.bg}"/>${a.art}</g>` : ''; };
 const hasAvatar = id => !!id && id !== 'av_default' && !!AVATAR_ART[id] && !minimal();   // True Minimalist: plain initials
+/* Garden looks (v1.16) */
+Object.assign(AVATAR_ART, {
+  av_pumpkin: { bg: '#fdebd3', art: '<ellipse cx="12" cy="14" rx="8.4" ry="6.6" fill="#e8761e"/><ellipse cx="12" cy="14" rx="3.2" ry="6.6" fill="none" stroke="#c75f12" stroke-width=".9"/><path d="M6.4 9.6q5.6-2.6 11.2 0" fill="none" stroke="#c75f12" stroke-width=".8" opacity=".6"/><rect x="11" y="5.2" width="2.2" height="3.4" rx="1" fill="#5c9b57"/><path d="M13 6.4q3-1.6 4.2.6" fill="none" stroke="#5c9b57" stroke-width="1.1"/>' + EYE(9.4, 13.2, .8) + EYE(14.6, 13.2, .8) + '<path d="M9.6 16.4q2.4 1.8 4.8 0" fill="none" stroke="#2a1d18" stroke-width=".9" stroke-linecap="round"/>' },
+  av_sunflower: { bg: '#fff4cf', art: '<g fill="#f4c430">' + [0, 45, 90, 135, 180, 225, 270, 315].map(a => `<ellipse cx="12" cy="5.2" rx="2" ry="3.4" transform="rotate(${a} 12 12)"/>`).join('') + '</g><circle cx="12" cy="12" r="4.6" fill="#7a4a22"/><circle cx="12" cy="12" r="3" fill="none" stroke="#5c3416" stroke-width=".7" stroke-dasharray="1 1"/>' + EYE(10.6, 11.4, .6) + EYE(13.4, 11.4, .6) + '<path d="M10.8 13.6q1.2 1 2.4 0" fill="none" stroke="#2a1d18" stroke-width=".7" stroke-linecap="round"/>' },
+  av_strawberry: { bg: '#ffe3e8', art: '<path d="M12 20.4q-6.4-3.2-6.4-9 0-3.6 6.4-4.6 6.4 1 6.4 4.6 0 5.8-6.4 9Z" fill="#e6414f"/><path d="M8.6 7.2 12 4.6l3.4 2.6-1.4 1.6-2-1-2 1Z" fill="#5c9b57"/><g fill="#fff6f6" opacity=".9"><circle cx="9.6" cy="11" r=".6"/><circle cx="14.4" cy="11" r=".6"/><circle cx="12" cy="14" r=".6"/><circle cx="9.8" cy="15.8" r=".6"/><circle cx="14.2" cy="15.8" r=".6"/></g>' + EYE(10.2, 12.6, .7) + EYE(13.8, 12.6, .7) + '<path d="M10.6 15q1.4 1 2.8 0" fill="none" stroke="#2a1d18" stroke-width=".8" stroke-linecap="round"/>' },
+  av_lotus: { bg: '#e4f2f5', anim: true, art: '<ellipse cx="12" cy="18.6" rx="9" ry="2" fill="#9fd1d8" opacity=".7"/><g fill="#f2a0c2"><path d="M12 17 7.2 10.4Q9.6 8 12 9.2 14.4 8 16.8 10.4Z"/><path d="M12 17 3.8 12.6Q6.6 9.6 9 11.4Z"/><path d="M12 17l8.2-4.4Q17.4 9.6 15 11.4Z"/></g><path d="M12 17 9.4 8.2Q12 5.6 14.6 8.2Z" fill="#f7bcd3"/><circle cx="12" cy="13.8" r="1.2" fill="#f4c430"/>' },
+});
 /** A plain round avatar. */
 const avatarSVG = (id, size = 32) => `<svg class="av" viewBox="0 0 24 24" width="${size}" height="${size}" aria-hidden="true">${avatarArt(id)}</svg>`;
 const myAvatar = () => equippedId('avatar');
@@ -13534,6 +14350,7 @@ for (const r of RAID_BOSSES) SPECIAL_AURAS['au_cr_' + r.id] = { cols: [r.a, r.b,
 
 // ---- Titles and session-complete effects ----
 const TITLE_TEXT = Object.fromEntries(EV_ITEMS.filter(x => x[1] === 'title').map(x => [x[0], x[2]]));
+Object.assign(TITLE_TEXT, { ti_gardener: 'Gardener', ti_greenthumb: 'Green Thumb', ti_harvestmoon: 'Harvest Moon' });   // garden looks (v1.16)
 const EV_FX = Object.fromEntries(EVENTS.filter(ev => EV_LOOK[ev.id].fx).map(ev => ['fx_ev_' + ev.id, EV_LOOK[ev.id].fx]));
 
 /** One stylesheet for every reward look, built from the data above. */
@@ -13704,13 +14521,15 @@ $('#tutBody').addEventListener('click', e => {
     setTimeout(() => { if (S.timer.status === 'idle') { S.timer.phase = 'focus'; UIS.gesture = performance.now(); startTimer(); } }, 300);
   }
   if (e.target.closest('#tutDemo')) {
+    FG.demoSoon = true; setTimeout(() => { FG.demoSoon = false; }, 5000);   // the focus guard holds pop-ups (the Day 1 reward) until the demo is running
     finishTutorial();
     showTab('timer');
     setTimeout(() => {
-      if (S.timer.status !== 'idle') return;
+      if (S.timer.status !== 'idle') { FG.demoSoon = false; return; }
       $('#nameInput').value = 'Demo session'; onNameChange();
       S.timer.phase = 'focus'; S.timer.oneOff = 60000; S.timer.demo = true;
       UIS.gesture = performance.now(); startTimer();
+      FG.demoSoon = false;
       pomeoSay('One minute! Watch what happens when it ends ⏱️', { kind: 'tap', ms: 4000 });
     }, 300);
   }
@@ -14080,35 +14899,37 @@ function demoSessions() {
   return out;
 }
 const DEMO_FRIENDS = [
-  { uid: 'demo_f1', name: 'James', tier: 'focused', level: 14, streak: 31, color: 'col_teal', frame: 'frame_orbit', avatar: 'av_fox', life: 9800 },
-  { uid: 'demo_f2', name: 'siverieg', tier: 'scholar', level: 11, streak: 9, color: '', frame: 'frame_ring', avatar: 'av_robot', life: 6100 },
-  { uid: 'demo_f3', name: 'Justin', tier: 'apprentice', level: 7, streak: 4, color: '', frame: '', avatar: 'av_owl', life: 2900 },
-  { uid: 'demo_f4', name: 'Princess_cupcake', tier: 'disciplined', level: 18, streak: 52, color: 'col_rose', frame: 'frame_hex', avatar: 'av_panda', life: 15400 },
-  { uid: 'demo_f5', name: 'lenvixty', tier: 'scholar', level: 12, streak: 16, color: 'col_violet', frame: 'frame_double', avatar: 'av_cat', life: 7300 },
+  { uid: 'demo_f1', name: 'James', tier: 'focused', level: 14, streak: 31, color: 'col_teal', frame: 'frame_orbit', avatar: 'av_fox', life: 9800, produce: 610, harvests: 88 },
+  { uid: 'demo_f2', name: 'siverieg', tier: 'scholar', level: 11, streak: 9, color: '', frame: 'frame_ring', avatar: 'av_robot', life: 6100, produce: 140, harvests: 31 },
+  { uid: 'demo_f3', name: 'Justin', tier: 'apprentice', level: 7, streak: 4, color: '', frame: '', avatar: 'av_owl', life: 2900, produce: 0, harvests: 0 },
+  { uid: 'demo_f4', name: 'Princess_cupcake', tier: 'disciplined', level: 18, streak: 52, color: 'col_rose', frame: 'frame_hex', avatar: 'av_panda', life: 15400, produce: 1230, harvests: 164 },
+  { uid: 'demo_f5', name: 'lenvixty', tier: 'scholar', level: 12, streak: 16, color: 'col_violet', frame: 'frame_double', avatar: 'av_cat', life: 7300, produce: 395, harvests: 57 },
 ];
 /** The demo garden: level 4, a few plants at every stage, two mutations in the almanac, some decor placed. */
 function demoGarden(sessions) {
   const now = Date.now(), d = n => now - n * 864e5, ids = sessions.slice(-40).map(s => s.id);
   const water = (mins, from) => Object.fromEntries(mins.map((m, i) => [ids[from + i] || 'demo_w' + (from + i), m]));
   const plants = [
-    { id: 'mig1', v: 1, sum: 1, at: d(20), grown: 96, golden: 7, ripe: 40, wilted: 3, y: 220, xp: 40 },
+    { id: 'mig1', v: 1, sum: 1, at: d(20), grown: 96, golden: 7, ripe: 40, wilted: 3, y: 255, xp: 40 },   // y covers the garden look bought below (v1.16)
     { id: 'demo_pl1', v: 1, sp: 'tomato', plot: 0, seed: 'st1', at: d(6), sk: 20, w: water([25, 20], 0), u: d(1) },         // leafy
     { id: 'demo_pl2', v: 1, sp: 'sunflower', plot: 1, seed: 'st3', at: d(5), sk: 21, w: water([25, 35], 3), u: d(1) },      // flowering
     { id: 'demo_pl3', v: 1, sp: 'strawberry', plot: 2, seed: 'demo_gb1', at: d(4), sk: 22, w: water([12], 5), u: d(1) },     // sprout
     { id: 'demo_pl4', v: 1, sp: 'lavender', plot: 3, seed: 'demo_gb2', at: d(9), sk: 17, w: water([25, 35, 25, 35], 6), u: d(1) },   // leafy
-    { id: 'demo_pl5', v: 1, sp: 'basil', plot: 4, seed: 'demo_gb3', at: d(3), sk: 23, w: water([30, 30], 14), fin: ids[15], fd: 30, m: '', u: d(0) },   // ready
+    { id: 'demo_pl5', v: 1, sp: 'basil', plot: 4, seed: 'demo_gb3', at: d(3), sk: 23, w: water([30, 30], 14), fin: ids[15], fd: 30, m: '', wm: ['moonlit'], u: d(0) },   // ready, Moonlit
     { id: 'demo_pl6', v: 1, sp: 'chilli', plot: 5, seed: 'demo_gb4', at: d(2), sk: 24, w: {}, u: d(2) },                    // seed
     { id: 'demo_pl7', v: 1, sp: 'marigold', plot: 7, seed: 'demo_gb5', at: d(1), sk: 25, w: water([7], 16), u: d(1) },       // sprout
-    { id: 'demo_h1', v: 1, sp: 'tomato', plot: -1, seed: 'st2', at: d(18), sk: 8, wt: 90, fin: ids[2], fd: 50, h: d(14), y: 8, m: 'golden', u: d(14) },
+    { id: 'demo_h1', v: 1, sp: 'tomato', plot: -1, seed: 'st2', at: d(18), sk: 8, wt: 90, fin: ids[2], fd: 50, h: d(14), y: 12, m: 'golden', wm: ['shocked'], u: d(14) },
     { id: 'demo_h2', v: 1, sp: 'basil', plot: -1, seed: 'demo_gb6', at: d(16), sk: 10, wt: 60, fin: ids[4], fd: 25, h: d(13), y: 4, m: '', u: d(13) },
     { id: 'demo_h3', v: 1, sp: 'sunflower', plot: -1, seed: 'demo_gb7', at: d(15), sk: 11, wt: 75, fin: ids[6], fd: 50, h: d(11), y: 5, m: '', u: d(11) },
-    { id: 'demo_h4', v: 1, sp: 'blueberry', plot: -1, seed: 'demo_gb8', at: d(17), sk: 9, wt: 300, fin: ids[9], fd: 90, h: d(8), y: 33, m: 'rainbow', u: d(8) },
+    { id: 'demo_h4', v: 1, sp: 'blueberry', plot: -1, seed: 'demo_gb8', at: d(17), sk: 9, wt: 300, fin: ids[9], fd: 90, h: d(8), y: 33, m: 'rainbow', giant: 1, kg: 2.04, u: d(8) },
     { id: 'demo_h5', v: 1, sp: 'marigold', plot: -1, seed: 'demo_gb9', at: d(12), sk: 14, wt: 70, fin: ids[11], fd: 25, h: d(6), y: 4, m: '', u: d(6) },
   ];
   const gb = (id, item, price, at, slot = '') => ({ id, v: 1, item, price, at, slot, u: at });
   const gbuys = [gb('st1', 'seed_tomato', 0, d(20)), gb('st2', 'seed_tomato', 0, d(20)), gb('st3', 'seed_sunflower', 0, d(20)),
     gb('demo_gb1', 'seed_strawberry', 5, d(4)), gb('demo_gb2', 'seed_lavender', 25, d(9)), gb('demo_gb3', 'seed_basil', 3, d(3)), gb('demo_gb4', 'seed_chilli', 6, d(2)), gb('demo_gb5', 'seed_marigold', 3, d(1)),
     gb('demo_gb6', 'seed_basil', 3, d(16)), gb('demo_gb7', 'seed_sunflower', 0, d(15)), gb('demo_gb8', 'seed_blueberry', 30, d(17)), gb('demo_gb9', 'seed_marigold', 3, d(12)), gb('demo_gb10', 'seed_tomato', 0, d(2)),
+    { ...gb('demo_gb_daily', 'seed_' + dailySeed().id, dailySeed().price, now - 2 * 3600e3), src: 'daily', day: seedDayKey() },   // today's rare seed, bought once
+    { ...gb('demo_gb_look', 'av_sunflower', 35, now - 6 * 864e5), ok: 1 },   // a garden look (v1.16)
     gb('demo_gb11', 'dc_fence_wood', 12, d(13), 'border'), gb('demo_gb12', 'dc_path_stone', 10, d(13), 'path'), gb('demo_gb13', 'dc_lantern', 15, d(10), 's1'), gb('demo_gb14', 'dc_birdhouse', 18, d(10), 's5'), gb('demo_gb15', 'dc_pond', 45, d(7), 's4'), gb('demo_gb16', 'dc_bench', 22, d(5), '')];
   return { plants, gbuys };
 }
@@ -14200,6 +15021,10 @@ function demoDocs() {
     decks: [{ id: 'demo_dk1', v: 1, name: 'Organic chemistry', subject: 'Chemistry', at: Date.now() - 9 * 864e5, u: Date.now() - 9 * 864e5 }, { id: 'demo_dk2', v: 1, name: 'Physics formulas', subject: 'Physics', at: Date.now() - 6 * 864e5, u: Date.now() - 6 * 864e5 }],
     cards: [['demo_dk1', 'Aldol condensation product', 'β-hydroxy aldehyde / ketone', '', 0], ['demo_dk1', 'Tollens’ test is positive for', 'Aldehydes (silver mirror)', '', 0], ['demo_dk1', 'Clemmensen reduction reagent', 'Zn–Hg / conc. HCl', dayKey(addDays(startOfDay(now), 3)), 3], ['demo_dk1', 'Cannizzaro reaction needs', 'An aldehyde with no α-hydrogen', dayKey(startOfDay(now)), 1], ['demo_dk1', 'Fehling’s solution colour change', 'Blue → brick-red Cu₂O', '', 0],
       ['demo_dk2', 'Kinetic energy', '½ m v²', dayKey(startOfDay(now)), 1], ['demo_dk2', 'Torque', 'τ = r × F', '', 0], ['demo_dk2', 'Snell’s law', 'n₁ sin θ₁ = n₂ sin θ₂', dayKey(addDays(startOfDay(now), 12)), 12], ['demo_dk2', 'Escape velocity', '√(2GM/R)', '', 0]].map(([deck, f, b, due, ivl], i) => ({ id: 'demo_cd' + i, v: 1, deck, f, b, due, ivl, ease: 2.5, reps: ivl ? 2 : 0, lapses: 0, at: Date.now() - (8 - i) * 864e5, u: Date.now() - 864e5 })),
+    eggs: [{ id: 'egg1', v: 1, kind: 'common', src: 'focus', at: Date.now() - 12 * 864e5, need: 300, w: Object.fromEntries(sessions.slice(-30, -18).map(s => [s.id, 25])), h: Date.now() - 9 * 864e5, pet: 'bunny', hs: sessions[sessions.length - 19].id, u: Date.now() - 9 * 864e5 },
+      { id: 'egg2', v: 1, kind: 'common', src: 'focus', at: Date.now() - 9 * 864e5, need: 300, w: Object.fromEntries(sessions.slice(-8, -3).map(s => [s.id, 25])), u: Date.now() - 864e5 },
+      { id: 'egg_lv4', v: 1, kind: 'rare', src: 'lv4', at: Date.now() - 8 * 864e5, need: 420, w: Object.fromEntries(sessions.slice(-18, -8).map(s => [s.id, 42])), h: Date.now() - 3 * 864e5, pet: 'fox', u: Date.now() - 3 * 864e5 }],
+    petPrefs: { p1: { v: 'bunny', u: Date.now() - 9 * 864e5 } },
     roomSets: [{ id: 'demo_rs1', v: 1, name: 'Study mode', slots: { wall: 'wall_sage', floor: 'floor_tiles', rug: 'rug_none', desk: 'desk_oak', lamp: 'lamp_desk', shelf: 'shelf_books', plant: 'plant_monstera', poster: 'poster_space', window: 'window_city', pet: 'pet_cat' }, u: Date.now() - 2 * 864e5 }],
     todos: [['Finish HC Verma ch. 7 problems', 0, 'high', 'Physics', [['Q1–10', true], ['Q11–20', false], ['Check answers', false]]], ['Revise organic named reactions', 1, 'med', 'Chemistry', []],
       ['Integration practice set', -1, 'high', 'Maths', []], ['Make biology flashcards', 3, 'low', 'Biology', []], ['Mock test review', null, 'med', 'JEE', []]]
@@ -14218,7 +15043,7 @@ function demoDocs() {
     const weekMin = Math.max(30, weekOf[i]), dayMin = Math.round(Math.min(weekMin, 35 + i * 20));
     const pub = { username: f.name, level: f.level, tier: f.tier, frame: ITEM_BY_ID[f.frame] ? f.frame : 'frame_none', color: ITEM_BY_ID[f.color] ? f.color : 'col_default', avatar: f.avatar };
     docs['publicProfiles/' + f.uid] = { ...pub, streak: f.streak, longest: f.streak + 6, hours: Math.round(f.life / 6) / 10, joined: Date.now() - (120 + i * 30) * 864e5, updatedAt: ts(Date.now()) };
-    docs['publicStats/' + f.uid] = { ...pub, global: true, dayKey: dayKey(now), dayMin, weekKey: wk, weekMin, weekKeySun: wkSun, weekMinSun: weekMin, monthKey: monthKeyOf(now), monthMin: weekMin * 3, lifeMin: f.life, lastWeekKey: dayKey(addDays(mon, -7)), lastWeekMin: weekMin + 40, updatedAt: ts(Date.now()) };
+    docs['publicStats/' + f.uid] = { ...pub, global: true, dayKey: dayKey(now), dayMin, weekKey: wk, weekMin, weekKeySun: wkSun, weekMinSun: weekMin, monthKey: monthKeyOf(now), monthMin: weekMin * 3, lifeMin: f.life, lastWeekKey: dayKey(addDays(mon, -7)), lastWeekMin: weekMin + 40, ...(f.produce ? { produce: f.produce, harvests: f.harvests } : {}), updatedAt: ts(Date.now()) };   // Justin has no garden totals yet (an older app), so he is off the garden boards
     const days = {}, goalDays = [];
     for (let k = 0; k < 28; k++) { if ((k * 7 + i) % 5 === 4) continue; const m = 60 + ((k * 37 + i * 11) % 120); days[dayKey(addDays(startOfDay(now), -k))] = m; if (m >= 120) goalDays.push(dayKey(addDays(startOfDay(now), -k))); }
     docs['activity/' + f.uid] = { visible: true, shareNames: true, days, goalDays, streak: f.streak, longest: f.streak + 6, updatedAt: ts(Date.now()),
@@ -14289,14 +15114,14 @@ function startPreview() {
 }
 /** Leaving reloads the page, so nothing from the demo stays in memory. "#signup" opens the sign-up tab. */
 function exitPreview(signup) { history.replaceState(null, '', location.pathname + location.search + (signup ? '#signup' : '')); location.reload(); }
-const PV_BLOCK = ['#plSave', '[data-dnew]', '[data-ddel]', '[data-cdel]', '[data-dkbulk]', '#dkAdd button', '[data-drename]', '[data-cedit]', '[data-rmset-save]', '[data-rmset-apply]', '[data-rmset-del]', '[data-rremove]', '.gd-plot.ready', '[data-gbuy]', '[data-gplant]', '[data-gharvest]', '[data-gplace]', '[data-gplaceat]', '[data-gremove]', '[data-gfocus]', '#mainBtn', '#skipBtn', '[data-qs]', '[data-buy]', '[data-equip]', '[data-toggle-extra]', '[data-kudos]', '[data-accept]', '[data-decline]', '[data-block]', '[data-unblock]',
+const PV_BLOCK = ['#plSave', '[data-dnew]', '[data-ddel]', '[data-cdel]', '[data-dkbulk]', '#dkAdd button', '[data-drename]', '[data-cedit]', '[data-rmset-save]', '[data-rmset-apply]', '[data-rmset-del]', '[data-rremove]', '.gd-plot.ready', '[data-gbuy]', '[data-gequip]', '[data-gplant]', '[data-gharvest]', '[data-gplace]', '[data-gplaceat]', '[data-gremove]', '[data-gfocus]', '#mainBtn', '#skipBtn', '[data-qs]', '[data-buy]', '[data-equip]', '[data-toggle-extra]', '[data-kudos]', '[data-accept]', '[data-decline]', '[data-block]', '[data-unblock]',
   '[data-join]', '[data-start]', '[data-claimlogin]', '#loginClaim', '[data-remadd]', '#remAdd', '[data-rdone]', '[data-rdel]', '[data-redit]', '[data-rev]', '[data-del]', '[data-delp]',
   '[data-exdel]', '[data-tdel]', '[data-tload]', '[data-remove]', '[data-tick]', '[data-energy]', '#parkBtn', '#subToggle', '#subCheckAdd', '#managePresets', '#noteSave', '#revSchedule', '#examsBtn',
   '#importBtn', '#exportBtn', '#wipeBtn', '#pomeoOutfit', '#replayTour', '#resetTips', '[data-news-tut]', '[data-news-min]', '#addFriendForm button', '#chips .chip', '[data-pin]', '.chip .pin',
-  '#squadBtn', '[data-squad]', '#examCard', '[data-gl]', '#tutMinimal', '#squadEdit', '[data-bclaim]', '[data-qclaim]', '[data-bequip]', '[data-bunequip]', '[data-btoggle]',
+  '#squadBtn', '[data-squad]', '#examCard', '[data-gl]', '#tutMinimal', '#squadEdit', '[data-bclaim]', '[data-qclaim]', '[data-bequip]', '[data-bunequip]', '[data-btoggle]', '[data-petequip]', '[data-petunequip]', '#egOut',
   '#loNew', '[data-lo-apply]', '[data-lo-del]', '#setFestive', '#todoAdd button', '#todoMore', '[data-tdone]', '[data-tdel]', '[data-tfocus]', '[data-tgrip]', '#tdSave', '#tdDelete', '[data-cdstyle]', '[data-cdbn]', '[data-cdfeat]', '[data-cdpriv]', '#shSave', '#shNative', '#shCopy', '#shLink', '#setTod', '#setTodRain', '#clanCreateBtn', '#clanJoinBtn', '#ccSave', '#cjFind', '#clanCardGo', '#ciRegen', '#ciCopy', '[data-cbuy]', '[data-cuse]', '#csdSave', '[data-cmode]', '#cstShop', '#cstSched', '#cstTransfer', '#cstDisband', '[data-rsvp]', '[data-cremind]', '[data-cedit]', '[data-ccancel]', '[data-cstart]', '[data-cjoinlive]', '#clanStudyNow', '#clanSchedBtn', '[data-react]', '[data-lvctl]', '#clanLeave', '[data-crole]', '[data-ctransfer]', '[data-cremove]', '[data-creqok]', '[data-creqno]', '#clanQuestClaim', '#clanRaidClaim', '[data-crbefore]', '#clanCancelReq', '#clanInvite'].join(',');
-const PV_WHY = [['#plSave', 'plan your week'], ['[data-dnew],[data-ddel],[data-cdel],[data-dkbulk],#dkAdd button,[data-drename],[data-cedit]', 'make your own flashcards'], ['[data-rmset-save],[data-rmset-apply],[data-rmset-del],[data-rremove]', 'decorate Pomeo’s room'], ['.gd-plot.ready,[data-gbuy],[data-gplant],[data-gharvest],[data-gplace],[data-gplaceat],[data-gremove],[data-gfocus]', 'grow your own garden'], ['[data-buy],[data-equip],[data-toggle-extra]', 'buy and equip shop items'], ['#mainBtn,[data-qs],#skipBtn', 'start your own focus sessions'], ['[data-kudos],[data-accept],[data-decline],#addFriendForm button,[data-block]', 'add friends and send kudos'],
-  ['[data-claimlogin],#loginClaim', 'collect daily rewards'], ['[data-bclaim],[data-qclaim]', 'claim boss and questline rewards'], ['[data-bequip],[data-bunequip],[data-btoggle],#loNew,[data-lo-apply],[data-lo-del]', 'equip items and save looks'], ['#remAdd,[data-remadd],[data-rdone],[data-redit],[data-rdel]', 'plan your own reminders'], ['#todoAdd button,#todoMore,[data-tdone],[data-tdel],[data-tfocus],[data-tgrip],#tdSave,#tdDelete', 'keep your own to-do list'], ['[data-cdstyle],[data-cdbn],[data-cdfeat],[data-cdpriv],#shSave,#shNative,#shCopy,#shLink', 'make and share your own player card'], ['#clanCreateBtn,#clanJoinBtn,#ccSave,#cjFind,#clanCardGo,[data-cjoinlive],#clanStudyNow,[data-react],[data-lvctl],[data-rsvp],[data-cremind],#clanSchedBtn,[data-cbuy],[data-cuse],#clanLeave,#clanQuestClaim,#clanRaidClaim,#clanInvite', 'create or join a clan and study live together']];
+const PV_WHY = [['#plSave', 'plan your week'], ['[data-dnew],[data-ddel],[data-cdel],[data-dkbulk],#dkAdd button,[data-drename],[data-cedit]', 'make your own flashcards'], ['[data-rmset-save],[data-rmset-apply],[data-rmset-del],[data-rremove]', 'decorate Pomeo’s room'], ['.gd-plot.ready,[data-gbuy],[data-gequip],[data-gplant],[data-gharvest],[data-gplace],[data-gplaceat],[data-gremove],[data-gfocus]', 'grow your own garden'], ['[data-buy],[data-equip],[data-toggle-extra]', 'buy and equip shop items'], ['#mainBtn,[data-qs],#skipBtn', 'start your own focus sessions'], ['[data-kudos],[data-accept],[data-decline],#addFriendForm button,[data-block]', 'add friends and send kudos'],
+  ['[data-claimlogin],#loginClaim', 'collect daily rewards'], ['[data-bclaim],[data-qclaim]', 'claim boss and questline rewards'], ['[data-bequip],[data-bunequip],[data-btoggle],#loNew,[data-lo-apply],[data-lo-del]', 'equip items and save looks'], ['[data-petequip],[data-petunequip],#egOut', 'keep garden pets'], ['#remAdd,[data-remadd],[data-rdone],[data-redit],[data-rdel]', 'plan your own reminders'], ['#todoAdd button,#todoMore,[data-tdone],[data-tdel],[data-tfocus],[data-tgrip],#tdSave,#tdDelete', 'keep your own to-do list'], ['[data-cdstyle],[data-cdbn],[data-cdfeat],[data-cdpriv],#shSave,#shNative,#shCopy,#shLink', 'make and share your own player card'], ['#clanCreateBtn,#clanJoinBtn,#ccSave,#cjFind,#clanCardGo,[data-cjoinlive],#clanStudyNow,[data-react],[data-lvctl],[data-rsvp],[data-cremind],#clanSchedBtn,[data-cbuy],[data-cuse],#clanLeave,#clanQuestClaim,#clanRaidClaim,#clanInvite', 'create or join a clan and study live together']];
 function previewPrompt(el) {
   const why = (PV_WHY.find(([sel]) => el && el.closest(sel)) || [, 'save your own sessions and settings'])[1];
   $('#pvWhy').textContent = `This is a demo account, so nothing can be changed. Create your own free account to ${why}.`;
@@ -14470,6 +15295,10 @@ async function claimQuest(evId, qid) {
   S.game.claims.quests[key] = at;
   const items = qid === 'final' ? ev.final : [q.reward];
   grantItems(items, 'ev:' + ev.id, at);
+  if (qid === 'final' && evStart(ev) >= EGG_EVENT_FROM && !eggList().some(e => e.id === 'egg_ev_' + ev.id)) {   // a rare pet egg with the final (v1.16)
+    S.eggs.push({ id: 'egg_ev_' + ev.id, v: 1, kind: 'rare', src: 'ev:' + ev.id, at, u: Date.now(), need: EGG_NEED.rare, w: {} });
+    setTimeout(() => toast('🥚 A rare pet egg joined your garden’s queue — focus to hatch it', 3600, true, { go: { tab: 'garden' } }), 3000);
+  }
   save();
   showRewardReveal({ kicker: qid === 'final' ? `${ev.name} · final reward` : `${ev.name} · quest ${qid.slice(1)} of ${ev.quests.length}`,
     title: qid === 'final' ? 'Questline complete! 🏆' : q.title, items, pal: [ev.a, ev.b] });
@@ -14621,7 +15450,7 @@ const CAT_LABEL = { theme: 'Theme', avatar: 'Profile picture', pomhat: 'Pomeo ha
 const BAG_CATS = [
   ['theme', 'Themes', ['theme']], ['avatar', 'Profile pictures', ['avatar']], ['pomeo', 'Pomeo outfits', ['pomhat', 'pomacc', 'pomskin']], ['room', 'Room', ['room']], ['aura', 'Auras', ['aura']],
   ['color', 'Name colours', ['color']], ['title', 'Titles', ['title']], ['sound', 'Sounds', ['sound', 'ambient']], ['timer', 'Timer styles', ['ring', 'trail', 'extra']],
-  ['font', 'Fonts', ['font']], ['effect', 'Effects', ['effect']], ['stamp', 'Stamps', ['stamp']], ['card', 'Card styles', ['card']], ['frame', 'Badge frames', ['frame']], ['trophies', 'Boss trophies', []], ['garden', 'Garden', []], ['clan', 'Clan', []], ['event', 'Event items', []], ['consumables', 'Consumables', []],
+  ['font', 'Fonts', ['font']], ['effect', 'Effects', ['effect']], ['stamp', 'Stamps', ['stamp']], ['card', 'Card styles', ['card']], ['frame', 'Badge frames', ['frame']], ['trophies', 'Boss trophies', []], ['garden', 'Garden', []], ['pets', 'Pets', []], ['clan', 'Clan', []], ['event', 'Event items', []], ['consumables', 'Consumables', []],
 ];
 const BAG_FILTERS = [['all', 'All'], ['equipped', 'Equipped'], ['new', 'New'], ['shop', 'Shop'], ['boss', 'Bosses'], ['event', 'Events'], ['clan', 'Clan'], ['reward', 'Rewards']];
 const RARITY_LABEL = { common: 'Common', rare: 'Rare', epic: 'Epic', legendary: 'Legendary' };
@@ -14650,8 +15479,9 @@ function bagItems() {
     if (it.price === 0 || it.cat === 'freeze' || !isOwned(it.id)) continue;
     const gr = S.game.grants[it.id], pu = firstBuy[it.id];
     if (it.clanLv || it.clanRaid) { out.push({ it, src: { kind: 'clan', label: it.clanRaid ? 'Clan raid' : `Clan level ${it.clanLv}` }, at: +CLAN.me.joinedAt || 0 }); continue; }
-    const src = gr ? srcOf(gr.src) : pu && pu.gift ? { kind: 'reward', label: 'Daily reward' } : { kind: 'shop', label: 'Shop' };
-    out.push({ it, src, at: +((gr || pu || {}).at) || 0 });
+    const gb = it.gprice ? garden().valid.find(b => b.item === it.id) : null;   // a garden look (v1.16)
+    const src = gr ? srcOf(gr.src) : gb ? { kind: 'shop', label: 'Garden shop' } : pu && pu.gift ? { kind: 'reward', label: 'Daily reward' } : { kind: 'shop', label: 'Shop' };
+    out.push({ it, src, at: +((gr || gb || pu || {}).at) || 0 });
   }
   return out;
 }
@@ -14759,7 +15589,7 @@ function renderBag() {
   if (!el || !USER) return;
   clearInterval(bagTipTimer);
   const g = game(), all = bagItems(), trophies = trophyCards(), cons = consumableCards(g);
-  const total = all.length + trophies.length + cons.length;
+  const total = all.length + trophies.length + cons.length + gardenBagCards('').length + petBagCards('').length;   // garden seeds, decor and pets count too (a bag with only those is not empty)
   const head = `<div class="bag-head"><div><h1 class="bag-title">Your bag</h1><div class="lbl">${total ? `${all.length} item${all.length === 1 ? '' : 's'}${trophies.length ? ` · ${trophies.length} trophies` : ''}` : 'Nothing here yet'}</div></div>
     ${total ? `<input type="search" id="bagSearch" placeholder="Search your bag" aria-label="Search your bag" value="${esc(bagQuery)}" autocomplete="off">` : ''}</div>`;
   if (!total) {
@@ -14800,11 +15630,12 @@ function renderBagList() {
   const inCat = (c, x) => c[0] === 'event' ? x.src.kind === 'event' : c[0] === 'clan' ? x.src.kind === 'clan' : x.src.kind !== 'clan' && c[2].includes(x.it.cat);
   const special = (f === 'all' || f === 'boss') && !q;
   const gcards = (f === 'all' || f === 'shop') ? gardenBagCards(q) : [];
+  const pcards = (f === 'all' || f === 'reward' || f === 'equipped') ? petBagCards(q).filter(c => f !== 'equipped' || /equipped/.test(c.slice(0, 80))) : [];
   const trophies = special || (q && 'boss trophies trophy'.includes(q)) ? trophyCards() : [];
   const cons = (f === 'all' || f === 'shop') && (!q || 'streak freeze consumable'.includes(q)) ? consumableCards(g) : [];
   const starters = ITEMS.filter(it => (it.cat === 'stamp' || it.cat === 'card') && it.price === 0).map(it => ({ it, src: { kind: 'reward', label: 'Free' }, at: 0 })).filter(match);
   const clanLocked = (f === 'all' || f === 'clan') && !q ? clanLockedCards(g) : [];
-  const counts = Object.fromEntries(BAG_CATS.map(c => [c[0], c[0] === 'trophies' ? trophies.length : c[0] === 'garden' ? gcards.length : c[0] === 'consumables' ? cons.length : [...starters, ...items].filter(x => inCat(c, x)).length + (c[0] === 'clan' ? clanLocked.length : 0)]));
+  const counts = Object.fromEntries(BAG_CATS.map(c => [c[0], c[0] === 'trophies' ? trophies.length : c[0] === 'garden' ? gcards.length : c[0] === 'pets' ? pcards.length : c[0] === 'consumables' ? cons.length : [...starters, ...items].filter(x => inCat(c, x)).length + (c[0] === 'clan' ? clanLocked.length : 0)]));
   const shown = BAG_CATS.filter(c => counts[c[0]] || c[0] === 'aura');
   if (cat !== 'all' && !shown.some(c => c[0] === cat)) cat = 'all';
   $('#bagCats').innerHTML = `<button data-bcat="all" class="${cat === 'all' ? 'active' : ''}">All</button>` + shown.map(c => `<button data-bcat="${c[0]}" class="${cat === c[0] ? 'active' : ''}">${c[1]} <span class="cnt">${counts[c[0]]}</span></button>`).join('');
@@ -14812,7 +15643,7 @@ function renderBagList() {
   const nNew = bagFresh.size, nb = $('#bagFilters [data-bfilter="new"]');
   if (nb) nb.textContent = nNew ? `New (${nNew})` : 'New';
   const section = c => {
-    let cards = c[0] === 'trophies' ? trophies : c[0] === 'garden' ? gcards : c[0] === 'consumables' ? cons : [...(c[0] === 'stamp' || c[0] === 'card' ? starters : []), ...items].filter(x => inCat(c, x)).sort((a, b) => c[0] === 'clan' ? CLAN_RARITY[itemRarity(b.it)] - CLAN_RARITY[itemRarity(a.it)] : 0).map(x => bagCard(x, g));
+    let cards = c[0] === 'trophies' ? trophies : c[0] === 'garden' ? gcards : c[0] === 'pets' ? pcards : c[0] === 'consumables' ? cons : [...(c[0] === 'stamp' || c[0] === 'card' ? starters : []), ...items].filter(x => inCat(c, x)).sort((a, b) => c[0] === 'clan' ? CLAN_RARITY[itemRarity(b.it)] - CLAN_RARITY[itemRarity(a.it)] : 0).map(x => bagCard(x, g));
     if (c[0] === 'clan') cards = [...cards, ...clanLocked];
     if (c[0] === 'aura' && (f === 'all' || (f === 'equipped' && !SPECIAL_AURAS[myAura()]))) {   // the automatic streak aura is always a choice
       const auto = ITEM_BY_ID.au_streak, on = !SPECIAL_AURAS[myAura()];
@@ -14912,6 +15743,8 @@ function deleteLoadout(id) {
     const tg = t.closest('[data-btoggle]'); if (tg) { toggleExtra(tg.dataset.btoggle); renderBag(); return; }
     const gp = t.closest('[data-gplace]'); if (gp) { openPlaceDlg(gp.dataset.gplace); return; }
     const gr = t.closest('[data-gremove]'); if (gr) { if (gardenRemove(gr.dataset.gremove)) { toast('Back in your bag', 1600, true); renderBag(); } return; }
+    const pe = t.closest('[data-petequip]'); if (pe) { if (petEquip(pe.dataset.petequip)) { uiSound('on'); toast(`${PET_BY_ID[pe.dataset.petequip].name} is out in the garden`, 1800, true); renderBag(); } return; }
+    const pu = t.closest('[data-petunequip]'); if (pu) { if (petUnequip(pu.dataset.petunequip)) { uiSound('off'); renderBag(); } return; }
     const rr = t.closest('[data-rremove]'); if (rr) { if (roomRemove(rr.dataset.rremove)) { toast('Back in your bag', 1600, true); renderBag(); } return; }
     const pv = t.closest('[data-preview]'); if (pv) { previewItem(pv.dataset.preview); return; }
     if (t.closest('#loNew')) { $('#loForm').classList.remove('hidden'); $('#loNew').classList.add('hidden'); $('#loName').focus(); return; }
@@ -14977,9 +15810,9 @@ function paintRipe(p) {
    which Firestore merges key by key on write — two devices never overwrite each other.
    Nothing here needs new security rules: it all lives in users/{uid}.
    ========================================================================== */
-const SYNC_LISTS = ['reminders', 'revisions', 'exams', 'parked', 'presets', 'subTemplates', 'loadouts', 'todos', 'plants', 'gbuys', 'roomSets', 'decks', 'cards', 'plan'];
+const SYNC_LISTS = ['reminders', 'revisions', 'exams', 'parked', 'presets', 'subTemplates', 'loadouts', 'todos', 'plants', 'gbuys', 'roomSets', 'decks', 'cards', 'plan', 'eggs'];
 /** Lists whose two copies of one item are combined rather than the newer one simply winning. */
-const LIST_MERGE = { plants: (win, lose) => mergePlant(win, lose) };
+const LIST_MERGE = { plants: (win, lose) => mergePlant(win, lose), eggs: (win, lose) => mergeEgg(win, lose) };
 const syncSnap = {};   // field -> Map(id -> the item as last saved or merged)
 const itemJSON = x => { const { u, ...rest } = x; return JSON.stringify(rest); };
 function snapLists() {
@@ -15017,6 +15850,8 @@ function mergeList(f, local, remote, tomb) {
   }
   return [...out.values()];
 }
+/** JSON with object keys in a fixed order, so two copies with the same content compare equal whichever device wrote them. */
+function canonJSON(x) { return JSON.stringify(x, (k, v) => v && typeof v === 'object' && !Array.isArray(v) ? sortedMap(v) : v); }
 /** Merge the cloud's copy into ours. Returns true when ours has something the cloud doesn't yet (so we upload). */
 function mergeSyncFrom(d) {
   const before = SYNC_LISTS.map(f => JSON.stringify(S[f]));
@@ -15030,7 +15865,7 @@ function mergeSyncFrom(d) {
     if (f === 'presets' && !remote.length) { ahead = true; continue; }   // presets are never empty
     const merged = mergeList(f, S[f], remote, S.tomb);
     if (f === 'presets' && !merged.length) continue;
-    if (JSON.stringify(merged) !== JSON.stringify(remote)) ahead = true;
+    if (canonJSON(merged) !== canonJSON(remote)) ahead = true;   // key order never counts as a difference (v1.16)
     S[f] = merged;
   }
   S.revisions = cleanRevisions(S.revisions);
@@ -15381,6 +16216,7 @@ $('#setPomeo').addEventListener('change', e => { S.settings.pomeo = e.target.che
 $('#setPomeoTalk').addEventListener('change', e => { S.settings.pomeoTalk = e.target.value; save(); });
 $('#setWater').addEventListener('change', e => { S.settings.waterNudge = e.target.checked; save(); });
 $('#setBreakCards').addEventListener('change', e => { S.settings.breakCards = e.target.checked; save(); if (S.ui.tab === 'reminders') renderCards(); });
+$('#setShopDot').addEventListener('change', e => { S.settings.shopDot = e.target.checked; save(); updateGardenDot(); });
 $('#setKeys').addEventListener('change', e => { S.settings.shortcuts = e.target.checked; save(); });
 $('#examsBtn').addEventListener('click', openExams);
 $('#setRevInt').addEventListener('change', e => {
@@ -15483,7 +16319,7 @@ $('#tab-board').addEventListener('click', e => {
   const b = t.closest('[data-scope],[data-period],[data-open]');
   if (!b) return;
   if (b.dataset.scope) { S.ui.lbScope = b.dataset.scope; saveLocal(); renderBoard(); }
-  else if (b.dataset.period) { S.ui.lbPeriod = b.dataset.period; saveLocal(); renderBoard(); }
+  else if (b.dataset.period) { S.ui.lbPeriod = b.dataset.period; S.ui[boardKindOf(b.dataset.period) === 'garden' ? 'lbGardenPeriod' : 'lbFocusPeriod'] = b.dataset.period; saveLocal(); renderBoard(); }
   else { S.ui.friendsView = 'friends'; showTab('friends'); openFriend(b.dataset.open); }
 });
 // Shop tab
@@ -15678,6 +16514,10 @@ const STAMP_ART = {
   stamp_pumpkin: '<circle cx="32" cy="32" r="27.5" fill="none" stroke="#e8761e" stroke-width="2.6" stroke-dasharray="5 3"/><ellipse cx="32" cy="36" rx="17" ry="14" fill="none" stroke="#e8761e" stroke-width="3"/><path d="M32 22q-5 6-5 14t5 14M32 22q5 6 5 14t-5 14" fill="none" stroke="#e8761e" stroke-width="1.6"/><path d="M31 22q-.6-4 2-6.4" stroke="#6b4a1f" stroke-width="2.6" stroke-linecap="round" fill="none"/><path d="M24.5 33l3.6-.4-1.6 3.4ZM36 32.6l3.6.4-2 3.2Z" fill="#e8761e"/><path d="M25 40.5q7 4 14 0" stroke="#e8761e" stroke-width="2" fill="none" stroke-linecap="round"/>',
   stamp_snow: '<circle cx="32" cy="32" r="27" fill="none" stroke="#4a90c2" stroke-width="3"/><g stroke="#4a90c2" stroke-width="3" stroke-linecap="round">' + [0, 60, 120].map(a => `<path d="M32 12v40M27 15l5 5 5-5M27 49l5-5 5 5" transform="rotate(${a} 32 32)" fill="none"/>`).join('') + '</g>',
 };
+Object.assign(STAMP_ART, {   // garden looks (v1.16)
+  stamp_sprout: '<circle cx="32" cy="32" r="27" fill="none" stroke="#5a8f3c" stroke-width="3"/><path d="M32 44V28" stroke="#5a8f3c" stroke-width="2.6" stroke-linecap="round"/><path d="M32 32q-10 0-11-11 10 0 11 11Zm0-4q0-11 11-11-1 11-11 11Z" fill="#8ec46d" stroke="#5a8f3c" stroke-width="1.4"/><path d="M22 46h20" stroke="#8a5a2b" stroke-width="2.6" stroke-linecap="round"/><text x="32" y="56" font-size="8.5" font-weight="900" letter-spacing="1.5" text-anchor="middle" fill="#5a8f3c" font-family="system-ui,sans-serif">GROWN</text>',
+  stamp_basket: '<circle cx="32" cy="32" r="27" fill="none" stroke="#b8865a" stroke-width="3"/><path d="M15 30h34l-3.5 16h-27Z" fill="#d9a066" stroke="#8a5a2b" stroke-width="1.6"/><path d="M20 30v16M26 30v16M32 30v16M38 30v16M44 30v16" stroke="#8a5a2b" stroke-width="1" opacity=".6"/><path d="M22 30q10-14 20 0" fill="none" stroke="#8a5a2b" stroke-width="2.2"/><circle cx="24" cy="27" r="4" fill="#e6414f"/><circle cx="32" cy="24.5" r="4.4" fill="#f4c430"/><circle cx="40" cy="27" r="4" fill="#8ec46d"/><path d="M31 20l1-3 1 3" stroke="#5a8f3c" stroke-width="1.2" fill="none"/>',
+});
 function stampArt(id) {
   if (STAMP_ART[id]) return STAMP_ART[id];
   const b = /^stamp_b_(\w+)$/.exec(id || '');
@@ -15960,7 +16800,7 @@ function cardData() {
   if (on('subjects')) { const sj = topSubjects(); if (sj.length) d.sj = sj; }
   if (!mini) {
     if (on('bosses')) { d.bd = allVictories().length; d.ms = BOSSES.filter(b => bossRecord(b.id).mastered).length; }
-    if (on('garden')) d.gp = garden().grownTotal;
+    if (on('garden')) { d.gp = garden().grownTotal; const r = gardenRecords().best; if (r && r.sp && GSP_BY_ID[r.sp]) d.bh = [r.sp, Math.round(r.kg * 100) / 100]; }
     if (on('featured')) { const f = myFeatured(); if (f.length) d.ft = f; }
   }
   return d;
@@ -15972,6 +16812,8 @@ function friendCardData(prof, act, name) {
   else Object.assign(d, { c: NAME_GRADS[prof.color] || NAME_COLORS[prof.color] ? prof.color : '', lv: +prof.level || 1, tr: tierById(prof.tier).id, av: AVATAR_ART[prof.avatar] ? prof.avatar : '',
     fr: ITEM_BY_ID[prof.frame] ? prof.frame : 'frame_none', st: 'card_minimal', bn: 'bn_mint', au: profAura(prof), sk: profStreak(prof), ...(/^[A-Z0-9]{2,5}$/.test(prof.clanTag || '') ? { ct: prof.clanTag } : {}) });
   d.h = +prof.hours || 0; d.cs = +prof.streak || 0; d.ls = +prof.longest || 0;
+  const bg = typeof prof.big === 'string' ? prof.big.split(':') : null;   // biggest harvest (v1.16): 'species:kg'
+  if (bg && Object.hasOwn(GSP_BY_ID, bg[0]) && +bg[1] > 0) d.bh = [bg[0], Math.min(1e5, Math.round(+bg[1] * 100) / 100)];
   if (act && !act.denied && act.visible && act.days) {
     const today = startOfDay(new Date()), start = addDays(weekStartOf(today, S.settings.weekStart), -77);
     d.wd = dayKey(addDays(today, -6)); d.wk = Array.from({ length: 7 }, (_, i) => +act.days[dayKey(addDays(today, i - 6))] || 0);
@@ -15997,6 +16839,7 @@ function sanitizeCard(o) {
   }
   for (const [k, hi, dec] of [['h', 1e6, 1], ['cs', 99999], ['ls', 99999], ['ss', 1e6], ['bd', 9999], ['ms', BOSSES.length], ['gp', 1e6]]) { const v = num(o[k], hi, dec); if (v !== undefined) d[k] = v; }
   if (d.cs !== undefined && d.ls === undefined) d.ls = d.cs;
+  if (Array.isArray(o.bh) && Object.hasOwn(GSP_BY_ID, String(o.bh[0])) && num(o.bh[1], 1e5, 2) > 0) d.bh = [o.bh[0], num(o.bh[1], 1e5, 2)];   // biggest harvest (v1.16)
   if (Array.isArray(o.wk) && o.wk.length === 7 && DAY_RE.test(o.wd || '')) { d.wk = o.wk.map(v => num(v, 1440) || 0); d.wd = o.wd; }
   if (typeof o.hm === 'string' && /^[0-4]{1,84}$/.test(o.hm) && DAY_RE.test(o.hs || '')) { d.hm = o.hm; d.hs = o.hs; }
   if (['Morning', 'Afternoon', 'Evening', 'Night'].includes(o.bt)) d.bt = o.bt;
@@ -16054,7 +16897,8 @@ function cardHTML(d, ctx = 'own') {
     d.ss !== undefined && tile(fmtNum(d.ss), 'Sessions')].filter(Boolean);
   const more = [d.bt && `<div class="pc-fact"><i aria-hidden="true">${PARTS[d.bt]}</i><span><b>${d.bt}</b>Best focus time</span></div>`,
     d.bd !== undefined && `<div class="pc-fact"><i aria-hidden="true">⚔️</i><span><b>${fmtNum(d.bd)} defeated</b>Bosses${d.ms ? ` · ${d.ms} Mastered` : ''}</span></div>`,
-    d.gp !== undefined && `<div class="pc-fact"><i aria-hidden="true">🌱</i><span><b>${fmtNum(d.gp)} harvest${d.gp === 1 ? '' : 's'}</b>Garden</span></div>`].filter(Boolean);
+    d.gp !== undefined && `<div class="pc-fact"><i aria-hidden="true">🌱</i><span><b>${fmtNum(d.gp)} harvest${d.gp === 1 ? '' : 's'}</b>Garden</span></div>`,
+    d.bh && `<div class="pc-fact"><i aria-hidden="true">🏆</i><span><b>${fmtKg(d.bh[1])} ${esc(GSP_BY_ID[d.bh[0]].name)}</b>Biggest harvest</span></div>`].filter(Boolean);
   const subj = d.sj ? `<div class="pc-sec"><div class="pc-h">Top subjects</div><ol class="pc-subj">${d.sj.map(([n, m]) => `<li><span>${esc(n)}</span><i style="--w:${Math.max(8, m / d.sj[0][1] * 100).toFixed(0)}%"></i><b>${fmtMin(m)}</b></li>`).join('')}</ol></div>` : '';
   const feat = d.ft ? `<div class="pc-feat">${d.ft.map(f => { const fi = featureInfo(f); return `<div class="pc-chip"><span class="pc-fi">${fi.icon(26)}</span><span><b>${esc(fi.label)}</b>${esc(fi.sub)}</span></div>`; }).join('')}</div>` : '';
   const charts = (d.wk ? `<div class="pc-sec"><div class="pc-h">Last 7 days</div>${weekBars(d)}</div>` : '') + (d.hm ? `<div class="pc-sec"><div class="pc-h">12 weeks</div>${heatGrid(d)}</div>` : '');
@@ -16361,7 +17205,7 @@ const FG = { q: [], n: 0, until: 0, ending: false, input: -1e9, running: false }
 const HOLD_ORDER = { level: 1, ach: 2, boss: 3, reveal: 4, unlock: 5, login: 6, migrate: 7, tip: 8, pomeo: 9, toast: 10 };
 const HOLD_GAP = { level: 900, ach: 3200, boss: 4200, reveal: 900, unlock: 3000, login: 900, migrate: 900, tip: 900, pomeo: 4500, toast: 1600 };
 /** A focus block is in progress (running or paused), and it isn't the moment it ends. */
-const guardOn = () => !!USER && focusActive() && !FG.ending;
+const guardOn = () => !!USER && (focusActive() || !!FG.demoSoon) && !FG.ending;   // demoSoon: the tutorial's demo block is about to start (v1.16)
 // Feedback for something the user just did (a tap or a key) is never held.
 const userJustActed = () => performance.now() - FG.input < 1500;
 for (const type of ['pointerdown', 'keydown']) document.addEventListener(type, e => { if (e.isTrusted) FG.input = performance.now(); }, true);
@@ -18710,7 +19554,7 @@ Object.assign(STAMP_ART, {
   stamp_diamond: '<circle cx="32" cy="32" r="27" fill="none" stroke="#8a6fd1" stroke-width="3"/><path d="M22 24h20l6 8-16 16-16-16Z" fill="#c9b7f5" stroke="#8a6fd1" stroke-width="1.8" stroke-linejoin="round"/><path d="M16 32h32M22 24l10 24 10-24M28 24l4 8 4-8" stroke="#8a6fd1" stroke-width="1.2" fill="none"/>',
 });
 /* ---------- Timer-ring trails ---------- */
-const TRAIL_COLORS = { trail_sparks: ['#ffd166', '#ff9f43', '#fff3b0'], trail_petals: ['#f7a8c4', '#f28ab0', '#ffd3e2'], trail_snow: ['#ffffff', '#e8f3ff', '#cfe3ff'], trail_bubbles: ['rgba(140,200,255,.7)', 'rgba(180,230,255,.6)', 'rgba(255,255,255,.5)'], trail_stars: ['#fff6c4', '#ffe08a', '#ffffff'], trail_embers: ['#ff6b35', '#ff9f43', '#ffd166'] };
+const TRAIL_COLORS = { trail_sparks: ['#ffd166', '#ff9f43', '#fff3b0'], trail_petals: ['#f7a8c4', '#f28ab0', '#ffd3e2'], trail_snow: ['#ffffff', '#e8f3ff', '#cfe3ff'], trail_bubbles: ['rgba(140,200,255,.7)', 'rgba(180,230,255,.6)', 'rgba(255,255,255,.5)'], trail_stars: ['#fff6c4', '#ffe08a', '#ffffff'], trail_embers: ['#ff6b35', '#ff9f43', '#ffd166'], trail_leaves: ['#c9a227', '#d9703a', '#7fb069'], trail_fireflies: ['#fff3a0', '#ffe066', '#d6ff8a'] };   // leaves + fireflies: garden looks (v1.16)
 let trailLast = 0, trailN = 0;
 function trailOn() { return motion() === 'full' && equippedId('trail') !== 'trail_none' && !!TRAIL_COLORS[equippedId('trail')] && S.timer.status === 'running'; }
 /** Called every frame while the ring is live: drops a particle at the ring's head a few times a second. */
@@ -18725,7 +19569,7 @@ function trailTick(p, t = performance.now()) {
   el.className = 'tp ' + kind.replace('trail_', 'tp-');
   const out = kind === 'trail_sparks' ? 1 : 0.3;   // sparks fly outward; the rest drift
   const dx = (Math.cos(a) * out * (10 + Math.random() * 18) + (Math.random() - .5) * 12).toFixed(1);
-  const dy = (kind === 'trail_bubbles' || kind === 'trail_embers' ? -(22 + Math.random() * 26) : kind === 'trail_petals' || kind === 'trail_snow' ? 22 + Math.random() * 26 : Math.sin(a) * out * (10 + Math.random() * 18)).toFixed(1);
+  const dy = (kind === 'trail_bubbles' || kind === 'trail_embers' || kind === 'trail_fireflies' ? -(22 + Math.random() * 26) : kind === 'trail_petals' || kind === 'trail_snow' || kind === 'trail_leaves' ? 22 + Math.random() * 26 : Math.sin(a) * out * (10 + Math.random() * 18)).toFixed(1);
   el.style.cssText = `left:${x.toFixed(1)}%;top:${y.toFixed(1)}%;--dx:${dx}px;--dy:${dy}px;--tc:${cols[Math.floor(Math.random() * cols.length)]};--rot:${Math.round(Math.random() * 360)}deg;--s:${(0.7 + Math.random() * 0.8).toFixed(2)};--d:${(kind === 'trail_sparks' ? 0.5 + Math.random() * 0.4 : 1.1 + Math.random() * 0.9).toFixed(2)}s`;
   host.appendChild(el);
   trailN++;
@@ -18735,7 +19579,7 @@ function trailTick(p, t = performance.now()) {
 function trailPreview(id) {
   const cols = TRAIL_COLORS[id];
   if (!cols) return '<svg viewBox="0 0 60 60" width="60" height="60"><circle cx="30" cy="30" r="22" fill="none" style="stroke:var(--line)" stroke-width="4"/><circle cx="30" cy="30" r="22" fill="none" style="stroke:var(--accent)" stroke-width="4" stroke-dasharray="90 138" transform="rotate(-90 30 30)"/></svg>';
-  const dots = [[48, 12], [54, 20], [44, 6], [58, 30], [50, 4], [40, 10]].map(([x, y], i) => id === 'trail_stars' ? `<path d="M${x} ${y - 3}l.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9Z" fill="${cols[i % 3]}"/>` : id === 'trail_petals' ? `<ellipse cx="${x}" cy="${y}" rx="3" ry="1.8" fill="${cols[i % 3]}" transform="rotate(${i * 50} ${x} ${y})"/>` : `<circle cx="${x}" cy="${y}" r="${id === 'trail_bubbles' ? 2.6 : 1.8}" fill="${cols[i % 3]}"${id === 'trail_bubbles' ? ' stroke="rgba(120,180,240,.8)" stroke-width=".6"' : ''}/>`).join('');
+  const dots = [[48, 12], [54, 20], [44, 6], [58, 30], [50, 4], [40, 10]].map(([x, y], i) => id === 'trail_stars' ? `<path d="M${x} ${y - 3}l.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9Z" fill="${cols[i % 3]}"/>` : id === 'trail_petals' || id === 'trail_leaves' ? `<ellipse cx="${x}" cy="${y}" rx="3" ry="1.8" fill="${cols[i % 3]}" transform="rotate(${i * 50} ${x} ${y})"/>` : `<circle cx="${x}" cy="${y}" r="${id === 'trail_bubbles' ? 2.6 : 1.8}" fill="${cols[i % 3]}"${id === 'trail_bubbles' ? ' stroke="rgba(120,180,240,.8)" stroke-width=".6"' : ''}/>`).join('');
   return `<svg viewBox="0 0 60 60" width="60" height="60"><circle cx="30" cy="30" r="22" fill="none" style="stroke:var(--line)" stroke-width="4"/><circle cx="30" cy="30" r="22" fill="none" style="stroke:var(--accent)" stroke-width="4" stroke-dasharray="90 138" transform="rotate(-90 30 30)"/>${dots}</svg>`;
 }
 /* ---------- More room art, seeds and garden decor ---------- */
@@ -18757,6 +19601,10 @@ GSPECIES.push(
   { id: 'dahlia',      name: 'Dahlia',      rarity: 'rare',      need: 340, price: 34,  lvl: 4, leaf: '#4e8a4a', flower: '#f28ab0', fruit: '#e04f8a', shape: 'pom',    hint: 'A rare seed from garden level 4.' },
   { id: 'orchid',      name: 'Orchid',      rarity: 'rare',      need: 380, price: 38,  lvl: 5, leaf: '#5b8f5e', flower: '#e8b4ff', fruit: '#c58cff', shape: 'orchid', hint: 'A rare seed from garden level 5.' },
   { id: 'dragonfruit', name: 'Dragon fruit', rarity: 'legendary', need: 720, price: 115, lvl: 7, leaf: '#4f9a7a', flower: '#fff6f6', fruit: '#f23c7a', shape: 'dragon', hint: 'A legendary seed from garden level 7.' },
+  // v1.16 — only in the rotating shop (featured slots and the rare seed of the day); also gifted at garden levels 6, 8 and 9
+  { id: 'bamboo',      name: 'Bamboo',      rarity: 'rare',      need: 280, price: 28,  lvl: 3, shop: 'rotating', leaf: '#6fb162', flower: '#e9f5d0', fruit: '#7cc26a', shape: 'long',  hint: 'Rotating shop only — shoots up fast.' },
+  { id: 'pineapple',   name: 'Pineapple',   rarity: 'rare',      need: 330, price: 33,  lvl: 4, shop: 'rotating', leaf: '#4e8a4a', flower: '#fbe7a0', fruit: '#f2b632', shape: 'big',   hint: 'Rotating shop only — sweet and spiky.' },
+  { id: 'sakura',      name: 'Sakura',      rarity: 'legendary', need: 640, price: 100, lvl: 6, shop: 'rotating', leaf: '#8fae8a', flower: '#ffd6e7', fruit: '#f7a8c4', shape: 'pom',   hint: 'Rotating shop only — a cloud of blossom.' },
 );
 for (const sp of GSPECIES) GSP_BY_ID[sp.id] = sp;
 GDECOR.push(
