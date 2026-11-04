@@ -6,7 +6,7 @@ No ads. No tracking. Runs in your browser.
 👉 **Try it:** https://siverieg.github.io/Pomodorolist-V1.0/
 🎬 **Watch the trailer:** https://youtu.be/Ir033JoyJ5Q
 
-Current version: **v1.19**
+Current version: **v1.19.1**
 
 ---
 
