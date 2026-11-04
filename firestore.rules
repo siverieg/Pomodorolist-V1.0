@@ -111,7 +111,7 @@ service cloud.firestore {
       let d = request.resource.data;
       // (on an update only the changed keys are checked: the stored document passed this check when it was written,
       //  and checking every key against the list costs too many of the 1,000 expressions a request may use — v1.19)
-      return (resource == null ? d.keys() : d.diff(resource.data).affectedKeys()).hasOnly(['username', 'level', 'tier', 'frame', 'color', 'avatar', 'aura', 'clanTag', 'global',
+      return (resource == null ? d.keys().toSet() : d.diff(resource.data).affectedKeys()).hasOnly(['username', 'level', 'tier', 'frame', 'color', 'avatar', 'aura', 'clanTag', 'global',
                                'dayKey', 'dayMin', 'weekKey', 'weekMin', 'weekKeySun', 'weekMinSun',
                                'monthKey', 'monthMin', 'lifeMin', 'lastWeekKey', 'lastWeekMin', 'produce', 'harvests', 'updatedAt'])
         && d.username == myName()
@@ -396,7 +396,10 @@ service cloud.firestore {
     function sessReq(id, u) { return /databases/$(database)/documents/studySessions/$(id)/requests/$(u); }
     function sessVisible(d) { return d.lobby == 'public' || d.vis == 'link' || me() in d.members || me() in d.invited; }
     function sessMember(id) { return signedIn() && me() in get(sessPath(id)).data.members; }
-    function validPattern(p) { return p is map && p.keys().hasOnly(['focus', 'short', 'rounds']) && p.focus is int && p.focus >= 5 && p.focus <= 120 && p.short is int && p.short >= 1 && p.short <= 30 && p.rounds is int && p.rounds >= 1 && p.rounds <= 8; }
+    // A session's rhythm: exactly what the app's preset editor allows (PRESET_LIMITS in the app: focus 1–240 min, break
+    // 1–120 min, 1–12 rounds). v1.19.1: this was the clan range (focus 5–120, break ≤ 30, ≤ 8 rounds), so a session with
+    // a longer preset such as 240 / 5 × 4 was refused. Clan sessions keep their own checks (fixed patterns up to 90 min).
+    function validPattern(p) { return p is map && p.keys().hasOnly(['focus', 'short', 'rounds']) && p.focus is int && p.focus >= 1 && p.focus <= 240 && p.short is int && p.short >= 1 && p.short <= 120 && p.rounds is int && p.rounds >= 1 && p.rounds <= 12; }
     function validNewSession(sid) {
       let d = request.resource.data;
       return d.keys().hasOnly(['title', 'host', 'hostName', 'pattern', 'mode', 'startAt', 'pausedAt', 'pauseTotal', 'shift', 'open', 'counted', 'vis', 'lobby', 'max', 'members', 'invited', 'welcome', 'plan', 'code', 'hostAt', 'createdAt', 'endedAt', 'updatedAt'])

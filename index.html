@@ -193,6 +193,23 @@ main { max-width: 1040px; margin: 0 auto; padding: 20px 16px 56px; }
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; }
 .stack { display: grid; gap: 16px; align-content: start; }
 .grid-2 { display: grid; gap: 16px; grid-template-columns: 1fr; }
+.grid-2 > * { min-width: 0; }   /* a column may be narrower than its widest content (a switcher that scrolls, v1.19.1) */
+/* Card columns (v1.19.1): a page's cards in reading order, split into two balanced columns on wide screens — the first
+   cards down the left, the rest down the right. fitMason() measures the cards and places each one on a grid of 4 px rows
+   (.mason-2), so both columns start on the same line in every browser and an empty card takes no room. (The first
+   version left the split to CSS columns, whose balancing differs between browsers: some started the right column
+   well below the left.) Where two columns can't be balanced (one would end far above the other, or there are only one or
+   two cards) the list is one centred column (.mason-one). Phones and tablets: one full-width column, as before. */
+.mason { display: grid; gap: var(--sp-4, 16px); align-content: start; min-width: 0; }
+.mason > * { min-width: 0; }
+@media (min-width: 860px) {
+  .mason { margin-bottom: var(--sp-4, 16px); }
+  .mason.mason-2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-auto-rows: 4px; row-gap: 0; align-items: start; }
+  .mason.mason-one { max-width: 760px; margin-inline: auto; }
+  .ach-card .achlist { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); column-gap: 28px; }   /* the achievements, full width below the cards */
+  .ach-card .achlist > .ach-tools { grid-column: 1 / -1; }
+  .ach-card .achlist > .ach:nth-child(-n+4) { border-top: 0; }
+}
 @media (min-width: 860px) { .grid-2 { grid-template-columns: 1.1fr 1fr; align-items: start; } }
 
 /* Buttons */
@@ -295,8 +312,7 @@ input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent);
 .chip.pinned .pin { color: var(--accent); }
 .chip.current { background: var(--accent-soft); }   /* the chip that is loaded right now (v1.18) */
 .sess-row .btn { flex: none; }
-.ach-tools { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; justify-content: space-between; margin: 0 0 10px; }
-.seg.seg-wrap { flex-wrap: wrap; }
+.ach-tools { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; justify-content: space-between; margin: 0 0 10px; min-width: 0; }
 .ach-sort { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; white-space: nowrap; }   /* the label holds the select: it sizes to it (v1.18 layout fix) */
 .ach-sort select { margin: 0; min-width: 0; max-width: 100%; }
 .ach .ach-cat { font-size: 11px; font-weight: 600; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 1px 7px; margin-left: 4px; vertical-align: 1px; }
@@ -499,6 +515,20 @@ input[type="range"] { accent-color: var(--accent); width: 160px; }
 .rw-note { margin: 6px 0 0; }
 /* v1.19 ranks */
 .rk-b { display: inline-flex; vertical-align: -2px; margin-left: 4px; flex: none; } .rk-b svg { display: block; }
+/* v1.19.1: my rank next to my name — the header chip (opens the Ranks board) and the player card (shows my progress) */
+.rkchip { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px 3px 7px; border: 1px solid var(--line); background: var(--surface); border-radius: 999px;
+  font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; cursor: pointer; flex: none; }
+.rkchip:hover { border-color: var(--muted); } .rkchip .rk-b { margin: 0; vertical-align: 0; }
+.lvchip .lv-rk { display: none; }
+@media (max-width: 400px) { :root:not([data-minimal]) .top .brand-deco { display: none; } }
+@media (max-width: 600px) { :root:not([data-minimal]) #appView .top .brand span:not(.brand-deco) { display: none; } }   /* up to 600 px the logo alone, so the rank fits beside the buttons */   /* the seasonal emoji makes room for the rank gem on small phones */
+@media (max-width: 480px) { #rankChip { display: none !important; } .lvchip .lv-rk { display: inline-flex; align-items: center; margin: -8px -6px -8px -2px; padding: 8px 6px 8px 2px; } .lvchip .lv-rk .rk-b { margin: 0; } }
+.pc-nrow { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; min-width: 0; }
+.pc-rank { display: inline-flex; align-items: center; gap: 5px; padding: 2px 9px 2px 6px; border-radius: 999px; border: 1px solid var(--pc-line, var(--line));
+  background: color-mix(in srgb, var(--pc-tile, var(--surface)) 75%, transparent); color: var(--pc-fg, var(--text)); font-family: inherit; font-size: 12.5px; font-weight: 650;
+  line-height: 1.3; white-space: nowrap; cursor: pointer; flex: none; }
+button.pc-rank:hover { border-color: var(--pc-acc, var(--accent)); } span.pc-rank { cursor: default; } .pc-rank .rk-b { margin: 0; vertical-align: 0; }
+.rk-card { transition: box-shadow .35s var(--ease); } .rk-card.rk-flash { box-shadow: 0 0 0 3px color-mix(in srgb, var(--rk, var(--accent)) 55%, transparent); }
 .rk-b.big { margin: 0; } .rk-b.big svg { filter: drop-shadow(0 2px 6px color-mix(in srgb, var(--rk, #888) 45%, transparent)); }
 .rank-line { margin: -6px 0 14px; padding: 8px 11px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); }
 .rank-line .rl-top { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 13.5px; } .rank-line .rl-top .rk-b { margin-left: 0; }
@@ -512,7 +542,6 @@ input[type="range"] { accent-color: var(--accent); width: 160px; }
 .ms-chip { font-size: 11px; font-weight: 700; margin-left: 5px; padding: 0 5px; border-radius: 99px; background: color-mix(in srgb, #f28c28 14%, transparent); color: #c4621a; white-space: nowrap; }
 .fr-gm { transform-box: view-box; transform-origin: 12px 12px; } :root[data-motion="full"] .fr-gm { animation: frGm 8s linear infinite; }
 @keyframes frGm { to { transform: rotate(360deg); } }
-#lbKind { flex-wrap: wrap; }
 /* landing cards (v1.18): a mini session lobby and the streak milestones */
 .fx-sess { display: grid; gap: 6px; width: 100%; max-width: 240px; }
 .fx-srow { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); font-size: 12px; text-align: left; }
@@ -562,8 +591,8 @@ input[type="range"] { accent-color: var(--accent); width: 160px; }
 #appView { position: relative; z-index: 1; }
 
 /* Zen mode: only the timer while a focus block runs */
-.zen #tab-timer .grid-2 { grid-template-columns: 1fr; max-width: 560px; margin: 0 auto; }
-.zen #tab-timer .grid-2 > .stack:nth-child(2), .zen #tab-timer .stack > .card:not(.timer-card) { display: none; }
+.zen #tab-timer .mason { --mason-cols: 1; max-width: 560px; margin: 0 auto; }   /* fitMason(): one column */
+.zen #tab-timer .mason > .card:not(.timer-card) { display: none; }
 .zen .top { opacity: .3; transition: opacity .3s; }
 .zen .top:hover, .zen .top:focus-within { opacity: 1; }
 
@@ -650,7 +679,6 @@ input[type="range"] { accent-color: var(--accent); width: 160px; }
 .lb li.me { background: var(--accent-soft); }
 .lb.pinned { border-top: 1px dashed var(--line); margin-top: 8px; padding-top: 8px; }
 /* Leaderboard v2 (v1.16): podium, rank arrows, your own rank, Pomeo's empty states */
-.lb-head .seg { flex-wrap: wrap; }
 .lb-podium { display: grid; grid-template-columns: 1fr 1.18fr 1fr; gap: 8px; align-items: end; margin: 4px 0 14px; }
 .lb-pod { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; padding: 14px 6px 10px; border-radius: 14px; background: var(--bg); text-align: center; }
 .lb-pod.p1 { padding-top: 20px; background: linear-gradient(180deg, rgba(201, 162, 39, .18), var(--bg) 80%); }
@@ -742,13 +770,23 @@ input[type="range"] { accent-color: var(--accent); width: 160px; }
 :root[data-motion="full"] #mainBtn.running::after { animation: glow 2.8s ease-in-out infinite; }
 @keyframes glow { 50% { opacity: .5; } }
 
-/* ---------- Segmented toggles: sliding pill ---------- */
-.seg { position: relative; }
-.seg > button { position: relative; z-index: 1; }
+/* ---------- Segmented toggles: sliding pill ----------
+   v1.19.1: every switcher stays on one line. One that doesn't fit its space scrolls sideways (no scrollbar), with a soft
+   fade on the side that has more (.seg-fl / .seg-fr, set by syncSegs); the selected option is scrolled into view. The pill
+   takes the selected button's own box (left, top, width, height), so it can never be taller than a button. */
+.seg { position: relative; flex-wrap: nowrap; max-width: 100%; min-width: 0; overflow-x: auto; overflow-y: hidden; scrollbar-width: none;
+  scroll-behavior: smooth; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
+.seg::-webkit-scrollbar { display: none; }
+:root[data-motion="off"] .seg { scroll-behavior: auto; }
+.seg > button { position: relative; z-index: 1; flex-shrink: 0; white-space: nowrap; }
+.seg > button:focus-visible { outline-offset: -2px; }   /* inside the bar, which clips what sticks out */
+.seg.seg-fl { -webkit-mask-image: linear-gradient(to right, transparent, #000 28px); mask-image: linear-gradient(to right, transparent, #000 28px); }
+.seg.seg-fr { -webkit-mask-image: linear-gradient(to left, transparent, #000 28px); mask-image: linear-gradient(to left, transparent, #000 28px); }
+.seg.seg-fl.seg-fr { -webkit-mask-image: linear-gradient(to right, transparent, #000 28px, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to right, transparent, #000 28px, #000 calc(100% - 28px), transparent); }
 .seg.has-ind > button.active { background: transparent; }
 .seg-ind {
-  position: absolute; left: 0; top: 3px; bottom: 3px; width: 0; border-radius: 999px; background: var(--accent);
-  z-index: 0; pointer-events: none; transition: transform .42s var(--spring-soft), width .42s var(--spring-soft), opacity .2s;
+  position: absolute; left: 0; top: 0; width: 0; height: 0; border-radius: 999px; background: var(--accent);
+  z-index: 0; pointer-events: none; transition: transform .42s var(--spring-soft), width .42s var(--spring-soft), height .42s var(--spring-soft), opacity .2s;
 }
 
 /* ---------- Switches and sliders ---------- */
@@ -988,9 +1026,9 @@ dialog.gt-dlg::backdrop { background: rgba(0, 0, 0, .18); backdrop-filter: none;
 @keyframes bounceIn { 0% { transform: scale(.7); opacity: .2; } 60% { transform: scale(1.07); opacity: 1; } 100% { transform: scale(1); } }
 
 /* Focus mode: everything but the timer steps back while a focus block runs */
-.top, .sidenav, .btmbar, .greet, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .stack > .card:not(.timer-card) { transition: opacity .6s var(--ease); }
-body.focus-dim :is(.top, .sidenav, .btmbar, .greet, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .stack > .card:not(.timer-card)) { opacity: .26; }
-body.focus-dim :is(.top, .sidenav, .btmbar, #tab-timer .grid-2 > .stack:nth-child(2), #tab-timer .stack > .card:not(.timer-card)):is(:hover, :focus-within) { opacity: 1; }
+.top, .sidenav, .btmbar, .greet, #tab-timer .mason > .card:not(.timer-card) { transition: opacity .6s var(--ease); }
+body.focus-dim :is(.top, .sidenav, .btmbar, .greet, #tab-timer .mason > .card:not(.timer-card)) { opacity: .26; }
+body.focus-dim :is(.top, .sidenav, .btmbar, #tab-timer .mason > .card:not(.timer-card)):is(:hover, :focus-within) { opacity: 1; }
 
 /* Tomato mascot */
 .mascot { position: absolute; top: 10px; left: 12px; width: 40px; height: 40px; overflow: visible; }
@@ -1339,8 +1377,6 @@ body.focus-dim :is(.top, .sidenav, .btmbar, #tab-timer .grid-2 > .stack:nth-chil
 .squad-pick { list-style: none; margin: 0 0 12px; padding: 0; max-height: 50vh; overflow: auto; }
 .squad-pick li { border-top: 1px solid var(--line); }
 .squad-pick label { display: flex; align-items: center; gap: 10px; padding: 9px 2px; cursor: pointer; }
-.quest-grid { display: grid; gap: 16px; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); }
-@media (max-width: 800px) { .quest-grid { grid-template-columns: 1fr; } }
 .past-bosses { display: flex; gap: 8px; flex-wrap: wrap; }
 .past-bosses .pb { width: 46px; height: 46px; border-radius: 12px; background: var(--heat0); display: grid; place-items: center; }
 .past-bosses .pb svg { width: 38px; height: 38px; }
@@ -2252,7 +2288,8 @@ a.btn { color: var(--text); text-decoration: none; display: inline-flex; align-i
 :root[data-minimal] { --card-pad: 24px; }
 @media (max-width: 640px) { :root[data-minimal] { --card-pad: 18px; } }
 :root[data-minimal] main { padding-top: 28px; }
-:root[data-minimal] .stack, :root[data-minimal] .grid-2 { gap: 22px; }
+:root[data-minimal] .stack, :root[data-minimal] .grid-2, :root[data-minimal] .mason { gap: 22px; }
+@media (min-width: 860px) { :root[data-minimal] .mason { margin-bottom: 22px; } :root[data-minimal] .mason.mason-2 { row-gap: 0; } }
 :root[data-minimal] .tabs { --accent-soft: color-mix(in srgb, var(--text) 8%, transparent); }
 :root[data-minimal] .tabs button.active { color: var(--text); }
 :root[data-minimal] .tabs button.active::before { display: none; }
@@ -3274,7 +3311,7 @@ body.first-load #todayBar { opacity: 0; }
 
 /* ---------- Clans (v1.14) ---------- */
 .ctag { font-size: .82em; font-weight: 700; letter-spacing: .03em; color: var(--clan-acc, var(--accent)); white-space: nowrap; }
-.clan-grid { display: grid; gap: 16px; grid-template-columns: 1fr; margin-top: 16px; align-items: start; }
+.clan-grid { display: grid; gap: 16px; grid-template-columns: 1fr; margin-top: 16px; align-items: start; }   /* the Clan page keeps its own two columns (not .mason) */
 @media (min-width: 860px) { .clan-grid { grid-template-columns: 1.1fr 1fr; } }
 .clan-none { text-align: center; padding: 28px 18px; }
 .clan-none .pomeo-pic { display: inline-block; }
@@ -3309,6 +3346,70 @@ body.first-load #todayBar { opacity: 0; }
 :root[data-motion="full"] .clan-now i, :root[data-motion="full"] .live-dot { animation: pulse 1s ease-in-out infinite alternate; }
 .clan-acts { margin-top: 14px; flex-wrap: wrap; }
 .clan-lives { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 8px; }
+/* ---------- Study sessions section (v1.19.1) ---------- */
+.sess-page:has(> .mason.mason-one) { max-width: 760px; margin-inline: auto; }   /* one column of cards: the header matches it */
+.sess-hero { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+.sess-hero h1 { margin: 0 0 4px; font-size: clamp(22px, 3vw, 28px); }
+.sess-hero p { margin: 0; max-width: 52ch; }
+.sess-hero .sh-act { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.sess-hero .sh-act .lbl { text-align: right; }
+@media (max-width: 560px) { .sess-hero .sh-act { align-items: stretch; width: 100%; } .sess-hero .sh-act .btn { width: 100%; } .sess-hero .sh-act .lbl { text-align: left; } }
+.sess-tiles { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 10px; }
+.sess-tile { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px; border: 1px solid var(--line); border-radius: 14px; background: color-mix(in srgb, var(--accent) 3%, transparent); }
+.sess-tile.mine { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
+.sess-tile .st-title { font-weight: 700; overflow-wrap: anywhere; }
+.sess-tile .st-by { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+.sess-tile .st-meta { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+.st-seats { display: inline-flex; align-items: center; gap: 3px; font-size: 12.5px; }
+.st-seats i { width: 8px; height: 8px; border-radius: 50%; background: var(--heat0); box-shadow: inset 0 0 0 1px var(--line); }
+.st-seats i.on { background: var(--accent); box-shadow: none; }
+.st-seats b { margin-left: 5px; font-variant-numeric: tabular-nums; }
+.st-fr { display: inline-flex; align-items: center; gap: 6px; }
+.st-fr .pics { display: inline-flex; }
+.st-fr .pics > * + * { margin-left: -6px; }
+.sess-tile .st-act { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+@media (max-width: 480px) { .sess-tile { grid-template-columns: auto minmax(0, 1fr); } .sess-tile .st-act { grid-column: 1 / -1; align-items: stretch; } .sess-tile .st-act .btn { width: 100%; } }
+.up-list { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 10px; }
+.up-row { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+.up-row:first-child { border-top: 0; padding-top: 0; }
+.up-row .up-acts { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+.up-row .up-tag { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.hist-tiles { margin: 8px 0 12px; }
+.hist-list { list-style: none; margin: 0; padding: 0; }
+.hist-list li { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-top: 1px solid var(--line); font-size: 14px; }
+.hist-list li:first-child { border-top: 0; }
+.hist-list .lbl { flex: none; text-align: right; }
+.sidenav .tbadge.tb-live, .btmbar .tbadge.tb-live { background: var(--accent); animation: tbPulse 1.8s ease-in-out infinite; }
+@keyframes tbPulse { 50% { box-shadow: 0 0 0 2px var(--surface), 0 0 0 5px color-mix(in srgb, var(--accent) 30%, transparent); } }
+:root[data-motion="off"] .tbadge.tb-live, :root[data-motion="reduced"] .tbadge.tb-live { animation: none; }
+/* the host sheet: one question at a time */
+.hs-dlg { width: min(560px, calc(100vw - 24px)); }
+.hs-dlg h2 { margin: 0; }
+.hs-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 4px; }
+.hs-dots { display: flex; gap: 6px; }
+.hs-dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--heat0); box-shadow: inset 0 0 0 1px var(--line); transition: background-color .2s, width .2s; }
+.hs-dots i.on { background: var(--accent); box-shadow: none; width: 20px; border-radius: 999px; }
+.hs-step { display: none; margin-top: 14px; }
+.hs-step.on { display: block; }
+.hs-step > h3 { margin: 0 0 4px; }
+.hs-step > p.lbl { margin: 0 0 12px; }
+.hs-opts { display: grid; gap: 8px; }
+.hs-opt { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; cursor: pointer; transition: border-color .15s, background-color .15s; }
+.hs-opt:hover { border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
+.hs-opt:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+.hs-opt input { margin-top: 3px; accent-color: var(--accent); }
+.hs-opt b { display: block; }
+.hs-seats { display: flex; flex-wrap: wrap; gap: 8px; }
+.hs-seats label { position: relative; }
+.hs-seats input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+.hs-seats span { display: grid; place-items: center; min-width: 46px; height: 42px; padding: 0 12px; border: 1px solid var(--line); border-radius: 12px; font-weight: 700; }
+.hs-seats input:checked + span { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.hs-seats input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+.hs-preset { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 12px; border-radius: 12px; background: color-mix(in srgb, var(--accent) 6%, transparent); margin-top: 12px; }
+.hs-preset select { max-width: 100%; }
+.hs-sum { margin: 12px 0 0; }
+.hs-nav { display: flex; justify-content: space-between; gap: 8px; margin-top: 16px; }
+.hs-nav .hs-r { display: flex; gap: 8px; margin-left: auto; }
 .clan-live-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; }
 .clan-live-row > div { flex: 1; min-width: 0; }
 /* planned sessions */
@@ -3344,6 +3445,16 @@ body.first-load #todayBar { opacity: 0; }
 .cm-menu button.danger, .danger-link { color: var(--danger); }
 .clan-feed li { display: flex; justify-content: space-between; gap: 10px; padding: 7px 0; border-top: 1px solid var(--line); font-size: 14px; }
 .clan-feed li:first-child { border-top: 0; }
+/* Folding cards (v1.19.1): a header that opens and closes the card, a short view when folded, remembered per device */
+.fold-hd { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; margin: 0 0 4px; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; border-radius: 8px; }
+.fold-hd h2 { margin: 0; }
+.fold-hd:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.fold-ic { flex: none; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; color: var(--muted); font-size: 14px; transition: background-color .15s, color .15s; }
+.fold-hd:hover .fold-ic { background: var(--accent-soft); color: var(--accent); }
+.fold-body { overflow: clip; }
+.fold-card.folded .fold-x { display: none; }
+.fold-card:not(.folded) .fold-more { display: none; }
+.fold-more { margin-top: 8px; padding: 4px 0; color: var(--accent); font-weight: 600; }
 .clan-feed li .lbl { flex: none; }
 .ctros { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 10px; }
 .ctro { text-align: center; padding: 10px 6px 8px; border-radius: 14px; border: 1px solid var(--line); background: linear-gradient(180deg, transparent 55%, var(--accent-soft)); font-size: 12.5px; display: grid; justify-items: center; gap: 4px; }
@@ -3825,6 +3936,7 @@ body.first-load #todayBar { opacity: 0; }
     <button class="iconbtn hidden" id="bagBtn" aria-label="Your bag" title="Your bag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1 12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2Z"/><path d="M9 10V6a3 3 0 0 1 6 0v4"/></svg><i class="tbadge hidden" id="bagDot" aria-label="New items"></i></button>
     <button class="coinpill hidden" id="coinPill" aria-label="Your coins — open the shop"></button>
     <button class="lvchip hidden" id="lvChip" aria-label="Your level — open your profile"></button>
+    <button class="rkchip hidden" id="rankChip" type="button"></button>
     <button class="iconbtn hidden" id="avatarBtn" aria-label="Profile and settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.66V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.66"/></svg></button>
   </div>
 </header>
@@ -3843,6 +3955,7 @@ body.first-load #todayBar { opacity: 0; }
   </div>
   <div class="nv-grp" role="group" aria-labelledby="nvhSocial"><div class="nv-h" id="nvhSocial">Social</div>
     <button type="button" title="Friends (7)" data-tab="friends"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nv-l">Friends</span><i class="tbadge hidden" id="friendsBadge" aria-label="New activity"></i></button>
+    <button type="button" title="Study sessions (J)" data-tab="sessions" id="sessTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14h18"/><path d="M5 14l-1 6M19 14l1 6"/><path d="M8 10.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM16 10.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/><path d="M10.5 14v-1M13.5 14v-1"/></svg><span class="nv-l">Study sessions</span><i class="tbadge hidden" id="sessBadge" aria-label=""></i></button>
     <button type="button" title="Clan (9)" data-tab="clan" id="clanTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="M9 12l2 2 4-4"/></svg><span class="nv-l">Clan</span><i class="tbadge hidden" id="clanDot" aria-label="Clan activity"></i></button>
     <button type="button" title="Leaderboard (5)" data-tab="board" id="boardTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg><span class="nv-l">Leaderboard</span></button>
   </div>
@@ -3858,8 +3971,7 @@ body.first-load #todayBar { opacity: 0; }
     <div class="greet" id="greet" aria-live="polite"></div>
     <div id="newsSlot"></div>
     <div id="eventSlot"></div>
-    <div class="grid-2">
-      <div class="stack">
+    <div class="mason timer-cards" data-keep2>   <!-- one list of cards in reading order, split into two balanced columns on wide screens (v1.19.1) -->
         <div class="card timer-card">
           <div class="pomeo-host" id="pomeoHost">
             <button class="pomeo-btn" id="pomeoBtn" aria-label="Pomeo, your tomato buddy. Tap to say hi, hold to pet."></button>
@@ -3943,9 +4055,6 @@ body.first-load #todayBar { opacity: 0; }
             </div>
           </div>
         </div>
-      </div>
-
-      <div class="stack">
         <div class="card exam-card empty" id="examCard" role="button" tabindex="0" aria-label="Exam countdown — tap to manage exams"></div>
         <div class="card">
           <div class="row between"><h2 style="margin:0">Today</h2><span class="lbl" id="todayDate"></span></div>
@@ -3973,7 +4082,6 @@ body.first-load #todayBar { opacity: 0; }
           </div>
           <div class="chips" id="chips"></div>
         </div>
-      </div>
     </div>
   </section>
 
@@ -4036,11 +4144,15 @@ body.first-load #todayBar { opacity: 0; }
     <div class="stats-head">
       <div class="seg" id="friendsSeg">
         <button data-view="friends">Friends<span class="cnt" id="reqCount"></span></button>
-        <button data-view="sessions">Study sessions</button>
         <button data-view="challenges">Challenges</button>
       </div>
     </div>
     <div id="friendsBody"></div>
+  </section>
+
+  <!-- ================================ STUDY SESSIONS (v1.19.1: their own section, was Friends › Study sessions) ================================ -->
+  <section class="tab" id="tab-sessions">
+    <div id="sessBody"></div>
   </section>
 
   <!-- ================================ LEADERBOARD TAB ================================ -->
@@ -4342,6 +4454,7 @@ body.first-load #todayBar { opacity: 0; }
 </div>
 
 <!-- Reminder editor -->
+<dialog id="sessHostDlg" class="hs-dlg" aria-labelledby="hsTitle"><div id="hsBody"></div></dialog>
 <dialog id="clanCreateDlg" class="clan-dlg" aria-labelledby="ccTitle">
   <h2 id="ccTitle">Create a clan</h2>
   <label class="lbl" for="ccName">Clan name (3–24 characters)</label><input type="text" id="ccName" maxlength="24" autocomplete="off" placeholder="e.g. Night Owls">
@@ -4577,6 +4690,7 @@ body.first-load #todayBar { opacity: 0; }
     <span><kbd>1</kbd>–<kbd>9</kbd></span><span>On the Timer with a checklist: tick that subtask. Otherwise 1–9 switch tabs.</span>
     <span><kbd>Shift</kbd>+<kbd>1</kbd>–<kbd>9</kbd></span><span>Always switch tabs: Timer · Reminders · Quests · Stats · Leaderboard · Shop · Friends · Profile · Clan</span>
     <kbd>0</kbd><span>Garden</span>
+    <kbd>J</kbd><span>Study sessions</span>
     <span><kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>K</kbd></span><span>Command palette: jump to any screen, setting or action</span>
     <kbd>?</kbd><span>Show this sheet</span>
   </div>
@@ -4913,13 +5027,59 @@ document.addEventListener('pointerdown', e => {
   setTimeout(() => dot.remove(), 650);
 }, { passive: true });
 
-/* ---------- Segmented toggles: a pill that slides to the selected option ---------- */
-const segPos = new Map();
+/* ---------- Segmented toggles: a pill that slides to the selected option ----------
+   One routine for every switcher (.seg) and the phone's bottom bar (.tabs). v1.19.1: the pill takes the selected
+   button's own box — it used to span the bar's whole height and only move sideways, so a bar that wrapped onto two
+   lines (the achievement categories) got a pill as tall as both lines. Bars no longer wrap (CSS): one that doesn't fit
+   scrolls, keeps the selected option in view and fades on the side that has more. The pill is measured again whenever
+   a bar or its selected button changes size (fonts, themes, glass, a view rendered while hidden and then shown), on
+   window resize, theme / glass / minimal / motion changes and when web fonts finish loading. */
+const segPos = new Map(), segKeys = new Map(), segScroll = new Map(), segWidth = new WeakMap();
+const segRO = typeof ResizeObserver === 'function' ? new ResizeObserver(() => queueSegs()) : null, segSeen = new WeakSet();
+const segName = seg => seg.id || seg.className;
+/** The fade on the side(s) with more options. */
+function segEdges(seg) {
+  const more = seg.scrollWidth > seg.clientWidth + 1;
+  seg.classList.toggle('seg-fl', more && seg.scrollLeft > 1);
+  seg.classList.toggle('seg-fr', more && seg.scrollLeft + seg.clientWidth < seg.scrollWidth - 1);
+}
+/** Scroll a bar that doesn't fit so the selected option is fully in view (with room for the fade). */
+function segReveal(seg, act, smooth) {
+  if (seg.scrollWidth <= seg.clientWidth + 1) return;
+  const pad = 28, l = act.offsetLeft, r = l + act.offsetWidth;
+  let to = null;
+  if (l - pad < seg.scrollLeft) to = l - pad;
+  else if (r + pad > seg.scrollLeft + seg.clientWidth) to = r + pad - seg.clientWidth;
+  if (to !== null) seg.scrollTo({ left: Math.max(0, to), behavior: smooth && motion() !== 'off' ? 'smooth' : 'instant' });
+}
+function segPlace(ind, p, sideOnly) {
+  ind.style.width = p.w + 'px';
+  if (sideOnly) ind.style.transform = `translateX(${p.x}px)`;
+  else { ind.style.height = p.h + 'px'; ind.style.transform = `translate(${p.x}px, ${p.y}px)`; }
+}
 function syncSegs() {
   document.querySelectorAll('.seg, .tabs').forEach(seg => {
+    const isSeg = seg.classList.contains('seg'), fresh = !segSeen.has(seg);
+    if (fresh) {
+      segSeen.add(seg);
+      if (segRO) segRO.observe(seg);
+      if (isSeg) {
+        seg.addEventListener('scroll', () => { segEdges(seg); segScroll.set(segName(seg), seg.scrollLeft); }, { passive: true });
+        const was = segScroll.get(segName(seg));   // a re-rendered bar starts where the previous one was scrolled to
+        if (was) seg.scrollTo({ left: was, behavior: 'instant' });
+      }
+    }
     const act = seg.querySelector(':scope > button.active:not(.hidden)');
     let ind = seg.querySelector(':scope > .seg-ind');
-    if (!act || !seg.getClientRects().length || !act.offsetWidth) { if (ind) ind.style.opacity = 0; return; }
+    if (!act || !seg.getClientRects().length || !act.offsetWidth) { if (ind) ind.style.opacity = 0; return; }   // hidden: measured again once shown (ResizeObserver)
+    if (segRO && !segSeen.has(act)) { segSeen.add(act); segRO.observe(act); }
+    const sideOnly = seg.classList.contains('btmbar');   // the bottom bar draws its own small pill (CSS): only follow sideways
+    // the button's layout box (not its on-screen box, which shrinks for a moment while pressed); the exact size comes
+    // from the computed style — offsetWidth/Height are rounded, which left the pill a pixel short
+    const cs = getComputedStyle(act), bb = cs.boxSizing === 'border-box', ex = (a, b) => bb ? 0 : parseFloat(cs[a]) + parseFloat(cs[b]);
+    const p = { x: act.offsetLeft, y: act.offsetTop,
+      w: (parseFloat(cs.width) + ex('paddingLeft', 'paddingRight') + ex('borderLeftWidth', 'borderRightWidth')) || act.offsetWidth,
+      h: (parseFloat(cs.height) + ex('paddingTop', 'paddingBottom') + ex('borderTopWidth', 'borderBottomWidth')) || act.offsetHeight };
     if (!ind) {
       ind = document.createElement('span');
       ind.className = 'seg-ind';
@@ -4928,32 +5088,123 @@ function syncSegs() {
       // A re-rendered toggle starts from where the previous one with the same id was, so it still slides.
       const prev = seg.id && segPos.get(seg.id);
       ind.style.transition = 'none';
-      ind.style.transform = `translateX(${prev ? prev.x : act.offsetLeft}px)`;
-      ind.style.width = (prev ? prev.w : act.offsetWidth) + 'px';
+      segPlace(ind, prev && prev.h ? prev : p, sideOnly);
       void ind.offsetWidth;
       ind.style.transition = '';
     }
-    const x = act.offsetLeft, w = act.offsetWidth;
     ind.style.opacity = 1;
-    if (ind.dataset.x === String(x) && ind.dataset.w === String(w)) return;
-    ind.dataset.x = x; ind.dataset.w = w;
-    ind.style.transform = `translateX(${x}px)`;
-    ind.style.width = w + 'px';
-    if (seg.id) segPos.set(seg.id, { x, w });
+    if (isSeg) {
+      const key = act.getAttributeNames().filter(a => a.startsWith('data-')).map(a => a + '=' + act.getAttribute(a)).join('&') + '|' + act.textContent.trim();
+      const was = segKeys.get(segName(seg)), wide = seg.clientWidth, resized = segWidth.get(seg) !== wide;
+      segWidth.set(seg, wide);
+      if (fresh || key !== was) { segKeys.set(segName(seg), key); segReveal(seg, act, was !== undefined && key !== was); }
+      else if (resized) segReveal(seg, act, false);   // shown again or a different width: keep the selected option in view
+      segEdges(seg);
+    }
+    const sig = `${p.x},${p.y},${p.w},${p.h}`;
+    if (ind.dataset.sig === sig) return;
+    ind.dataset.sig = sig;
+    segPlace(ind, p, sideOnly);
+    if (seg.id) segPos.set(seg.id, p);
   });
 }
 let segQueued = false;
+function queueSegs() { if (segQueued) return; segQueued = true; requestAnimationFrame(() => { segQueued = false; syncSegs(); }); }
 new MutationObserver(muts => {
   if (segQueued) return;
   for (const m of muts) {
     const t = m.target;
     if (t.nodeType !== 1 || t.closest('#ring, #toast, #achCard, .floater, .gring')) continue;
-    segQueued = true;
-    requestAnimationFrame(() => { segQueued = false; syncSegs(); });
+    queueSegs();
     return;
   }
 }).observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['class'] });
-window.addEventListener('resize', () => requestAnimationFrame(syncSegs));
+// theme, glass, minimal, motion and font-size changes live on <html>
+new MutationObserver(queueSegs).observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'style', 'data-theme', 'data-skin', 'data-glass', 'data-glass-solid', 'data-minimal', 'data-motion'] });
+window.addEventListener('resize', queueSegs);
+if (document.fonts && document.fonts.addEventListener) document.fonts.addEventListener('loadingdone', queueSegs);
+
+/* ---------- Card columns (v1.19.1) ----------
+   A .mason list is one column of cards in reading order. On wide screens fitMason() splits it in two: it measures the
+   cards at column width, finds where to cut the list so the two columns end as close together as possible (first part
+   down the left, rest down the right) and places every card on the grid's 4 px rows — each column's first card on row 1,
+   so the columns always start on the same line, whatever the browser. Hidden and empty cards take no room. When two
+   columns can't be balanced — one or two cards, or one column would end more than MASON_SLACK px above the other because
+   a card is too tall to share — the list is one centred column instead. data-keep2 (the Timer) always keeps two columns
+   when it has two cards to show; --mason-cols: 1 in CSS (Zen mode) keeps one. Re-placed when a card changes size (opening,
+   closing, new content, fonts), when the list's width changes (resize, the sidebar) and when cards are added or removed:
+   a card that grows is re-placed before the frame is painted, so it never overlaps the card below. */
+const MASON_MQ = matchMedia('(min-width: 860px)'), MASON_SLACK = 160, MASON_ROW = 4;
+const masonSeen = new WeakSet(), masonQ = new Set();
+let masonRaf = 0;
+const masonRO = typeof ResizeObserver === 'function' ? new ResizeObserver(es => {
+  const ms = new Set();
+  for (const e of es) { const m = e.target.parentElement && e.target.parentElement.closest('.mason'); if (m) ms.add(m); }
+  ms.forEach(m => fitMason(m, true));
+}) : null;
+function queueMason(m) { masonQ.add(m); if (!masonRaf) masonRaf = requestAnimationFrame(() => { masonRaf = 0; const l = [...masonQ]; masonQ.clear(); l.forEach(m => fitMason(m)); }); }
+/** Where each column of a two-column list ends (page px), or null when it isn't laid out in two columns. */
+function masonEnds(m) {
+  const r = m.getBoundingClientRect(), mid = r.left + r.width / 2, end = [null, null];
+  for (const c of m.children) { if (!c.getClientRects().length || !c.offsetHeight) continue; const b = c.getBoundingClientRect(); const k = b.left + b.width / 2 < mid ? 0 : 1; end[k] = Math.max(end[k] ?? -Infinity, b.bottom); }
+  return end;
+}
+function masonClear(m) { for (const c of m.children) if (c.style.gridRow || c.style.gridColumn) { c.style.gridRow = ''; c.style.gridColumn = ''; } }
+function masonMode(m, mode) {   // '' (phones and tablets), 'one' or 'two'
+  m.classList.toggle('mason-2', mode === 'two'); m.classList.toggle('mason-one', mode === 'one');
+  const cols = mode === 'two' ? '2' : '1';
+  if (m.dataset.cols !== cols) m.dataset.cols = cols;
+}
+/** The best place to cut the list: [left column height, right column height, index of the first card on the right]. */
+function masonSplit(hs, gap) {
+  const n = hs.length, tot = hs.reduce((a, h) => a + h + gap, 0);
+  let best = null, left = 0;
+  for (let k = 1; k < n; k++) {
+    left += hs[k - 1] + gap; const right = tot - left, worst = Math.max(left, right), diff = Math.abs(left - right);
+    if (!best || worst < best[3] - .5 || (Math.abs(worst - best[3]) <= .5 && diff < Math.abs(best[0] - best[1]))) best = [left, right, k, worst];
+  }
+  return best;
+}
+function fitMason(m, fromResize) {
+  if (!m.isConnected) return;
+  const kids = [...m.children];
+  if (masonRO) for (const c of kids) if (!masonSeen.has(c)) { masonSeen.add(c); masonRO.observe(c); }
+  if (!MASON_MQ.matches || !m.getClientRects().length) { if (m.classList.contains('mason-2')) masonClear(m); masonMode(m, ''); return; }
+  const cs = getComputedStyle(m), gap = parseFloat(cs.columnGap) || 16, oneOnly = cs.getPropertyValue('--mason-cols').trim() === '1';
+  const isTwo = m.classList.contains('mason-2');
+  if (fromResize && !isTwo) { queueMason(m); return; }   // switching columns changes every card's width: do it next frame
+  if (!isTwo) { masonClear(m); masonMode(m, 'two'); }      // measure at column width (the cards are re-placed before the frame is painted)
+  const shown = kids.filter(c => c.getClientRects().length && c.offsetHeight > 0);
+  const hs = shown.map(c => c.getBoundingClientRect().height);
+  const keep2 = m.hasAttribute('data-keep2');
+  const cut = shown.length >= 2 ? masonSplit(hs, gap) : null;
+  const one = oneOnly || !cut || (!keep2 && (shown.length < 3 || Math.abs(cut[0] - cut[1]) > MASON_SLACK));
+  if (one) {
+    if (fromResize) { queueMason(m); return; }
+    masonClear(m); masonMode(m, 'one'); return;
+  }
+  const y = [0, 0];   // where the next card of each column starts (px); placed on the nearest row, so gaps stay even
+  shown.forEach((c, i) => {
+    const col = i < cut[2] ? 0 : 1;
+    const gr = `${Math.round(y[col] / MASON_ROW) + 1} / span ${Math.max(1, Math.ceil(hs[i] / MASON_ROW))}`, gc = String(col + 1);
+    if (c.style.gridRow !== gr) c.style.gridRow = gr;
+    if (c.style.gridColumn !== gc) c.style.gridColumn = gc;
+    y[col] += hs[i] + gap;
+  });
+  for (const c of kids) if (!shown.includes(c) && (c.style.gridRow !== '1 / span 1' || c.style.gridColumn !== '1')) { c.style.gridRow = '1 / span 1'; c.style.gridColumn = '1'; }   // hidden or empty: no room
+}
+function fitAllMasons() { document.querySelectorAll('.mason').forEach(queueMason); }
+new MutationObserver(muts => {
+  for (const mu of muts) {
+    const t = mu.target;
+    if (t.nodeType !== 1) continue;
+    const m = t.classList.contains('mason') ? t : t.closest('.mason');
+    if (m) { queueMason(m); continue; }
+    for (const n of mu.addedNodes) if (n.nodeType === 1 && (n.classList.contains('mason') || n.querySelector('.mason'))) { fitAllMasons(); return; }
+  }
+}).observe(document.body, { subtree: true, childList: true });
+MASON_MQ.addEventListener && MASON_MQ.addEventListener('change', fitAllMasons);
+window.addEventListener('resize', fitAllMasons);
 
 /* ---------- Dialogs: animate closing too (opening is pure CSS) ---------- */
 (() => {
@@ -6412,6 +6663,7 @@ function renderClock() {
   if (document.title !== title) document.title = title;
 }
 
+let zenWas = false;   // Zen mode shows the timer alone: the card columns are re-placed when it starts and ends
 function renderTimer() {
   const t = S.timer, p = t.live && t.live.mode !== 'together' && LIVE.doc ? { ...activePreset(), rounds: LIVE.doc.pattern.rounds, name: LIVE.doc.title } : activePreset();
   renderLiveBar();
@@ -6435,7 +6687,7 @@ function renderTimer() {
   $('#skipBtn').classList.toggle('early', early);
   $('#muteBtn').innerHTML = S.settings.sound ? ICON_SOUND : ICON_MUTE;
   $('#muteBtn').title = S.settings.sound ? 'Sound on — click to mute' : 'Muted — click for sound';
-  document.body.classList.toggle('zen', extraOn('x_zen') && t.status === 'running' && t.phase === 'focus');
+  if (document.body.classList.toggle('zen', extraOn('x_zen') && t.status === 'running' && t.phase === 'focus') !== zenWas) { zenWas = !zenWas; fitAllMasons(); }
   document.body.classList.toggle('focus-dim', t.status === 'running' && t.phase === 'focus' && S.ui.tab === 'timer');
   setMascot();
   renderPark();
@@ -8596,6 +8848,7 @@ function renderHeaderChip() {
   if (!USER) return;
   const on = S.settings.gamification;
   $('#lvChip').classList.toggle('hidden', !on);
+  renderRankChip();
   $('#coinPill').classList.toggle('hidden', !on);
   $('#avatarBtn').classList.toggle('hidden', on);
   $('#avatarBtn').innerHTML = hasAvatar(myAvatar()) ? avatarSVG(myAvatar(), 26) : USER_SVG;
@@ -8612,7 +8865,7 @@ function renderHeaderChip() {
   $('#lvChip').innerHTML = `<span class="gring" title="Today: ${goalPct}% of your daily goal"><svg viewBox="0 0 36 36" aria-hidden="true"><circle class="gt" cx="18" cy="18" r="16"/>` +
     `<circle class="gp" cx="18" cy="18" r="16" pathLength="100" stroke-dasharray="100" style="stroke-dashoffset:${100 - fromPct}"/></svg>` +
     withAura(badgeSVG(g.tier, { size: 20, frame: equippedId('frame'), avatar: myAvatar() }), g.streak.cur, myAura()) + '</span>' +
-    `<span${nameAttrs(equippedId('color'), 'uname')}>${esc(USER.guest ? 'You' : '@' + USER.username)}</span><span class="lvn">Lv ${g.lv.level}</span><i class="tbadge hidden" aria-hidden="true"></i>`;
+    `<span${nameAttrs(equippedId('color'), 'uname')}>${esc(USER.guest ? 'You' : '@' + USER.username)}</span><span class="lvn">Lv ${g.lv.level}</span>${hdrRankGem()}<i class="tbadge hidden" aria-hidden="true"></i>`;
   updateLoginDot();
   $('#lvChip').title = `${TITLE_TEXT[equippedId('title')] ? TITLE_TEXT[equippedId('title')] + ' · ' : ''}${g.tier.name} · Level ${g.lv.level} · ${fmtNum(g.lv.need - g.lv.into)} XP to level ${g.lv.level + 1}`;
   if (fromPct !== goalPct) { const gp = $('#lvChip .gp'); void gp.getBoundingClientRect(); requestAnimationFrame(() => { gp.style.strokeDashoffset = 100 - goalPct; }); }
@@ -8687,6 +8940,9 @@ function groupCardHTML(where = 'profile') {
   const steps = miles.map(a => `<li class="${claimed[a.id] ? 'done' : ''}"><b>${a.goal} h</b><span class="lbl">${esc(achRewardText(a))}</span></li>`).join('');
   const bar = next ? `<div class="xpbar" style="margin:8px 0 4px"><i data-fill="${Math.min(100, g.clanHours / next.goal * 100).toFixed(1)}" data-fill-key="clanmile"></i></div><div class="lbl">${fmtNum(Math.floor(g.clanHours * 10) / 10)} / ${next.goal} h in clan sessions with clanmates · next: ${esc(achRewardText(next))}</div>` : '<p class="lbl" style="margin:6px 0 0">Every clan-session milestone reached — thank you for studying together.</p>';
   const together = where === 'profile' ? `<div class="tiles" style="margin:8px 0 12px">${[[fmtNum(Math.floor(g.hours * 10) / 10) + ' h', 'focused with others'], [g.people.size, 'study partners'], [g.hosted.size, 'sessions hosted']].map(([v, l]) => `<div class="tile"><div class="v">${v}</div><div class="s">${l}</div></div>`).join('')}</div>` : '';
+  if (where === 'clan') return `${foldHead('clanMiles', 'Clan session milestones', 'group-card')}${bar}
+    <div class="fold-x"><p class="lbl" style="margin:10px 0 0">Hours you focus in clan sessions while a clanmate focuses too. Clan-only rewards: clan seeds, a crest stamp, a banner frame, an aura and the Clan Scholar title.</p><ul class="mile-list">${steps}</ul></div>
+    ${foldMore('clanMiles', 'Show all milestones')}</div></div>`;   // folds to the progress line and the next reward (v1.19.1)
   return `<div class="card group-card"><h2 style="margin:0 0 4px">${where === 'profile' ? 'Studying together' : 'Clan session milestones'}</h2>${together}
     ${where === 'profile' ? '<h3 style="margin:4px 0 0">Clan session milestones</h3>' : '<p class="lbl" style="margin:0">Hours you focus in clan sessions while a clanmate focuses too. Clan-only rewards: clan seeds, a crest stamp, a banner frame, an aura and the Clan Scholar title.</p>'}
     ${bar}<ul class="mile-list">${steps}</ul></div>`;
@@ -8708,8 +8964,7 @@ function renderProgress() {
   const achs = achListHTML(stats, claimed);
   const groupCard = groupCardHTML('profile');
   $('#progressView').innerHTML = `
-    <div class="grid-2">
-      <div class="stack">
+    <div class="mason prog-cards">
         <div class="card prog-hero" style="--tier:${g.tier.color}">
           <div class="bigbadge">${withAura(badgeSVG(g.tier, { size: 76, frame }), g.streak.cur, myAura())}</div>
           <div style="flex:1;min-width:0">
@@ -8733,11 +8988,10 @@ function renderProgress() {
         <div class="card"><h2>Badges</h2><div class="tiergrid">${tiers}</div></div>
         ${auraCard()}
         ${groupCard}
-      </div>
-      <div class="card">
-        <div class="row between" style="margin-bottom:6px"><h2 style="margin:0">Achievements</h2><span class="lbl">${done} / ${ACHIEVEMENTS.length}</span></div>
-        <div class="achlist">${achs}</div>
-      </div>
+    </div>
+    <div class="card ach-card" style="margin-top:var(--sp-4, 16px)">
+      <div class="row between" style="margin-bottom:6px"><h2 style="margin:0">Achievements</h2><span class="lbl">${done} / ${ACHIEVEMENTS.length}</span></div>
+      <div class="achlist">${achs}</div>
     </div>
     <div style="margin-top:16px">${trophyShelf()}</div>`;
   animateCounts($('#progressView'));
@@ -9286,10 +9540,10 @@ function onInbox(qs) {
     if (SOC.inboxSeen.has(d.id)) continue;
     SOC.inboxSeen.add(d.id);
     if (it.type === 'sinvite') {   // a study-session invite (v1.18): Join / Ignore in the inbox, a toast now
-      inboxAdd({ type: 'session', key: 'sinv:' + d.id, at, who: it.from || '', title: `@${it.fromName} invites you to study: ${it.title || 'a session'}`, body: 'Join from here or from Friends › Study sessions', go: { tab: 'friends', view: 'sessions' } });
+      inboxAdd({ type: 'session', key: 'sinv:' + d.id, at, who: it.from || '', title: `@${it.fromName} invites you to study: ${it.title || 'a session'}`, body: 'Join from here or from Study sessions', go: { tab: 'sessions' } });
       const item = IB.find(x => x.key === 'sinv:' + d.id); if (item) { item.act = { kind: 'sinv', sid: it.target }; ibSave(); }
-      if (S.ui.tab !== 'friends') { SOC.unread = true; updateFriendsDot(); }
-      if (shown++ < 3 && Date.now() - at < 10 * 60000) toast(`@${it.fromName} invites you to study: ${it.title || 'a session'}`, 4200, false, { log: false, type: 'session', go: { tab: 'friends', view: 'sessions' } });
+      if (S.ui.tab !== 'sessions') { SESS.unread = true; updateSessBadge(); }
+      if (shown++ < 3 && Date.now() - at < 10 * 60000) toast(`@${it.fromName} invites you to study: ${it.title || 'a session'}`, 4200, false, { log: false, type: 'session', go: { tab: 'sessions' } });
       SESS.at = 0;
       continue;
     }
@@ -9350,11 +9604,32 @@ function presenceText(p) {
 }
 
 /* ---------- Leaderboards ---------- */
-/* Leaderboard v2 (v1.16): two kinds of board — Focus time (daily / weekly / monthly / lifetime) and Garden (produce
-   earned and plants harvested, both all-time, from the optional publicStats fields `produce` and `harvests`). */
-const BOARD_KINDS = { focus: [['day', 'Daily'], ['week', 'Weekly'], ['month', 'Monthly'], ['life', 'Lifetime']], garden: [['produce', 'Produce'], ['harvests', 'Harvests']],
-  rank: [['season', 'This season']], streak: [['streak', 'Current'], ['best', 'Best']] };   // v1.19: Ranks and Streaks
+/* Leaderboard v2 (v1.16): two kinds of board — Focus time (daily / weekly / lifetime) and Garden (produce earned and
+   plants harvested, both all-time, from the optional publicStats fields `produce` and `harvests`). v1.19: Ranks and
+   Streaks. v1.19.1: no Monthly focus board any more — the Ranks board (this season = this UTC month) replaces it; the app
+   still publishes monthKey / monthMin, so older apps' monthly boards keep working. */
+const BOARD_KINDS = { focus: [['day', 'Daily'], ['week', 'Weekly'], ['life', 'Lifetime']], garden: [['produce', 'Produce'], ['harvests', 'Harvests']],
+  rank: [['season', 'This season']], streak: [['streak', 'Current'], ['best', 'Best']] };
 const boardKindOf = period => (period === 'produce' || period === 'harvests' ? 'garden' : period === 'season' ? 'rank' : period === 'streak' || period === 'best' ? 'streak' : 'focus');
+/* Each kind's button reopens the last period used on that kind (S.ui.lbFocusPeriod …). v1.19.1: the click handler used to
+   file every non-garden period under Focus, so after a visit to Ranks or Streaks the Focus time button carried "season"
+   (or "streak") and opened that board instead — saved, so a reload kept it. Now one function files the period under its
+   own kind, and a remembered period is only used when it really belongs to that kind (saved state from 1.19 is repaired
+   on read; a saved "month" falls back to Weekly). */
+const BOARD_MEMO = { focus: 'lbFocusPeriod', garden: 'lbGardenPeriod', rank: 'lbRankPeriod', streak: 'lbStreakPeriod' };
+const BOARD_DEFAULT = { focus: 'week', garden: 'produce', rank: 'season', streak: 'streak' };
+const boardPeriodOk = (kind, p) => !!BOARD_KINDS[kind] && BOARD_KINDS[kind].some(([x]) => x === p);
+/** The period a kind's button opens. */
+const boardPeriodFor = kind => (boardPeriodOk(kind, S.ui[BOARD_MEMO[kind]]) ? S.ui[BOARD_MEMO[kind]] : BOARD_DEFAULT[kind]);
+/** The board showing now (a saved period that no longer exists, such as "month", becomes Weekly). */
+const boardPeriodNow = () => { const p = S.ui.lbPeriod; return boardPeriodOk(boardKindOf(p), p) ? p : BOARD_DEFAULT.focus; };
+/** Show a period and remember it for its own kind. */
+function setBoardPeriod(p) {
+  if (!boardPeriodOk(boardKindOf(p), p)) p = BOARD_DEFAULT.focus;
+  S.ui.lbPeriod = p;
+  S.ui[BOARD_MEMO[boardKindOf(p)]] = p;
+  for (const k in BOARD_MEMO) if (S.ui[BOARD_MEMO[k]] !== undefined && !boardPeriodOk(k, S.ui[BOARD_MEMO[k]])) delete S.ui[BOARD_MEMO[k]];   // repair what 1.19 filed under the wrong kind
+}
 const BOARD_NAME = { day: 'daily', week: 'weekly', month: 'monthly', life: 'lifetime', produce: 'produce', harvests: 'harvests', season: 'season', streak: 'streak', best: 'best streak' };
 /** A streak still running for the viewer: the last goal day is today or the day before (one more day for time zones). */
 const streakLive = d => !!d && typeof d.streakDay === 'string' && DAY_RE.test(d.streakDay) && Math.round((startOfDay(new Date()) - parseDay(d.streakDay)) / 864e5) <= 2;
@@ -9564,11 +9839,11 @@ function renderFriends(fromLoad) {
     return;
   }
   if (SOC.friend) { renderFriendProfile(fromLoad); return; }
-  let view = ['challenges', 'sessions'].includes(S.ui.friendsView) ? S.ui.friendsView : 'friends';
-  if (!gameOn && view === 'challenges') view = S.ui.friendsView = 'friends';
+  let view = S.ui.friendsView === 'challenges' ? 'challenges' : 'friends';   // (Study sessions moved to their own section in v1.19.1)
+  if (!gameOn && view === 'challenges') view = 'friends';
+  if (S.ui.friendsView !== view) S.ui.friendsView = view;
   $$('#friendsSeg button').forEach(b => b.classList.toggle('active', b.dataset.view === view));
   if (view === 'challenges') renderChallenges(fromLoad);
-  else if (view === 'sessions') renderSessions(fromLoad);   // v1.18
   else renderFriendsList(fromLoad);
 }
 
@@ -9592,8 +9867,7 @@ function renderFriendsList(fromLoad) {
   }).sort((a, b) => (b.includes('class="live"') ? 1 : 0) - (a.includes('class="live"') ? 1 : 0)).join('');
   $('#friendsBody').innerHTML = `
     ${recap}
-    <div class="grid-2">
-      <div class="stack">
+    <div class="mason fr-cards">
         <div class="card">
           <h2>Add a friend</h2>
           <form class="addrow" id="addFriendForm" autocomplete="off">
@@ -9611,7 +9885,6 @@ function renderFriendsList(fromLoad) {
         ${out.length ? `<div class="card"><h2>Sent</h2><ul class="plist">${out.map(f => `
           <li class="person">${personRow(f.to, f.toName, null, '<div class="sub">waiting for them to accept</div>')}
             <button class="btn small" data-cancel="${f.id}">Cancel</button></li>`).join('')}</ul></div>` : ''}
-      </div>
       <div class="card">
         <div class="row between" style="margin-bottom:8px"><h2 style="margin:0">Friends</h2><span class="lbl">${fl.length} / ${MAX_FRIENDS}
           <button class="linkbtn" id="refreshFriends" title="Refresh">↻</button></span></div>
@@ -9711,13 +9984,14 @@ function lbEmptyHTML(scope, period) {
   return `<div class="lb-empty">${pomeoSVG({ state: 'idle', size: 72 })}<p>${txt}</p></div>`;
 }
 async function renderBoard(fromLoad) {
-  const scope = S.ui.lbScope || 'friends', period = S.ui.lbPeriod || 'week', kind = boardKindOf(period);
-  S.ui[kind === 'garden' ? 'lbGardenPeriod' : kind === 'streak' ? 'lbStreakPeriod' : kind === 'rank' ? 'lbRankPeriod' : 'lbFocusPeriod'] = period;   // the kind buttons return to the last period of each kind
+  const period = boardPeriodNow(), kind = boardKindOf(period);
+  const scope = ['friends', 'global', 'clans'].includes(S.ui.lbScope) ? S.ui.lbScope : 'friends';
+  setBoardPeriod(period);   // the kind buttons return to the last period of each kind
   if (scope === 'clans') return renderClanBoard(fromLoad);
   const head = `
     <div class="lb-head">
       <div class="seg" id="lbScope"><button data-scope="friends" class="${scope === 'friends' ? 'active' : ''}">Friends</button><button data-scope="global" class="${scope === 'global' ? 'active' : ''}">Global</button><button data-scope="clans">Clans</button></div>
-      <div class="seg lb-kind" id="lbKind"><button data-period="${S.ui.lbFocusPeriod || 'week'}" class="${kind === 'focus' ? 'active' : ''}">Focus time</button><button data-period="${S.ui.lbGardenPeriod || 'produce'}" class="${kind === 'garden' ? 'active' : ''}">Garden</button><button data-period="season" class="${kind === 'rank' ? 'active' : ''}">Ranks</button><button data-period="${S.ui.lbStreakPeriod || 'streak'}" class="${kind === 'streak' ? 'active' : ''}">Streaks</button></div>
+      <div class="seg lb-kind" id="lbKind">${[['focus', 'Focus time'], ['garden', 'Garden'], ['rank', 'Ranks'], ['streak', 'Streaks']].map(([k, n]) => `<button data-period="${boardPeriodFor(k)}" data-kind="${k}" class="${kind === k ? 'active' : ''}" aria-pressed="${kind === k}">${n}</button>`).join('')}</div>
       <div class="seg" id="lbPeriod">${BOARD_KINDS[kind].map(([p, n]) => `<button data-period="${p}" class="${p === period ? 'active' : ''}">${n}</button>`).join('')}</div>
     </div>`;
   const key = `${scope}|${period}|${periodKey(period)}|${S.settings.weekStart}`, c = SOC.lb[key];
@@ -9764,7 +10038,7 @@ async function renderBoard(fromLoad) {
   let note = '';
   if (scope === 'global' && !S.settings.globalBoard && mine) note = `<div class="lb-note">You’re not on the global leaderboard. <button class="linkbtn" id="goPrivacy">Turn it on in Settings</button></div>`;
   $('#boardBody').innerHTML = head + `
-    <div class="card lb-card">
+    <div class="card lb-card" data-board="${scope}|${period}">
       <div class="row between lb-meta"><span class="lbl">${resetText(period)}</span><span class="lbl">Updated ${Math.max(0, Math.round((Date.now() - (res.at || Date.now())) / 60000))} min ago <button class="linkbtn" id="lbRefresh" title="Refresh">↻</button></span></div>
       ${res.error ? `<div class="empty">${esc(res.error)}</div>` : res.rows.length && !lonely ? podium + (rest.length ? `<ol class="lb">${rest.map(row).join('')}</ol>` : '') : lbEmptyHTML(scope, period)}
       ${res.myRow ? `<ol class="lb pinned">${row(res.myRow)}</ol>` : ''}
@@ -9973,6 +10247,7 @@ function showTab(tab) {
   if (tab === 'board') { SOC.lbShown = null; renderBoardTab(); }
   if (tab === 'clan') { renderClan(); clanLoadDetails(); }
   if (tab === 'friends') { SOC.friend = null; SOC.unread = false; updateFriendsDot(); renderFriends(); }
+  if (tab === 'sessions') { SESS.unread = false; renderSessionsPage(); updateSessBadge(); }
   const y = scrollMem[tab] || 0;   // restore once the tab has laid out (charts can grow it a moment later)
   window.scrollTo({ top: y, behavior: 'instant' });
   if (y) [60, 250].forEach(ms => setTimeout(() => { if (S.ui.tab === tab && Math.abs(window.scrollY - y) > 4) window.scrollTo({ top: y, behavior: 'instant' }); }, ms));
@@ -11321,6 +11596,45 @@ function rankBadge(i, { size = 14, cls = '' } = {}) {
   const dots = pips ? Array.from({ length: pips }, (_, k) => `<circle cx="${8 + (k - (pips - 1) / 2) * 2.6}" cy="14.6" r=".9" fill="${R.col}"/>`).join('') : '';
   return `<span class="rk-b ${cls}" title="${esc(rankName(i))}" aria-label="${esc(rankName(i))}"><svg viewBox="0 0 16 16" width="${size}" height="${size}" aria-hidden="true">${crown}<path d="M8 4 13 7.6 8 13 3 7.6Z" fill="${R.col}"/><path d="M8 4 10.4 7.6 8 13 5.6 7.6Z" fill="${R.col2}" opacity=".75"/>${dots}</svg></span>`;
 }
+/* v1.19.1: my rank next to my name. Hidden in True Minimalist (like every rank badge) and before sign-in. */
+function renderRankChip() {
+  const el = $('#rankChip'); if (!el) return;
+  const show = !!USER && !minimal();
+  el.classList.toggle('hidden', !show);
+  if (!show) { el.innerHTML = ''; return; }
+  const r = myRank(), nm = rankName(r.idx);
+  const html = rankBadge(r.idx, { size: 15 }) + `<span class="rkn">${esc(nm)}</span>`;
+  if (el.innerHTML !== html) el.innerHTML = html;
+  el.setAttribute('aria-label', `Your rank: ${nm} — open the Ranks board`);
+  el.title = `${nm} · ${fmtH(r.min)} this season` + (r.next !== null ? ` · ${rankName(r.next)} in ${fmtH(r.left)}` : '');
+}
+/** On phones (≤ 480 px) the separate chip doesn't fit beside the header's buttons: the rank gem sits inside the level
+    chip instead (a tap on the gem still opens the Ranks board; the name is in its label). */
+function hdrRankGem() {
+  if (minimal() || !USER) return '';
+  const r = myRank(), nm = rankName(r.idx);
+  return `<span class="lv-rk" data-hdr-rank title="${esc(nm)} — open the Ranks board" aria-label="Rank: ${esc(nm)}">${rankBadge(r.idx, { size: 15 })}</span>`;
+}
+/** My rank on my own player card (a button there; a plain label in the Customise preview). */
+function myRankPill(ctx) {
+  if (minimal() || !USER) return '';
+  const r = myRank(), nm = rankName(r.idx), inner = rankBadge(r.idx, { size: 15 }) + `<span>${esc(nm)}</span>`;
+  return ctx === 'own' ? `<button type="button" class="pc-rank" data-myrank aria-label="Your rank: ${esc(nm)} — show your progress" title="${esc(nm)} · ${fmtH(r.min)} this season">${inner}</button>`
+    : `<span class="pc-rank">${inner}</span>`;
+}
+/** The header chip opens the Ranks board (a guest, who has no boards, gets the Rank card instead). */
+function openMyRank() {
+  if (!USER) return;
+  if (USER.guest) { showRankProgress(); return; }
+  if (S.ui.lbScope === 'clans') S.ui.lbScope = 'friends';
+  setBoardPeriod('season'); saveLocal();
+  if (S.ui.tab === 'board') renderBoard(); else showTab('board');
+}
+/** The Rank card on the profile (the progress to the next step), scrolled into view and briefly outlined. */
+function showRankProgress() {
+  if (S.ui.tab !== 'profile') showTab('profile');
+  setTimeout(() => { const c = $('#rankCard'); if (!c) return; try { c.scrollIntoView({ block: 'center', behavior: motion() === 'off' ? 'auto' : 'smooth' }); } catch (e) { /* older browsers */ } c.classList.add('rk-flash'); setTimeout(() => c.classList.remove('rk-flash'), 1600); }, 120);
+}
 const fmtH = m => (Math.floor(m / 6) / 10).toFixed(1).replace(/\.0$/, '') + ' h';
 /** Season rewards in the coin ledger: the earliest claim of each season pays its peak's coins, once. */
 function seasonCoinsAt(t) {
@@ -11534,8 +11848,7 @@ function renderBossView(host) {
         : `<p class="muted" style="margin:0 0 10px;font-size:14px">${sqb.members.length} fighters · ${fmtNum(sqb.done ? sqb.hp : Math.min(sqb.rawDmg, sqb.hp))} / ${fmtNum(sqb.hp)} HP done</p><div class="btn-row" style="align-items:center"><button class="btn small" data-bmode="squad">Open the squad battle</button>${sqb.done ? '' : '<button class="linkbtn" id="squadEdit">Edit squad</button>'}</div>`}</div>`;
   const pendCard = pendOther.length ? `<div class="card claim-card"><h2>Rewards to claim</h2><ul class="claim-list">${pendOther.map(p => `<li><span class="cl-art">${bossSVG(p.boss.id)}</span><span><b>${esc(p.boss.name)}</b><span class="lbl">${p.mode === 'squad' ? 'Squad' : 'Solo'} victory</span></span><button class="btn primary small" data-bclaim="${p.boss.id}|${p.mode}">Claim</button></li>`).join('')}</ul></div>` : '';
   host.innerHTML = `
-    <div class="quest-grid">
-      <div class="stack">
+    <div class="mason quest-grid">
         <div class="card arena-card phase-${st.phase}${noSquad ? ' no-squad' : ''}" style="${pal}">
           <div class="arena-top"><span class="boss-kicker">Boss of the week · ${range}</span>
             ${canSquad || view === 'squad' ? `<div class="seg" id="bossModeSeg">${modeBtn('solo')}${modeBtn('squad')}</div>` : ''}</div>
@@ -11555,18 +11868,15 @@ function renderBossView(host) {
           ${victory}
           <p class="lbl" style="margin:12px 0 0">1 focus minute = 1 damage. ${view === 'squad' ? `Squad HP = Solo HP × (1 + 0.6 × each extra member)${st.formed ? `: ${fmtNum(BOSS_HP[b.id])} × ${(1 + 0.6 * (st.members.length - 1)).toFixed(1)}` : ''}.` : `Each boss has its own HP, from ${fmtNum(BOSS_HP.swarm)} (Easy) to ${fmtNum(BOSS_HP.dragon)} (Legendary): harder bosses give rarer rewards.`}${st.hp < (view === 'squad' ? squadHPFor(BOSS_HP[b.id], st.members.length) : BOSS_HP[b.id]) && !st.done ? ' This week’s HP is lower than usual, so no progress is lost with the new difficulty.' : ''} Solo and Squad are separate battles — win both this week to master the boss. Bosses that get away leave quietly.</p>
         </div>
-        <div class="card"><div class="row between" style="margin-bottom:8px"><h2 style="margin:0">Battle log</h2><span class="lbl">${view === 'squad' ? 'Squad' : 'Solo'}</span></div>${logHTML}</div>
-      </div>
-      <div class="stack">
         ${pendCard}
         ${squadCard}${squadTeaser}
+        <div class="card"><div class="row between" style="margin-bottom:8px"><h2 style="margin:0">Battle log</h2><span class="lbl">${view === 'squad' ? 'Squad' : 'Solo'}</span></div>${logHTML}</div>
         <div class="card"><h2>Rewards for ${esc(b.short)}</h2>
           ${rewardCell(BOSS_REWARDS.solo(b.id), `Solo victory · ${RARITY_LABEL[bossRarity(b.id, 'solo')]}`, 'Its own app theme, a special aura and a profile picture', rewardsClaimed(b.id, 'solo'))}
           ${rewardCell(BOSS_REWARDS.squad(b.id), `Squad victory · ${RARITY_LABEL[bossRarity(b.id, 'squad')]}`, 'Its name colour, a fancier squad aura and a golden profile picture', rewardsClaimed(b.id, 'squad'))}
           <div class="rp${rec.mastered ? ' got' : ''}"><div class="rp-h"><b>Both in one week</b>${rec.mastered ? '<span class="ok">✓ Earned</span>' : ''}</div><div class="rp-items">${masteredBadge(b, rec.mastered)}</div><div class="lbl">A “Mastered” badge in the Trophy Hall</div></div>
           <p class="lbl" style="margin:10px 0 0">It returns every 10 weeks: beat it again for coins and another star on its trophy.</p></div>
         <div class="card next-boss" style="--ba:${nb.a};--bb:${nb.b}"><div class="nb-art">${bossSVG(nb.id)}</div><div style="min-width:0"><div class="boss-kicker">Next week</div><div class="nb-name">${esc(nb.name)}</div>${tierBadge(nb.id)}<div class="lbl">Arrives Monday · in ${nbDays} day${nbDays === 1 ? '' : 's'}</div></div></div>
-      </div>
     </div>
     ${trophyHall(b.id)}`;
   writeLS(BOSS_SEEN_KEY, { wk: st.wk, [view]: st.dmg, [view === 'solo' ? 'squad' : 'solo']: seen.wk === st.wk ? +seen[view === 'solo' ? 'squad' : 'solo'] || 0 : 0 });
@@ -14432,6 +14742,7 @@ document.addEventListener('keydown', e => {
     if (btn && !btn.classList.contains('hidden')) { e.preventDefault(); showTab(tab); }
     return;
   }
+  if (k === 'j') { e.preventDefault(); showTab('sessions'); return; }   // Study sessions (v1.19.1)
   if (k === 't') { e.preventDefault(); focusSubAdd(); return; }
   if (k === 'n') { e.preventDefault(); showTab('timer'); setTimeout(() => $('#nameInput').focus(), 30); return; }
   if (S.ui.tab !== 'timer') return;
@@ -15030,9 +15341,10 @@ addEventListener('resize', () => $$('.catrow').forEach(updateFades));
    command palette, offline banner, pull to refresh, tab swipes, haptics.
    Everything here is stored on this device (localStorage); no new cloud data.
    ========================================================================== */
-const APP_VERSION = '1.19';
+const APP_VERSION = '1.19.1';
 const VER_KEY = 'pomodorolist-seen-version';
 const CHANGELOG = [
+  { v: '1.19.1', t: 'Leaderboard fix and your rank next to your name', d: 'Fixed: on the Leaderboard, the Focus time button could open the Ranks board after you had visited Ranks or Streaks (even after a reload). Each board now goes back to its own last view. The Monthly focus board is gone — the Ranks board (this season = this month) replaces it. Your rank now shows next to your name in the header and on your player card: tap it in the header for the Ranks board, or on the card for your progress. Hidden in True Minimalist. Also fixed: switchers such as the achievement categories no longer wrap onto two lines with a stretched highlight — they stay on one line and scroll sideways when they don’t fit. On wide screens the cards on the Timer, Profile, Clan, Quests and Friends pages now fill two balanced columns (or one centred column when there are too few), instead of leaving a big empty space beside one column; the achievements list spreads across the page below the cards. Fixed: hosting a study session with a long preset (focus blocks over 120 min, such as 240 / 5 × 4) failed with a confusing clan message — sessions now take any preset the timer allows, and session errors talk about the session, not your clan. Study sessions now have their own section (sidebar: Friends · Study sessions · Clan · Leaderboard, or press J): live tables with who’s inside and the seats left, a step-by-step Host sheet that shows the preset it uses, upcoming sessions with reminders and your clan’s RSVPs, your history, and a dot when a friend is studying or someone asks to join. The Clan page is back to its familiar layout, with Activity and Clan session milestones that fold away. Fixed: on wide screens one card column could start lower than the other, and a clan leader could see “joined the clan — just now” again after opening the app on a new device.' },
   { v: '1.19', t: 'Ranks for this season and streak leaderboards', d: 'Ranks show how much you study right now: every month is a season, and your counted focus hours (up to 14 h a day) take you from Bronze through Silver, Gold, Platinum and Diamond (three divisions each) to Master and Grandmaster. A new season starts on the 1st with a small head start from last season’s best. The end of a season pays coins and puts a season badge on your trophy shelf, and the first time you reach a rank you get its frame, aura or room poster. Rank badges show next to names on boards, friend lists, study tables and clans. The leaderboard has Ranks and Streaks (current and best) boards for friends and everyone.' },
   { v: '1.18', t: 'Study sessions without a clan, rewards for studying together, streak milestones, a new Pomeo, a weekly quest board, a monthly track, Pomeo’s stages and a collection log', d: 'The Friends tab now has Friends · Study sessions · Challenges. Host a public, friends-only or link study session (no clan needed), let people ask to join, invite friends, hand over or end it, and see who is studying now. Studying together pays: coins for new study partners, clan-session milestones with clan-only rewards, bonus Clan Points and 39 new achievements with real rewards, on a sortable achievements page. Streak milestones at 3, 7, 14, 30, 50, 100, 200 and 365 days give titles, the Ember theme, a Flame Pomeo picture, a trophy, a Flame ring, a Blaze frame, an Eternal flame aura and a Golden Pomeo statue, celebrated once after your block. Pomeo is redrawn: minimal and cute, everywhere, and he grows with your focus hours. New: a weekly quest board, a free monthly reward track, a collection log, and your monthly recap counts who you studied with. Fixes: recently used presets keep their order and favourites, and one challenge join per week.' },
   { v: '1.17', t: 'Plant XP, the Harvests basket, boosts, a garden tour, stronger pets with mutations, Finish early, endless daily rewards and user-reported fixes', d: 'Growth is now plant XP: every focus block feeds each growing plant a generous share (a common plant is ready in 2–3 blocks, 4–6 with four growing), and coin-bought ×1.5 / ×2 boosts speed it up. Harvested crops wait in the new Harvests tab with their weight, skins and a 1–5★ rarity: sell them one by one or in bulk, keep favourites, and get a festival bonus at weekends. A Pomeo-guided garden tour, daily garden tasks, compost, a trophy shelf, plant info cards, scenes unlocked by garden level and a livelier scene. Pets: three slots (garden levels 1 / 3 / 6), stronger capped buffs, every egg drinks every block in full, and a small deterministic chance of a Golden, Shiny, Rainbow, Shadow, Frost or Ember pet. Finish early logs the minutes you did; a garden glance card sits on the Timer; the logo takes you home. Daily rewards keep counting past Day 7 with a gift every 7th day. Fixes: blocks always water your plants, changing the daily goal keeps your streak, one challenge reward per preset per week, starting banners that suit every theme, smoother animations.' },
@@ -15158,6 +15470,7 @@ function ibGo(it) {
   const g = it.go || {};
   $('#inboxDlg').close();
   if (g.action === 'login') { showTab('profile'); setTimeout(() => { if (loginOn() && !loginToday().claimed) openLoginDlg(); }, 250); return; }
+  if (g.tab === 'friends' && g.view === 'sessions') { showTab('sessions'); return; }   // inbox items saved before 1.19.1
   if (g.view) S.ui.friendsView = g.view;
   if (g.gview) S.ui.gardenView = g.gview;   // a garden view, e.g. the Harvests tab (v1.17)
   if (g.tab) showTab(g.tab);
@@ -15279,8 +15592,8 @@ function goSetting(row) {
    ========================================================================== */
 function cmdList(q) {
   const L = [], add = (ic, t, g, run, k = '') => L.push({ ic, t, g, run, k });
-  const tabs = [['timer', '⏱️', 'Timer'], ['reminders', '🔔', 'Reminders'], ['quests', '⚔️', 'Quests'], ['stats', '📊', 'Stats'], ['garden', '🌱', 'Garden'], ['board', '🏆', 'Leaderboard'], ['shop', '🛍️', 'Shop'], ['friends', '👥', 'Friends'], ['profile', '👤', 'Profile'], ['settings', '⚙️', 'Settings'], ['about', 'ℹ️', 'About']];
-  for (const [id, ic, n] of tabs) if (!(['quests', 'shop', 'garden'].includes(id) && !S.settings.gamification)) add(ic, n, 'Go to', () => showTab(id), id === 'board' ? 'ranks leaderboard' : id === 'garden' ? 'plants seeds harvest' : '');
+  const tabs = [['timer', '⏱️', 'Timer'], ['reminders', '🔔', 'Reminders'], ['quests', '⚔️', 'Quests'], ['stats', '📊', 'Stats'], ['garden', '🌱', 'Garden'], ['board', '🏆', 'Leaderboard'], ['shop', '🛍️', 'Shop'], ['friends', '👥', 'Friends'], ['sessions', '📚', 'Study sessions'], ['profile', '👤', 'Profile'], ['settings', '⚙️', 'Settings'], ['about', 'ℹ️', 'About']];
+  for (const [id, ic, n] of tabs) if (!(['quests', 'shop', 'garden'].includes(id) && !S.settings.gamification)) add(ic, n, 'Go to', () => showTab(id), id === 'board' ? 'ranks leaderboard' : id === 'garden' ? 'plants seeds harvest' : id === 'sessions' ? 'study together live host join table' : '');
   add('📥', 'Inbox', 'Open', openInbox, 'notifications messages');
   const t = S.timer;
   add(t.status === 'running' ? '⏸️' : '▶️', t.status === 'running' ? 'Pause timer' : t.status === 'paused' ? 'Resume timer' : 'Start timer', 'Timer', () => { showTab('timer'); $('#mainBtn').click(); }, 'start pause resume focus');
@@ -16523,6 +16836,8 @@ function demoDocs() {
   for (const [uid, name, av, st, min] of [['demo_f1', 'James', 'av_fox', 'focus', 25], ['demo_f2', 'siverieg', 'av_robot', 'focus', 25]])
     docs[`studySessions/demo_sess1/people/${uid}`] = { name, avatar: av, color: '', aura: '', state: st, sname: 'Organic chemistry', min, beat: ts(Date.now() - 20e3), joinedAt: Date.now() - 20 * 60000, endAt: Date.now() + 5 * 60000, left: 0 };
   docs['studySessions/demo_sess2'] = { title: 'Mock test marathon', host: 'demo_f4', hostName: 'Princess_cupcake', pattern: { focus: 50, short: 10, rounds: 3 }, mode: 'synced', startAt: ts(Date.now() - 5 * 60000), pausedAt: 0, pauseTotal: 0, shift: 0, open: true, counted: false, vis: 'friends', lobby: 'friends', max: 4, members: ['demo_f4'], invited: ['demo'], plan: 0, code: '', hostAt: ts(Date.now() - 5 * 60000), createdAt: ts(Date.now() - 5 * 60000), endedAt: 0, updatedAt: ts(Date.now() - 60000) };
+  // v1.19.1: a planned table for later today (Upcoming: Remind me)
+  docs['studySessions/demo_sess3'] = { title: 'Physics problem set', host: 'demo_f3', hostName: 'Justin', pattern: { focus: 50, short: 10, rounds: 2 }, mode: 'together', startAt: ts(Date.now() - 2 * 60000), pausedAt: 0, pauseTotal: 0, shift: 0, open: true, counted: false, vis: 'friends', lobby: 'friends', max: 5, members: ['demo_f3'], invited: ['demo'], plan: Date.now() + 150 * 60000, code: '', hostAt: ts(Date.now() - 2 * 60000), createdAt: ts(Date.now() - 2 * 60000), endedAt: 0, updatedAt: ts(Date.now() - 2 * 60000), welcome: [] };
   docs['challenges/demo_c1'] = { preset: 'h10', weekKey: wk, creator: 'demo_f4', members: ['demo_f4', 'demo', 'demo_f1'], invited: ['demo'], names: { demo_f4: 'Princess_cupcake', demo: 'demo_scholar', demo_f1: 'James' },
     progress: { demo_f4: 410, demo: Math.round(myWeek), demo_f1: 280 }, createdAt: ts(Date.now() - 2 * 864e5) };
   Object.assign(docs, demoClanDocs(ts, wk));
@@ -16585,13 +16900,13 @@ function startPreview() {
 /** Leaving reloads the page, so nothing from the demo stays in memory. "#signup" opens the sign-up tab. */
 function exitPreview(signup) { history.replaceState(null, '', location.pathname + location.search + (signup ? '#signup' : '')); location.reload(); }
 const PV_BLOCK = ['#plSave', '[data-dnew]', '[data-ddel]', '[data-cdel]', '[data-dkbulk]', '#dkAdd button', '[data-drename]', '[data-cedit]', '[data-rmset-save]', '[data-rmset-apply]', '[data-rmset-del]', '[data-rremove]', '.gd-plot.ready', '[data-gbuy]', '[data-gequip]', '[data-gplant]', '[data-gharvest]', '[data-gplace]', '[data-gplaceat]', '[data-gremove]', '[data-gfocus]', '#mainBtn', '#skipBtn', '[data-qs]', '[data-buy]', '[data-equip]', '[data-toggle-extra]', '[data-kudos]', '[data-accept]', '[data-decline]', '[data-block]', '[data-unblock]',
-  '[data-join]', '[data-start]', '[data-claimlogin]', '#loginClaim', '[data-sjoin]', '[data-sask]', '[data-shost]', '[data-sinvite]', '[data-sallow]', '[data-sdeny]', '[data-skick]', '[data-shand]', '[data-scode]', '[data-remadd]', '#remAdd', '[data-rdone]', '[data-rdel]', '[data-redit]', '[data-rev]', '[data-del]', '[data-delp]',
+  '[data-join]', '[data-start]', '[data-claimlogin]', '#loginClaim', '[data-sremind]', '[data-hrsvp]', '[data-sjoin]', '[data-sask]', '[data-shost]', '[data-sinvite]', '[data-sallow]', '[data-sdeny]', '[data-skick]', '[data-shand]', '[data-scode]', '[data-remadd]', '#remAdd', '[data-rdone]', '[data-rdel]', '[data-redit]', '[data-rev]', '[data-del]', '[data-delp]',
   '[data-exdel]', '[data-tdel]', '[data-tload]', '[data-remove]', '[data-tick]', '[data-energy]', '#parkBtn', '#subToggle', '#subCheckAdd', '#managePresets', '#noteSave', '#revSchedule', '#examsBtn',
   '#importBtn', '#exportBtn', '#wipeBtn', '#pomeoOutfit', '[data-sell]', '[data-sellall]', '[data-fav]', '[data-compost]', '[data-gtask]', '#replayTour', '#resetTips', '[data-news-tut]', '[data-news-min]', '#addFriendForm button', '#chips .chip', '[data-pin]', '.chip .pin',
   '#squadBtn', '[data-squad]', '#examCard', '[data-gl]', '#tutMinimal', '#squadEdit', '[data-bclaim]', '[data-qclaim]', '[data-bequip]', '[data-bunequip]', '[data-btoggle]', '[data-petequip]', '[data-petunequip]', '#egOut',
   '#loNew', '[data-lo-apply]', '[data-lo-del]', '#setFestive', '#todoAdd button', '#todoMore', '[data-tdone]', '[data-tdel]', '[data-tfocus]', '[data-tgrip]', '#tdSave', '#tdDelete', '[data-cdstyle]', '[data-cdbn]', '[data-cdfeat]', '[data-cdpriv]', '#shSave', '#shNative', '#shCopy', '#shLink', '#setTod', '#setTodRain', '#clanCreateBtn', '#clanJoinBtn', '#ccSave', '#cjFind', '#clanCardGo', '#ciRegen', '#ciCopy', '[data-cbuy]', '[data-cuse]', '#csdSave', '[data-cmode]', '#cstShop', '#cstSched', '#cstTransfer', '#cstDisband', '[data-rsvp]', '[data-cremind]', '[data-cedit]', '[data-ccancel]', '[data-cstart]', '[data-cjoinlive]', '#clanStudyNow', '#clanSchedBtn', '[data-react]', '[data-lvctl]', '#clanLeave', '[data-crole]', '[data-ctransfer]', '[data-cremove]', '[data-creqok]', '[data-creqno]', '#clanQuestClaim', '#clanRaidClaim', '[data-crbefore]', '#clanCancelReq', '#clanInvite'].join(',');
 const PV_WHY = [['#plSave', 'plan your week'], ['[data-dnew],[data-ddel],[data-cdel],[data-dkbulk],#dkAdd button,[data-drename],[data-cedit]', 'make your own flashcards'], ['[data-rmset-save],[data-rmset-apply],[data-rmset-del],[data-rremove]', 'decorate Pomeo’s room'], ['.gd-plot.ready,[data-gbuy],[data-gequip],[data-gplant],[data-gharvest],[data-gplace],[data-gplaceat],[data-gremove],[data-gfocus]', 'grow your own garden'], ['[data-buy],[data-equip],[data-toggle-extra]', 'buy and equip shop items'], ['#mainBtn,[data-qs],#skipBtn', 'start your own focus sessions'], ['[data-kudos],[data-accept],[data-decline],#addFriendForm button,[data-block]', 'add friends and send kudos'],
-  ['[data-claimlogin],#loginClaim', 'collect daily rewards'], ['[data-sjoin],[data-sask],[data-shost],[data-sinvite],[data-sallow],[data-sdeny],[data-skick],[data-shand],[data-scode]', 'study live with friends'], ['[data-sell],[data-sellall],[data-fav],[data-compost]', 'sell your harvests for produce'], ['[data-gtask]', 'claim garden tasks'], ['[data-bclaim],[data-qclaim]', 'claim boss and questline rewards'], ['[data-bequip],[data-bunequip],[data-btoggle],#loNew,[data-lo-apply],[data-lo-del]', 'equip items and save looks'], ['[data-petequip],[data-petunequip],#egOut', 'keep garden pets'], ['#remAdd,[data-remadd],[data-rdone],[data-redit],[data-rdel]', 'plan your own reminders'], ['#todoAdd button,#todoMore,[data-tdone],[data-tdel],[data-tfocus],[data-tgrip],#tdSave,#tdDelete', 'keep your own to-do list'], ['[data-cdstyle],[data-cdbn],[data-cdfeat],[data-cdpriv],#shSave,#shNative,#shCopy,#shLink', 'make and share your own player card'], ['#clanCreateBtn,#clanJoinBtn,#ccSave,#cjFind,#clanCardGo,[data-cjoinlive],#clanStudyNow,[data-react],[data-lvctl],[data-rsvp],[data-cremind],#clanSchedBtn,[data-cbuy],[data-cuse],#clanLeave,#clanQuestClaim,#clanRaidClaim,#clanInvite', 'create or join a clan and study live together']];
+  ['[data-claimlogin],#loginClaim', 'collect daily rewards'], ['[data-sjoin],[data-sask],[data-shost],[data-sinvite],[data-sallow],[data-sdeny],[data-skick],[data-shand],[data-scode],[data-sremind]', 'study live with friends'], ['[data-hrsvp]', 'join your clan’s sessions'], ['[data-sell],[data-sellall],[data-fav],[data-compost]', 'sell your harvests for produce'], ['[data-gtask]', 'claim garden tasks'], ['[data-bclaim],[data-qclaim]', 'claim boss and questline rewards'], ['[data-bequip],[data-bunequip],[data-btoggle],#loNew,[data-lo-apply],[data-lo-del]', 'equip items and save looks'], ['[data-petequip],[data-petunequip],#egOut', 'keep garden pets'], ['#remAdd,[data-remadd],[data-rdone],[data-redit],[data-rdel]', 'plan your own reminders'], ['#todoAdd button,#todoMore,[data-tdone],[data-tdel],[data-tfocus],[data-tgrip],#tdSave,#tdDelete', 'keep your own to-do list'], ['[data-cdstyle],[data-cdbn],[data-cdfeat],[data-cdpriv],#shSave,#shNative,#shCopy,#shLink', 'make and share your own player card'], ['#clanCreateBtn,#clanJoinBtn,#ccSave,#cjFind,#clanCardGo,[data-cjoinlive],#clanStudyNow,[data-react],[data-lvctl],[data-rsvp],[data-cremind],#clanSchedBtn,[data-cbuy],[data-cuse],#clanLeave,#clanQuestClaim,#clanRaidClaim,#clanInvite', 'create or join a clan and study live together']];
 function previewPrompt(el) {
   const why = (PV_WHY.find(([sel]) => el && el.closest(sel)) || [, 'save your own sessions and settings'])[1];
   $('#pvWhy').textContent = `This is a demo account, so nothing can be changed. Create your own free account to ${why}.`;
@@ -17446,6 +17761,7 @@ function tourSteps() {
     { tab: 'board', text: 'Leaderboard: see how your focus compares with friends.' },
     on && { tab: 'shop', text: 'Shop: spend coins on themes, sounds and outfits for me.' },
     { tab: 'friends', text: 'Friends: add friends, send kudos, see who’s focusing.' },
+    { tab: 'sessions', text: 'Study sessions: join a friend’s table or host your own — no clan needed.' },
     { tab: 'clan', text: 'Clan: your study group — plan sessions and study live together.' },
     on && { tab: 'quests', text: 'Quests: a new boss every week — every focus minute is a hit.' },
   ].filter(Boolean);
@@ -17767,7 +18083,9 @@ $('#shareInvite2').addEventListener('click', () => shareInvite($('#copyInvite'))
 $('#blockedList').addEventListener('click', e => { const b = e.target.closest('[data-unblock]'); if (b) unblockUser(b.dataset.unblock); });
 
 // Header shortcuts: coins open the Shop, the level badge (or avatar) opens Profile
-$('#lvChip').addEventListener('click', () => showTab('profile'));
+$('#lvChip').addEventListener('click', e => { if (e.target.closest('[data-hdr-rank]')) { uiSound('tick'); openMyRank(); return; } showTab('profile'); });   // the rank gem (phones) opens the Ranks board
+$('#rankChip').addEventListener('click', () => { uiSound('tick'); openMyRank(); });
+document.addEventListener('click', e => { if (e.target.closest('[data-myrank]')) { uiSound('tick'); showRankProgress(); } });
 $('#avatarBtn').addEventListener('click', () => showTab('profile'));
 $('#coinPill').addEventListener('click', () => showTab('shop'));
 $('#tab-profile').addEventListener('click', e => {
@@ -17790,7 +18108,7 @@ $('#tab-board').addEventListener('click', e => {
   const b = t.closest('[data-scope],[data-period],[data-open]');
   if (!b) return;
   if (b.dataset.scope) { S.ui.lbScope = b.dataset.scope; saveLocal(); renderBoard(); }
-  else if (b.dataset.period) { S.ui.lbPeriod = b.dataset.period; S.ui[boardKindOf(b.dataset.period) === 'garden' ? 'lbGardenPeriod' : 'lbFocusPeriod'] = b.dataset.period; saveLocal(); renderBoard(); }
+  else if (b.dataset.period) { setBoardPeriod(b.dataset.kind ? boardPeriodFor(b.dataset.kind) : b.dataset.period); saveLocal(); renderBoard(); }   // a kind button: that kind's last period (read now, not from the button)
   else { S.ui.friendsView = 'friends'; showTab('friends'); openFriend(b.dataset.open); }
 });
 // Shop tab
@@ -17894,12 +18212,16 @@ $('#presetList').addEventListener('click', e => {
     renderAll();
   }
 });
+/* The limits of a timer preset (v1.19.1: one table for the preset editor and for study sessions; the Firestore rules for
+   studySessions accept exactly these — keep them in step). Clan sessions use the fixed CLAN_PATTERNS. */
+const PRESET_LIMITS = { focus: [1, 240], short: [1, 120], long: [1, 180], rounds: [1, 12] };
+for (const [k, id] of [['focus', '#pfFocus'], ['short', '#pfShort'], ['long', '#pfLong'], ['rounds', '#pfRounds']]) { $(id).min = PRESET_LIMITS[k][0]; $(id).max = PRESET_LIMITS[k][1]; }   // the editor's inputs follow PRESET_LIMITS
 $('#presetForm').addEventListener('submit', e => {
   e.preventDefault();
   const n = (id, lo, hi) => clamp(Math.round(+$(id).value) || lo, lo, hi);
   const data = {
     name: $('#pfName').value.trim() || 'Untitled preset',
-    focus: n('#pfFocus', 1, 240), short: n('#pfShort', 1, 120), long: n('#pfLong', 1, 180), rounds: n('#pfRounds', 1, 12),
+    focus: n('#pfFocus', ...PRESET_LIMITS.focus), short: n('#pfShort', ...PRESET_LIMITS.short), long: n('#pfLong', ...PRESET_LIMITS.long), rounds: n('#pfRounds', ...PRESET_LIMITS.rounds),
   };
   const id = $('#pfId').value;
   if (id) Object.assign(S.presets.find(p => p.id === id), data);
@@ -18405,7 +18727,7 @@ function cardHTML(d, ctx = 'own') {
   if (fold) return `<article class="pcard cs-${style.slice(5)}${mini ? ' pc-mini' : ''} pc-${ctx} pc-fold${open ? '' : ' pc-closed'}" style="${vars}" aria-label="Player card of ${name}">
     ${banner}
     <div class="pc-id"><div class="pc-av">${pic}</div><div class="pc-who">
-      <div${nameAttrs(mini ? '' : d.c, 'pc-name')}>${name}</div>${!mini && /^[A-Z0-9]{2,5}$/.test(d.ct || '') ? `<div class="pc-clan">🛡️ [${esc(d.ct)}]${d.cr && Object.values(CLAN_ROLES).includes(d.cr) ? ' · ' + esc(d.cr) : ''}</div>` : ''}
+      <div class="pc-nrow"><div${nameAttrs(mini ? '' : d.c, 'pc-name')}>${name}</div>${!mini && (ctx === 'own' || ctx === 'preview') ? myRankPill(ctx) : ''}</div>${!mini && /^[A-Z0-9]{2,5}$/.test(d.ct || '') ? `<div class="pc-clan">🛡️ [${esc(d.ct)}]${d.cr && Object.values(CLAN_ROLES).includes(d.cr) ? ' · ' + esc(d.cr) : ''}</div>` : ''}
       ${!mini && d.t ? `<div class="pc-title">${esc(TITLE_TEXT[d.t])}</div>` : ''}
       ${tier ? `<div class="pc-lv"><span class="pc-tier" style="--tc:${tier.color}">${badgeSVG(tier, { size: 16 })}${tier.name}</span><span>Level ${d.lv}</span></div>` : ''}</div></div>
     <button type="button" class="pc-toggle" data-pc-toggle aria-expanded="${open}"><span>${open ? 'Hide stats' : 'Show stats'}</span><i aria-hidden="true">▾</i></button>
@@ -18414,7 +18736,7 @@ function cardHTML(d, ctx = 'own') {
   return `<article class="pcard cs-${style.slice(5)}${mini ? ' pc-mini' : ''} pc-${ctx}" style="${vars}" aria-label="Player card of ${name}">
     ${banner}
     <div class="pc-id"><div class="pc-av">${pic}</div><div class="pc-who">
-      <div${nameAttrs(mini ? '' : d.c, 'pc-name')}>${name}</div>${!mini && /^[A-Z0-9]{2,5}$/.test(d.ct || '') ? `<div class="pc-clan">🛡️ [${esc(d.ct)}]${d.cr && Object.values(CLAN_ROLES).includes(d.cr) ? ' · ' + esc(d.cr) : ''}</div>` : ''}
+      <div class="pc-nrow"><div${nameAttrs(mini ? '' : d.c, 'pc-name')}>${name}</div>${!mini && (ctx === 'own' || ctx === 'preview') ? myRankPill(ctx) : ''}</div>${!mini && /^[A-Z0-9]{2,5}$/.test(d.ct || '') ? `<div class="pc-clan">🛡️ [${esc(d.ct)}]${d.cr && Object.values(CLAN_ROLES).includes(d.cr) ? ' · ' + esc(d.cr) : ''}</div>` : ''}
       ${!mini && d.t ? `<div class="pc-title">${esc(TITLE_TEXT[d.t])}</div>` : ''}
       ${tier ? `<div class="pc-lv"><span class="pc-tier" style="--tc:${tier.color}">${badgeSVG(tier, { size: 16 })}${tier.name}</span><span>Level ${d.lv}</span></div>` : ''}</div></div>
     ${tiles.length ? `<div class="pc-tiles">${tiles.join('')}</div>` : ''}
@@ -19122,6 +19444,14 @@ async function clanBonusFlush(items) {
 }
 const clanPoints = d => Math.max(0, clanEarned(d) - (d.spent || 0));
 const CLAN_TITLES = ['Group study', 'Silent study hour', 'Exam prep sprint', 'Homework hour', 'Revision session', 'Problem solving', 'Reading session', 'Mock test', 'Early birds', 'Night owls'];
+/** Why a preset can't be used for a study session (out of range or not whole numbers), or ''. */
+function sessPatternProblem(p) {
+  const v = k => +p[k], ok = k => Number.isFinite(v(k)) && v(k) >= PRESET_LIMITS[k][0] && v(k) <= PRESET_LIMITS[k][1];
+  if (!ok('focus')) return `Study sessions support focus blocks of ${PRESET_LIMITS.focus[0]}–${PRESET_LIMITS.focus[1]} min — pick a preset in that range`;
+  if (!ok('short')) return `Study sessions support breaks of up to ${PRESET_LIMITS.short[1]} min — pick a preset with a shorter break`;
+  if (!ok('rounds')) return `Study sessions support up to ${PRESET_LIMITS.rounds[1]} rounds — pick a preset with fewer rounds`;
+  return '';
+}
 const CLAN_PATTERNS = [
   { id: 'c25', name: '25 / 5 × 4', focus: 25, short: 5, rounds: 4 }, { id: 'c50', name: '50 / 10 × 2', focus: 50, short: 10, rounds: 2 },
   { id: 'c45', name: '45 / 10 × 3', focus: 45, short: 10, rounds: 3 }, { id: 'c90', name: '90 / 15 × 2', focus: 90, short: 15, rounds: 2 },
@@ -19346,7 +19676,7 @@ async function clanRefresh(withDetails = false) {
         CLAN.id = id; CLAN.doc = snapData(doc); CLAN.me = snapData(me); CLAN.info = snapData(info);
         CLAN.myReq = null;
         G = null;
-        if (joinedNow && !isPreview()) { clanFeed('join', 0, { once: 'join:' + id + ':' + CLAN.me.joinedAt }); if (CLAN.started) watchClanLive(); applyCosmetics(); schedulePublish(); }
+        if (joinedNow && !isPreview()) { clanFeedJoin(); if (CLAN.started) watchClanLive(); applyCosmetics(); schedulePublish(); }
       }
     }
     CLAN.at.base = Date.now();
@@ -19690,6 +20020,27 @@ function clanFeed(type, n = 0, { once = '' } = {}) {
   if (once) { const k = 'pomodorolist-clanfeed:' + once; if (localStorage.getItem(k)) return; writeLS(k, 1); }
   FB.addDoc(cCol(CLAN.id, 'feed'), { type, who: USER.username, n: Math.max(0, Math.round(n)), at: FB.serverTimestamp() }).catch(() => {});
 }
+/** "@name joined the clan" — once per real join. v1.19.1: this ran whenever this device had no clan saved yet (a new
+    browser, a private window, cleared data), guarded only by a note on the device, so a leader who joined weeks ago got a
+    fresh "joined the clan — just now" on every new device. Now: only within a day of the membership starting (joinedAt
+    on the member document), and under one fixed id per membership, so a second device's write is refused (the feed
+    allows creating an event, never changing one). */
+const JOIN_FEED_WINDOW = 864e5;
+function clanFeedJoin() {
+  if (!inClan() || isPreview() || !cloudReady() || !CLAN.me) return;
+  const at = +CLAN.me.joinedAt || 0;
+  if (!at || Date.now() - at > JOIN_FEED_WINDOW) return;
+  const k = 'pomodorolist-clanfeed:join:' + CLAN.id + ':' + at;
+  try { if (localStorage.getItem(k)) return; } catch (e) {}
+  writeLS(k, 1);
+  FB.setDoc(cDoc(CLAN.id, 'feed', `join_${USER.uid}_${at}`), { type: 'join', who: USER.username, n: 0, at: FB.serverTimestamp() }).catch(() => {});
+}
+/** A join event written long after that member really joined (the bug above) is left out of the Activity list. */
+function feedEventOk(e) {
+  if (e.type !== 'join') return true;
+  const m = (CLAN.members || []).find(x => x.name === e.who), joined = m ? +m.joinedAt || 0 : 0;
+  return !joined || !e.at || +e.at - joined <= JOIN_FEED_WINDOW;
+}
 const FEED_TEXT = {
   focus: (w, n) => `@${w} focused ${fmtMin(n)}`, join: w => `@${w} joined the clan`, level: (w, n) => `The clan reached level ${n} 🎉`,
   sched: (w, n) => `@${w} scheduled a study session for ${fmtHM(new Date(2000, 0, 1, Math.floor(n / 60), n % 60).getTime())}`,
@@ -19812,7 +20163,7 @@ const liveIsClan = () => !!LIVE.cid;
 const liveDoc = (...sub) => (LIVE.cid ? FB.doc(FB.db, 'clans', LIVE.cid, 'live', LIVE.lid, ...sub) : FB.doc(FB.db, 'studySessions', LIVE.lid, ...sub));
 const liveCol = sub => (LIVE.cid ? FB.collection(FB.db, 'clans', LIVE.cid, 'live', LIVE.lid, sub) : FB.collection(FB.db, 'studySessions', LIVE.lid, sub));
 const liveRefFor = (cid, lid, ...sub) => (cid ? FB.doc(FB.db, 'clans', cid, 'live', lid, ...sub) : FB.doc(FB.db, 'studySessions', lid, ...sub));
-const liveHome = () => (liveIsClan() ? 'clan' : 'friends');
+const liveHome = () => (liveIsClan() ? 'clan' : 'sessions');   // a study session without a clan lives in Study sessions (v1.19.1)
 /** Who focused at the same time as me in this block (both modes): the Phase 3 "studied together" record. */
 const liveMatesNow = () => [...new Set([...(LIVE.blockMates || []), ...livePeople().filter(p => p.id !== USER.uid && p.st === 'focus').map(p => p.id)])];
 const liveSrvNow = () => Date.now() + LIVE.off;
@@ -19905,7 +20256,7 @@ async function liveJoin(lid, fresh = false, cid = CLAN.id) {
   LIVE.beatTimer = setInterval(() => liveBeat(), 60000);   // presence heartbeat: once a minute
   if (mode !== 'together') liveSync();
   renderAll();
-  if (!cid) { S.ui.friendsView = 'sessions'; sessWatchRequests(); }
+  if (!cid) sessWatchRequests();
   showTab(liveHome());
 }
 function liveListen() {
@@ -20201,6 +20552,13 @@ async function sessLoad(force) {
 function sessExpire(sid) { if (!cloudReady() || isPreview()) return; FB.updateDoc(sessRef(sid), { open: false, lobby: 'none', invited: [], endedAt: Date.now(), updatedAt: FB.serverTimestamp() }).catch(() => {}); }
 /** A friend hosting an open session right now (for the "Studying now · Ask to join" badge). */
 const sessHostedBy = uid => SESS.lobby.find(l => l.host === uid && sessOpen(l) && !(l.members || []).includes(USER.uid));
+/** Starting a session was refused. Rules before 1.19.1 took focus blocks of 5–120 min, breaks up to 30 and 8 rounds;
+    if the preset is outside that, say so (the site's rules may not be updated yet) instead of a vague error. */
+function sessCreateDenied() {
+  const p = activePreset();
+  if (+p.focus > 120 || +p.focus < 5 || +p.short > 30 || +p.rounds > 8) return 'Couldn’t start a session with this preset — try one with focus blocks of 5–120 min, breaks up to 30 min and up to 8 rounds';
+  return 'Couldn’t start the session — please try again';
+}
 /** Host a session. mode together|synced, vis friends|link|public, max 2–10, plan = ms (0 = now). */
 async function sessCreate({ title, mode = 'together', vis = 'friends', max = 6, plan = 0 }) {
   if (!sessReady()) throw new Error('Log in and connect to host a session');
@@ -20209,9 +20567,11 @@ async function sessCreate({ title, mode = 'together', vis = 'friends', max = 6, 
   if (bad) throw new Error(bad);
   if (mode === 'synced' && S.timer.status !== 'idle') throw new Error('Finish or reset your current timer first — a Synced timer takes over your timer');
   await clockOffset();
-  const p = activePreset(), sid = FB.doc(FB.collection(FB.db, 'studySessions')).id, code = vis === 'friends' ? '' : newClanCode();
+  const p = activePreset(), pp = sessPatternProblem(p);
+  if (pp) throw new Error(pp);   // before anything is written (v1.19.1)
+  const sid = FB.doc(FB.collection(FB.db, 'studySessions')).id, code = vis === 'friends' ? '' : newClanCode();
   const invited = vis === 'friends' ? friendsList().map(otherUid).slice(0, 100) : [];
-  const data = { title: title.trim().slice(0, 40), host: USER.uid, hostName: USER.username, pattern: { focus: p.focus, short: p.short, rounds: p.rounds }, mode: mode === 'synced' ? 'synced' : 'together',
+  const data = { title: title.trim().slice(0, 40), host: USER.uid, hostName: USER.username, pattern: { focus: Math.round(+p.focus), short: Math.round(+p.short), rounds: Math.round(+p.rounds) }, mode: mode === 'synced' ? 'synced' : 'together',
     startAt: FB.serverTimestamp(), pausedAt: mode === 'synced' ? Math.round(liveSrvNow()) : 0, pauseTotal: 0, shift: 0, open: true, counted: false,
     vis, lobby: vis === 'public' ? 'public' : vis === 'friends' ? 'friends' : 'none', max: clamp(Math.round(+max) || 6, 2, 10), members: [USER.uid], invited,
     plan: Math.max(0, Math.round(+plan) || 0), code, welcome: [], hostAt: FB.serverTimestamp(), createdAt: FB.serverTimestamp(), endedAt: 0, updatedAt: FB.serverTimestamp() };
@@ -20286,9 +20646,9 @@ function sessUnwatchRequests() { if (SESS.reqUnsub) { try { SESS.reqUnsub(); } c
  *  timer and makes no sound) and an inbox item with the two buttons. */
 function sessPromptRequest(r) {
   const key = 'sreq:' + LIVE.lid + ':' + r.id;
-  inboxAdd({ type: 'session', key, title: `@${r.name} wants to join your session`, body: 'Allow or decline — they are waiting', go: { tab: 'friends', view: 'sessions' } });
+  inboxAdd({ type: 'session', key, title: `@${r.name} wants to join your session`, body: 'Allow or decline — they are waiting', go: { tab: 'sessions' } });
   const it = IB.find(x => x.key === key); if (it) { it.act = { kind: 'sreq', sid: LIVE.lid, uid: r.id }; ibSave(); }
-  toast(`@${r.name} wants to join your session`, 5000, false, { now: true, log: false, type: 'session', go: { tab: 'friends', view: 'sessions' } });
+  toast(`@${r.name} wants to join your session`, 5000, false, { now: true, log: false, type: 'session', go: { tab: 'sessions' } });
   if (S.ui.tab !== 'friends') { SOC.unread = true; updateFriendsDot(); }
 }
 async function sessAnswer(uid, ok) {
@@ -20386,7 +20746,7 @@ function maybeOpenSessionLink() {
   let tries = 0;
   const go = async () => {
     if (!socialReady()) { if (tries++ < 40) { setTimeout(go, 500); return; } toast('Couldn’t open the invite — try the link again once you’re online', 3600); return; }   // the friends / cloud layer is still loading
-    try { const sid = await sessByCode(code); S.ui.friendsView = 'sessions'; showTab('friends'); await sessJoin(sid); } catch (e) { toast(e.message || 'That invite link didn’t work', 3600); }
+    try { const sid = await sessByCode(code); showTab('sessions'); await sessJoin(sid); } catch (e) { toast(e.message || 'That invite link didn’t work', 3600); }
   };
   setTimeout(go, 600);
 }
@@ -20396,37 +20756,231 @@ function sessHistory() {
   for (const s of S.sessions) if (s.live && !s.clan) { const h = by[s.live] ||= { lid: s.live, blocks: 0, min: 0, mates: new Set(), last: 0, title: s.lt || '' }; h.blocks++; h.min += s.duration / 60000; (s.mates || []).forEach(m => h.mates.add(m)); h.last = Math.max(h.last, s.end); if (s.lt) h.title = s.lt; }
   return Object.values(by).sort((a, b) => b.last - a.last).slice(0, 12);
 }
-/* ----- rendering: Friends › Study sessions ----- */
+/* ----- rendering: the Study sessions section (v1.19.1: its own section, was Friends › Study sessions) ----- */
 function renderSessionBits() {
   renderLiveBar();
-  if (S.ui.tab === 'friends' && !SOC.friend) renderFriends(true);
+  if (S.ui.tab === 'friends' && !SOC.friend) renderFriends(true);   // the friend rows' "Studying now · Ask to join"
+  if (S.ui.tab === 'sessions') renderSessionsPage(true);
+  updateSessBadge();
 }
-function sessRowHTML(l) {
-  const mine = (l.members || []).includes(USER.uid), n = (l.members || []).length, isHost = l.host === USER.uid, friend = friendsList().some(f => otherUid(f) === l.host);
-  const when = l.plan && l.plan > Date.now() ? `starts ${fmtHM(l.plan)}` : `${n} of ${l.max || 10} at the table`;
-  const btn = mine ? `<button class="btn small primary" data-sjoin="${esc(l.id)}">${isHost ? 'Open' : 'Rejoin'}</button>`
+const sessRerender = () => { if (S.ui.tab === 'sessions') renderSessionsPage(true); else if (S.ui.tab === 'friends') renderFriends(true); };
+const isFriendUid = uid => friendsList().some(f => otherUid(f) === uid);
+const friendNameOf = uid => { const f = friendsList().find(x => otherUid(x) === uid); return f ? otherName(f) : ''; };
+/** Friends at a table (not me). */
+const sessFriendsIn = l => (l.members || []).filter(u => u !== USER.uid && isFriendUid(u));
+/** A friend's table I could join right now (live, not planned for later, not mine). */
+const sessFriendLive = l => sessOpen(l) && !(l.plan > Date.now()) && !(l.members || []).includes(USER.uid) && (isFriendUid(l.host) || sessFriendsIn(l).length > 0);
+/** The nav dot: red when someone is asking to join your table or a session invite is unread; a soft live dot when a
+    friend is studying at an open table right now. */
+function updateSessBadge() {
+  const b = $('#sessBadge');
+  if (!b) return;
+  const on = USER && !USER.guest;
+  const asks = on ? SESS.reqs.length : 0, live = on && SESS.lobby.some(sessFriendLive), red = !!(asks || (on && SESS.unread));
+  b.classList.toggle('hidden', !(red || live));
+  b.classList.toggle('tb-live', !red && live);
+  b.setAttribute('aria-label', asks ? `${asks} asking to join your session` : red ? 'New study-session invite' : live ? 'A friend is studying live now' : '');
+}
+/** The button on a session: Open / Rejoin / Waiting… / Full / Ask to join / Join. */
+function sessBtnHTML(l) {
+  const mine = (l.members || []).includes(USER.uid), n = (l.members || []).length, isHost = l.host === USER.uid;
+  return mine ? `<button class="btn small primary" data-sjoin="${esc(l.id)}">${isHost ? 'Open' : 'Rejoin'}</button>`
     : SESS.waiting && SESS.waiting.sid === l.id ? `<span class="lbl">Waiting for @${esc(l.hostName)}… <button class="linkbtn" data-scancel>cancel</button></span>`
     : n >= (l.max || 10) ? '<span class="lbl">Full</span>'
     : l.vis === 'friends' ? `<button class="btn small primary" data-sask="${esc(l.id)}">Ask to join</button>` : `<button class="btn small primary" data-sjoin="${esc(l.id)}">Join</button>`;
+}
+function sessRowHTML(l) {   // a compact row (the friend list, "Your session")
+  const n = (l.members || []).length, friend = isFriendUid(l.host);
+  const when = l.plan && l.plan > Date.now() ? `starts ${fmtHM(l.plan)}` : `${n} of ${l.max || 10} at the table`;
   return `<li class="clan-live-row sess-row"><span class="live-dot" aria-hidden="true"></span><div><b>${esc(l.title)}</b> <span class="lv-mode${l.mode === 'synced' ? ' synced' : ''}">${CLAN_MODES[l.mode === 'synced' ? 'synced' : 'together'].short}</span>
-    <div class="lbl">${lookPic(personLook(l.host, l.hostName), 18)} @${esc(l.hostName)}${friend ? ' · friend' : l.vis === 'public' ? ' · public' : ''} · ${when} · ${l.pattern.focus}/${l.pattern.short} × ${l.pattern.rounds}</div></div>${btn}</li>`;
+    <div class="lbl">${lookPic(personLook(l.host, l.hostName), 18)} @${esc(l.hostName)}${friend ? ' · friend' : l.vis === 'public' ? ' · public' : ''} · ${when} · ${l.pattern.focus}/${l.pattern.short} × ${l.pattern.rounds}</div></div>${sessBtnHTML(l)}</li>`;
 }
-function sessHostFormHTML() {
+/** A live table: the host's picture (frame, aura), title, mode, seats filled, friends inside, Join / Ask to join. */
+function sessTileHTML(l) {
+  const n = (l.members || []).length, max = l.max || 10, host = personLook(l.host, l.hostName), mode = l.mode === 'synced' ? 'synced' : 'together';
+  const fin = sessFriendsIn(l).filter(u => u !== l.host).slice(0, 4);
+  const seats = `<span class="st-seats" title="${n} of ${max} seats taken" aria-label="${n} of ${max} seats taken">${Array.from({ length: max }, (_, i) => `<i class="${i < n ? 'on' : ''}"></i>`).join('')}<b>${n}/${max}</b></span>`;
+  const friends = fin.length ? `<span class="st-fr"><span class="pics">${fin.map(u => lookPic(personLook(u, friendNameOf(u)), 22)).join('')}</span><span class="lbl">${fin.length === 1 ? `@${esc(friendNameOf(fin[0]))} is in` : `${fin.length} friends inside`}</span></span>` : '';
+  const tag = l.host === USER.uid ? 'your table' : isFriendUid(l.host) ? 'friend' : l.vis === 'public' ? 'public' : l.vis === 'link' ? 'invite link' : '';
+  return `<li class="sess-tile${(l.members || []).includes(USER.uid) ? ' mine' : ''}" data-sid="${esc(l.id)}">
+    <div class="st-pic">${lookPic(host, 46)}</div>
+    <div class="st-main"><div class="st-title">${esc(l.title)}</div>
+      <div class="lbl st-by">${lookName(host)}${tag ? ` · ${tag}` : ''} <span class="lv-mode${mode === 'synced' ? ' synced' : ''}">${CLAN_MODES[mode].short}</span></div>
+      <div class="st-meta">${seats}${friends}<span class="lbl">${l.pattern.focus}/${l.pattern.short} × ${l.pattern.rounds}</span></div></div>
+    <div class="st-act">${sessBtnHTML(l)}</div></li>`;
+}
+/** Planned for later: friends' study sessions (Remind me — on this device) and your clan's planned sessions (RSVP). */
+function sessUpcomingHTML(planned) {
+  const rem = S.ui.sessRemind || {};
+  const study = planned.map(l => `<li class="up-row"><div class="cs-when"><b>${fmtHM(l.plan)}</b><span>${esc(fmtClanWhen(l.plan).split(' · ')[0])}</span></div>
+    <div><span class="up-tag">Study session</span><div class="rt"><b>${esc(l.title)}</b></div><div class="lbl">${lookPic(personLook(l.host, l.hostName), 18)} @${esc(l.hostName)} · ${CLAN_MODES[l.mode === 'synced' ? 'synced' : 'together'].short} · ${(l.members || []).length}/${l.max || 10} seats · ${l.pattern.focus}/${l.pattern.short} × ${l.pattern.rounds}</div>
+      <div class="up-acts"><button class="btn small${rem[l.id] ? ' on' : ''}" data-sremind="${esc(l.id)}" aria-pressed="${rem[l.id] ? 'true' : 'false'}">${rem[l.id] ? '🔔 Reminder on' : 'Remind me'}</button>${sessBtnHTML(l)}</div></div></li>`);
+  const clan = inClan() && CLAN.sessions ? upcomingClanSessions().slice(0, 5).map(({ s: cs, at }) => {
+    const mine = (cs.rsvp || {})[USER.uid] || '', going = Object.values(cs.rsvp || {}).filter(v => v === 'going').length;
+    return `<li class="up-row" data-hcsid="${esc(cs.id)}"><div class="cs-when"><b>${fmtHM(at)}</b><span>${esc(fmtClanWhen(at).split(' · ')[0])}</span></div>
+    <div><span class="up-tag">${clanTagHTML(CLAN.doc && CLAN.doc.tag)} Clan session</span><div class="rt"><b>${esc(cs.title)}</b></div><div class="lbl">${CLAN_MODES[cs.mode === 'together' ? 'together' : 'synced'].short} · ${going} going</div>
+      <div class="up-acts"><div class="seg cs-rsvp" role="group" aria-label="Are you going?">${[['going', 'Going'], ['maybe', 'Maybe'], ['no', 'Can’t']].map(([v, n]) => `<button data-hrsvp="${v}" class="${mine === v ? 'active' : ''}">${n}</button>`).join('')}</div></div></div></li>`;
+  }) : [];
+  const rows = [...study, ...clan].join('');
+  return `<div class="card" id="sessUpcoming"><h2>Upcoming</h2>${rows ? `<ul class="up-list">${rows}</ul>` : `<p class="lbl" style="margin:8px 0 0">Nothing planned yet. Host a session and choose “Plan for later” — friends can set a reminder.</p>`}</div>`;
+}
+/** Your history: totals (hours together, partners, sessions hosted) and your recent tables. */
+function sessHistoryHTML() {
+  const g = groupStats(), hist = sessHistory().slice(0, 12);
+  const tiles = `<div class="tiles hist-tiles">${[[fmtNum(Math.floor(g.hours * 10) / 10) + ' h', 'hours together'], [g.people.size, 'study partners'], [g.hosted.size, 'sessions hosted']].map(([v, l]) => `<div class="tile"><div class="v">${v}</div><div class="s">${l}</div></div>`).join('')}</div>`;
+  const list = hist.length ? `<ul class="hist-list">${hist.map((h, i) => `<li${i >= 4 ? ' class="fold-x"' : ''}><span><b>${esc(h.title || 'Study session')}</b>${h.mates.size ? ` <span class="lbl">· with ${h.mates.size} other${h.mates.size === 1 ? '' : 's'}</span>` : ''}</span><span class="lbl">${fmtShort(new Date(h.last))} · ${fmtMin(h.min)}</span></li>`).join('')}</ul>${hist.length > 4 ? foldMore('sessHist', `Show all (${hist.length})`) : ''}`
+    : sceneEmpty('read', 'big-icon', '<p class="lbl" style="margin:6px 0 0">Your tables show up here — how long you focused and with how many people.</p>');
+  return `${foldHead('sessHist', 'Your history').replace('class="card fold-card', 'id="sessHistory" class="card fold-card')}${tiles}${list}</div></div>`;   // folds to the totals and the latest four
+}
+function renderSessionsPage(fromLoad) {
+  const body = $('#sessBody');
+  if (!body) return;
+  if (!USER || USER.guest) {
+    body.innerHTML = `<div class="card empty-card">${pomeoScene('wave') || `<div class="big-icon">${iconSVG(ICONS.names, 30)}</div>`}<h3>Study together</h3>
+      <p class="muted">Log in to host a study session or join your friends’ tables.</p><button class="btn primary" id="guestLogin">Log in to study together</button></div>`;
+    return;
+  }
+  if (localOnly || !socialReady()) {
+    body.innerHTML = `<div class="card empty-card"><p class="muted">${localOnly ? 'Study sessions need an internet connection. Your timer and stats still work offline.' : ''}</p>${localOnly ? '' : skelRows(3)}</div>`;
+    return;
+  }
+  if (!fromLoad || !SESS.at) sessLoad();
+  if (inSess()) { body.innerHTML = liveTableHTML() + sessTableToolsHTML(); animateFills(body); return; }
+  const lobby = SESS.lobby.filter(l => l.host !== USER.uid), mine = SESS.mine;
+  const now = lobby.filter(l => !(l.plan > Date.now())).sort((a, b) => sessFriendsIn(b).length + (isFriendUid(b.host) ? 2 : 0) - sessFriendsIn(a).length - (isFriendUid(a.host) ? 2 : 0));
+  const planned = lobby.filter(l => l.plan > Date.now()).sort((a, b) => a.plan - b.plan);
   const p = activePreset();
-  return `<div class="card" id="sessHost"><h2>Host a study session</h2>
-    <p class="lbl" style="margin:-4px 0 10px">No clan needed. Your current preset sets the rhythm: <b>${esc(p.name)}</b> (${p.focus}/${p.short} × ${p.rounds}).</p>
-    <form id="sessForm" autocomplete="off">
-      <div class="addrow"><input type="text" id="sessTitle" placeholder="What are you studying?" maxlength="40" value="${esc(S.ui.sessTitle || '')}"></div>
-      <div class="seg" style="margin:10px 0" id="sessMode"><button type="button" data-smode="together" class="${S.ui.sessMode !== 'synced' ? 'active' : ''}">Focus together</button><button type="button" data-smode="synced" class="${S.ui.sessMode === 'synced' ? 'active' : ''}">Synced timer</button></div>
-      <p class="lbl" style="margin:-4px 0 10px">${S.ui.sessMode === 'synced' ? CLAN_MODES.synced.desc : CLAN_MODES.together.desc}.</p>
-      <div class="grid-2" style="gap:10px">
-        <label class="lbl">Who can join<select id="sessVis">${Object.entries(SESS_VIS).map(([k, v]) => `<option value="${k}"${(S.ui.sessVis || 'friends') === k ? ' selected' : ''}>${v.name} — ${v.desc}</option>`).join('')}</select></label>
-        <label class="lbl">Seats<select id="sessMax">${[2, 3, 4, 5, 6, 8, 10].map(n => `<option value="${n}"${(+S.ui.sessMax || 6) === n ? ' selected' : ''}>${n}</option>`).join('')}</select></label>
-      </div>
-      <div class="row between" style="margin-top:10px;gap:8px;flex-wrap:wrap"><label class="lbl"><input type="checkbox" id="sessLater"${S.ui.sessLater ? ' checked' : ''}> Plan it for later <input type="time" id="sessTime" value="${esc(S.ui.sessTime || '')}" style="margin-left:6px"></label>
-        <button class="btn primary" type="submit" data-shost>Start the session</button></div>
-    </form></div>`;
+  const summary = LIVE.summary && (LIVE.summary.home === 'sessions' || LIVE.summary.home === 'friends') ? liveSummaryHTML() : '';
+  const live = now.length ? `<ul class="sess-tiles">${now.map(sessTileHTML).join('')}</ul>`
+    : SESS.at ? sceneEmpty('wave', 'big-icon', `<h3 style="margin:8px 0 4px">No one’s studying right now</h3><p class="lbl" style="margin:0 0 12px">Start one and your friends will see it.</p><button class="btn primary" data-shostopen>Host a session</button>`)
+    : skelRows(2);
+  body.innerHTML = `<div class="sess-page">${summary}
+    <div class="card sess-hero"><div class="sh-text"><h1>Study sessions</h1><p class="muted">Study at one table with friends: everyone focuses, nobody chats. No clan needed.</p></div>
+      <div class="sh-act"><button class="btn primary" id="sessHostOpen" data-shostopen>＋ Host a session</button><span class="lbl">Rhythm: ${esc(p.name)} · ${p.focus}/${p.short} × ${p.rounds}</span></div></div>
+    ${mine.length ? `<div class="card" id="sessMine" style="margin-bottom:16px"><h2>Your table</h2><ul class="sess-tiles">${mine.map(sessTileHTML).join('')}</ul></div>` : ''}
+    <div class="mason sess-cards">
+      <div class="card" id="sessLive"><div class="row between"><h2 style="margin:0">Live now</h2><button class="linkbtn" data-srefresh title="Refresh" aria-label="Refresh">↻</button></div>${live}</div>
+      ${sessUpcomingHTML(planned)}
+      ${sessHistoryHTML()}
+    </div></div>`;
+  animateFills(body);
 }
+/* ----- the host sheet: name → how you'll study → who can join → seats → when (and the preset it uses) ----- */
+const HS_STEPS = ['Name', 'Mode', 'Who can join', 'Seats', 'When'];
+let hsStep = 0;
+function hostSheetHTML() {
+  const ui = S.ui, mode = ui.sessMode === 'synced' ? 'synced' : 'together', vis = SESS_VIS[ui.sessVis] ? ui.sessVis : 'friends', max = [2, 3, 4, 5, 6, 8, 10].includes(+ui.sessMax) ? +ui.sessMax : 6, later = !!ui.sessLater;
+  const p = activePreset(), problem = sessPatternProblem(p);
+  const opt = (name, val, on, title, desc) => `<label class="hs-opt"><input type="radio" name="${name}" value="${val}"${on ? ' checked' : ''}><span><b>${title}</b><span class="lbl">${desc}</span></span></label>`;
+  return `<form id="sessForm" autocomplete="off" novalidate>
+    <div class="hs-top"><h2 id="hsTitle">Host a study session</h2><div class="hs-dots" aria-hidden="true">${HS_STEPS.map((_, i) => `<i class="${i === hsStep ? 'on' : ''}"></i>`).join('')}</div></div>
+    <p class="lbl" style="margin:0" id="hsWhere">Step ${hsStep + 1} of ${HS_STEPS.length} · ${HS_STEPS[hsStep]}</p>
+    <div class="hs-step${hsStep === 0 ? ' on' : ''}" data-hs="0"><h3>What are you studying?</h3><p class="lbl">Friends see this on your table.</p>
+      <input type="text" id="sessTitle" placeholder="e.g. Organic chemistry" maxlength="40" value="${esc(ui.sessTitle || '')}">
+      <p class="lbl" id="hsTitleErr" role="alert" style="color:var(--danger);min-height:18px;margin:6px 0 0"></p></div>
+    <div class="hs-step${hsStep === 1 ? ' on' : ''}" data-hs="1"><h3>How you’ll study</h3><p class="lbl">You can’t change this once the table is open.</p><div class="hs-opts">
+      ${opt('sessMode', 'together', mode === 'together', 'Focus together', 'Everyone runs their own timer and preset at one table. Stepping away only affects you.')}
+      ${opt('sessMode', 'synced', mode === 'synced', 'Synced timer', 'One shared timer for the whole table — you start, pause and skip for everyone. It takes over your timer.')}</div></div>
+    <div class="hs-step${hsStep === 2 ? ' on' : ''}" data-hs="2"><h3>Who can join</h3><p class="lbl">You can make or switch off an invite link later.</p><div class="hs-opts">
+      ${Object.entries(SESS_VIS).map(([k, v]) => opt('sessVis', k, vis === k, v.name, v.desc)).join('')}</div></div>
+    <div class="hs-step${hsStep === 3 ? ' on' : ''}" data-hs="3"><h3>How many seats?</h3><p class="lbl">Including you.</p>
+      <div class="hs-seats" role="radiogroup" aria-label="Seats">${[2, 3, 4, 5, 6, 8, 10].map(n => `<label><input type="radio" name="sessMax" value="${n}"${max === n ? ' checked' : ''} aria-label="${n} seats"><span>${n}</span></label>`).join('')}</div></div>
+    <div class="hs-step${hsStep === 4 ? ' on' : ''}" data-hs="4"><h3>When</h3><div class="hs-opts">
+      ${opt('sessWhen', 'now', !later, 'Start now', 'The table opens straight away.')}
+      <label class="hs-opt"><input type="radio" name="sessWhen" value="later"${later ? ' checked' : ''}><span><b>Plan it for later</b><span class="lbl">Friends see the time and can set a reminder. <input type="time" id="sessTime" value="${esc(ui.sessTime || '')}" aria-label="Start time" style="margin-top:6px"></span></span></label></div>
+      <div class="hs-preset"><span>Rhythm</span><select id="sessPreset" aria-label="Preset for this session">${S.presets.map(x => `<option value="${esc(x.id)}"${x.id === p.id ? ' selected' : ''}>${esc(x.name)} · ${x.focus}/${x.short} × ${x.rounds}</option>`).join('')}</select></div>
+      ${problem ? `<p class="lbl warn-note" id="sessPresetWarn" style="margin:8px 0 0;color:var(--danger)">${esc(problem)}.</p>` : ''}
+      <p class="lbl hs-sum" id="hsSum"></p></div>
+    <div class="hs-nav"><button type="button" class="btn" id="hsBack">${hsStep ? 'Back' : 'Cancel'}</button><div class="hs-r">
+      ${hsStep < HS_STEPS.length - 1 ? '<button type="button" class="btn primary" id="hsNext">Next</button>' : `<button type="submit" class="btn primary" data-shost${problem ? ' disabled' : ''}>${later ? 'Plan the session' : 'Start the session'}</button>`}</div></div>
+  </form>`;
+}
+/** Keep what's been chosen so far (the sheet re-draws on every step). */
+function hostSheetRead() {
+  const f = $('#sessForm'); if (!f) return;
+  const v = n => { const x = f.querySelector(`input[name="${n}"]:checked`); return x ? x.value : ''; };
+  const t = $('#sessTitle'); if (t) S.ui.sessTitle = t.value;
+  if (v('sessMode')) S.ui.sessMode = v('sessMode');
+  if (v('sessVis')) S.ui.sessVis = v('sessVis');
+  if (v('sessMax')) S.ui.sessMax = +v('sessMax');
+  if (v('sessWhen')) S.ui.sessLater = v('sessWhen') === 'later';
+  const tm = $('#sessTime'); if (tm) S.ui.sessTime = tm.value;
+}
+function hostSheetDraw(focusFirst = true) {
+  const d = $('#sessHostDlg');
+  $('#hsBody').innerHTML = hostSheetHTML();   // (not the dialog itself: toasts shown over the sheet live in it)
+  const sum = $('#hsSum');
+  if (sum) { const ui = S.ui, p = activePreset(); sum.textContent = `“${(ui.sessTitle || '').trim() || `${USER.username}'s session`}” · ${CLAN_MODES[ui.sessMode === 'synced' ? 'synced' : 'together'].short} · ${(SESS_VIS[ui.sessVis] || SESS_VIS.friends).name} · ${+ui.sessMax || 6} seats · ${p.focus}/${p.short} × ${p.rounds}`; }
+  if (focusFirst) { const f = d.querySelector('.hs-step.on input:checked, .hs-step.on input[type=text], .hs-step.on input'); if (f) f.focus({ preventScroll: true }); }
+}
+function openHostSheet() {
+  if (inLive()) { toast('Leave your current session first'); return; }
+  hsStep = 0;
+  hostSheetDraw(false);
+  const d = $('#sessHostDlg');
+  if (!d.open) d.showModal();
+  setTimeout(() => { const t = $('#sessTitle'); if (t) t.focus(); }, 30);
+}
+function hostSheetGo(dir) {
+  hostSheetRead();
+  if (dir > 0 && hsStep === 0) { const bad = (S.ui.sessTitle || '').trim() ? clanTitleProblem(S.ui.sessTitle) : ''; if (bad) { $('#hsTitleErr').textContent = bad; return; } }
+  if (dir < 0 && hsStep === 0) { $('#sessHostDlg').close(); saveLocal(); return; }
+  hsStep = clamp(hsStep + dir, 0, HS_STEPS.length - 1);
+  hostSheetDraw();
+}
+$('#sessHostDlg').addEventListener('click', e => {
+  if (e.target.closest('#hsNext')) { hostSheetGo(1); return; }
+  if (e.target.closest('#hsBack')) { hostSheetGo(-1); return; }
+});
+$('#sessHostDlg').addEventListener('change', e => {
+  if (e.target.id === 'sessPreset') { hostSheetRead(); S.activePresetId = e.target.value; save(); renderAll(); hostSheetDraw(false); $('#sessPreset').focus(); return; }   // the preset this session uses (and the timer's)
+  if (e.target.name === 'sessWhen' || e.target.name === 'sessMode' || e.target.name === 'sessVis' || e.target.name === 'sessMax') { hostSheetRead(); if (e.target.name === 'sessWhen') { hostSheetDraw(false); const x = $(`#sessHostDlg input[name=sessWhen][value=${e.target.value}]`); if (x) x.focus(); if (e.target.value === 'later') { const t = $('#sessTime'); if (t) t.focus(); } } }
+});
+$('#sessHostDlg').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'sessTitle') { e.preventDefault(); hostSheetGo(1); } });
+$('#sessHostDlg').addEventListener('submit', async e => {
+  if (e.target.id !== 'sessForm') return;
+  e.preventDefault();
+  hostSheetRead();
+  const btn = e.target.querySelector('[data-shost]');
+  if (isPreview()) { previewPrompt(btn); return; }
+  const title = (S.ui.sessTitle || '').trim() || `${USER.username}'s session`, later = !!S.ui.sessLater, time = S.ui.sessTime || '';
+  let plan = 0;
+  if (later) {
+    if (!/^\d\d:\d\d$/.test(time)) { toast('Pick a start time — or choose Start now', 3000); const t = $('#sessTime'); if (t) t.focus(); return; }
+    const [h, m] = time.split(':').map(Number); const d = new Date(); d.setHours(h, m, 0, 0); if (d.getTime() < Date.now() - 60000) d.setDate(d.getDate() + 1); plan = d.getTime();
+  }
+  saveLocal();
+  const ok = await sessAct(btn, () => sessCreate({ title, mode: S.ui.sessMode === 'synced' ? 'synced' : 'together', vis: SESS_VIS[S.ui.sessVis] ? S.ui.sessVis : 'friends', max: +S.ui.sessMax || 6, plan }), { ok: later ? 'Session planned — your table is open' : 'Session started', denied: sessCreateDenied });
+  if (ok) { $('#sessHostDlg').close(); showTab('sessions'); }
+});
+/* ----- "Remind me" on a friend's planned session: kept on this device, a notice when it starts ----- */
+function sessToggleRemind(sid) {
+  const l = SESS.lobby.find(x => x.id === sid); if (!l) return;
+  const r = S.ui.sessRemind ||= {};
+  if (r[sid]) { delete r[sid]; toast('Reminder off', 2000, true, { now: true }); }
+  else { r[sid] = { at: +l.plan || Date.now(), title: String(l.title || '').slice(0, 40), host: String(l.hostName || '').slice(0, 24) }; toast(`I’ll remind you at ${fmtHM(l.plan)} 🔔`, 2400, true, { now: true }); }
+  saveLocal(); sessRerender();
+}
+function sessRemindTick() {
+  const r = S.ui && S.ui.sessRemind;
+  if (!r || !USER || USER.guest || isPreview()) return;
+  let ch = false;
+  for (const [sid, x] of Object.entries(r)) {
+    if (!x || !+x.at) { delete r[sid]; ch = true; continue; }
+    if (Date.now() < x.at - 30000) continue;
+    delete r[sid]; ch = true;
+    if (Date.now() - x.at > 30 * 60000) continue;   // long gone (the app was closed): no late notice
+    inboxAdd({ type: 'session', key: 'srem:' + sid, title: `Starting now: ${x.title}`, body: `@${x.host}’s study session — join from Study sessions`, go: { tab: 'sessions' } });
+    toast(`“${x.title}” is starting — join from Study sessions`, 5000, false, { now: true, log: false, type: 'session', go: { tab: 'sessions' } });
+    SESS.at = 0;
+  }
+  if (ch) saveLocal();
+}
+setInterval(sessRemindTick, 30000);
+/* the lobby is checked every 5 minutes while the app is open, for the nav's live dot (three small queries, cached 90 s) */
+const sessLobbyTick = () => { if (USER && !USER.guest && socialReady() && !document.hidden) sessLoad().catch(() => {}); };
+setTimeout(sessLobbyTick, 15000);
+setInterval(sessLobbyTick, 5 * 60000);
 function sessTableToolsHTML() {
   const d = LIVE.doc; if (!d) return '';
   const host = liveMine(), people = livePeople(), members = d.members || [];
@@ -20443,59 +20997,44 @@ function sessTableToolsHTML() {
     ${host && seats ? `<details style="margin-top:10px"><summary class="lbl">Manage seats (${members.length - 1})</summary><ul class="plist">${seats}</ul></details>` : ''}
     ${host ? '' : '<p class="lbl" style="margin:10px 0 0">The host can hand over, remove people or end the session. If the host leaves, the longest-present person takes over.</p>'}</div>`;
 }
-function renderSessions(fromLoad) {
-  if (!fromLoad || !SESS.at) sessLoad();
-  const body = $('#friendsBody');
-  if (inSess()) { body.innerHTML = liveTableHTML() + sessTableToolsHTML(); animateFills(body); return; }
-  const lobby = SESS.lobby.filter(l => l.host !== USER.uid), mine = SESS.mine, now = lobby.filter(l => !(l.plan > Date.now())), planned = lobby.filter(l => l.plan > Date.now());
-  const hist = sessHistory();
-  body.innerHTML = `${LIVE.summary && LIVE.summary.home === 'friends' ? liveSummaryHTML() : ''}${sessHostFormHTML()}
-    ${mine.length ? `<div class="card"><h2>Your session</h2><ul class="clan-lives">${mine.map(sessRowHTML).join('')}</ul></div>` : ''}
-    <div class="card"><div class="row between"><h2 style="margin:0">Live now</h2><button class="linkbtn" data-srefresh title="Refresh">↻</button></div>
-      ${now.length ? `<ul class="clan-lives">${now.map(sessRowHTML).join('')}</ul>` : `<p class="lbl" style="margin:8px 0 0">${SESS.at ? 'No one you can join is studying right now. Host one — your friends will see it.' : skelRows(2)}</p>`}</div>
-    ${planned.length ? `<div class="card"><h2>Planned</h2><ul class="clan-lives">${planned.map(sessRowHTML).join('')}</ul></div>` : ''}
-    <div class="card"><h2>Your history</h2>${hist.length ? `<ul class="plist">${hist.map(h => `<li class="person"><div class="who"><div class="nm-row">${esc(h.title || 'Study session')}</div><div class="sub">${fmtShort(new Date(h.last))} · ${h.blocks} block${h.blocks === 1 ? '' : 's'} · ${fmtMin(h.min)}${h.mates.size ? ` · with ${h.mates.size} other${h.mates.size === 1 ? '' : 's'}` : ''}</div></div></li>`).join('')}</ul>` : '<p class="lbl" style="margin:8px 0 0">Blocks you focus inside a session will be listed here.</p>'}</div>`;
-}
-/* ----- clicks in the Friends tab for sessions ----- */
-$('#friendsBody').addEventListener('click', async e => {
+/* ----- clicks on sessions: the Study sessions section, and the "Ask to join" on friend rows in Friends ----- */
+async function sessClick(e) {
   const t = e.target, lv = t.closest('#lvLeave, #lvSumClose, [data-lvctl], [data-react]');
+  if (t.closest('[data-shostopen]')) { openHostSheet(); return; }
   if (lv && inSess()) {
     e.stopPropagation();
-    if (lv.id === 'lvSumClose') { LIVE.summary = null; renderFriends(true); return; }
+    if (lv.id === 'lvSumClose') { LIVE.summary = null; sessRerender(); return; }
     if (lv.id === 'lvLeave') { if (await confirmDlg({ title: 'Leave the session?', body: 'Your focus so far counts if you’ve done at least 80% of this block.', ok: 'Leave' })) sessLeave(); return; }
     if (lv.dataset.lvctl) { if (lv.dataset.lvctl === 'end' && !(await confirmDlg({ title: 'End the session for everyone?', ok: 'End session', danger: true }))) return; liveControl(lv.dataset.lvctl); return; }
     if (lv.dataset.react) { liveReact(lv.dataset.react); return; }
   }
-  if (lv && lv.id === 'lvSumClose') { LIVE.summary = null; renderFriends(true); return; }
-  const b = t.closest('[data-sjoin],[data-sask],[data-scancel],[data-sallow],[data-sdeny],[data-skick],[data-shand],[data-sinvite],[data-scopy],[data-sshare],[data-scode],[data-srefresh],[data-smode]');
+  if (lv && lv.id === 'lvSumClose') { LIVE.summary = null; sessRerender(); return; }
+  const b = t.closest('[data-sjoin],[data-sask],[data-scancel],[data-sallow],[data-sdeny],[data-skick],[data-shand],[data-sinvite],[data-scopy],[data-sshare],[data-scode],[data-srefresh],[data-sremind],[data-hrsvp]');
   if (!b) return;
   e.stopPropagation();   // a button inside a friend row must not open their profile
+  if (b.dataset.srefresh !== undefined) { await sessLoad(true); sessRerender(); return; }   // (reading is fine in the demo)
   if (isPreview()) { previewPrompt(b); return; }
-  if (b.dataset.smode) { S.ui.sessMode = b.dataset.smode; if ($('#sessTitle')) S.ui.sessTitle = $('#sessTitle').value; saveLocal(); renderFriends(true); return; }
-  if (b.dataset.srefresh !== undefined) { await sessLoad(true); renderFriends(true); return; }
-  if (b.dataset.sjoin) { clanAct(b, () => sessJoin(b.dataset.sjoin)); return; }
-  if (b.dataset.sask) { clanAct(b, () => sessJoin(b.dataset.sask)); return; }
+  if (b.dataset.sremind) { sessToggleRemind(b.dataset.sremind); return; }
+  if (b.dataset.hrsvp) {   // a clan session's RSVP, the same as on the Clan page
+    const row = b.closest('[data-hcsid]'), cs = row && (CLAN.sessions || []).find(x => x.id === row.dataset.hcsid);
+    if (cs) clanAct(b, async () => { await clanRsvp(cs.id, b.dataset.hrsvp); if (b.dataset.hrsvp !== 'no' && !(S.clanRem[cs.id] && S.clanRem[cs.id].on)) setClanRem(cs.id, true); sessRerender(); renderReminderBits(); });
+    return;
+  }
+  if (b.dataset.sjoin) { sessAct(b, () => sessJoin(b.dataset.sjoin), { denied: 'Couldn’t join — the session may be full or closed' }); return; }
+  if (b.dataset.sask) { sessAct(b, () => sessJoin(b.dataset.sask), { denied: 'Couldn’t ask to join — the session may have closed' }); return; }
   if (b.dataset.scancel !== undefined) { sessCancelAsk(); return; }
-  if (b.dataset.sallow) { clanAct(b, () => sessAnswer(b.dataset.sallow, true)); return; }
-  if (b.dataset.sdeny) { clanAct(b, () => sessAnswer(b.dataset.sdeny, false)); return; }
-  if (b.dataset.skick) { clanAct(b, () => sessKick(b.dataset.skick)); return; }
-  if (b.dataset.shand) { clanAct(b, () => sessHandOver(b.dataset.shand)); return; }
-  if (b.dataset.sinvite) { clanAct(b, () => sessInvite(b.dataset.sinvite)); return; }
+  if (b.dataset.sallow) { sessAct(b, () => sessAnswer(b.dataset.sallow, true), { denied: 'Couldn’t let them in — the request may have been withdrawn or the table is full' }); return; }
+  if (b.dataset.sdeny) { sessAct(b, () => sessAnswer(b.dataset.sdeny, false), { denied: 'Couldn’t decline — the request may have been withdrawn' }); return; }
+  if (b.dataset.skick) { sessAct(b, () => sessKick(b.dataset.skick), { denied: 'Couldn’t remove them — they may have left already' }); return; }
+  if (b.dataset.shand) { sessAct(b, () => sessHandOver(b.dataset.shand), { denied: 'Couldn’t hand over hosting — they may have left' }); return; }
+  if (b.dataset.sinvite) { sessAct(b, () => sessInvite(b.dataset.sinvite), { denied: 'Couldn’t send the invite — try again in a moment' }); return; }
   if (b.dataset.scopy) { copyText(sessLink(b.dataset.scopy), { btn: b, what: 'Invite link' }); return; }
   if (b.dataset.sshare) { shareLink({ title: 'Study with me on Pomodorolist', text: 'Join my study session', url: sessLink(b.dataset.sshare), btn: b }); return; }
-  if (b.dataset.scode) { clanAct(b, () => sessRegenCode(b.dataset.scode === 'off')); return; }
-});
-$('#friendsBody').addEventListener('submit', async e => {
-  if (e.target.id !== 'sessForm') return;
-  e.preventDefault();
-  if (isPreview()) { previewPrompt(e.target.querySelector('[data-shost]')); return; }
-  const title = $('#sessTitle').value.trim() || `${USER.username}'s session`, later = $('#sessLater').checked, time = $('#sessTime').value;
-  let plan = 0;
-  if (later && /^\d\d:\d\d$/.test(time)) { const [h, m] = time.split(':').map(Number); const d = new Date(); d.setHours(h, m, 0, 0); if (d.getTime() < Date.now() - 60000) d.setDate(d.getDate() + 1); plan = d.getTime(); }
-  Object.assign(S.ui, { sessTitle: title, sessVis: $('#sessVis').value, sessMax: +$('#sessMax').value, sessLater: later, sessTime: time }); saveLocal();
-  const btn = e.target.querySelector('[data-shost]');
-  clanAct(btn, () => sessCreate({ title, mode: S.ui.sessMode === 'synced' ? 'synced' : 'together', vis: $('#sessVis').value, max: +$('#sessMax').value, plan }), 'Session started');
-});
+  if (b.dataset.scode) { sessAct(b, () => sessRegenCode(b.dataset.scode === 'off'), { denied: 'Couldn’t change the invite link — only the host can' }); return; }
+}
+$('#friendsBody').addEventListener('click', sessClick);
+$('#sessBody').addEventListener('click', sessClick);
+$('#sessBody').addEventListener('click', e => { if (e.target.closest('#guestLogin')) logout(); });   // a guest: log in (as in Friends)
 
 /* ---------- Clan screen ---------- */
 const clanAgo = at => { const m = Math.max(0, Math.round((Date.now() - at) / 60000)); return m < 1 ? 'just now' : m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} d ago`; };
@@ -20616,7 +21155,7 @@ function renderLiveClock() {
   const st = liveState(d);
   el.textContent = st.done ? '0:00' : fmtClock(st.left);
 }
-function renderLive() { renderClanBits(); if (!liveIsClan()) renderSessionBits(); }   // renderClanBits draws the clan screen when it is open (once, v1.17); sessions without a clan draw in Friends › Study sessions (v1.18)
+function renderLive() { renderClanBits(); if (!liveIsClan()) renderSessionBits(); }   // renderClanBits draws the clan screen when it is open (once, v1.17); sessions without a clan draw in Study sessions (v1.19.1; before: Friends › Study sessions (v1.18)
 function liveSummaryHTML() {
   const s = LIVE.summary;
   return `<div class="card lv-sum">
@@ -20694,11 +21233,42 @@ function membersHTML() {
     <ul class="cm-list">${rows}</ul>
     <div class="row" style="justify-content:flex-end;margin-top:8px"><button class="linkbtn danger-link" id="clanLeave">Leave clan</button></div></div>`;
 }
+/* ---------- Folding cards (v1.19.1) ----------
+   A card whose header opens and closes it: folded it shows a short view (.fold-x parts hidden) and a "Show all" button.
+   Open or folded is remembered per device (the demo keeps it for the visit only — it never writes). Smooth unless
+   Animations are off or reduced. */
+const FOLD_KEY = 'pomodorolist-fold';
+const FOLD = (() => { try { const o = JSON.parse(localStorage.getItem(FOLD_KEY) || '{}'); return o && typeof o === 'object' ? o : {}; } catch (e) { return {}; } })();
+const foldOpen = id => FOLD[id] === 1;
+/** The card's opening tag + header. Close it with </div></div>. */
+function foldHead(id, title, cls = '') {
+  const open = foldOpen(id);
+  return `<div class="card fold-card${cls ? ' ' + cls : ''}${open ? '' : ' folded'}" data-fold-id="${id}"><button type="button" class="fold-hd" data-fold="${id}" aria-expanded="${open}"><h2>${title}</h2><span class="fold-ic" aria-hidden="true">${open ? '▴' : '▾'}</span></button><div class="fold-body">`;
+}
+const foldMore = (id, label) => `<button type="button" class="linkbtn fold-more" data-fold="${id}">${label}</button>`;
+function setFold(card, open) {
+  const id = card.dataset.foldId, body = card.querySelector('.fold-body'), h0 = body ? body.offsetHeight : 0;
+  FOLD[id] = open ? 1 : 0;
+  try { localStorage.setItem(FOLD_KEY, JSON.stringify(FOLD)); } catch (e) { /* private mode */ }
+  card.classList.toggle('folded', !open);
+  const hd = card.querySelector('.fold-hd');
+  if (hd) { hd.setAttribute('aria-expanded', String(open)); hd.querySelector('.fold-ic').textContent = open ? '▴' : '▾'; }
+  const h1 = body ? body.offsetHeight : 0;
+  if (body && h0 !== h1 && motion() === 'full' && body.animate) body.animate([{ height: h0 + 'px' }, { height: h1 + 'px' }], { duration: 280, easing: 'cubic-bezier(.2,.8,.2,1)' });
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-fold]'); if (!b) return;
+  const card = b.closest('.fold-card'); if (!card) return;
+  uiSound('tick'); setFold(card, card.classList.contains('folded'));
+  if (!b.classList.contains('fold-hd')) card.querySelector('.fold-hd').focus({ preventScroll: true });
+});
+const FEED_SHORT = 5;
 function feedHTML() {
   const f = CLAN.feed;
   if (!f) return '';
-  const rows = f.filter(e => FEED_TEXT[e.type]).slice(0, 20).map(e => `<li><span>${feedLine(e)}</span><span class="lbl">${clanAgo(e.at || Date.now())}</span></li>`).join('');
-  return `<div class="card"><h2>Activity</h2>${rows ? `<ul class="clan-feed">${rows}</ul>` : '<p class="lbl">Nothing yet — focus sessions, new members and level-ups show up here.</p>'}</div>`;
+  const list = f.filter(e => FEED_TEXT[e.type] && feedEventOk(e)).slice(0, 20);
+  const rows = list.map((e, i) => `<li${i >= FEED_SHORT ? ' class="fold-x"' : ''}><span>${feedLine(e)}</span><span class="lbl">${clanAgo(e.at || Date.now())}</span></li>`).join('');
+  return `${foldHead('clanFeed', 'Activity', 'feed-card')}${rows ? `<ul class="clan-feed">${rows}</ul>${list.length > FEED_SHORT ? foldMore('clanFeed', `Show all (${list.length})`) : ''}` : '<p class="lbl">Nothing yet — focus sessions, new members and level-ups show up here.</p>'}</div></div>`;
 }
 function trophyHTML(d) {
   const raids = Object.entries(d.raids || {}).sort(), quests = Object.keys(d.quests || {}).length;
@@ -20736,7 +21306,7 @@ async function loadClanBoard(period, force) {
   return (CLB[key] = { rows, mine, error, at: error ? Date.now() - 160000 : Date.now() });
 }
 async function renderClanBoard(fromLoad) {
-  const period = S.ui.clbPeriod || 'week', wk = dayKey(weekMonday()), key = period + '|' + wk, c = CLB[key];
+  const period = S.ui.clbPeriod === 'all' ? 'all' : 'week', wk = dayKey(weekMonday()), key = period + '|' + wk, c = CLB[key];
   const head = `<div class="lb-head"><div class="seg" id="lbScope">${[['friends', 'Friends'], ['global', 'Global'], ['clans', 'Clans']].map(([s, n]) => `<button data-scope="${s}" class="${s === 'clans' ? 'active' : ''}">${n}</button>`).join('')}</div>
     <div class="seg" id="clbPeriod"><button data-cperiod="week" class="${period === 'week' ? 'active' : ''}">Weekly</button><button data-cperiod="all" class="${period === 'all' ? 'active' : ''}">All-time</button></div></div>`;
   if (!c || (!fromLoad && Date.now() - c.at > 3 * 60000)) {
@@ -20746,7 +21316,7 @@ async function renderClanBoard(fromLoad) {
   }
   const row = r => `<li class="${r.id === CLAN.id ? 'me' : ''}${r.rank <= 3 ? ' top' + r.rank : ''}" data-cpub="${esc(r.id)}" tabindex="0" role="button">
     <span class="rk">${r.rank}</span>${clanEmblemSVG(r, 30)}<span class="nm">${esc(r.name)} ${clanTagHTML(r.tag)}<span class="lbl clb-sub">Lv ${r.level} · ${r.members} member${r.members === 1 ? '' : 's'}</span></span><span class="v">${fmtMin(r.minutes)}</span></li>`;
-  $('#boardBody').innerHTML = head + `<div class="card">
+  $('#boardBody').innerHTML = head + `<div class="card" data-board="clans|${period}">
     <div class="row between lb-meta"><span class="lbl">${period === 'week' ? 'Clan focus this week · resets Monday' : 'All clan focus since each clan began'}</span><span class="lbl"><button class="linkbtn" id="clbRefresh" title="Refresh">↻</button></span></div>
     ${c.error ? `<div class="empty">${esc(c.error)}</div>` : c.rows.length ? `<ol class="lb clb">${c.rows.map(row).join('')}</ol>` : '<div class="empty">No clan has focused yet this week.</div>'}
     ${c.mine ? `<ol class="lb clb pinned">${row(c.mine)}</ol>` : ''}
@@ -20862,6 +21432,21 @@ function confirmDlg({ title, body = '', ok = 'OK', danger = false, type = '' }) 
     okB.onclick = () => done(true); $('#cfNo').onclick = () => done(false); dlg.oncancel = () => done(false);
     dlg.showModal();
   });
+}
+/** Run a study-session action (not a clan one) with a busy button and the session's own messages. v1.19.1: these went
+    through clanAct, which said "refreshing your clan" and reloaded the clan even for a session that has nothing to do
+    with one. A refused write reloads the session list instead. */
+async function sessAct(btn, fn, { ok = '', denied = 'That didn’t go through — the session may have changed, so it’s been refreshed' } = {}) {
+  if (btn) btn.disabled = true;
+  try { const r = await fn(); if (ok) toast(ok, 2400, true, { now: true }); return r ?? true; }
+  catch (e) {
+    console.warn('session', e);
+    const no = e && e.code === 'permission-denied';
+    toast(no ? (typeof denied === 'function' ? denied(e) : denied) : e && e.message && !e.code ? e.message : 'Couldn’t do that — check your connection', 3600, false, { now: true });
+    if (no) { SESS.at = 0; if (S.ui.tab === 'friends' || S.ui.tab === 'sessions') sessLoad(true).then(sessRerender).catch(() => {}); }
+    return false;
+  }
+  finally { if (btn && btn.isConnected) btn.disabled = false; }
 }
 /** Run a clan action with a busy button and a friendly error. */
 async function clanAct(btn, fn, okMsg = '') {
@@ -21065,10 +21650,10 @@ $('#ibBody').addEventListener('click', e => {
   if (!b) return;
   e.stopPropagation();
   const li = e.target.closest('[data-ib]'), it = IB.find(x => li && x.id === li.dataset.ib), done = () => { if (it) { it.read = true; it.act = null; ibSave(); } };
-  if (b.dataset.ibsjoin) { done(); clanAct(b, async () => { S.ui.friendsView = 'sessions'; showTab('friends'); await sessJoin(b.dataset.ibsjoin); }); }
+  if (b.dataset.ibsjoin) { done(); sessAct(b, async () => { showTab('sessions'); await sessJoin(b.dataset.ibsjoin); }); }
   else if (b.dataset.ibsno) { done(); }
-  else if (b.dataset.ibsok) { clanAct(b, async () => { await sessAnswer(b.dataset.ibsok, true); done(); }); }
-  else if (b.dataset.ibsdeny) { clanAct(b, async () => { await sessAnswer(b.dataset.ibsdeny, false); done(); }); }
+  else if (b.dataset.ibsok) { sessAct(b, async () => { await sessAnswer(b.dataset.ibsok, true); done(); }, { denied: 'Couldn’t let them in — the request may have been withdrawn or the table is full' }); }
+  else if (b.dataset.ibsdeny) { sessAct(b, async () => { await sessAnswer(b.dataset.ibsdeny, false); done(); }, { denied: 'Couldn’t decline — the request may have been withdrawn' }); }
 }, true);
 $('#ibBody').addEventListener('click', e => {
   const ok = e.target.closest('[data-ibcok]'), no = e.target.closest('[data-ibcno]');
@@ -21113,7 +21698,7 @@ function renderLiveBar() {
   const n = livePeople().length;
   el.innerHTML = `<span class="live-dot" aria-hidden="true"></span><b>${inTogether() ? 'At the table' : 'Live'}: ${esc(LIVE.doc.title)}</b><span class="lbl">${n} at the table · ${inTogether() ? 'your own timer' : liveMine() ? 'you run the timer' : 'host @' + esc(LIVE.doc.hostName)}</span><button class="linkbtn" data-goclan>Open table</button>`;
 }
-$('#liveBar').addEventListener('click', e => { if (e.target.closest('[data-goclan]')) { if (!liveIsClan()) S.ui.friendsView = 'sessions'; showTab(liveHome()); } });
+$('#liveBar').addEventListener('click', e => { if (e.target.closest('[data-goclan]')) showTab(liveHome()); });
 function clanTodayLine() {
   if (!inClan()) return '';
   if (inLive()) return `<div class="today-clan"><span class="live-dot" aria-hidden="true"></span>Studying live: <button data-goclan>${esc(LIVE.doc ? LIVE.doc.title : 'your clan')}</button></div>`;
@@ -21527,7 +22112,7 @@ Object.assign(DECOR_ART, {
 const NAV_MINI_KEY = 'pomodorolist-nav-mini';
 const NAV_MQ = { phone: matchMedia('(max-width: 640px)'), side: matchMedia('(min-width: 1180px)') };
 const navMode = () => (NAV_MQ.phone.matches ? 'phone' : NAV_MQ.side.matches ? 'side' : 'drawer');
-const NAV_LABEL = { timer: 'Timer', reminders: 'Reminders', quests: 'Quests', stats: 'Stats', garden: 'Garden', board: 'Leaderboard', shop: 'Shop', friends: 'Friends', clan: 'Clan', profile: 'Profile' };
+const NAV_LABEL = { timer: 'Timer', reminders: 'Reminders', quests: 'Quests', stats: 'Stats', garden: 'Garden', board: 'Leaderboard', shop: 'Shop', friends: 'Friends', sessions: 'Study sessions', clan: 'Clan', profile: 'Profile' };
 let navOpener = null;
 /** Is this element really on screen (not in the closed menu, not hidden)? */
 function navShown(el) {
