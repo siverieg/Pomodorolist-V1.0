@@ -109,7 +109,9 @@ service cloud.firestore {
     }
     function validStats() {
       let d = request.resource.data;
-      return d.keys().hasOnly(['username', 'level', 'tier', 'frame', 'color', 'avatar', 'aura', 'clanTag', 'global',
+      // (on an update only the changed keys are checked: the stored document passed this check when it was written,
+      //  and checking every key against the list costs too many of the 1,000 expressions a request may use — v1.19)
+      return (resource == null ? d.keys() : d.diff(resource.data).affectedKeys()).hasOnly(['username', 'level', 'tier', 'frame', 'color', 'avatar', 'aura', 'clanTag', 'global',
                                'dayKey', 'dayMin', 'weekKey', 'weekMin', 'weekKeySun', 'weekMinSun',
                                'monthKey', 'monthMin', 'lifeMin', 'lastWeekKey', 'lastWeekMin', 'produce', 'harvests', 'updatedAt'])
         && d.username == myName()
@@ -140,28 +142,96 @@ service cloud.firestore {
     // may take any value under its ceiling; while it stays on the document it never goes down and grows at most
     // perMin per minute since the last write (plus one 4-hour session), plus slack. Like lifeMin's first upload,
     // this is a self-reported stat: dropping and re-adding the field resets the bound (accepted; see the notes).
-    function growsTotal(f, perMin, slack) {
-      let n = request.resource.data;
-      let o = resource.data;
-      return !(f in n) || !(f in o) || (n[f] >= o[f] && n[f] - o[f] <= (elapsedMin() + 240) * perMin + slack);
+    function growsTotal(n, o, f, perMin, slack, room) {
+      return !(f in n) || !(f in o) || (n[f] >= o[f] && n[f] - o[f] <= room * perMin + slack);
     }
     function createLimits() { return true; }                  // first upload may include past history
     // Minutes since this document was last written (server clock).
     function elapsedMin() { return (request.time.toMillis() - resource.data.updatedAt.toMillis()) / 60000; }
     // Within the same period a total can't go down, and can't grow by more than the real time
     // that has passed since the last write plus one 4-hour session. A new period starts from 0.
-    function grows(keyField, minField) {
-      let n = request.resource.data;
-      let o = resource.data;
-      return (n[keyField] == o[keyField] && n[minField] >= o[minField] && n[minField] - o[minField] <= elapsedMin() + 240)
-          || (n[keyField] != o[keyField] && n[minField] <= elapsedMin() + 240);
+    // (n, o and room — minutes since the last write + one 4-hour session — are computed once per request: the rules
+    // engine allows 1,000 expressions per request, and recomputing them in every check went over it in v1.19)
+    function grows(n, o, keyField, minField, room) {
+      return (n[keyField] == o[keyField] && n[minField] >= o[minField] && n[minField] - o[minField] <= room)
+          || (n[keyField] != o[keyField] && n[minField] <= room);
     }
     function updateLimits() {
       let n = request.resource.data;
       let o = resource.data;
-      return grows('dayKey', 'dayMin') && grows('weekKey', 'weekMin') && grows('weekKeySun', 'weekMinSun') && grows('monthKey', 'monthMin')
-        && n.lifeMin >= o.lifeMin && n.lifeMin - o.lifeMin <= elapsedMin() + 240
-        && growsTotal('produce', 2.0, 0) && growsTotal('harvests', 0.034, 2);   // ≤ 2 produce per minute of focus; a harvest per ~30 minutes (v1.16)
+      let room = elapsedMin() + 240;
+      return grows(n, o, 'dayKey', 'dayMin', room) && grows(n, o, 'weekKey', 'weekMin', room) && grows(n, o, 'weekKeySun', 'weekMinSun', room) && grows(n, o, 'monthKey', 'monthMin', room)
+        && n.lifeMin >= o.lifeMin && n.lifeMin - o.lifeMin <= room
+        && growsTotal(n, o, 'produce', 2.0, 0, room) && growsTotal(n, o, 'harvests', 0.034, 2, room);   // ≤ 2 produce per minute of focus; a harvest per ~30 minutes (v1.16)
+    }
+
+    // ---------------- v1.19: ranks and streaks (a document of their own) ----------------
+    // rankStats/{uid}: the look shown on the boards, the global flag, this season's counted minutes and last season's
+    // peak, the current and best streak with the last day the goal was met, and the account's creation time. Kept out
+    // of publicStats so neither document's checks come near the rules engine's 1,000-expression budget per request.
+    match /rankStats/{uid} {
+      allow get: if signedIn() && (me() == uid || ((resource.data.global == true || isFriend(uid)) && !blockedBy(uid)));
+      allow list: if signedIn() && resource.data.global == true;   // the global Ranks and Streaks boards
+      allow create: if signedIn() && me() == uid && validRankStats() && request.resource.data.prevPeak == 0 && request.resource.data.seasonMin <= 240;   // a new document starts low: deleting and re-creating it can't jump the season
+      allow update: if signedIn() && me() == uid && validRankStats() && rankGrows();
+      allow delete: if signedIn() && me() == uid;
+    }
+    function validRankStats() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['username', 'level', 'tier', 'frame', 'color', 'avatar', 'aura', 'global',
+                               'seasonKey', 'seasonMin', 'prevPeak', 'streak', 'bestStreak', 'streakDay', 'joined', 'updatedAt'])
+        && d.username == myName() && d.global is bool && validAvatar(d) && validAura(d)
+        && d.level is int && d.level >= 1 && d.level <= 1000
+        && d.tier is string && d.tier.size() <= 20 && d.frame is string && d.frame.size() <= 30 && d.color is string && d.color.size() <= 30
+        && validSeason(d) && 'seasonKey' in d && validStreak(d) && 'streak' in d
+        && d.updatedAt == request.time;
+    }
+    function rankGrows() {
+      let n = request.resource.data;
+      let o = resource.data;
+      let room = (request.time.toMillis() - o.updatedAt.toMillis()) / 60000 + 240;
+      return seasonGrows(n, o, room) && streakGrows(n, o, room);
+    }
+
+    // ---------------- v1.19: seasons (ranks) and streaks ----------------
+    // A season is the current calendar month in UTC (the server clock). Counted minutes allow at most 14 h (840 min) a
+    // UTC day, so they can't exceed 840 × the day of the month; within a season they never go down and grow by at most
+    // the real time since the last write + 4 h; a new season starts from that bound. prevPeak (last season's peak rank,
+    // which sets the placement floor) is 0 on a new document or a new field, stays fixed within a season and, when the
+    // season changes, can't exceed the rank of the minutes the document held.
+    function seasonKeyNow() { return string(request.time.year()) + '-' + (request.time.month() < 10 ? '0' : '') + string(request.time.month()); }
+    // the rank index of counted minutes, as in the app (Bronze III 0 … Diamond I 14, Master 15, Grandmaster 16)
+    function rankOf(m) {
+      return (m >= 200 ? 1 : 0) + (m >= 400 ? 1 : 0) + (m >= 600 ? 1 : 0) + (m >= 900 ? 1 : 0) + (m >= 1200 ? 1 : 0) + (m >= 1500 ? 1 : 0)
+        + (m >= 2000 ? 1 : 0) + (m >= 2500 ? 1 : 0) + (m >= 3000 ? 1 : 0) + (m >= 3600 ? 1 : 0) + (m >= 4200 ? 1 : 0) + (m >= 4800 ? 1 : 0)
+        + (m >= 5600 ? 1 : 0) + (m >= 6400 ? 1 : 0) + (m >= 7200 ? 1 : 0) + (m >= 10800 ? 1 : 0);
+    }
+    function validSeason(d) {
+      return (!('seasonKey' in d) && !('seasonMin' in d) && !('prevPeak' in d))
+        || (d.seasonKey == seasonKeyNow() && d.seasonMin is int && d.seasonMin >= 0 && d.seasonMin <= request.time.day() * 840
+            && d.prevPeak is int && d.prevPeak >= 0 && d.prevPeak <= 16);
+    }
+    function seasonGrows(n, o, room) {
+      return !('seasonKey' in n)
+        || (!('seasonKey' in o) && n.prevPeak == 0)
+        || (n.seasonKey == o.seasonKey && n.seasonMin >= o.seasonMin && n.seasonMin - o.seasonMin <= room && n.prevPeak == o.prevPeak)
+        || (n.seasonKey != o.seasonKey && n.seasonMin <= room && n.prevPeak <= rankOf(o.seasonMin));
+    }
+    // Streaks: whole numbers, best ≥ current, best no longer than the account is old (joined = the account's creation
+    // time; it never changes once published); the best never goes down and grows by at most the elapsed days + 2 per write.
+    // The current streak may jump up to the best (a device that catches up). Self-reported: the first publish is only
+    // bounded by the account's age (see the report).
+    function validStreak(d) {
+      return (!('streak' in d) && !('bestStreak' in d) && !('streakDay' in d) && !('joined' in d))
+        || (d.streak is int && d.bestStreak is int && d.streak >= 0 && d.bestStreak >= d.streak && d.bestStreak <= 100000
+            && d.joined is int && d.joined > 0 && d.joined <= request.time.toMillis()
+            && d.bestStreak <= (request.time.toMillis() - d.joined) / 86400000 + 2
+            && d.streakDay is string && (d.streakDay == '' || dayKeyOk(d.streakDay)));
+    }
+    function streakGrows(n, o, room) {
+      let days = (room - 240) / 1440 + 2;
+      return !('streak' in n) || !('streak' in o)
+        || (n.joined == o.joined && n.bestStreak >= o.bestStreak && n.bestStreak - o.bestStreak <= days);   // (the current streak is bounded by the best)
     }
 
     // ---------------- Friend-visible activity + "focusing now" ----------------
@@ -236,12 +306,15 @@ service cloud.firestore {
     }
     function validInboxItem(id) {
       let d = request.resource.data;
-      return d.keys().hasOnly(['from', 'fromName', 'type', 'emoji', 'target', 'day', 'createdAt'])
+      return d.keys().hasOnly(['from', 'fromName', 'type', 'emoji', 'target', 'day', 'title', 'createdAt'])
         && d.from == me() && d.fromName == myName() && d.createdAt == request.time
         && ((d.type == 'kudos' && d.emoji in ['🔥', '👏', '💪', '⭐'] && d.target is string && d.target.matches('^[A-Za-z0-9_-]{1,40}$')
               && id == 'k_' + me() + '_' + d.target)
          || (d.type == 'nudge' && d.emoji == '👀' && d.day is string && d.day.size() == 10
-              && id == 'n_' + me() + '_' + d.day));
+              && id == 'n_' + me() + '_' + d.day)
+         // v1.18: a study-session invite — only the session's host sends it, the title passes the word filter
+         || (d.type == 'sinvite' && d.target is string && d.target.matches('^[A-Za-z0-9_-]{1,40}$') && d.title is string && d.title.size() <= 40 && cleanText(d.title)
+              && id == 'si_' + me() + '_' + d.target && get(path('studySessions', d.target)).data.host == me()));
     }
 
     // ---------------- Weekly challenges ----------------
@@ -271,7 +344,32 @@ service cloud.firestore {
         && n.members == o.members.concat([me()])
         && n.names.diff(o.names).affectedKeys().hasOnly([me()]) && n.names[me()] == myName()
         && n.progress.diff(o.progress).affectedKeys().hasOnly([me()]) && n.progress[me()] is int
-        && n.progress[me()] >= 0 && n.progress[me()] <= 10080;
+        && n.progress[me()] >= 0 && n.progress[me()] <= 10080
+        // v1.18 join cap: the same batch must bump my weekly join counter (challengeJoins/{me}) for this week and this challenge
+        && getAfter(joinsPath()).data.weekKey == o.weekKey && getAfter(joinsPath()).data.last == request.resource.id;
+    }
+    // ---------------- Challenge join counter (v1.18) ----------------
+    //   challengeJoins/{uid}  { weekKey, n, last, at }  — how many challenges I JOINED this week (my own don't count).
+    //   Written only in the batch that joins a challenge; n can never pass CH_JOIN_MAX (1) within a week, so a user
+    //   is in their own challenge plus at most one joined one. Owner-only read; never deleted.
+    function joinsPath() { return /databases/$(database)/documents/challengeJoins/$(me()); }
+    function validJoinCounter(d) {
+      return d.keys().hasOnly(['weekKey', 'n', 'last', 'at'])
+        && d.weekKey is string && d.weekKey.size() == 10
+        && d.n is int && d.n >= 1 && d.n <= 1
+        && d.last is string && d.last.size() <= 80 && d.at == request.time
+        && getAfter(path('challenges', d.last)).data.weekKey == d.weekKey
+        && me() in getAfter(path('challenges', d.last)).data.members
+        && getAfter(path('challenges', d.last)).data.creator != me();
+    }
+    match /challengeJoins/{uid} {
+      allow get: if signedIn() && me() == uid;
+      allow list: if false;
+      allow create: if signedIn() && me() == uid && validJoinCounter(request.resource.data) && request.resource.data.n == 1;
+      allow update: if signedIn() && me() == uid && validJoinCounter(request.resource.data)
+        && request.resource.data.last != resource.data.last
+        && (resource.data.weekKey != request.resource.data.weekKey ? request.resource.data.n == 1 : request.resource.data.n == resource.data.n + 1);
+      allow delete: if false;
     }
     function updateMyProgress() {
       let n = request.resource.data;
@@ -280,6 +378,118 @@ service cloud.firestore {
         && n.diff(o).affectedKeys().hasOnly(['progress'])
         && n.progress.diff(o.progress).affectedKeys().hasOnly([me()])
         && n.progress[me()] is int && n.progress[me()] >= o.progress[me()] && n.progress[me()] <= 10080;
+    }
+
+    // ============================================================================
+    // STUDY SESSIONS (v1.18) — live sessions without a clan, on the clan live engine.
+    //   studySessions/{sid}                 host, pattern, mode, visibility, members (≤ max ≤ 10), invited (friends-only lobby), code
+    //   studySessions/{sid}/people/{uid}    presence (members only, own document, heartbeat)
+    //   studySessions/{sid}/reactions/{uid} preset emoji, one doc per person, ≥ 2 s apart
+    //   studySessions/{sid}/requests/{uid}  "ask to join" (friends of the host; the host answers)
+    //   sessionCodes/{code}                 { sid } — invite links, get only
+    // Visibility: public (listed and joinable by anyone), link (joinable by anyone who has the id), friends (friends
+    // of the host see it and must be let in). Nobody writes another person's presence; only the host answers
+    // requests, kicks, hands over, changes the link; the longest-present member may take a stale host seat.
+    // ============================================================================
+    function sessPath(id) { return /databases/$(database)/documents/studySessions/$(id); }
+    function sessPeople(id, u) { return /databases/$(database)/documents/studySessions/$(id)/people/$(u); }
+    function sessReq(id, u) { return /databases/$(database)/documents/studySessions/$(id)/requests/$(u); }
+    function sessVisible(d) { return d.lobby == 'public' || d.vis == 'link' || me() in d.members || me() in d.invited; }
+    function sessMember(id) { return signedIn() && me() in get(sessPath(id)).data.members; }
+    function validPattern(p) { return p is map && p.keys().hasOnly(['focus', 'short', 'rounds']) && p.focus is int && p.focus >= 5 && p.focus <= 120 && p.short is int && p.short >= 1 && p.short <= 30 && p.rounds is int && p.rounds >= 1 && p.rounds <= 8; }
+    function validNewSession(sid) {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['title', 'host', 'hostName', 'pattern', 'mode', 'startAt', 'pausedAt', 'pauseTotal', 'shift', 'open', 'counted', 'vis', 'lobby', 'max', 'members', 'invited', 'welcome', 'plan', 'code', 'hostAt', 'createdAt', 'endedAt', 'updatedAt'])
+        && d.host == me() && d.hostName == myName()
+        && d.title is string && d.title.size() >= 1 && d.title.size() <= 40 && cleanText(d.title)
+        && validPattern(d.pattern) && d.mode in ['together', 'synced']
+        && d.startAt == request.time && d.pausedAt is int && d.pausedAt >= 0 && d.pauseTotal == 0 && d.shift == 0
+        && d.open == true && d.counted == false
+        && d.vis in ['friends', 'link', 'public']
+        && d.lobby == (d.vis == 'public' ? 'public' : (d.vis == 'friends' ? 'friends' : 'none'))
+        && d.max is int && d.max >= 2 && d.max <= 10
+        && d.members == [me()]
+        && d.invited is list && d.invited.size() <= 100 && (d.vis == 'friends' || d.invited.size() == 0)
+        && d.plan is int && d.plan >= 0 && d.welcome == []
+        && d.code is string && (d.code == '' || (d.code.size() == 8 && d.vis != 'friends' && getAfter(path('sessionCodes', d.code)).data.sid == sid))
+        && d.hostAt == request.time && d.createdAt == request.time && d.endedAt == 0 && d.updatedAt == request.time;
+    }
+    function sessUpdate(sid) {
+      let n = request.resource.data;
+      let o = resource.data;
+      let k = n.diff(o).affectedKeys();
+      let host = o.host == me();
+      let newMember = n.members.size() == o.members.size() + 1 && n.members[0:o.members.size()] == o.members;
+      let who = n.members[n.members.size() - 1];
+      return n.updatedAt == request.time && k.hasAny(['updatedAt']) && o.open == true && (
+        // someone joins: themselves (public / link) or a friend the host let in (the request says 'ok' after this batch)
+        (k.hasOnly(['members', 'updatedAt']) && newMember && n.members.size() <= o.max
+          && ((who == me() && !(me() in o.members) && (o.vis in ['public', 'link'] || me() in o.welcome))
+              || (host && who != me() && getAfter(sessReq(sid, who)).data.status == 'ok')))
+        // someone leaves (themselves), or the host removes someone
+        || (k.hasOnly(['members', 'updatedAt']) && n.members.size() == o.members.size() - 1 && o.members.hasAll(n.members)
+          && ((!(me() in n.members) && me() in o.members && me() != o.host) || (host && me() in n.members)))
+        // the host's timer controls, link and lobby
+        || (host && k.hasOnly(['pausedAt', 'pauseTotal', 'shift', 'code', 'lobby', 'invited', 'welcome', 'updatedAt'])
+          && n.pausedAt is int && n.pausedAt >= 0 && n.pauseTotal is int && n.pauseTotal >= 0 && n.shift is int && n.shift >= 0
+          && n.code is string && (n.code == '' || (n.code.size() == 8 && o.vis != 'friends' && getAfter(path('sessionCodes', n.code)).data.sid == sid))
+          && n.lobby in ['public', 'friends', 'none'] && n.invited is list && n.invited.size() <= 100 && n.welcome is list && n.welcome.size() <= 100)
+        // hand over (host), or take a stale host seat (any member, when the host's presence stopped)
+        || (k.hasOnly(['host', 'hostName', 'hostAt', 'updatedAt']) && n.host in o.members && n.hostAt == request.time && n.hostName is string && n.hostName.size() <= 30
+          && (host || (n.host == me() && me() in o.members
+              && (!exists(sessPeople(sid, o.host)) || get(sessPeople(sid, o.host)).data.state == 'left' || get(sessPeople(sid, o.host)).data.beat < request.time - duration.value(2, 'm')))))
+        // the end: the host, any member, or anyone once it is 6 hours old
+        || (k.hasOnly(['open', 'endedAt', 'lobby', 'invited', 'pausedAt', 'pauseTotal', 'shift', 'updatedAt']) && n.open == false && n.lobby == 'none' && n.invited.size() == 0
+          && (me() in o.members || o.createdAt < request.time - duration.value(6, 'h')))
+      );
+    }
+    match /studySessions/{sid} {
+      allow get, list: if signedIn() && sessVisible(resource.data);
+      allow create: if signedIn() && validNewSession(sid);
+      allow update: if signedIn() && sessUpdate(sid);
+      allow delete: if false;
+      match /people/{uid} {
+        allow read: if sessMember(sid);
+        allow create, update: if signedIn() && uid == me() && sessMember(sid)
+          && request.resource.data.keys().hasOnly(['name', 'avatar', 'color', 'aura', 'state', 'sname', 'min', 'beat', 'joinedAt', 'endAt', 'left'])
+          && request.resource.data.name == myName()
+          && request.resource.data.state in ['focus', 'break', 'paused', 'idle', 'away', 'left']
+          && request.resource.data.avatar is string && request.resource.data.color is string && request.resource.data.aura is string
+          && request.resource.data.sname is string && request.resource.data.sname.size() <= 80
+          && request.resource.data.min is int && request.resource.data.min >= 0 && request.resource.data.min <= 1440
+          && request.resource.data.joinedAt is number && request.resource.data.endAt is number && request.resource.data.left is number
+          && request.resource.data.beat == request.time;
+        allow delete: if signedIn() && (uid == me() || get(sessPath(sid)).data.host == me());
+      }
+      match /reactions/{rid} {
+        allow read: if sessMember(sid);
+        allow create, update: if signedIn() && rid == me() && sessMember(sid) && validReaction()
+          && (resource == null || resource.data.at < request.time - duration.value(2, 's'));
+        allow delete: if false;
+      }
+      match /requests/{uid} {
+        allow read: if signedIn() && (uid == me() || get(sessPath(sid)).data.host == me());
+        allow create: if signedIn() && uid == me() && !(me() in get(sessPath(sid)).data.members)
+          && get(sessPath(sid)).data.vis == 'friends' && isFriend(get(sessPath(sid)).data.host) && !blockedBy(get(sessPath(sid)).data.host)
+          && request.resource.data.keys().hasOnly(['name', 'at', 'status']) && request.resource.data.name == myName()
+          && request.resource.data.at == request.time && request.resource.data.status == 'pending';
+        // the host answers once; the requester may ask again 60 s later (a new pending request)
+        allow update: if signedIn() && (
+          (get(sessPath(sid)).data.host == me() && resource.data.status == 'pending'
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'by', 'answeredAt'])
+            && request.resource.data.status in ['ok', 'no'] && request.resource.data.by == myName() && request.resource.data.answeredAt == request.time)
+          || (uid == me() && request.resource.data.keys().hasOnly(['name', 'at', 'status']) && request.resource.data.status == 'pending'
+            && request.resource.data.name == myName() && request.resource.data.at == request.time && resource.data.at < request.time - duration.value(60, 's')));
+        allow delete: if signedIn() && (uid == me() || get(sessPath(sid)).data.host == me());
+      }
+    }
+    match /sessionCodes/{code} {
+      allow get: if signedIn();
+      allow list: if false;
+      allow create: if signedIn() && request.resource.data.keys().hasOnly(['sid'])
+        && getAfter(sessPath(request.resource.data.sid)).data.code == code && getAfter(sessPath(request.resource.data.sid)).data.host == me();
+      allow update: if false;
+      allow delete: if signedIn() && get(sessPath(resource.data.sid)).data.host == me();
     }
 
     // ============================================================================
@@ -325,7 +535,7 @@ service cloud.firestore {
       return lv is int && lv >= 1 && lv <= 30 && xp >= T[lv - 1] && (lv == 30 || xp < T[lv]);
     }
     // Clan Points: earned from clan XP, levels, weekly quests and raids (never real money or personal coins)
-    function earned(d) { return math.floor(d.xp / 30) + (d.level - 1) * 25 + d.tq * 100 + d.tr * 300; }
+    function earned(d) { return math.floor(d.xp / 30) + (d.level - 1) * 25 + d.tq * 100 + d.tr * 300 + d.get('bonus', 0); }   // + bonus points from clan sessions (v1.18)
     // Clan shop: item -> [price in Clan Points, clan level needed]
     function shopItem(k) {
       return {
@@ -348,15 +558,20 @@ service cloud.firestore {
       return [[7000, 9300], [7500, 10000], [5000, 6000], [6500, 8500], [8000, 10000], [5000, 6000],
               [7000, 9300], [6500, 8500], [5000, 6000], [6000, 8000], [8500, 10000], [5500, 7500]][i];
     }
+    // v1.18: the range is looked up once (`let`), so a clan write stays well inside the rules engine's 1,000-expression
+    // budget — from November 2026 the first version evaluated the 12-month table three times per call and clan
+    // creation (a six-document batch) tripped the budget.
     function raidHPFor(mk, members) {
+      let r = raidRange(mk);
+      let m = members > 30 ? 30 : (members < 1 ? 1 : members);
       return mk < '2026-11'
         ? (members * 600 > 1800 ? members * 600 : 1800)
-        : math.round((raidRange(mk)[0] * 29 + (raidRange(mk)[1] - raidRange(mk)[0]) * ((members > 30 ? 30 : (members < 1 ? 1 : members)) - 1)) / 2900.0) * 100;
+        : math.round((r[0] * 29 + (r[1] - r[0]) * (m - 1)) / 2900.0) * 100;
     }
     function validClanDoc(d) {
       return d.keys().hasOnly(['name', 'nameLower', 'tag', 'desc', 'emblem', 'banner', 'theme', 'frame', 'joinMode', 'members',
                                'xp', 'level', 'weekKey', 'weekMin', 'monthKey', 'monthMin', 'raidHP', 'weekGroups', 'lastLive',
-                               'spent', 'owned', 'lastBuy', 'tq', 'tr', 'quests', 'raids', 'gday', 'gstreak', 'lastMember', 'createdAt', 'updatedAt'])
+                               'spent', 'owned', 'lastBuy', 'tq', 'tr', 'quests', 'raids', 'gday', 'gstreak', 'lastMember', 'bonus', 'createdAt', 'updatedAt'])
         && validClanName(d.name) && d.nameLower == d.name.lower() && validTag(d.tag)
         && d.desc in ['jee', 'neet', 'boards', 'college', 'coding', 'language', 'chill', 'upsc', 'school', 'work']
         && d.joinMode in ['approval', 'open']
@@ -376,7 +591,7 @@ service cloud.firestore {
     // leeway for time zones). A far-future key would freeze the clan's counting for everyone, so it's refused.
     function dayKeyOk(k) {
       return k is string && k.matches('^20[0-9]{2}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$')
-        && int(k[0:4]) * 10000 + int(k[5:7]) * 100 + int(k[8:10]) <= request.time.year() * 10000 + request.time.month() * 100 + request.time.day() + 1;
+        && timestamp.date(int(k[0:4]), int(k[5:7]), int(k[8:10])) <= request.time + duration.value(1, 'd');   // at most a day ahead (also on the last day of a month — v1.19)
     }
     function monthKeyOk(k) {
       return k is string && k.matches('^20[0-9]{2}-(0[1-9]|1[0-2])$')
@@ -394,6 +609,7 @@ service cloud.firestore {
         && request.resource.data.members == 1 && request.resource.data.xp == 0 && request.resource.data.spent == 0
         && request.resource.data.owned.size() == 0 && request.resource.data.tq == 0 && request.resource.data.tr == 0
         && request.resource.data.quests.size() == 0 && request.resource.data.raids.size() == 0                       // nothing won yet
+        && request.resource.data.get('bonus', 0) == 0                                                                 // no bonus Clan Points yet (v1.18)
         && request.resource.data.weekMin == 0 && request.resource.data.monthMin == 0 && request.resource.data.weekGroups == 0 && request.resource.data.gstreak == 0
         && dayKeyOk(request.resource.data.weekKey) && monthKeyOk(request.resource.data.monthKey) && request.resource.data.raidHP == raidHPFor(request.resource.data.monthKey, 1)
         && request.resource.data.createdAt == request.time;
@@ -429,7 +645,7 @@ service cloud.firestore {
                 && !existsAfter(/databases/$(database)/documents/clans/$(cid)/requests/$(uid))
                 && request.resource.data.name == get(/databases/$(database)/documents/clans/$(cid)/requests/$(uid)).data.name)
           );
-        allow update: if signedIn() && (memberFocus(cid, uid) || memberLook(cid, uid) || memberRole(cid, uid));
+        allow update: if signedIn() && (memberFocus(cid, uid) || memberLook(cid, uid) || memberRole(cid, uid) || memberBonus(cid, uid));
         // leave, be removed (officers remove members; the leader removes anyone), or disband
         allow delete: if signedIn() && (uid == me() || isLeader(cid) || (isOfficer(cid) && resource.data.role == 'member'));
       }
@@ -534,7 +750,15 @@ service cloud.firestore {
           || (k.hasOnly(['quests', 'tq', 'updatedAt']) && clanQuest(cid, n, o))
           || (k.hasOnly(['raids', 'tr', 'updatedAt']) && clanRaid(cid, n, o))
           || (k.hasOnly(['weekGroups', 'weekKey', 'weekMin', 'gday', 'gstreak', 'lastLive', 'updatedAt']) && clanGroup(cid, n, o))
+          || (k.hasOnly(['bonus', 'updatedAt']) && clanBonus(cid, n, o))
         );
+    }
+    // Bonus Clan Points (v1.18): exactly what my member row adds to today's count (at most 6 a day, see memberBonus).
+    function clanBonus(cid, n, o) {
+      let mo = get(memberPath(cid, me())).data;
+      let mn = getAfter(memberPath(cid, me())).data;
+      let had = mn.bday == mo.get('bday', '') ? mo.get('bcp', 0) : 0;
+      return isMember(cid) && n.bonus is int && n.bonus - o.get('bonus', 0) == mn.bcp - had && n.bonus > o.get('bonus', 0);
     }
     // A member's completed focus adds to the clan, exactly as much as to their own contribution.
     function clanFocus(cid, n, o) {
@@ -630,6 +854,20 @@ service cloud.firestore {
         && ((n.weekKey == o.weekKey && n.weekMin == o.weekMin + (n.contrib - o.contrib)) || (n.weekKey > o.weekKey && n.weekMin == n.contrib - o.contrib))
         && n.lastIds is list && n.lastIds.size() <= 12
         && n.lastAt is int && n.lastAt <= request.time.toMillis() + 600000      // device clocks can be a little ahead
+        && n.updatedAt == request.time;
+    }
+    // Today's bonus Clan Points from clan sessions (v1.18): the day can't run ahead of the calendar or go back, the count
+    // only grows within a day and stays at most 6, and the clan's bonus total grows by exactly the same amount.
+    function memberBonus(cid, uid) {
+      let n = request.resource.data;
+      let o = resource.data;
+      let had = n.bday == o.get('bday', '') ? o.get('bcp', 0) : 0;
+      let y = request.time - duration.value(1, 'd');
+      return uid == me() && isMember(cid) && changed(['bday', 'bcp', 'updatedAt'])
+        && dayKeyOk(n.bday) && n.bday >= o.get('bday', '') && n.bcp is int && n.bcp > had && n.bcp <= 6
+        && int(n.bday[0:4]) * 10000 + int(n.bday[5:7]) * 100 + int(n.bday[8:10]) >= y.year() * 10000 + y.month() * 100 + y.day()   // today or yesterday only
+        && o.joinedAt < request.time - duration.value(1, 'd')                                                        // not in the first day of membership
+        && getAfter(clanPath(cid)).data.get('bonus', 0) - get(clanPath(cid)).data.get('bonus', 0) == n.bcp - had
         && n.updatedAt == request.time;
     }
     // My look in the member list (picture, name colour, aura, level) and whether others see my session names.
