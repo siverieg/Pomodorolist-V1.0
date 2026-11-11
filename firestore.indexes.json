@@ -1,0 +1,41 @@
+{
+  "indexes": [
+    { "collectionGroup": "publicStats", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "global", "order": "ASCENDING" }, { "fieldPath": "dayKey", "order": "ASCENDING" }, { "fieldPath": "dayMin", "order": "DESCENDING" } ] },
+    { "collectionGroup": "publicStats", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "global", "order": "ASCENDING" }, { "fieldPath": "weekKey", "order": "ASCENDING" }, { "fieldPath": "weekMin", "order": "DESCENDING" } ] },
+    { "collectionGroup": "publicStats", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "global", "order": "ASCENDING" }, { "fieldPath": "weekKeySun", "order": "ASCENDING" }, { "fieldPath": "weekMinSun", "order": "DESCENDING" } ] },
+    { "collectionGroup": "publicStats", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "global", "order": "ASCENDING" }, { "fieldPath": "monthKey", "order": "ASCENDING" }, { "fieldPath": "monthMin", "order": "DESCENDING" } ] },
+    { "collectionGroup": "publicStats", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "global", "order": "ASCENDING" }, { "fieldPath": "lifeMin", "order": "DESCENDING" } ] },
+    { "collectionGroup": "publicStats", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "global", "order": "ASCENDING" }, { "fieldPath": "produce", "order": "DESCENDING" } ] },
+    { "collectionGroup": "publicStats", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "global", "order": "ASCENDING" }, { "fieldPath": "harvests", "order": "DESCENDING" } ] },
+    { "collectionGroup": "challenges", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "members", "arrayConfig": "CONTAINS" }, { "fieldPath": "weekKey", "order": "ASCENDING" } ] },
+    { "collectionGroup": "challenges", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "invited", "arrayConfig": "CONTAINS" }, { "fieldPath": "weekKey", "order": "ASCENDING" } ] },
+    { "collectionGroup": "clans", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "weekKey", "order": "ASCENDING" }, { "fieldPath": "weekMin", "order": "DESCENDING" } ] },
+    { "collectionGroup": "clans", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "weekKey", "order": "ASCENDING" }, { "fieldPath": "weekMin", "order": "ASCENDING" } ] },
+    { "collectionGroup": "studySessions", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "lobby", "order": "ASCENDING" }, { "fieldPath": "createdAt", "order": "DESCENDING" } ] },
+    { "collectionGroup": "rankStats", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "global", "order": "ASCENDING" }, { "fieldPath": "seasonKey", "order": "ASCENDING" }, { "fieldPath": "seasonMin", "order": "DESCENDING" } ] },
+    { "collectionGroup": "rankStats", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "global", "order": "ASCENDING" }, { "fieldPath": "streakDay", "order": "ASCENDING" }, { "fieldPath": "streak", "order": "DESCENDING" } ] },
+    { "collectionGroup": "rankStats", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "global", "order": "ASCENDING" }, { "fieldPath": "bestStreak", "order": "DESCENDING" } ] },
+    { "collectionGroup": "posts", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "aud", "arrayConfig": "CONTAINS" }, { "fieldPath": "at", "order": "DESCENDING" } ] },
+    { "collectionGroup": "posts", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "aud", "arrayConfig": "CONTAINS" }, { "fieldPath": "author", "order": "ASCENDING" }, { "fieldPath": "at", "order": "ASCENDING" } ] },
+    { "collectionGroup": "posts", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "aud", "arrayConfig": "CONTAINS" }, { "fieldPath": "author", "order": "ASCENDING" }, { "fieldPath": "at", "order": "DESCENDING" } ] }
+  ],
+  "fieldOverrides": []
+}

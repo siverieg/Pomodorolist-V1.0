@@ -535,6 +535,42 @@ button.pc-rank:hover { border-color: var(--pc-acc, var(--accent)); } span.pc-ran
 .rank-line .rl-next { margin-left: auto; }
 .rl-bar i { background: linear-gradient(90deg, var(--rk2, #f2d06b), var(--rk, var(--accent))) !important; }
 .rank-line .rl-bar i { background: var(--rk, var(--accent)) !important; }
+/* v1.20: the division hint and the rank ladder */
+.rk-hint { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; margin: 6px 0 2px; font-size: 12.5px; color: var(--muted); }
+.rk-hint b { color: var(--rk, var(--accent)); }
+.rk-hint .rh-step { padding: 1px 7px; border-radius: 999px; border: 1px solid var(--line); }
+.rk-hint .rh-step.on { border-color: var(--rk, var(--accent)); background: color-mix(in srgb, var(--rk, var(--accent)) 14%, transparent); color: var(--text); font-weight: 700; }
+.rk-open { cursor: pointer; }
+.rk-b[data-rk] { cursor: help; }
+.rkl-dlg { width: min(520px, calc(100vw - 24px)); }
+.rkl-dlg h2 { margin: 0 0 2px; }
+.rkl-list { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 6px; }
+.rkl-row { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 10px; align-items: center; padding: 6px 8px; border-radius: 12px; }
+.rkl-row.cur { background: color-mix(in srgb, var(--rk) 12%, transparent); }
+.rkl-maj { display: flex; align-items: center; gap: 6px; font-weight: 700; color: var(--rk); }
+.rkl-maj .rk-b { margin: 0; }
+.rkl-divs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.rkl-divs.one { grid-template-columns: minmax(0, 1fr); }
+.rkl-div { position: relative; padding: 4px 8px; border: 1px solid var(--line); border-radius: 10px; font-size: 12px; line-height: 1.3; overflow: hidden; }
+.rkl-div b { display: block; font-size: 12.5px; }
+.rkl-div.done { border-color: color-mix(in srgb, var(--rk) 45%, var(--line)); }
+.rkl-div.me { border-color: var(--rk); box-shadow: 0 0 0 2px color-mix(in srgb, var(--rk) 35%, transparent); }
+.rkl-div.me::after { content: 'You'; position: absolute; top: 3px; right: 6px; font-size: 10px; font-weight: 800; color: var(--rk); }
+.rkl-div.nx { border-style: dashed; border-color: var(--rk); }
+.rkl-div .rkl-bar { display: block; height: 3px; margin-top: 4px; border-radius: 999px; background: var(--heat0); overflow: hidden; }
+.rkl-div .rkl-bar i { display: block; height: 100%; background: var(--rk); }
+.rkl-foot { margin: 12px 0 0; }
+@media (max-width: 420px) { .rkl-row { grid-template-columns: minmax(0, 1fr); gap: 4px; } }
+/* v1.20: overtime — after a focus block ends the timer counts up */
+#ring.ot .prog { stroke: var(--warn, #e0a030); }
+#ring.ot .time { color: var(--warn, #c98a1a); }
+:root[data-motion="full"] #ring.ot .ring-glow { animation: otGlow 2.4s ease-in-out infinite; }
+@keyframes otGlow { 50% { opacity: .55; } }
+.phase-label.ot { color: var(--warn, #c98a1a); }
+.ot-line { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 6px 10px; margin: -2px 0 8px; font-size: 13px; color: var(--muted); text-align: center; }
+.ot-line .linkbtn { color: var(--accent); padding: 0; }
+.ot-dlg { width: min(440px, calc(100vw - 24px)); }
+.sess .ot-tag, .ot-tag { font-size: 11px; font-weight: 700; color: var(--warn, #c98a1a); margin-left: 6px; white-space: nowrap; }
 .rk-card .rk-hero { display: flex; align-items: center; gap: 12px; margin: 10px 0 4px; } .rk-card .rk-name { font-size: 20px; font-weight: 800; color: var(--rk); }
 .rk-gifts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; } .rk-gift { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; padding: 3px 8px; border-radius: 99px; border: 1px solid var(--line); color: var(--muted); }
 .rk-gift .rk-b { margin: 0; } .rk-gift.got { color: var(--text); border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
@@ -560,6 +596,59 @@ button.pc-rank:hover { border-color: var(--pc-acc, var(--accent)); } span.pc-ran
 .wq-bar i { display: block; height: 100%; width: 100%; background: var(--accent); border-radius: inherit; transition: transform .6s var(--ease, ease); }
 .wq-st { flex: none; font-weight: 700; font-size: 13px; color: var(--muted); } .wq-row.done .wq-st { color: var(--accent); }
 .tr-card { margin-top: 16px; }
+/* v1.20: Posts */
+.post-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+/* v1.20 Posts section: a hero with the filters, then the feed in day cards (the shared balanced columns) */
+.posts-hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 16px; align-items: start; margin-bottom: 16px; }
+.posts-hero h1 { margin: 0 0 4px; font-size: clamp(22px, 3vw, 28px); }
+.posts-hero p { margin: 0; }
+.posts-hero .ph-act { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+.posts-hero .seg { grid-column: 1 / -1; justify-self: start; }
+.posts-hero .po-off { grid-column: 1 / -1; margin: 0; }
+@media (max-width: 560px) { .posts-hero { grid-template-columns: minmax(0, 1fr); } .posts-hero .ph-act { justify-content: flex-start; } }
+.post-day h2 { margin: 0 0 4px; font-size: 15px; color: var(--muted); font-weight: 700; letter-spacing: .02em; }
+.post-day .post-list { gap: 0; }
+.post-day .post { border: 0; border-radius: 0; background: none; padding: 12px 0; border-top: 1px solid var(--line); }
+.post-day .post:first-child { border-top: 0; }
+.post { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px 12px; padding: 12px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+.post .po-top { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.post .po-txt { margin-top: 2px; overflow-wrap: anywhere; }
+.post .po-txt .po-ic { margin-right: 4px; }
+.post .po-time { font-size: 12px; color: var(--muted); margin-left: auto; white-space: nowrap; }
+.post .po-react { grid-column: 2; display: flex; gap: 6px; flex-wrap: wrap; }
+.po-react button { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border: 1px solid var(--line); border-radius: 999px; background: none; color: inherit; font: inherit; font-size: 13px; cursor: pointer; }
+.po-react button.on { border-color: var(--accent); background: var(--accent-soft); }
+.po-react button:disabled { cursor: default; opacity: .8; }
+.po-react b { font-weight: 700; font-size: 12px; }
+.post-types { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 6px 14px; padding: 8px 0 4px; }
+.pt-opt { display: flex; align-items: center; gap: 6px; font-size: 14px; }
+/* v1.20: the Study Pass */
+.pass-hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px; align-items: center; background: linear-gradient(135deg, color-mix(in srgb, var(--ea) 16%, var(--surface)), color-mix(in srgb, var(--eb) 12%, var(--surface))); }
+.pass-hero .ph-name { font-size: clamp(20px, 3vw, 26px); font-weight: 800; margin: 2px 0 6px; }
+.pass-hero .ph-meta { display: flex; flex-wrap: wrap; gap: 6px; }
+.pass-hero .pill.warn { background: color-mix(in srgb, var(--warn, #e0a030) 22%, transparent); color: var(--text); font-weight: 700; }
+@media (max-width: 560px) { .pass-hero { grid-template-columns: minmax(0, 1fr); } .pass-hero .btn { width: 100%; } }
+.pass-view { grid-template-columns: minmax(0, 1fr); }   /* .stack is a grid: without this the 30-tier row sizes the column to its full width */
+.pass-card { min-width: 0; }
+.pass-card h2 { margin: 0; }
+.pass-card .pc-sub { margin: 4px 0 10px; }
+.pass-bar { position: relative; height: 8px; border-radius: 999px; background: var(--heat0); overflow: hidden; margin: 8px 0 4px; }
+.pass-bar i { position: absolute; inset: 0; transform-origin: left; background: linear-gradient(90deg, var(--ea, var(--accent)), var(--eb, var(--accent))); }
+.pass-row { display: grid; grid-auto-flow: column; grid-auto-columns: 108px; gap: 8px; overflow-x: auto; padding: 4px 2px 10px; scroll-snap-type: x proximity; scrollbar-width: thin; }
+.pt { scroll-snap-align: start; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 6px; border: 1px solid var(--line); border-radius: 14px; text-align: center; min-height: 148px; background: var(--surface); }
+.pt .pt-n { font-size: 11px; font-weight: 800; color: var(--muted); }
+.pt .pt-ic { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 12px; background: var(--heat0); font-size: 22px; overflow: hidden; }
+.pt .pt-ic svg { max-width: 42px; max-height: 42px; }
+.pt .pt-l { font-size: 11.5px; line-height: 1.25; min-height: 28px; overflow-wrap: anywhere; }
+.pt .pt-s { margin-top: auto; font-size: 11px; }
+.pt .btn { padding: 4px 10px; font-size: 12px; margin-top: auto; }
+.pt.big { border-color: color-mix(in srgb, var(--ea, var(--accent)) 55%, var(--line)); }
+.pt.ready { border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 25%, transparent); }
+.pt.got { opacity: .62; }
+.pt.got .pt-ic { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.pt.prepaid { opacity: .55; }
+.pt.cur { outline: 2px dashed color-mix(in srgb, var(--ea, var(--accent)) 60%, transparent); outline-offset: 2px; }
+.ql-pass { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 10px; padding: 8px 10px; border-radius: 12px; background: color-mix(in srgb, var(--ea, var(--accent)) 10%, transparent); font-size: 13px; }
 .tr-line { position: relative; height: 6px; border-radius: 99px; background: var(--line); margin: 30px 12px 64px; }
 .tr-fill { position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(90deg, #f2a65a, var(--accent)); transform-origin: 0 50%; }
 .tr-node { position: absolute; left: var(--x); top: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; width: 64px; }
@@ -3955,6 +4044,7 @@ body.first-load #todayBar { opacity: 0; }
   </div>
   <div class="nv-grp" role="group" aria-labelledby="nvhSocial"><div class="nv-h" id="nvhSocial">Social</div>
     <button type="button" title="Friends (7)" data-tab="friends"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span class="nv-l">Friends</span><i class="tbadge hidden" id="friendsBadge" aria-label="New activity"></i></button>
+    <button type="button" title="Posts (O)" data-tab="posts" id="postsTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="17" height="16" rx="3"/><path d="M7.5 9h9M7.5 12.5h9M7.5 16h5"/></svg><span class="nv-l">Posts</span><i class="tbadge hidden" id="postsBadge" aria-label=""></i></button>
     <button type="button" title="Study sessions (J)" data-tab="sessions" id="sessTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 14h18"/><path d="M5 14l-1 6M19 14l1 6"/><path d="M8 10.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM16 10.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/><path d="M10.5 14v-1M13.5 14v-1"/></svg><span class="nv-l">Study sessions</span><i class="tbadge hidden" id="sessBadge" aria-label=""></i></button>
     <button type="button" title="Clan (9)" data-tab="clan" id="clanTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="M9 12l2 2 4-4"/></svg><span class="nv-l">Clan</span><i class="tbadge hidden" id="clanDot" aria-label="Clan activity"></i></button>
     <button type="button" title="Leaderboard (5)" data-tab="board" id="boardTabBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg><span class="nv-l">Leaderboard</span></button>
@@ -3997,6 +4087,7 @@ body.first-load #todayBar { opacity: 0; }
               <div class="ring-sub" id="ringSub"></div>
             </div>
           </div>
+          <div class="ot-line hidden" id="otLine" aria-live="polite"></div>
           <div class="controls">
             <button class="btn" id="resetBtn" title="Reset (double-reset returns to round 1)">Reset</button>
             <button class="btn primary" id="mainBtn"><span class="mb-lbl">Start</span></button>
@@ -4150,6 +4241,11 @@ body.first-load #todayBar { opacity: 0; }
     <div id="friendsBody"></div>
   </section>
 
+  <!-- ================================ POSTS (v1.20: their own section) ================================ -->
+  <section class="tab" id="tab-posts">
+    <div id="postsBody"></div>
+  </section>
+
   <!-- ================================ STUDY SESSIONS (v1.19.1: their own section, was Friends › Study sessions) ================================ -->
   <section class="tab" id="tab-sessions">
     <div id="sessBody"></div>
@@ -4204,6 +4300,10 @@ body.first-load #todayBar { opacity: 0; }
         <div class="setting" data-k="auto start break automatic">
           <div><div>Auto-start next phase</div><div class="desc">Begin breaks and focus blocks automatically</div></div>
           <input type="checkbox" id="setAuto" aria-label="Auto-start next phase">
+        </div>
+        <div class="setting" data-k="overtime extra time keep going count up after focus">
+          <div><div>Overtime after focus ends</div><div class="desc">When a focus block ends, keep counting up until you tap Stop — the extra minutes count too (up to 4 h a block)</div></div>
+          <input type="checkbox" id="setOvertime" aria-label="Overtime after focus ends">
         </div>
         <div class="setting" data-k="keyboard shortcuts keys hotkeys">
           <div><div>Keyboard shortcuts</div><div class="desc">Press <kbd>?</kbd> to see them all, <kbd>Ctrl</kbd>+<kbd>K</kbd> for the command palette</div></div>
@@ -4359,6 +4459,11 @@ body.first-load #todayBar { opacity: 0; }
             <div><div>Show my activity to friends</div><div class="desc">Last 12 weeks, recent sessions and “focusing now”</div></div>
             <input type="checkbox" id="setShareAct" aria-label="Show my activity to friends">
           </div>
+          <div class="setting" data-k="posts feed share friends privacy achievements automatic">
+            <div><div>Share posts with friends</div><div class="desc">Automatic posts when you reach something (a streak, a rank, a boss…) — never any text you write</div></div>
+            <input type="checkbox" id="setPosts" aria-label="Share posts with friends">
+          </div>
+          <details class="setting-more" id="postTypesBox" data-k="posts types choose what gets posted"><summary class="lbl">Choose what gets posted</summary><div class="post-types" id="postTypes"></div></details>
           <div class="setting" data-k="session names share privacy">
             <div><div>Share session names with friends</div><div class="desc">If off, friends see “Focus session”</div></div>
             <input type="checkbox" id="setShareNames" aria-label="Share session names with friends">
@@ -4454,6 +4559,12 @@ body.first-load #todayBar { opacity: 0; }
 </div>
 
 <!-- Reminder editor -->
+<dialog id="otIdleDlg" class="ot-dlg" aria-labelledby="otIdleTitle">
+  <h2 id="otIdleTitle" style="margin:0 0 6px">Were you still focusing?</h2>
+  <p class="muted" id="otIdleBody" style="margin:0"></p>
+  <div class="btn-row" style="justify-content:flex-end;margin-top:14px;flex-wrap:wrap"><button class="btn" type="button" id="otIdleNo"></button><button class="btn primary" type="button" id="otIdleYes">Yes, count it</button></div>
+</dialog>
+<dialog id="rankLadderDlg" class="rkl-dlg" aria-labelledby="rklTitle"><div id="rklBody"></div><div class="btn-row" style="justify-content:flex-end;margin-top:12px"><button class="btn" type="button" id="rklBoard">Ranks board</button><button class="btn primary" type="button" id="rklClose">Close</button></div></dialog>
 <dialog id="sessHostDlg" class="hs-dlg" aria-labelledby="hsTitle"><div id="hsBody"></div></dialog>
 <dialog id="clanCreateDlg" class="clan-dlg" aria-labelledby="ccTitle">
   <h2 id="ccTitle">Create a clan</h2>
@@ -4690,6 +4801,7 @@ body.first-load #todayBar { opacity: 0; }
     <span><kbd>1</kbd>–<kbd>9</kbd></span><span>On the Timer with a checklist: tick that subtask. Otherwise 1–9 switch tabs.</span>
     <span><kbd>Shift</kbd>+<kbd>1</kbd>–<kbd>9</kbd></span><span>Always switch tabs: Timer · Reminders · Quests · Stats · Leaderboard · Shop · Friends · Profile · Clan</span>
     <kbd>0</kbd><span>Garden</span>
+    <kbd>O</kbd><span>Posts</span>
     <kbd>J</kbd><span>Study sessions</span>
     <span><kbd>Ctrl</kbd>/<kbd>⌘</kbd>+<kbd>K</kbd></span><span>Command palette: jump to any screen, setting or action</span>
     <kbd>?</kbd><span>Show this sheet</span>
@@ -5508,7 +5620,7 @@ const NAME_PALETTE = ['#2f8f83', '#5b7fd6', '#d08a3c', '#b45f8c', '#6a9a4a', '#8
 function defaultState() {
   return {
     version: 2,
-    settings: { goalMin: 60, weekStart: 1, sound: true, notify: true, theme: 'auto', autoStart: false, gamification: true, ambientVolume: 0.5,
+    settings: { goalMin: 60, weekStart: 1, sound: true, notify: true, theme: 'auto', autoStart: false, overtime: true, gamification: true, ambientVolume: 0.5,
                 shareActivity: true, shareNames: true, globalBoard: false,
                 pomeo: true, pomeoTalk: 'sometimes', waterNudge: true, breakCards: true, shopDot: true, dailyTip: true,
                 bossMode: 'solo', shortcuts: true, revIntervals: [1, 3, 7, 21, 45],
@@ -5920,7 +6032,7 @@ function afterFirstLoad() {
   updateBagDot(); updateQuestDot(); renderFestive();
   maybeOfferMigration();
   initSocial();
-  clanStart().then(() => { watchClanLive(); liveResume(); maybeOpenClanLink(); maybeOpenSessionLink(); });
+  clanStart().then(() => { watchClanLive(); liveResume(); maybeOpenClanLink(); maybeOpenSessionLink(); postsStart(); postsPeekStart(); });   // postsStart: v1.20 posts only what happens from now on
 }
 
 /* ==========================================================================
@@ -6363,6 +6475,7 @@ function startTimer() {
       togetherBlockStart();
     }
   }
+  if (t.ot) { t.ot.from = now; t.ot.act = now; }   // resuming overtime (v1.20)
   t.endAt = now + t.remaining;
   t.status = 'running';
   save();
@@ -6372,6 +6485,7 @@ function startTimer() {
 function pauseTimer() {
   const t = S.timer;
   if (recentGesture()) { uiClaim(); haptic(10); uiSound('pause', { always: true }); }
+  if (t.ot) { t.ot.acc = otMs(); t.ot.from = Date.now(); }   // overtime: bank what has run (v1.20)
   t.remaining = Math.max(0, t.endAt - Date.now());
   t.status = 'paused';
   saveLocal();
@@ -6390,6 +6504,84 @@ function advancePhase() {
 }
 
 const EARLY_MIN_MS = 5 * 60000;   // "Finish early" logs the minutes focused from 5 minutes on (v1.17)
+
+/* ---------- Overtime (v1.20) ----------
+   With the setting on (the default), a focus block that reaches 0 plays the end sound as usual and then counts UP:
+   S.timer.ot = { from, acc, act } — `from` is when the current running stretch began (the planned end, so a sleeping
+   tab still counts), `acc` the overtime banked before a pause, `act` the last sign of the user (a tap or key, or the
+   start of overtime). Stop (or Break) logs ONE block: the planned minutes plus the overtime, so everything that counts
+   focus minutes counts it too. The whole block is capped at 240 min — the preset and rules limits (a 4-hour session) —
+   so no write is ever refused. If overtime has run 10 minutes past the last sign of the user, the app asks "Were you
+   still focusing?" (only while the tab is visible; until then nothing is logged and the cap waits for the answer).
+   Not in a Synced timer (the host runs the shared timer) or the tutorial's demo block. Per device, like the timer. */
+const OT_TOTAL_MS = 240 * 60000, OT_IDLE_MS = 10 * 60000;
+const otOn = () => S.settings.overtime !== false;
+const otSynced = () => !!(S.timer.live && S.timer.live.mode !== 'together');
+let otLastAct = Date.now();
+for (const type of ['pointerdown', 'keydown', 'wheel', 'touchstart']) document.addEventListener(type, e => { if (!e.isTrusted) return; otLastAct = Date.now(); const t = S.timer; if (t && t.ot && t.status === 'running' && !$('#otIdleDlg').open) t.ot.act = otLastAct; }, { capture: true, passive: true });
+/** Room left for overtime in this block (ms). */
+const otMaxMs = () => Math.max(0, OT_TOTAL_MS - (+S.timer.planned || 0));
+/** Overtime counted up to `at` (ms), capped. */
+function otMs(at = Date.now()) {
+  const o = S.timer.ot; if (!o) return 0;
+  return Math.min(otMaxMs(), Math.max(0, (+o.acc || 0) + (S.timer.status === 'running' ? Math.max(0, at - o.from) : 0)));
+}
+/** May this focus block go into overtime when it reaches 0? */
+const otEligible = () => { const t = S.timer; return otOn() && t.phase === 'focus' && !otSynced() && !t.demo && otMaxMs() >= 60000; };   // (t.demo: the tutorial's 1-minute block)
+/** The block reached 0: the end sound, then count up. */
+function otEnter() {
+  const t = S.timer, end = t.endAt;
+  t.ot = { from: end, acc: 0, act: Math.max(otLastAct, end) };
+  t.remaining = 0;
+  if (!endSoundRang(end)) playEndSound();
+  notify('Focus block done', 'Overtime is running — tap Stop when you’re finished.');
+  haptic([20, 60, 20]);
+  saveLocal();
+  renderTimer();
+}
+/** End an overtime block. why: 'stop' | 'break' | 'cap' | 'off' | 'away' (log up to the last sign of the user). */
+function otStop(why) {
+  const t = S.timer, o = t.ot;
+  if (!o || t.phase !== 'focus') return;
+  const now = Date.now(), max = otMaxMs();
+  let ot, end;
+  if (why === 'away') { const upto = Math.min(now, Math.max(o.act, o.from)); ot = Math.min(max, (+o.acc || 0) + (t.status === 'running' ? Math.max(0, upto - o.from) : 0)); end = t.status === 'running' ? upto : now; }
+  else { ot = otMs(now); end = t.status === 'running' && ot >= max ? o.from + (max - (+o.acc || 0)) : now; }
+  t.otDone = { ms: Math.round(ot), end: Math.round(Math.min(end, now)) };
+  if ($('#otIdleDlg').open) $('#otIdleDlg').close();
+  finishPhase(why === 'break' ? 'otbreak' : 'complete');
+  if (why === 'cap') toast(`Overtime stopped at ${fmtMin(OT_TOTAL_MS / 60000)} — the block is logged`, 4200, true, { now: true });
+  if (why === 'off') toast('Overtime off — turn it back on in Settings', 3200, true, { now: true });
+}
+/** Overtime has run 10 minutes past the last sign of the user (asked only while the tab is visible). */
+function otAsk() {
+  const t = S.timer, o = t.ot, d = $('#otIdleDlg');
+  if (!o || d.open) return;
+  $('#otIdleBody').textContent = `Overtime has run ${fmtMin(Math.round(otMs() / 60000))} so far, ${fmtMin(Math.max(1, Math.round((Date.now() - o.act) / 60000)))} of it since you last used the app.`;
+  $('#otIdleNo').textContent = `No — log up to ${fmtHM(Math.max(o.act, o.from))}`;
+  d.showModal();
+}
+$('#otIdleYes').addEventListener('click', () => { const t = S.timer; $('#otIdleDlg').close(); if (!t.ot) return; t.ot.act = Date.now(); saveLocal(); if (t.status === 'running' && otMs() >= otMaxMs()) otStop('cap'); else renderTimer(); });
+$('#otIdleNo').addEventListener('click', () => { $('#otIdleDlg').close(); otStop('away'); });
+/** Every tick while counting up: the cap, the "still focusing?" question. */
+function otTick() {
+  const t = S.timer, o = t.ot;
+  if (!o || t.status !== 'running') return;
+  const idle = Date.now() - o.act >= OT_IDLE_MS;
+  if (idle) { if (!document.hidden) otAsk(); return; }   // nothing is logged until the answer
+  if (otMs() >= otMaxMs()) otStop('cap');
+}
+/** One-time tip for people who used the app before 1.20: after their first block in this version (never during one). */
+function otTipAfterBlock(hadOt) {
+  if (S.settings.otTip || isPreview()) return;
+  S.settings.otTip = Date.now();   // synced: once per account
+  save();
+  if (!S.sessions.some(x => x && +x.end < OT_RELEASE)) return;   // a new account: the overtime display explains itself
+  const msg = hadOt ? 'New in 1.20: Overtime — when a block ends the timer keeps counting until you tap Stop, and the extra minutes count. Turn it off in Settings.' : 'New in 1.20: Overtime — when a block ends, the timer can keep counting until you tap Stop. It’s on; turn it off in Settings.';
+  const show = () => toast(msg, 7000, true, { log: false, go: { tab: 'settings' } });
+  if (!holdForFocus('tip', 'ottip', show)) show();   // a tip: it comes back before Pomeo's chatter
+}
+const OT_RELEASE = Date.UTC(2026, 10, 10);   // v1.20
 /**
  * End the current phase.
  * reason: 'complete' (timer ran out), 'skip', 'early' (Finish early: log what was focused) or 'reset'.
@@ -6398,18 +6590,22 @@ const EARLY_MIN_MS = 5 * 60000;   // "Finish early" logs the minutes focused fro
 function finishPhase(reason) {
   const t = S.timer;
   const wasFocus = t.phase === 'focus', endedAt = t.endAt;
+  const otd = wasFocus && t.ot ? (t.otDone || { ms: otMs(), end: Date.now() }) : null;   // an overtime block: planned + overtime, one log (v1.20)
+  if (otd && reason !== 'otbreak' && reason !== 'complete') reason = 'complete';   // Skip / Finish early / Reset in overtime still log the finished block
+  const otBreak = reason === 'otbreak'; if (otBreak) reason = 'complete';
+  t.ot = null; t.otDone = null;
   let tooShort = false;
   if (reason === 'early' && wasFocus && t.status !== 'idle' && t.planned - remainingMs() < EARLY_MIN_MS) { toast(`Under ${EARLY_MIN_MS / 60000} minutes — nothing logged`); reason = 'reset'; tooShort = true; }
   if (reason === 'complete') motionComplete(wasFocus);
 
   if (wasFocus && t.status !== 'idle') {
     const rem = reason === 'complete' ? 0 : remainingMs();
-    const focused = t.planned - rem;
+    const focused = t.planned - rem + (otd ? Math.max(0, otd.ms) : 0);
     // For natural completion use endAt, so the log is exact even if the tab was asleep.
-    const end = reason === 'complete' ? t.endAt : Date.now();
+    const end = otd ? Math.max(t.endAt, otd.end) : reason === 'complete' ? t.endAt : Date.now();
     if (focused >= 0.8 * t.planned || (reason === 'early' && focused >= EARLY_MIN_MS)) {
       FG.ending = true;
-      try { logSession(focused, end, reason === 'early' && focused < t.planned); } finally { FG.ending = false; }
+      try { logSession(focused, end, reason === 'early' && focused < t.planned, otd ? Math.round(otd.ms / 60000) : 0); } finally { FG.ending = false; }
       focusEnded();
       const fx = equippedId('effect');
       setTimeout(() => playEffect(fx), reason === 'complete' && motion() === 'full' ? 700 : 0);
@@ -6437,17 +6633,18 @@ function finishPhase(reason) {
 
   if (reason === 'complete' && wasFocus) { setTimeout(pomeoBreakStart, 5600); setTimeout(offerBreakCards, 11500); }   // flashcards: offered on the break, never during focus
   if (reason === 'complete') {
-    if (!endSoundRang(endedAt)) playEndSound();   // the booked chime may have rung already (on time, in a background tab)
-    if (wasFocus) notify('Focus complete', `Nice work on “${t.name || 'Untitled'}”. Time for a break.`);
-    else notify('Break over', 'Ready for the next focus block?');
-    if (S.settings.autoStart && !(t.live && t.live.mode !== 'together')) { startTimer(); return; }
+    if (!otd && !endSoundRang(endedAt)) playEndSound();   // the booked chime may have rung already (on time, in a background tab); an overtime block rang when it reached 0
+    if (wasFocus && !otd) notify('Focus complete', `Nice work on “${t.name || 'Untitled'}”. Time for a break.`);
+    else if (!wasFocus) notify('Break over', 'Ready for the next focus block?');
+    if (wasFocus) setTimeout(() => otTipAfterBlock(!!otd), 1500);
+    if ((S.settings.autoStart || otBreak) && !(t.live && t.live.mode !== 'together')) { startTimer(); return; }
   }
   save();
   renderAll();
 }
 
 /** Record a completed focus block locally and in the cloud. */
-function logSession(focusedMs, end, early = false) {
+function logSession(focusedMs, end, early = false, otMin = 0) {
   const t = S.timer;
   const name = currentName();
   ensureName(name);
@@ -6459,6 +6656,7 @@ function logSession(focusedMs, end, early = false) {
     duration: Math.round(focusedMs),
     planned: t.planned,
     ...(early ? { early: 1 } : {}),   // finished early: the minutes focused count, the history shows the mark (v1.17)
+    ...(otMin > 0 ? { ot: otMin } : {}),   // minutes of overtime in this block (v1.20; the duration includes them)
     preset: activePreset().name,
     stamp: equippedId('stamp'),
     ...(t.live && (t.live.mode !== 'together' || (LIVE.blockMates && LIVE.blockMates.size)) ? { live: t.live.lid, clan: t.live.cid, stamp: 'stamp_together' } : t.live ? { live: t.live.lid, clan: t.live.cid } : {}),
@@ -6485,18 +6683,22 @@ function logSession(focusedMs, end, early = false) {
   else if (USER && !USER.guest) S.pendingSessions.push(s);
   G = null;
   const news = reconcileRewards('collect');
-  const earlyText = early ? `Finished early · ${fmtMin(focusedMs / 60000)} of ${fmtMin(t.planned / 60000)}` : '';
-  if (!S.settings.gamification) { toast(early ? `${earlyText} · ${name}` : `Logged ${fmtMin(focusedMs / 60000)} · ${name}`); socialAfterSession(); return; }
+  const earlyText = early ? `Finished early · ${fmtMin(focusedMs / 60000)} of ${fmtMin(t.planned / 60000)}` : otMin > 0 ? `${fmtMin(focusedMs / 60000)} with ${fmtMin(otMin)} overtime` : '';
+  if (!S.settings.gamification) { toast(earlyText ? `${earlyText} · ${name}` : `Logged ${fmtMin(focusedMs / 60000)} · ${name}`); socialAfterSession(); return; }
   const goalDays = news.filter(n => n.type === 'goal').length;
-  toast(`${early ? earlyText + ' · ' : ''}+${xpForSession(s)} XP · +${COINS_PER_SESSION + GOAL_BONUS * goalDays + subCoins} coins${goalDays ? ' · daily goal reached' : ''}`);
+  toast(`${earlyText ? earlyText + ' · ' : ''}+${xpForSession(s)} XP · +${COINS_PER_SESSION + GOAL_BONUS * goalDays + subCoins} coins${goalDays ? ' · daily goal reached' : ''}`);
   setTimeout(() => uiSound('coin'), 900);
   floatUp([[`+${xpForSession(s)} XP`], [`+${COINS_PER_SESSION + GOAL_BONUS * goalDays + subCoins} coins`, 'coin'], ...(victoryOf(dayKey(weekMonday()), bossView()) ? [] : [[`⚔️ −${Math.round(focusedMs / 60000)} HP`]]), ...(gw && gw.mins ? [[`🌱 +${gw.mins} min water`]] : [])]);
   if (gw && gw.ripe.length) setTimeout(() => toast(`${gw.ripe.length === 1 ? mutNames(gw.ripe[0]).map(n => n + ' ').join('') + speciesOf(gw.ripe[0]).name + ' is' : gw.ripe.length + ' plants are'} ready to harvest 🌱${gw.ripe.some(p => wmOf(p).length) && gw.ripe.length > 1 ? ' — with a focus-weather mutation' : ''}`, 3600, true, { go: { tab: 'garden' } }), 1500);
   if (gw && gw.hatched && gw.hatched.length) announceHatched(gw.hatched);   // the reveal waits for the end-of-block feedback, then the focus queue (v1.16)
   announce(news, 'loud');
+  postsFromNews(news);   // v1.20 posts: what this block just unlocked
+  if (s.live && Array.isArray(s.mates) && s.mates.length) makePost('session', s.live, s.mates.length, { mates: s.mates });   // studied together (the same check as the together rewards)
+  { const before = (game().focusMs - s.duration) / 3.6e6, after = game().focusMs / 3.6e6; for (const H of POST_HOURS) if (before < H && after >= H) makePost('hours', 'h' + H, H); }
   socialAfterSession();
   const levelAfter = game().lv.level;
   if (levelBefore && levelAfter > levelBefore) setTimeout(() => showLevelUp(levelBefore, levelAfter), 700);
+  if (levelBefore && levelAfter > levelBefore) { const tierUp = TIERS.some(t => t.min > levelBefore && t.min <= levelAfter); if (tierUp || Math.floor(levelAfter / 10) > Math.floor(levelBefore / 10)) makePost('level', 'L' + levelAfter, levelAfter); }   // a new badge, or every 10 levels (v1.20)
 }
 
 /* ==========================================================================
@@ -6652,14 +6854,14 @@ const ICON_MUTE  = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" s
 
 /** Fast path, called several times a second. */
 function renderClock() {
-  const rem = remainingMs(), planned = plannedMs();
+  const rem = remainingMs(), planned = plannedMs(), ot = S.timer.ot && S.timer.phase === 'focus';
   const progress = planned ? 1 - rem / planned : 0;
-  setTimeDigits(fmtClock(rem));
+  setTimeDigits(ot ? '+' + fmtClock(otMs()) : fmtClock(rem));
   if (!ringRAF) paintRing();   // while running, a requestAnimationFrame loop draws the ring every frame
   updateFavicon(clamp(progress, 0, 1));
   const t = S.timer;
   const label = t.phase === 'focus' ? 'Focus' : t.phase === 'short' ? 'Break' : 'Long break';
-  const title = t.status === 'idle' ? 'Pomodorolist' : `${fmtClock(rem)} · ${label}${t.status === 'paused' ? ' (paused)' : ''}`;
+  const title = t.status === 'idle' ? 'Pomodorolist' : ot ? `+${fmtClock(otMs())} · Overtime${t.status === 'paused' ? ' (paused)' : ''}` : `${fmtClock(rem)} · ${label}${t.status === 'paused' ? ' (paused)' : ''}`;
   if (document.title !== title) document.title = title;
 }
 
@@ -6669,8 +6871,11 @@ function renderTimer() {
   renderLiveBar();
   const isBreak = t.phase !== 'focus';
   const label = t.phase === 'focus' ? 'Focus' : t.phase === 'short' ? 'Short break' : 'Long break';
-  $('#phaseLabel').textContent = label + (t.status === 'paused' ? ' · paused' : '');
+  const ot = !!(t.ot && !isBreak);
+  $('#phaseLabel').textContent = (ot ? 'Overtime' : label) + (t.status === 'paused' ? ' · paused' : '');
   $('#phaseLabel').classList.toggle('break', isBreak);
+  $('#phaseLabel').classList.toggle('ot', ot);
+  $('#ring').classList.toggle('ot', ot);
   $('#ring').classList.toggle('break', isBreak);
   $('#ring').classList.toggle('breathing', isBreak && t.status === 'running');
 
@@ -6680,11 +6885,17 @@ function renderTimer() {
     `<span class="${i < done ? 'done' : (i === t.round - 1 && t.phase === 'focus' ? 'current' : '')}"></span>`).join('');
 
   $('#ringSub').textContent = t.phase === 'focus' ? (currentName() === 'Untitled' ? p.name : currentName()) : p.name;
-  setMainBtn(t.status === 'running' ? 'Pause' : t.status === 'paused' ? 'Resume' : (isBreak ? 'Start break' : 'Start'), t.status === 'running');
-  const early = !isBreak && t.status !== 'idle' && !(t.live && t.live.mode !== 'together');   // Finish early (v1.17): end now and log the minutes focused
-  $('#skipBtn').textContent = early ? 'Finish early' : 'Skip';
-  $('#skipBtn').title = early ? `End the block now and log the minutes focused (from ${EARLY_MIN_MS / 60000} minutes); Reset abandons it` : 'Skip this phase';
+  setMainBtn(ot ? 'Stop' : t.status === 'running' ? 'Pause' : t.status === 'paused' ? 'Resume' : (isBreak ? 'Start break' : 'Start'), t.status === 'running' && !ot);
+  const early = !ot && !isBreak && t.status !== 'idle' && !(t.live && t.live.mode !== 'together');   // Finish early (v1.17): end now and log the minutes focused
+  $('#skipBtn').textContent = ot ? 'Break' : early ? 'Finish early' : 'Skip';
+  $('#skipBtn').title = ot ? 'Log the block and start your break now' : early ? `End the block now and log the minutes focused (from ${EARLY_MIN_MS / 60000} minutes); Reset abandons it` : 'Skip this phase';
   $('#skipBtn').classList.toggle('early', early);
+  $('#resetBtn').textContent = ot ? (t.status === 'paused' ? 'Resume' : 'Pause') : 'Reset';   // in overtime the block is already done: nothing to reset
+  $('#resetBtn').title = ot ? (t.status === 'paused' ? 'Resume overtime' : 'Pause overtime') : 'Reset (double-reset returns to round 1)';
+  const otl = $('#otLine');
+  if (ot) { otl.innerHTML = `<span>Block done — the extra minutes count until you tap <b>Stop</b> (up to ${fmtMin(OT_TOTAL_MS / 60000)} a block)</span><button type="button" class="linkbtn" id="otOff">Turn off overtime</button>`; otl.classList.remove('hidden'); }
+  else if (otOn() && otSynced() && !isBreak) { otl.innerHTML = '<span>Overtime is off in a Synced timer — the host runs the shared timer</span>'; otl.classList.remove('hidden'); }
+  else { otl.innerHTML = ''; otl.classList.add('hidden'); }
   $('#muteBtn').innerHTML = S.settings.sound ? ICON_SOUND : ICON_MUTE;
   $('#muteBtn').title = S.settings.sound ? 'Sound on — click to mute' : 'Muted — click for sound';
   if (document.body.classList.toggle('zen', extraOn('x_zen') && t.status === 'running' && t.phase === 'focus') !== zenWas) { zenWas = !zenWas; fitAllMasons(); }
@@ -6994,7 +7205,7 @@ function renderStats() {
       ? `<ul class="sesslist">${daySessions.slice().reverse().map(s => `
           <li><span class="t">${fmtTime(s.start)}–${fmtTime(s.end)}</span>
             <span class="dot" style="background:${esc(colorFor(s.name))}"></span>
-            <span class="nm" title="${esc(s.preset || '')}">${esc(s.name)}${s.early ? `<span class="early" title="Finished early · ${fmtMin(s.duration / 60000)} of ${fmtMin((s.planned || s.duration) / 60000)}">early</span>` : ''}${S.energy[s.id] ? `<span class="en" title="Focus: ${ENERGY[S.energy[s.id]].t}">${ENERGY[S.energy[s.id]].e}</span>` : ''}${S.notes[s.id] ? `<span class="note">“${esc(S.notes[s.id])}”</span>` : ''}${s.subtasks && s.subtasks.length ? `<details class="subdet"><summary>${s.subtasks.filter(x => x.d).length}/${s.subtasks.length} subtasks</summary><ul>${s.subtasks.map(x => `<li class="${x.d ? 'ok' : 'no'}">${esc(x.t)}</li>`).join('')}</ul></details>` : ''}</span>
+            <span class="nm" title="${esc(s.preset || '')}">${esc(s.name)}${s.early ? `<span class="early" title="Finished early · ${fmtMin(s.duration / 60000)} of ${fmtMin((s.planned || s.duration) / 60000)}">early</span>` : ''}${s.ot ? `<span class="ot-tag" title="${fmtMin(s.ot)} of overtime after the block ended">+${fmtMin(s.ot)}</span>` : ''}${S.energy[s.id] ? `<span class="en" title="Focus: ${ENERGY[S.energy[s.id]].t}">${ENERGY[S.energy[s.id]].e}</span>` : ''}${S.notes[s.id] ? `<span class="note">“${esc(S.notes[s.id])}”</span>` : ''}${s.subtasks && s.subtasks.length ? `<details class="subdet"><summary>${s.subtasks.filter(x => x.d).length}/${s.subtasks.length} subtasks</summary><ul>${s.subtasks.map(x => `<li class="${x.d ? 'ok' : 'no'}">${esc(x.t)}</li>`).join('')}</ul></details>` : ''}</span>
             ${stampOn() ? `<span class="st-mini" title="Stamp: ${esc(ITEM_BY_ID[sessionStamp(s)].name)}">${stampSVG(sessionStamp(s), 22)}</span>` : ''}<span class="d">${fmtMin(s.duration / 60000)}</span>
             <button class="linkbtn" data-del="${esc(s.id)}" title="Delete this session" aria-label="Delete">✕</button></li>`).join('')}</ul>`
       : sceneEmpty('read', '', 'No focus blocks on this day.', 'margin-top:12px');
@@ -7052,6 +7263,7 @@ function renderSettings() {
   $('#setSound').checked = st.sound;
   $('#setNotify').checked = st.notify;
   $('#setAuto').checked = st.autoStart;
+  $('#setOvertime').checked = st.overtime !== false;
   $('#setMinimal').checked = minimal();
   $('#setAtmo').checked = st.atmosphere !== false;
   $('#setFestive').checked = st.festive !== false;
@@ -7151,7 +7363,8 @@ function normalizeGame(g) {
       brew: map(c.brew),               // '<boss>|solo' | '<boss>|squad' -> ts (boss rewards claimed)
       quests: map(c.quests),           // '<event>:q1' … | '<event>:final' -> ts (questline rewards claimed)
       wq: map(c.wq),                   // v1.18 weekly quest board: '<week Monday>:<quest id>' -> ts
-      track: map(c.track),             // v1.18 monthly reward track: 'YYYY-MM:<tier>' -> ts
+      track: map(c.track),             // v1.18 monthly reward track: 'YYYY-MM:<tier>' -> ts (no new ones from November 2026: the Study Pass's Focus track took over)
+      pass: map(c.pass),               // v1.20 Study Pass: '<event>:p:<tier>' (Pass track) | '<event>:f:<tier>' (Focus track) -> ts
       evo: map(c.evo),                 // v1.18 Pomeo's stages reached: '1'…'5' -> ts
       season: map(c.season),           // v1.19 season rewards: 'YYYY-MM:<peak rank>' -> ts (the earliest per season pays)
       rkup: map(c.rkup),               // v1.19 rank-ups celebrated: 'YYYY-MM:<rank>' -> ts
@@ -7803,6 +8016,20 @@ for (const ev of EVENTS) for (const id of [...ev.rewards, ...ev.final]) {
   const r = EV_ITEMS.find(x => x[0] === id);
   ITEMS.push({ id, cat: r[1], name: r[2], desc: r[3], price: -1, ev: ev.id, rarity: ev.final.includes(id) ? 'legendary' : 'epic' });
 }
+// v1.20 Study Pass cosmetics: one set per event from the first pass on, in the event's colours (see STUDY PASS)
+const PASS_FROM = '2026-11-08';   // Monsoon Study: the first event with a Study Pass
+/** "Monsoon Study Pass", "Christmas Study Pass": the pass's name, without saying Study twice. */
+const passName = ev => /\bStudy$/.test(ev.name) ? ev.name + ' Pass' : ev.name + ' Study Pass';
+const passShort = ev => ev.name.replace(/^Pomeo’s /, '').replace(/^Rainy Season: /, '').replace(/ Grind$/, '').replace(/, New Goals$/, '');
+for (const ev of EVENTS) if (ev.start >= PASS_FROM) {
+  const sh = passShort(ev), how = passName(ev);
+  ITEMS.push(
+    { id: 'stamp_pass_' + ev.id, cat: 'stamp', name: `${sh} seal`, desc: `A ${sh} seal on finished blocks`, price: -1, pev: ev.id, rarity: 'rare', how: how + ' · Pass tier 10' },
+    { id: 'ti_pass_' + ev.id, cat: 'title', name: `${sh} Pass Holder`, desc: 'A title under your name', price: -1, pev: ev.id, rarity: 'epic', how: how + ' · Pass tier 15' },
+    { id: 'col_pass_' + ev.id, cat: 'color', name: `${sh} shimmer`, desc: `A three-tone ${sh} name colour`, price: -1, pev: ev.id, rarity: 'epic', how: how + ' · Pass tier 20' },
+    { id: 'au_pass_' + ev.id, cat: 'aura', name: `${sh} pass aura`, desc: 'The pass’s spinning aura', price: -1, pev: ev.id, rarity: 'legendary', how: how + ' · Pass tier 30' },
+    { id: 'stamp_passf_' + ev.id, cat: 'stamp', name: `${sh} focus seal`, desc: 'For every focus hour of the event', price: -1, pev: ev.id, rarity: 'epic', how: how + ' · Focus track, the last step' });
+}
 
 /* Completion stamps and player-card styles (v1.13). The free ones can be equipped by everyone; shop stamps are
    bought; boss and event ones unlock by themselves (see UNLOCKS) and go to the bag like other rewards. */
@@ -8059,7 +8286,7 @@ function earnedAt(t) {
   const cl = S.game.claims;
   for (const ts of Object.values(cl.goalDays)) if (ts <= t) c += GOAL_BONUS;
   for (const [m, ts] of Object.entries(cl.milestones)) if (ts <= t) c += STREAK_BONUS[m] || 0;
-  c += wqCoinsAt(t) + trackCoinsAt(t) + seasonCoinsAt(t);   // v1.18 weekly quests and the monthly track; v1.19 season rewards
+  c += wqCoinsAt(t) + trackCoinsAt(t) + seasonCoinsAt(t) + passCoinsAt(t);   // v1.18 weekly quests and the monthly track; v1.19 season rewards; v1.20 the Study Pass
   for (const [id, ts] of Object.entries(cl.achievements)) if (ts <= t && ACH_BY_ID[id]) c += ACH_BY_ID[id].coins;
   // Social: +10 per new friend, but at most 5 per Monday-to-Sunday week, so it can't be farmed.
   const perWeek = {};
@@ -8191,11 +8418,18 @@ function reconcileRewards(mode = 'quiet') {
       if (!cl.wq[k] && wqVal(q, mon) >= q.n) { cl.wq[k] = Math.min(now, +addDays(mon, 7) - 1); wqGive(q, k, cl.wq[k]); news.push({ type: 'wq', q, k }); }
     }
     for (const mk of [monthKey(now), monthKey(+new Date(new Date().getFullYear(), new Date().getMonth(), 0))]) {
+      if (mk > TRACK_LAST_MONTH) continue;   // v1.20: from November 2026 the Study Pass's Focus track replaces the monthly track
       const h = trackHours(mk);
       TRACK.forEach((t, i) => { const k = mk + ':' + i; if (!cl.track[k] && h >= t.h) { cl.track[k] = now; trackGive(t, k, now); news.push({ type: 'track', t, mk }); } });
     }
     const st = evoStage(g0.focusMs);
     for (let i = 1; i <= st; i++) if (!cl.evo[i]) { cl.evo[i] = now; news.push({ type: 'evo', s: i }); }
+    if (!cl.pass._from) cl.pass._from = now;   // v1.20: the day this account's passes start counting (the pass running now scales to the days left)
+    // v1.20: a Study Pass that has ended adds whatever was reached but not claimed (nothing reached is lost)
+    for (const ev of EVENTS) if (passEvent(ev) && evEnd(ev) <= now && evEnd(ev) > now - 120 * 864e5) {
+      const left = passClaimable(ev);
+      if (left.length) { const got = passClaim(ev, left, true); if (got.length) news.push({ type: 'passend', ev, n: got.length }); }
+    }
     // v1.19 ranks: finished seasons pay their peak once, the first time ever at a rank gives its cosmetic, rank-ups
     const tot = seasonTotals(), sk = seasonKeyNow();
     for (const mk of Object.keys(tot)) if (mk >= RANK_FROM && mk < sk && tot[mk] > 0 && !Object.keys(cl.season).some(k => k.split(':')[0] === mk)) {
@@ -8249,6 +8483,11 @@ function announce(news, mode) {
   const evo = news.filter(n => n.type === 'evo').map(n => n.s);
   if (evo.length && (mode === 'loud' || mode === 'initial')) announceEvo(Math.max(...evo));
   for (const n of news) if ((n.type === 'wq' || n.type === 'track') && (mode === 'loud' || mode === 'initial')) announceQuest(n);
+  for (const n of news) if (n.type === 'passend' && !isPreview()) {   // v1.20: a pass ended with rewards reached but not claimed — they were added
+    const t = `${n.ev.emoji} ${passName(n.ev)} ended · ${n.n} reward${n.n === 1 ? '' : 's'} you reached ${n.n === 1 ? 'was' : 'were'} added for you`;
+    inboxAdd({ type: 'boss', key: 'passend:' + n.ev.id, title: t, go: { tab: 'quests' }, read: true });
+    if (!holdForFocus('toast', 'passend:' + n.ev.id, () => toast(t, 4200, true, { log: false }))) toast(t, 4200, true, { log: false });
+  }
   const miles = news.filter(n => n.type === 'streak').map(n => n.m);
   if (miles.length && mode === 'loud') showStreakMilestones(miles);   // one skippable celebration (v1.18)
   else if (miles.length && mode === 'initial') showStreakMilestones(miles, true);   // first load (an update, an import): a notice, not a dialog over the app
@@ -8856,9 +9095,11 @@ function renderHeaderChip() {
   $('#shopTabBtn').classList.toggle('hidden', !on);
   $('#questTabBtn').classList.toggle('hidden', !on);
   $('#gardenTabBtn').classList.toggle('hidden', !on);
+  $('#postsTabBtn').classList.toggle('hidden', !on);   // v1.20: Posts is a game extra too (hidden in True Minimalist)
+  updatePostsBadge();
   updateBagDot();
   updateGardenDot();
-  if (!on) { updateLoginDot(); if (['shop', 'quests', 'bag', 'garden', 'room'].includes(S.ui.tab)) showTab('timer'); return; }
+  if (!on) { updateLoginDot(); if (['shop', 'quests', 'bag', 'garden', 'room', 'posts'].includes(S.ui.tab)) showTab('timer'); return; }
   const g = game();
   const goalPct = Math.min(100, Math.round(((g.idx[dayKey(new Date())] || {}).total || 0) / S.settings.goalMin * 100));
   const fromPct = lastGoalPct ?? goalPct;
@@ -9439,14 +9680,238 @@ function publishPresence() {
   const t = S.timer, s = S.settings;
   let now = null;
   if (s.shareActivity && t.status !== 'idle') {
-    now = { name: t.phase === 'focus' ? (s.shareNames ? currentName().slice(0, 80) : 'Focus session') : 'Break', phase: t.phase, status: t.status,
+    now = { name: t.phase === 'focus' ? (s.shareNames ? currentName().slice(0, 80) : 'Focus session') : 'Break', phase: t.phase, status: t.ot && t.status === 'running' && t.phase === 'focus' ? 'overtime' : t.status,   // "overtime" (v1.20): older apps show nothing for it, as before
       endAt: t.status === 'running' ? t.endAt : 0, left: t.status === 'paused' ? Math.round(t.remaining / 60000) : 0 };
   }
   writePublic('presence', { visible: !!s.shareActivity, now });
 }
 
+/* ==========================================================================
+   POSTS (v1.20) — a feed of automatic posts: the app writes them from a fixed list of types when something happens;
+   nobody can type anything. posts/{type}_{uid}_{ref}: the id is fixed by what the post is about, so a reload, a second
+   device, an offline sync or a re-render can never post the same thing twice (the rules refuse a second write).
+   · No history: only things that happen from this version on (settings.postsFrom, at most two days old).
+   · At most 10 posts a day per device, at most 3 at once; bursts of achievements show as one card.
+   · Who sees it: the post carries its audience (aud = the author's friends when it was posted, and the author), so a
+     friend's whole feed is ONE query (aud contains me, newest first, 50) — the same at 5 friends or 100. Blocking or
+     unfriending takes that person out of your recent posts' audience; the feed only ever shows your current friends.
+   · Reactions: 🔥 👏 💪 ⭐, one per person per post (r.<uid>), friends only. No comments.
+   · Posts older than 30 days aren't shown, and the author's app deletes them (a few a day).
+   ========================================================================== */
+const POST_TYPES = {
+  ach:     { ic: '🏅', name: 'Achievements' },
+  streak:  { ic: '🔥', name: 'Streak milestones' },
+  rank:    { ic: '⬆️', name: 'Rank-ups' },
+  level:   { ic: '⭐', name: 'Levels and new badges' },
+  session: { ic: '📚', name: 'Study sessions with friends' },
+  boss:    { ic: '⚔️', name: 'Weekly boss victories' },
+  quest:   { ic: '🗺️', name: 'Questlines and Study Passes' },
+  harvest: { ic: '🌱', name: 'Giant and 5★ harvests' },
+  pet:     { ic: '🐣', name: 'Rare and mutated pets' },
+  clan:    { ic: '🛡️', name: 'Clan level-ups and raids' },
+  hours:   { ic: '⏱️', name: 'Focus-hour milestones' },
+  evo:     { ic: '🍅', name: 'Pomeo’s stages' },
+};
+const POSTS_DAY_CAP = 10, POSTS_TTL = 30 * 864e5, POSTS_REFRESH = 3 * 60000, POST_HOURS = [50, 100, 250, 500, 1000, 2000, 5000], POST_EMOJI = ['🔥', '👏', '💪', '⭐'];
+const POST = { list: null, at: 0, busy: false, mine: {}, burst: 0, burstAt: 0, cleanAt: 0 };
+/** Posts follow "Share activity" until the person sets Posts themselves (someone who opted out of sharing isn't opted in). */
+const postsWanted = () => S.settings.posts === undefined ? S.settings.shareActivity !== false : S.settings.posts !== false;
+const postsOn = () => !!USER && !USER.guest && postsWanted() && !minimal();   // True Minimalist hides Posts and pauses posting
+const postTypeOn = t => postsOn() && !(S.settings.postOff || {})[t];
+/** The day this account started posting (set once, synced): nothing from before it is ever posted. */
+function postsStart() { if (USER && !USER.guest && !isPreview() && !S.settings.postsFrom) { S.settings.postsFrom = Date.now(); save(); } }
+const postRef = r => String(r).replace(/[^A-Za-z0-9_.-]/g, '-').slice(0, 60);
+/** Post something that just happened. Returns true when a new post was written. */
+async function makePost(type, ref, n = 0, { mates = [], at = Date.now() } = {}) {
+  if (!POST_TYPES[type] || !postTypeOn(type) || isPreview() || !socialReady() || !cloudReady()) return false;
+  const from = +S.settings.postsFrom || 0;
+  if (!from || at < from - 60000 || Date.now() - at > 2 * 864e5) return false;   // never history
+  if (Date.now() - POST.burstAt > 5000) { POST.burst = 0; POST.burstAt = Date.now(); }
+  if (POST.burst >= 3) return false;   // at most 3 at once
+  const day = dayKey(new Date()), pd = S.ui.postDay && S.ui.postDay.d === day ? S.ui.postDay.n : 0;
+  if (pd >= POSTS_DAY_CAP) return false;
+  ref = postRef(ref);
+  const id = `${type}_${USER.uid}_${ref}`;
+  if (POST.mine[id]) return false;
+  POST.mine[id] = 1; POST.burst++;
+  const bl = SOC.blocked || {}, aud = [USER.uid, ...friendsList().map(otherUid).filter(u => u && !bl[u])].slice(0, 151);
+  const doc = { author: USER.uid, authorName: USER.username, type, ref, n: Math.max(0, Math.min(1e6, Math.round(+n || 0))), aud, day, at: FB.serverTimestamp() };
+  if (mates.length) doc.mates = mates.filter(u => typeof u === 'string' && /^[A-Za-z0-9]{1,40}$/.test(u)).slice(0, 6);
+  S.ui.postDay = { d: day, n: pd + 1 }; saveLocal();
+  try { await FB.setDoc(FB.doc(FB.db, 'posts', id), doc); POST.at = 0; return true; }
+  catch (e) { return false; }   // already posted (another device, an earlier visit): the rules refuse a second write
+}
+/** Take people out of the audience of my recent posts (blocked, or no longer friends). */
+async function postsDropAudience(uids) {
+  if (!uids.length || !cloudReady() || isPreview()) return;
+  try {
+    const qs = await FB.getDocs(FB.query(FB.collection(FB.db, 'posts'), FB.where('aud', 'array-contains', USER.uid), FB.where('author', '==', USER.uid), FB.orderBy('at', 'desc'), FB.limit(50)));
+    for (const d of qs.docs) { const x = d.data(); if (x.author !== USER.uid) continue; const aud = (x.aud || []).filter(u => !uids.includes(u)); if (aud.length !== (x.aud || []).length) FB.updateDoc(d.ref, { aud }).catch(() => {}); }
+  } catch (e) { console.warn('posts audience', e && e.code); }
+}
+/** My posts older than 30 days are deleted (at most 20 a day). */
+async function postsCleanup() {
+  if (!cloudReady() || isPreview() || Date.now() - Math.max(POST.cleanAt || 0, +S.ui.postClean || 0) < 864e5) return;
+  POST.cleanAt = S.ui.postClean = Date.now(); saveLocal();   // once a day per device, across reloads
+  try {
+    const qs = await FB.getDocs(FB.query(FB.collection(FB.db, 'posts'), FB.where('aud', 'array-contains', USER.uid), FB.where('author', '==', USER.uid), FB.orderBy('at', 'asc'), FB.limit(20)));   // (the rules read posts by their audience: the query must say so)
+    for (const d of qs.docs) { const t = tsMs(d.data().at); if (t && Date.now() - t > POSTS_TTL) FB.deleteDoc(d.ref).catch(() => {}); }
+  } catch (e) { console.warn('posts cleanup', e && e.code); }
+}
+/** The feed: posts whose audience includes me, newest first, the last 30 days, from me and my current friends. */
+async function loadPosts(force) {
+  if (!socialReady() || POST.busy || (!force && POST.list && Date.now() - POST.at < POSTS_REFRESH)) return POST.list;
+  POST.busy = true;
+  try {
+    const qs = await FB.getDocs(FB.query(FB.collection(FB.db, 'posts'), FB.where('aud', 'array-contains', USER.uid), FB.orderBy('at', 'desc'), FB.limit(50)));
+    const fr = new Set(friendsList().map(otherUid));
+    POST.list = qs.docs.map(d => ({ id: d.id, ...d.data(), at: tsMs(d.data().at) || Date.now() })).filter(x => (x.author === USER.uid || fr.has(x.author)) && Date.now() - x.at < POSTS_TTL && POST_TYPES[x.type]);
+    POST.at = Date.now(); POST.err = null;
+    POST.newest = postsNewest(POST.list); if (S.ui.tab === 'posts') postsMarkSeen(); else updatePostsBadge();
+    prefetchLooks([...new Set(POST.list.map(x => x.author))], () => { if (S.ui.tab === 'posts') renderPostsPage(true); });
+  } catch (e) { console.warn('posts', e && e.code); if (!POST.list) POST.list = []; POST.err = /index/i.test(e && e.message || '') ? 'index' : 'net'; }
+  finally { POST.busy = false; }
+  if (S.ui.tab === 'posts') renderPostsPage(true);
+  setTimeout(postsCleanup, 4000);
+  return POST.list;
+}
+/** What a post says (no free text: everything comes from the type, the number and our own tables). */
+function postText(x, group) {
+  const rk = i => esc(rankName(Math.max(0, Math.min(16, +i || 0))));
+  switch (x.type) {
+    case 'ach': { const as = (group || [x]).map(p => ACH_BY_ID[p.ref.split('.')[0]]).filter(Boolean).map(a => `<b>${esc(a.name)}</b>`); return as.length > 1 ? `unlocked ${as.length} achievements: ${as.slice(0, -1).join(', ')} and ${as[as.length - 1]}` : `unlocked ${as[0] || 'an achievement'}`; }
+    case 'streak': return `reached a <b>${fmtNum(x.n)}-day</b> streak`;
+    case 'rank': return `ranked up to ${rankBadge(+x.n, { size: 14 })} <b>${rk(x.n)}</b>`;
+    case 'level': { const t = TIERS.slice().reverse().find(t => +x.n >= t.min); return `reached <b>level ${fmtNum(x.n)}</b>${t && t.min === +x.n ? ` — the <b>${esc(t.name)}</b> badge` : ''}`; }
+    case 'session': {   // a mate's name shows only to their friends, and only if they posted the same table themselves (their own setting allows it)
+      const fr = new Set(friendsList().map(otherUid)), m = x.mates || [], you = m.includes(USER.uid) && x.author !== USER.uid;
+      const shown = m.filter(u => u !== USER.uid && fr.has(u) && POST.list && POST.list.some(p => p.type === 'session' && p.author === u && p.ref === x.ref)).map(u => `@${esc(friendNameOf(u))}`);
+      const named = [...(you ? ['you'] : []), ...shown], others = m.length - shown.length - (you ? 1 : 0);
+      return `studied together${named.length ? ' with ' + named.join(', ') : ''}${others > 0 ? `${named.length ? ' and' : ' with'} ${others} other${others === 1 ? '' : 's'}` : ''}`; }
+    case 'boss': { const b = BOSSES[+x.n] || null, sq = /-squad$/.test(x.ref); return `defeated <b>${b ? esc(b.name) : 'the weekly boss'}</b>${sq ? ' with their squad' : ' solo'}`; }
+    case 'quest': { const ev = EVENTS.find(e => e.id === x.ref.replace(/-pass$/, '')); return /-pass$/.test(x.ref) ? `completed the <b>${ev ? esc(passName(ev)) : 'Study Pass'}</b> 🎟️` : `finished the <b>${ev ? ev.emoji + ' ' + esc(ev.name) : ''}</b> questline`; }
+    case 'harvest': { const [sp] = x.ref.split('.'), spn = (GSP_BY_ID[sp] || {}).name || 'crop'; return +x.n >= 100 ? `harvested a <b>Giant ${esc(spn)}</b>` : `harvested a <b>5★ ${esc(spn)}</b>`; }
+    case 'pet': { const [pm, pid] = x.ref.split('.'), pet = PET_BY_ID[pid]; return pet ? `hatched a <b>${esc(petMutName(pet, PET_MUTS[pm] ? pm : ''))}</b>${pet.rarity !== 'common' ? ` (${esc(RARITY_LABEL[pet.rarity] || pet.rarity)})` : ''}` : 'hatched a pet'; }
+    case 'clan': return /-raid-/.test(x.ref) ? 'helped their clan beat the monthly raid boss' : `their clan reached <b>level ${fmtNum(x.n)}</b>`;
+    case 'hours': return `hit <b>${fmtNum(x.n)} hours</b> of focus`;
+    case 'evo': return `their Pomeo grew into <b>${esc((EVO[+x.n] || {}).name || 'a new stage')}</b>`;
+  }
+  return '';
+}
+function postCardHTML(x, group) {
+  const L = personLook(x.author, x.authorName), me = x.author === USER.uid, r = x.r || {}, mine = r[USER.uid];
+  const counts = POST_EMOJI.map(e => [e, Object.values(r).filter(v => v === e).length]);
+  const txt = postText(x, group), joined = /^[’']/.test(txt);
+  return `<li class="post" data-post="${esc(x.id)}">${lookPic(L, 40)}<div><div class="po-top">${lookName(L)}${me ? ' <span class="lbl">(you)</span>' : ''}<span class="po-time">${postAgo(x.at)}</span></div>
+    <div class="po-txt"><span class="po-ic" aria-hidden="true">${POST_TYPES[x.type].ic}</span>${joined ? '' : ' '}${txt}</div></div>
+    <div class="po-react" role="group" aria-label="Reactions">${counts.map(([e, n]) => `<button type="button" data-preact="${e}"${mine === e ? ' class="on" aria-pressed="true"' : ' aria-pressed="false"'}${me ? ' disabled' : ''} aria-label="${e} ${n}">${e}${n ? `<b>${n}</b>` : ''}</button>`).join('')}</div></li>`;
+}
+const postAgo = t => { const m = Math.max(0, Math.round((Date.now() - t) / 60000)); return m < 1 ? 'just now' : m < 60 ? `${m}m` : m < 1440 ? `${Math.round(m / 60)}h` : `${Math.round(m / 1440)}d`; };
+/** The newest post from a friend (not me) in a list — what the sidebar dot compares with the last visit. */
+function postsNewest(list) { const fr = new Set(friendsList().map(otherUid)); return Math.max(0, ...(list || []).filter(x => x.author !== USER.uid && fr.has(x.author) && Date.now() - x.at < POSTS_TTL).map(x => x.at)); }
+function updatePostsBadge() {
+  const b = $('#postsBadge');
+  if (!b) return;
+  const on = !!USER && !USER.guest && !minimal() && S.ui.tab !== 'posts' && (POST.newest || 0) > (+S.ui.postsSeen || 0);
+  b.classList.toggle('hidden', !on);
+  b.setAttribute('aria-label', on ? 'New posts from friends' : '');
+}
+function postsMarkSeen() { S.ui.postsSeen = Math.max(Date.now(), POST.newest || 0); saveLocal(); updatePostsBadge(); }
+/** A light check for the dot: the five newest posts I can read (5 reads), at sign-in and every 15 minutes while the app is open. */
+async function postsPeek() {
+  if (!USER || USER.guest || minimal() || (!socialReady() && !isPreview()) || S.ui.tab === 'posts' || document.hidden) return;
+  try {
+    const qs = await FB.getDocs(FB.query(FB.collection(FB.db, 'posts'), FB.where('aud', 'array-contains', USER.uid), FB.orderBy('at', 'desc'), FB.limit(5)));
+    POST.newest = Math.max(POST.newest || 0, postsNewest(qs.docs.map(d => ({ ...d.data(), at: tsMs(d.data().at) || 0 }))));
+  } catch (e) { /* offline, or the index is still building */ }
+  updatePostsBadge();
+}
+let postsPeekTimer = 0;
+function postsPeekStart() { clearInterval(postsPeekTimer); setTimeout(postsPeek, 4000); postsPeekTimer = setInterval(postsPeek, 15 * 60000); }
+const POST_FILTERS = [['all', 'All'], ['friends', 'Friends'], ['clan', 'Clan'], ['you', 'You']];
+let postsClanAsked = false;
+function postsFiltered(list, f) {
+  if (f === 'you') return list.filter(x => x.author === USER.uid);
+  if (f === 'friends') { const fr = new Set(friendsList().map(otherUid)); return list.filter(x => x.author !== USER.uid && fr.has(x.author)); }
+  if (f === 'clan') {
+    if (!CLAN.id) return [];
+    if (!CLAN.members && !postsClanAsked) { postsClanAsked = true; clanLoadDetails().then(() => { if (S.ui.tab === 'posts') renderPostsPage(true); }).catch(() => {}); }
+    const cm = new Set((CLAN.members || []).map(m => m.id));
+    return list.filter(x => cm.has(x.author) || (x.type === 'clan' && x.author === USER.uid));
+  }
+  return list;
+}
+/** Posts: a hero (what this is, the filters, the posting switch), then the feed newest first in day cards. */
+function renderPostsPage(fromLoad) {
+  const body = $('#postsBody');
+  if (!body) return;
+  if (!USER || USER.guest) {
+    body.innerHTML = `<div class="card empty-card">${pomeoScene('wave') || ''}<h3>Your friends’ wins</h3><p class="muted">Log in to see what your friends reach — a streak, a rank, a boss — and cheer them on.</p><button class="btn primary" id="guestLogin">Log in to see posts</button></div>`;
+    return;
+  }
+  if (localOnly || (!socialReady() && !isPreview())) { body.innerHTML = `<div class="card empty-card"><p class="muted">${localOnly ? 'Posts need an internet connection. Your timer and stats still work offline.' : ''}</p>${localOnly ? '' : skelRows(3)}</div>`; return; }
+  if (!fromLoad || !POST.list) loadPosts();
+  const f = POST_FILTERS.some(([k]) => k === S.ui.postFilter) ? S.ui.postFilter : 'all';
+  const list = POST.list === null ? null : postsFiltered(POST.list, f);
+  // a burst of achievements (same author, within two hours) shows as one post
+  const cards = []; let grp = null;
+  for (const x of list || []) {
+    if (x.type === 'ach' && grp && grp[0].author === x.author && Math.abs(grp[grp.length - 1].at - x.at) < 2 * 3600e3) { grp.push(x); continue; }
+    if (x.type === 'ach') { grp = [x]; cards.push(grp); } else { grp = null; cards.push([x]); }
+  }
+  // newest first, in day cards: Today · Yesterday · This week · Earlier
+  const t0 = +startOfDay(new Date()), day = at => at >= t0 ? 0 : at >= t0 - 864e5 ? 1 : at >= t0 - 6 * 864e5 ? 2 : 3;
+  const DAYS = ['Today', 'Yesterday', 'This week', 'Earlier'], groups = [[], [], [], []];
+  for (const g of cards) groups[day(g[0].at)].push(g);
+  const on = postsWanted(), nOff = Object.keys(S.settings.postOff || {}).filter(k => POST_TYPES[k]).length;
+  const empty = f === 'you' ? ['Nothing from you yet', on ? 'When you reach something — a streak, a rank, a boss — it’s posted here for your friends.' : 'Your posting is off, so nothing of yours is shared.']
+    : f === 'clan' && !CLAN.id ? ['No clan yet', 'Join or start a clan to see your clanmates’ wins here.']
+    : ['Nothing yet — your friends’ wins will show up here', 'A streak, a rank-up, a boss, a Giant harvest… posted by the app, never written. React with ' + POST_EMOJI.join(' ') + '.'];
+  body.innerHTML = `<div class="card posts-hero"><div><h1>Posts</h1><p class="muted">Wins from you and your friends, the last 30 days — automatic, nobody writes anything.</p></div>
+      <div class="ph-act"><button class="btn small" type="button" data-psettings title="Choose what gets posted">${on ? `Posting on${nOff ? ` · ${POST_TYPES_N - nOff} of ${POST_TYPES_N}` : ''}` : 'Posting off'} ⚙</button><button class="linkbtn" data-prefresh title="Refresh" aria-label="Refresh">↻</button></div>
+      <div class="seg" id="postSeg" role="tablist" aria-label="Show">${POST_FILTERS.map(([k, n]) => `<button type="button" data-pfilter="${k}" role="tab" aria-selected="${k === f}"${k === f ? ' class="active"' : ''}>${n}</button>`).join('')}</div>
+      ${on ? '' : '<p class="lbl po-off">Your posting is off — friends don’t see your wins. You still see theirs.</p>'}
+      ${POST.err === 'index' ? '<p class="lbl po-off">Posts are getting ready — try again in a few minutes.</p>' : ''}</div>
+    ${list === null ? `<div class="card">${skelRows(3)}</div>`
+      : !cards.length ? `<div class="card">${sceneEmpty('wave', 'big-icon', `<h3 style="margin:8px 0 4px">${esc(empty[0])}</h3><p class="lbl" style="margin:0">${esc(empty[1])}</p>`)}</div>`
+      : `<div class="mason posts-cards">${groups.map((gs, i) => gs.length ? `<div class="card post-day"><h2>${DAYS[i]}</h2><ul class="post-list">${gs.map(g => postCardHTML(g[0], g.length > 1 ? g : null)).join('')}</ul></div>` : '').join('')}</div>`}`;
+  syncSegs();
+}
+const POST_TYPES_N = Object.keys(POST_TYPES).length;
+const renderPosts = renderPostsPage;   // (the name the feed had while it lived under Friends)
+async function postReact(id, e) {
+  const x = (POST.list || []).find(p => p.id === id);
+  if (!x || x.author === USER.uid || !POST_EMOJI.includes(e)) return;
+  const prev = (x.r || {})[USER.uid], next = prev === e ? null : e;
+  x.r = { ...(x.r || {}) }; if (next) x.r[USER.uid] = next; else delete x.r[USER.uid];
+  renderPostsPage(true);
+  try { await FB.updateDoc(FB.doc(FB.db, 'posts', id), { ['r.' + USER.uid]: next || FB.deleteField() }); uiSound('tick'); }
+  catch (err) { if (prev) x.r[USER.uid] = prev; else delete x.r[USER.uid]; renderPostsPage(true); toast(err && err.code === 'permission-denied' ? 'Couldn’t react — you can react to your friends’ posts' : 'Couldn’t react — check your connection'); }
+}
+document.addEventListener('click', e => {
+  const r = e.target.closest('[data-preact]');
+  if (r) { const li = r.closest('[data-post]'); if (isPreview()) { previewPrompt(r); return; } if (li) postReact(li.dataset.post, r.dataset.preact); return; }
+  if (e.target.closest('[data-prefresh]')) { if (Date.now() - POST.at > 20000) loadPosts(true); else renderPostsPage(true); return; }   // a full reload at most every 20 s (each is up to 50 reads)
+  const pf = e.target.closest('[data-pfilter]');
+  if (pf) { S.ui.postFilter = pf.dataset.pfilter; saveLocal(); renderPostsPage(true); viewIn($('#postsBody .posts-cards') || $('#postsBody')); return; }
+  if (e.target.closest('[data-psettings]')) { showTab('settings'); setTimeout(() => { const d = $('#postTypesBox'); if (d) d.open = true; const t = $('#setPosts'); if (t) { t.closest('.setting').scrollIntoView({ block: 'center', behavior: 'smooth' }); t.focus({ preventScroll: true }); } }, 120); return; }
+});
+document.addEventListener('change', e => {
+  if (e.target.id === 'setPosts') { S.settings.posts = e.target.checked; save(); renderPrivacy(); if (S.ui.tab === 'posts') renderPostsPage(true); return; }
+  if (e.target.dataset && e.target.dataset.posttype) { const o = { ...(S.settings.postOff || {}) }; if (e.target.checked) delete o[e.target.dataset.posttype]; else o[e.target.dataset.posttype] = true; S.settings.postOff = o; save(); }
+});
+/** Things that happened, turned into posts (called right after they happen — never for history). */
+function postsFromNews(news) {
+  for (const n of news.filter(n => n.type === 'rankup')) makePost('rank', `${seasonKeyNow()}-${n.idx}`, n.idx);
+  for (const n of news.filter(n => n.type === 'streak' && n.m >= 7)) makePost('streak', 'm' + n.m, n.m);
+  for (const n of news.filter(n => n.type === 'evo')) makePost('evo', 'e' + n.s, n.s);
+  for (const n of news.filter(n => n.type === 'ach')) makePost('ach', n.a.id, 0);
+}
+
 /* ---------- Friend requests ---------- */
+let postsFriendSet = null;
 function onFriendshipsChanged() {
+  { const now = new Set(friendsList().map(otherUid)); if (postsFriendSet) { const gone = [...postsFriendSet].filter(u => !now.has(u)); if (gone.length) postsDropAudience(gone); } postsFriendSet = now; }   // v1.20: an ex-friend leaves my posts' audience
   const n = incoming().length;
   updateFriendsDot();
   $('#reqCount').textContent = n || '';
@@ -9501,6 +9966,7 @@ async function blockUser(uid, name) {
   if (!confirm(`Block @${name}? They won’t be able to send you requests or see your profile, and you’ll stop being friends.`)) return;
   try {
     await FB.setDoc(FB.doc(FB.db, 'users', USER.uid, 'blocked', uid), { name, at: Date.now() });
+    postsDropAudience([uid]);   // v1.20: blocked people never see my posts
     const f = SOC.friendships.find(x => x.users.includes(uid));
     if (f) await FB.deleteDoc(FB.doc(FB.db, 'friendships', f.id));
     SOC.friend = null;
@@ -9600,6 +10066,8 @@ function presenceText(p) {
     return n.phase === 'focus' ? `${n.name} – ${left} min left` : `On a break – ${left} min left`;
   }
   if (n.status === 'paused' && p.updatedAt && Date.now() - p.updatedAt.toMillis() < 3 * 3600e3) return `${n.phase === 'focus' ? n.name : 'Break'} – paused`;
+  // v1.20: counting up after the block's end (status "overtime", written when it starts; within the 4-hour block limit)
+  if (n.status === 'overtime' && p.updatedAt && Date.now() - p.updatedAt.toMillis() < 4 * 3600e3) return `${n.name} – overtime`;
   return '';
 }
 
@@ -9839,7 +10307,7 @@ function renderFriends(fromLoad) {
     return;
   }
   if (SOC.friend) { renderFriendProfile(fromLoad); return; }
-  let view = S.ui.friendsView === 'challenges' ? 'challenges' : 'friends';   // (Study sessions moved to their own section in v1.19.1)
+  let view = S.ui.friendsView === 'challenges' ? 'challenges' : 'friends';   // (Study sessions and Posts have their own sections: v1.19.1, v1.20)
   if (!gameOn && view === 'challenges') view = 'friends';
   if (S.ui.friendsView !== view) S.ui.friendsView = view;
   $$('#friendsSeg button').forEach(b => b.classList.toggle('active', b.dataset.view === view));
@@ -10209,6 +10677,8 @@ function renderPrivacy() {
   if (!USER || USER.guest) { card.classList.add('hidden'); return; }
   card.classList.remove('hidden');
   $('#setShareAct').checked = S.settings.shareActivity;
+  $('#setPosts').checked = postsWanted();
+  $('#postTypes').innerHTML = Object.entries(POST_TYPES).map(([k, v]) => `<label class="pt-opt"><input type="checkbox" data-posttype="${k}"${(S.settings.postOff || {})[k] ? '' : ' checked'}${postsWanted() ? '' : ' disabled'}> ${v.ic} ${esc(v.name)}</label>`).join('');
   $('#setShareNames').checked = S.settings.shareNames;
   $('#setGlobal').checked = S.settings.globalBoard;
   $('#inviteDesc').textContent = `Friend code @${USER.username}`;
@@ -10223,7 +10693,7 @@ function renderPrivacy() {
    ========================================================================== */
 const scrollMem = {};
 function showTab(tab) {
-  if ((tab === 'shop' || tab === 'quests' || tab === 'bag' || tab === 'garden' || tab === 'room') && !S.settings.gamification) tab = 'timer';
+  if ((tab === 'shop' || tab === 'quests' || tab === 'bag' || tab === 'garden' || tab === 'room' || tab === 'posts') && !S.settings.gamification) tab = 'timer';
   if (S.ui.tab === 'bag' && tab !== 'bag') leaveBag();
   hideTip();
   if (!$('#tab-' + tab)) tab = 'timer';
@@ -10248,6 +10718,7 @@ function showTab(tab) {
   if (tab === 'clan') { renderClan(); clanLoadDetails(); }
   if (tab === 'friends') { SOC.friend = null; SOC.unread = false; updateFriendsDot(); renderFriends(); }
   if (tab === 'sessions') { SESS.unread = false; renderSessionsPage(); updateSessBadge(); }
+  if (tab === 'posts') { postsMarkSeen(); renderPostsPage(); }
   const y = scrollMem[tab] || 0;   // restore once the tab has laid out (charts can grow it a moment later)
   window.scrollTo({ top: y, behavior: 'instant' });
   if (y) [60, 250].forEach(ms => setTimeout(() => { if (S.ui.tab === tab && Math.abs(window.scrollY - y) > 4) window.scrollTo({ top: y, behavior: 'instant' }); }, ms));
@@ -11261,6 +11732,7 @@ function checkBoss() {
   G = null;
   save();
   for (const st of won) announceVictory(st);
+  for (const st of won) makePost('boss', bkey(st.wk, st.mode), Math.max(0, BOSSES.indexOf(st.boss)));   // v1.20
   setTimeout(() => checkUnlocks(), 2500);   // a boss emblem stamp (and Champion when it's Mastered), after the victory
   renderHeaderChip();
   updateQuestDot();
@@ -11402,6 +11874,154 @@ function wqGive(q, key, at) {
   if (q.seed && !has('wqs_' + key)) S.gbuys.push({ id: 'wqs_' + key, v: 1, item: 'seed_' + wqSeedOf(key), price: 0, at, slot: '', src: 'gift' });
   GD = null;
 }
+/* ==========================================================================
+   STUDY PASS (v1.20) — a free reward pass alongside each questline, from Monsoon Study (8 Nov 2026) on. Same dates,
+   same theme. Two rows:
+   · Pass track: 30 tiers of Pass XP. Pass XP = 1 per focus minute + 30 for a day's goal + 15 for the daily reward
+     + 40 per quest-board quest + 50 per questline quest, at most 180 a day (so it can't be finished in a few days of
+     grinding). 2,700 XP in all: a normal day (90 min, goal reached, daily reward, a couple of weekly quests) is ~146, so
+     about 18 days; the cap makes 15 days the fastest. An event shorter than 20 days scales the tiers down to fit.
+   · Focus track: 20 steps by focus hours during the event (1 h … 26 h), at most 14 h a day (the ranks' cap).
+   Progress comes from what every device already has (the synced session log and claims), so all devices agree.
+   Claims are ledger entries game.claims.pass['<event>:p|f:<tier>'] (add-only, merged across devices); coins come
+   from the ledger, produce/seeds/eggs/cosmetics are keyed by the same entry, so nothing pays twice. Claim any time
+   before the event ends; what you reached but didn't claim is added for you when it ends (nothing is lost).
+   The v1.18 monthly track is merged into the Focus track: no new monthly-track rewards from November 2026, everything
+   already claimed stays, and for Monsoon Study (which overlaps November) the first Focus steps worth what the November
+   track already paid are marked as paid — the same hours don't pay twice.
+   ========================================================================== */
+const PASS_TIERS = 30, PASS_FULL_XP = 2700, PASS_DAY_CAP = 180, PASS_LAST_CAP = 240, PASS_XP = { goal: 30, login: 15, wq: 40, quest: 50 };
+// Pace (v1.20): a pass counts the days you actually have — from the event's start, or, for the event running when this
+// account first opened 1.20 (or was created), from that day. The requirement is sized so a normal studier (90 min a
+// day, the daily goal, the daily reward, two quest-board quests a week ≈ 146 Pass XP a day) finishes about 2.5 days
+// before the end, never above the full 2,700 (30 × 90; a full-length event: ~19 days, 15 at the fastest).
+// Catch-up: on a day you study, 75% of the daily cap you didn't use goes into a bank; on a day you're behind the pace
+// line, the bank tops your Pass XP up (to the cap). In the last 7 days the cap is 240 while you're behind.
+const PASS_NORMAL_DAY = 146, PASS_LEAD = 2.5, PASS_ROLL = 0.75, PASS_FOCUS_NORMAL_H = 1.5;
+const FOCUS_H = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11.5, 13, 14.5, 16, 17.5, 19, 20.5, 22, 24, 26], FOCUS_DAY_CAP = 840;
+const TRACK_LAST_MONTH = '2026-10';   // the monthly track pays for October 2026 and before; the pass from November
+const passEvent = ev => !!ev && ev.start >= PASS_FROM;
+const evDays = ev => Math.round((evEnd(ev) - evStart(ev)) / 864e5);
+/** The days this account's pass runs: [first day key, days available]. */
+function passWindow(ev) {
+  const fromTs = +(S.game.claims.pass || {})._from || 0, fromDay = fromTs ? dayKey(new Date(fromTs)) : '';
+  const start = fromDay > ev.start && fromDay <= ev.end ? fromDay : ev.start;   // only the event running when 1.20 (or the account) began
+  return [start, Math.round((evEnd(ev) - parseDay(start).getTime()) / 864e5)];
+}
+/** Pass XP for the whole pass, for `days` available (multiples of 30, so every tier is a whole number). */
+const passTotalXP = days => Math.max(30 * 30, Math.min(PASS_FULL_XP, Math.round(PASS_NORMAL_DAY * (days - PASS_LEAD) / 30) * 30));
+/** The Focus track's last step in hours for `days` available (1.5 h a day for a normal studier, at most 26 h). */
+const passFocusScale = days => Math.min(1, Math.max(0.25, PASS_FOCUS_NORMAL_H * (days - PASS_LEAD) / FOCUS_H[FOCUS_H.length - 1]));
+const passXpPerTier = ev => passTotalXP(passWindow(ev)[1]) / PASS_TIERS;
+const focusTierH = (ev, i) => Math.max(0.5, Math.round(FOCUS_H[i] * passFocusScale(passWindow(ev)[1]) * 2) / 2);
+/** The rewards of a tier (i from 1). Pass track: coins and produce, seeds every 5th, eggs, then the themed cosmetics. */
+function passReward(ev, track, i) {
+  if (track === 'p') {
+    const it = { 10: 'stamp_pass_', 15: 'ti_pass_', 20: 'col_pass_', 30: 'au_pass_' }[i];
+    if (it) return i === 30 ? { item: it + ev.id, coins: 100 } : { item: it + ev.id };
+    if (i === 25) return { egg: 'rare' };
+    if (i === 12) return { egg: 'common' };
+    if (i % 5 === 0) return { seed: 1 };
+    return i % 2 ? { coins: 20 + i } : { produce: 15 + i };
+  }
+  if (i === 20) return { item: 'stamp_passf_' + ev.id, coins: 40 };
+  if (i === 10) return { egg: 'common' };
+  if (i === 7 || i === 14) return { seed: 1 };
+  return i % 2 ? { coins: 10 + i } : { produce: 10 + i };
+}
+const passSeedOf = key => WQ_SEEDS[h32('ps' + key) % WQ_SEEDS.length];
+function passRewardText(r, key) {
+  const out = [];
+  if (r.item && ITEM_BY_ID[r.item]) out.push(ITEM_BY_ID[r.item].name);
+  if (r.coins) out.push(`${r.coins} coins`);
+  if (r.produce) out.push(`${r.produce} produce`);
+  if (r.seed) out.push(`${(GSP_BY_ID[passSeedOf(key)] || {}).name || 'A'} seed`);
+  if (r.egg) out.push(`a ${r.egg} egg`);
+  return out.join(' + ');
+}
+/** Rough worth of a reward in coins (only to match what the November track already paid). */
+const rewardWorth = r => (r.coins || 0) + (r.produce || 0) + (r.seed ? 30 : 0) + (r.egg ? (r.egg === 'rare' ? 150 : 100) : 0);
+let PASSC = null, PASSCkey = '';
+/** Progress in an event's pass: Pass XP (capped per day), the tier reached, focus hours (capped per day), the step reached. */
+function passState(ev) {
+  const cl = S.game.claims, list = S.sessions || [], last = list[list.length - 1];
+  const key = ev.id + '|' + list.length + ':' + (last ? last.id + ':' + last.end : '') + '|' + Object.keys(cl.login).length + '|' + Object.keys(cl.wq).length + '|' + Object.keys(cl.quests).length + '|' + Object.keys(cl.goalDays).length + '|' + Object.keys(cl.pass).length + '|' + S.settings.goalMin + '|' + dayKey(new Date());
+  if (PASSC && PASSCkey === key) return PASSC;
+  const [wStart, avail] = passWindow(ev);
+  const idx = game().idx, from = parseDay(wStart).getTime(), to = evEnd(ev), days = {}, tk = dayKey(new Date());
+  const add = (k, v) => { if (k >= wStart && k <= ev.end) days[k] = (days[k] || 0) + v; };
+  let focusMin = 0;
+  for (let d = parseDay(wStart); +d < to && +d <= Date.now(); d = addDays(d, 1)) {
+    const k = dayKey(d), m = (idx[k] || {}).total || 0;
+    if (m > 0) { add(k, Math.floor(m)); focusMin += Math.min(FOCUS_DAY_CAP, m); if (goalMetDay(idx, k)) add(k, PASS_XP.goal); }
+  }
+  for (const k of Object.keys(cl.login)) add(k, PASS_XP.login);
+  for (const ts of Object.values(cl.wq)) if (+ts >= from && +ts < to) add(dayKey(new Date(+ts)), PASS_XP.wq);
+  for (const [k, ts] of Object.entries(cl.quests)) if (k.startsWith(ev.id + ':') && !k.endsWith(':final') && +ts >= from && +ts < to) add(dayKey(new Date(+ts)), PASS_XP.quest);
+  // day by day through the window: the cap, the pace line, the catch-up bank
+  const total = passTotalXP(avail), per = total / PASS_TIERS;
+  let xp = 0, today = 0, bank = 0, boost = 0, todayCap = PASS_DAY_CAP, i = 0;
+  for (let d = parseDay(wStart); +d < to && +d <= Date.now(); d = addDays(d, 1), i++) {
+    const k = dayKey(d), e = days[k] || 0, cap = i >= avail - 7 ? PASS_LAST_CAP : PASS_DAY_CAP, base = Math.min(PASS_DAY_CAP, e), line = total * (i + 1) / Math.max(1, avail - PASS_LEAD);
+    let got = base;
+    if (e > 0 && xp + base < line) {   // behind the pace line: the bank tops it up, and in the last week the cap rises
+      const top = Math.min(cap, e) - base, fromBank = Math.min(bank, e, Math.max(0, line - xp - base), cap - base);
+      got = Math.min(cap, base + top + fromBank); bank -= Math.max(0, got - base - top); if (k === tk) boost = got - base;
+    }
+    if (e >= 15) bank += PASS_ROLL * Math.max(0, PASS_DAY_CAP - base);
+    xp += got;
+    if (k === tk) { today = got; todayCap = cap; }
+  }
+  const tier = Math.min(PASS_TIERS, Math.floor(xp / per)), hours = focusMin / 60;
+  let step = 0; for (let i = 0; i < FOCUS_H.length; i++) if (hours >= focusTierH(ev, i)) step = i + 1;
+  // what the v1.18 monthly track already paid for months this event overlaps (only Monsoon Study / November 2026)
+  let paid = 0;
+  for (const [k] of Object.entries(cl.track)) { const [mk, ti] = k.split(':'); if (mk > TRACK_LAST_MONTH && mk >= ev.start.slice(0, 7) && mk <= ev.end.slice(0, 7) && TRACK[+ti]) paid += rewardWorth(TRACK[+ti]); }
+  let pre = 0, acc = 0; while (pre < FOCUS_H.length && acc + rewardWorth(passReward(ev, 'f', pre + 1)) <= paid && !passReward(ev, 'f', pre + 1).item) { acc += rewardWorth(passReward(ev, 'f', pre + 1)); pre++; }
+  PASSC = { ev, xp, today, todayRaw: days[tk] || 0, todayCap, per, total, tier, hours, step, prepaid: pre, paidByTrack: paid, wStart, avail, bank: Math.round(bank), boost: Math.round(boost) };
+  PASSCkey = key;
+  return PASSC;
+}
+const passKey = (ev, track, i) => `${ev.id}:${track}:${i}`;
+/** Can this tier be claimed now (reached, not claimed, not paid by the monthly track)? */
+function passClaimable(ev, st = passState(ev)) {
+  const cl = S.game.claims.pass, out = [];
+  for (let i = 1; i <= st.tier; i++) if (!cl[passKey(ev, 'p', i)]) out.push(['p', i]);
+  for (let i = st.prepaid + 1; i <= st.step; i++) if (!cl[passKey(ev, 'f', i)]) out.push(['f', i]);
+  return out;
+}
+/** Give a tier's rewards (coins come from the ledger; the rest keyed by the claim, so a second device adds nothing). */
+function passGive(r, key, at) {
+  const has = id => (S.gbuys || []).some(b => b && b.id === id);
+  if (r.produce && !has('ps_' + key)) S.gbuys.push({ id: 'ps_' + key, v: 1, item: 'quest', price: 0, bonus: r.produce, at, slot: '', src: 'quest' });
+  if (r.seed && !has('pss_' + key)) S.gbuys.push({ id: 'pss_' + key, v: 1, item: 'seed_' + passSeedOf(key), price: 0, at, slot: '', src: 'gift' });
+  if (r.egg && !(S.eggs || []).some(e => e && e.id === 'egg_ps_' + key)) (S.eggs ||= []).push({ id: 'egg_ps_' + key, v: 1, kind: r.egg, src: 'gift', at, need: EGG_NEED[r.egg], w: {} });
+  if (r.item && ITEM_BY_ID[r.item] && !S.game.grants[r.item]) S.game.grants[r.item] = { src: 'pass:' + key, at };
+  GD = null; G = null;
+}
+/** Claim tiers (all reachable ones when `which` is empty). Returns what was claimed. */
+function passClaim(ev, which, quiet = false) {
+  if (!passEvent(ev) || isPreview()) return [];
+  const st = passState(ev), cl = S.game.claims.pass, now = Date.now(), at = Math.min(now, evEnd(ev) - 1), done = [];
+  for (const [track, i] of which && which.length ? which : passClaimable(ev, st)) {
+    const k = passKey(ev, track, i), reached = track === 'p' ? i <= st.tier : i <= st.step && i > st.prepaid;
+    if (!reached || cl[k]) continue;
+    cl[k] = at; passGive(passReward(ev, track, i), k, at); done.push([track, i]);
+  }
+  if (done.length) { PASSC = null; G = null; if (!quiet) save(); }
+  if (done.some(([t, i]) => t === 'p' && i === PASS_TIERS)) makePost('quest', ev.id + '-pass', PASS_TIERS);   // v1.20: completed the Study Pass
+  return done;
+}
+/** Coins from the pass ledger. */
+function passCoinsAt(t) {
+  let c = 0;
+  for (const [k, ts] of Object.entries(S.game.claims.pass || {})) {
+    if (+ts > t) continue;
+    const [eid, track, i] = k.split(':'), ev = EVENTS.find(x => x.id === eid);
+    if (ev && (track === 'p' || track === 'f') && +i >= 1 && +i <= (track === 'p' ? PASS_TIERS : FOCUS_H.length)) c += passReward(ev, track, +i).coins || 0;
+  }
+  return c;
+}
 /** Coins from the board: at most three quests a week count (two devices can't add a fourth). */
 function wqCoinsAt(t) {
   const per = {};
@@ -11454,10 +12074,64 @@ function renderBoardView(host) {
   const daysLeft = Math.ceil((+new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1) - Date.now()) / 864e5);
   host.innerHTML = `<div class="card wq-card"><div class="row between" style="flex-wrap:wrap;gap:6px"><h2 style="margin:0">This week’s quests</h2><span class="lbl">${left} day${left === 1 ? '' : 's'} left · new quests every Monday</span></div>
       <div class="wq-list">${rows}</div><p class="lbl" style="margin:8px 0 0">Rewards arrive by themselves when a quest is done. Everyone gets the same three quests each week.</p></div>
+    ${mk > TRACK_LAST_MONTH ? `<div class="card tr-card"><h2 style="margin:0">The monthly track is now the Study Pass</h2><p class="lbl" style="margin:6px 0 10px">Focus hours now fill the Study Pass’s Focus track during each questline — same free rewards, plus a Pass track with themed cosmetics. Everything you got from the monthly track stays yours.</p><button class="btn small" type="button" data-qview="pass">Open the Study Pass ›</button></div>` : `
     <div class="card tr-card"><div class="row between" style="flex-wrap:wrap;gap:6px"><h2 style="margin:0">${monthName(mk)} track${ev ? ` <span class="lbl">alongside ${esc(ev.label)}</span>` : ''}</h2><span class="lbl">${fmtNum(Math.floor(h * 10) / 10)} h this month · resets in ${daysLeft} day${daysLeft === 1 ? '' : 's'}</span></div>
       <div class="tr-line"><div class="tr-fill" style="transform:scaleX(${Math.min(1, h / last).toFixed(3)})"></div>${nodes}</div>
-      <p class="lbl" style="margin:8px 0 0">Free for everyone: focus hours this month unlock each step. It starts again on the 1st.</p></div>`;
+      <p class="lbl" style="margin:8px 0 0">Free for everyone: focus hours this month unlock each step. It starts again on the 1st.</p></div>`}`;
 }
+/** Quests › Study Pass: the event's two tracks. */
+function passIconHTML(r, key, g) {
+  if (r.item && ITEM_BY_ID[r.item]) return rewardPreview(ITEM_BY_ID[r.item], g);
+  if (r.egg) return '🥚'; if (r.seed) return '🌱'; if (r.produce) return '🧺';
+  return COIN_SVG;
+}
+function passTierHTML(ev, track, i, st, g, cl) {
+  const k = passKey(ev, track, i), r = passReward(ev, track, i), got = !!cl[k], pre = track === 'f' && i <= st.prepaid;
+  const reached = track === 'p' ? i <= st.tier : i <= st.step, cur = track === 'p' ? i === st.tier + 1 : i === st.step + 1;
+  const need = track === 'p' ? `${fmtNum(i * st.per)} XP` : `${focusTierH(ev, i - 1)} h`;
+  const big = !!r.item;
+  const stt = pre ? '<span class="pt-s lbl" title="Paid by the November monthly track">✓ paid</span>' : got ? '<span class="pt-s lbl ok">✓ Claimed</span>' : reached ? `<button class="btn small primary" type="button" data-pclaim="${track}:${i}">Claim</button>` : `<span class="pt-s lbl">${need}</span>`;
+  return `<div class="pt${big ? ' big' : ''}${pre ? ' prepaid' : got ? ' got' : reached ? ' ready' : ''}${cur ? ' cur' : ''}" role="listitem" aria-label="${track === 'p' ? 'Pass' : 'Focus'} tier ${i}: ${esc(passRewardText(r, k))}${got || pre ? ', claimed' : reached ? ', ready to claim' : ', needs ' + need}">
+    <span class="pt-n">${track === 'p' ? 'Tier' : 'Step'} ${i}</span><span class="pt-ic">${passIconHTML(r, k, g)}</span><span class="pt-l">${esc(passRewardText(r, k))}</span>${stt}</div>`;
+}
+function renderPassView(host) {
+  const ev = currentEvent(), g = game(), cl = S.game.claims.pass;
+  if (!passEvent(ev)) {
+    const nx = EVENTS.find(x => passEvent(x) && evStart(x) > Date.now());
+    host.innerHTML = `<div class="card">${sceneEmpty('wave', 'big-icon', `<h3 style="margin:8px 0 4px">No Study Pass right now</h3><p class="lbl" style="margin:0">${nx ? `The next one comes with ${nx.emoji} <b>${esc(nx.name)}</b> on ${parseDay(nx.start).toLocaleDateString([], { weekday: 'long', day: 'numeric', month: 'long' })}.` : 'A new pass comes with the next questline.'}</p>`)}</div>`;
+    return;
+  }
+  const st = passState(ev), left = Math.max(1, Math.ceil((evEnd(ev) - Date.now()) / 864e5)), can = passClaimable(ev, st), soon = left <= 3;
+  const pPct = Math.min(1, st.xp / (PASS_TIERS * st.per)), fPct = Math.min(1, st.hours / focusTierH(ev, FOCUS_H.length - 1));
+  host.innerHTML = `<div class="stack pass-view" style="--ea:${ev.a};--eb:${ev.b}">
+    <div class="card pass-hero"><div><div class="boss-kicker">Study Pass · ${esc(ev.label)} · ${evRange(ev)}</div><div class="ph-name">${ev.emoji} ${esc(passName(ev))}</div>
+      <div class="ph-meta"><span class="pill${soon ? ' warn' : ''}">${soon ? `Ends in ${left} day${left === 1 ? '' : 's'}` : `${left} days left`}</span><span class="pill">Pass tier ${st.tier} / ${PASS_TIERS}</span><span class="pill">Focus ${st.step} / ${FOCUS_H.length}</span><span class="pill">Today ${fmtNum(st.today)} / ${st.todayCap} XP</span>${st.bank ? `<span class="pill" title="Catch-up: on days you study, 75% of the daily cap you don’t use is saved; it tops you up on days you’re behind">Catch-up ${fmtNum(st.bank)} XP</span>` : ''}</div>
+      <p class="lbl" style="margin:8px 0 0">${soon ? 'Almost over: anything you reach but don’t claim is added for you when it ends. ' : ''}Free, always — no money, ever. Claim each reward any time before ${parseDay(ev.end).toLocaleDateString([], { day: 'numeric', month: 'long' })}.</p></div>
+      ${can.length ? `<button class="btn primary" type="button" data-pclaimall>Claim all (${can.length})</button>` : ''}</div>
+    <div class="card pass-card"><div class="row between" style="gap:8px;flex-wrap:wrap"><h2>Pass track</h2><span class="lbl">${fmtNum(st.xp)} / ${fmtNum(PASS_TIERS * st.per)} Pass XP</span></div>
+      <div class="pass-bar"><i style="transform:scaleX(${pPct.toFixed(3)})"></i></div>
+      <p class="lbl pc-sub">Pass XP: 1 per focus minute, +${PASS_XP.goal} for your daily goal, +${PASS_XP.login} for the daily reward, +${PASS_XP.wq} per quest-board quest, +${PASS_XP.quest} per questline quest — up to ${PASS_DAY_CAP} a day (${PASS_LAST_CAP} in the last week if you’re behind). Behind? Catch-up XP saved from lighter days tops you up. ${st.wStart > ev.start ? `Your pass started ${parseDay(st.wStart).toLocaleDateString([], { day: 'numeric', month: 'short' })}, so it’s sized for the ${st.avail} days left. ` : ''}Themed rewards at tiers 10, 15, 20 and 30.</p>
+      <div class="pass-row" role="list" data-prow="p">${Array.from({ length: PASS_TIERS }, (_, k) => passTierHTML(ev, 'p', k + 1, st, g, cl)).join('')}</div></div>
+    <div class="card pass-card"><div class="row between" style="gap:8px;flex-wrap:wrap"><h2>Focus track</h2><span class="lbl">${fmtNum(Math.floor(st.hours * 10) / 10)} / ${focusTierH(ev, FOCUS_H.length - 1)} h</span></div>
+      <div class="pass-bar"><i style="transform:scaleX(${fPct.toFixed(3)})"></i></div>
+      <p class="lbl pc-sub">Just focus hours during ${esc(ev.name)} — up to 14 h a day count. Smaller, steadier rewards; the focus seal at the end.${st.prepaid ? ` The first ${st.prepaid} step${st.prepaid === 1 ? ' was' : 's were'} already paid by the November monthly track.` : ''}</p>
+      <div class="pass-row" role="list" data-prow="f">${Array.from({ length: FOCUS_H.length }, (_, k) => passTierHTML(ev, 'f', k + 1, st, g, cl)).join('')}</div></div></div>`;
+  // show where you are: each row scrolls to its current step
+  for (const row of host.querySelectorAll('.pass-row')) { const c = row.querySelector('.pt.cur') || row.querySelector('.pt.ready'); if (c) row.scrollLeft = Math.max(0, c.offsetLeft - row.clientWidth / 2 + c.offsetWidth / 2); }
+}
+document.addEventListener('click', e => {
+  const one = e.target.closest('[data-pclaim]'), all = e.target.closest('[data-pclaimall]');
+  if (!one && !all) return;
+  const ev = currentEvent(); if (!passEvent(ev)) return;
+  const which = one ? [[one.dataset.pclaim.split(':')[0], +one.dataset.pclaim.split(':')[1]]] : [];
+  const got = passClaim(ev, which);
+  if (!got.length) return;
+  uiSound('coin');
+  const items = got.map(([t, i]) => passReward(ev, t, i).item).filter(id => id && ITEM_BY_ID[id]);
+  toast(got.length === 1 ? `🎟️ ${passRewardText(passReward(ev, got[0][0], got[0][1]), passKey(ev, got[0][0], got[0][1]))}` : `🎟️ ${got.length} rewards claimed`, 3000, true, { now: true });
+  if (items.length) showRewardReveal({ kicker: 'Study Pass', title: ev.name, items, pal: [ev.a, ev.b], key: 'pass:' + got.map(x => x.join('')).join(',') });
+  renderQuests(); renderAll();
+});
 // ---- Pomeo's stages: lifetime focus hours ----
 const EVO = [{ h: 0, name: 'Seedling' }, { h: 10, name: 'Sprout' }, { h: 50, name: 'Bloom' }, { h: 150, name: 'Ripe' }, { h: 400, name: 'Radiant' }, { h: 1000, name: 'Golden' }];
 const evoStage = ms => { const h = (+ms || 0) / 3.6e6; let s = 0; EVO.forEach((e, i) => { if (h >= e.h) s = i; }); return s; };
@@ -11594,8 +12268,63 @@ function rankBadge(i, { size = 14, cls = '' } = {}) {
   const m = rankMajor(i), R = RANK_MAJORS[m], pips = m < 5 ? (i % 3) + 1 : 0;
   const crown = m === 6 ? '<path d="M4.6 3.2 6 4.6 8 2.4 10 4.6 11.4 3.2 11 5.6H5Z" fill="#ffd166"/>' : m === 5 ? '<circle cx="8" cy="3.4" r="1.1" fill="#ffd166"/>' : '';
   const dots = pips ? Array.from({ length: pips }, (_, k) => `<circle cx="${8 + (k - (pips - 1) / 2) * 2.6}" cy="14.6" r=".9" fill="${R.col}"/>`).join('') : '';
-  return `<span class="rk-b ${cls}" title="${esc(rankName(i))}" aria-label="${esc(rankName(i))}"><svg viewBox="0 0 16 16" width="${size}" height="${size}" aria-hidden="true">${crown}<path d="M8 4 13 7.6 8 13 3 7.6Z" fill="${R.col}"/><path d="M8 4 10.4 7.6 8 13 5.6 7.6Z" fill="${R.col2}" opacity=".75"/>${dots}</svg></span>`;
+  return `<span class="rk-b ${cls}" data-rk="${i}" title="${esc(rankTip(i))}" aria-label="${esc(rankName(i))}"><svg viewBox="0 0 16 16" width="${size}" height="${size}" aria-hidden="true">${crown}<path d="M8 4 13 7.6 8 13 3 7.6Z" fill="${R.col}"/><path d="M8 4 10.4 7.6 8 13 5.6 7.6Z" fill="${R.col2}" opacity=".75"/>${dots}</svg></span>`;
 }
+/* ---------- v1.20: the division order (III → II → I) and the rank ladder ----------
+   Divisions count up from III (the lowest) to I, then the next rank starts again at III. People read "III" as the top,
+   so every badge says it in its tooltip, the Rank card shows the steps around you, and a tap opens the whole ladder. */
+const RANK_BOUNDS = i => [RANK_T[i], i < 16 ? RANK_T[i + 1] : null];
+/** The tooltip on a rank badge. */
+function rankTip(i) {
+  const m = rankMajor(i);
+  if (m >= 5) return `${rankName(i)} · tap for every rank`;
+  const nx = m < 4 ? RANK_MAJORS[m + 1].name + ' III' : 'Master';
+  return `${rankName(i)} · divisions go III → II → I, then ${nx} · tap for every rank`;
+}
+/** "Bronze III → II → I → Silver III", the current step marked (for the Rank card). */
+function rankHintHTML(idx) {
+  const m = rankMajor(idx);
+  if (m >= 5) return `<div class="rk-hint"><span class="rh-step${m === 5 ? ' on' : ''}">Master</span>→<span class="rh-step${m === 6 ? ' on' : ''}">Grandmaster</span></div>`;
+  const base = m * 3, nx = m < 4 ? `${RANK_MAJORS[m + 1].name} III` : 'Master';
+  return `<div class="rk-hint" aria-label="Divisions go III, II, I, then ${esc(nx)}"><b>${RANK_MAJORS[m].name}</b>${[0, 1, 2].map(k => `<span class="rh-step${base + k === idx ? ' on' : ''}">${['III', 'II', 'I'][k]}</span>`).join('→')}→<span class="rh-step">${esc(nx)}</span></div>`;
+}
+/** The whole ladder: every rank and division with its hours, where you are and what's next. */
+function rankLadderHTML() {
+  const r = myRank(), h = m => fmtH(m).replace(' h', '');
+  const rows = RANK_MAJORS.map((R, m) => {
+    const steps = m < 5 ? [m * 3, m * 3 + 1, m * 3 + 2] : [m === 5 ? 15 : 16];
+    const divs = steps.map(i => {
+      const [a, b] = RANK_BOUNDS(i), me = i === r.idx, done = i < r.idx, nx = i === r.next;
+      const range = b === null ? `${h(a)} h +` : `${h(a)}–${h(b)} h`;
+      const bar = me ? `<span class="rkl-bar"><i style="width:${(r.pct * 100).toFixed(0)}%"></i></span>` : '';
+      return `<div class="rkl-div${me ? ' me' : ''}${done ? ' done' : ''}${nx ? ' nx' : ''}"><b>${m < 5 ? ['III', 'II', 'I'][i % 3] : R.name}</b>${range}${bar}</div>`;
+    }).join('');
+    return `<li class="rkl-row${rankMajor(r.idx) === m ? ' cur' : ''}" style="--rk:${R.col}"><span class="rkl-maj">${rankBadge(steps[steps.length - 1], { size: 16 })}${R.name}</span><div class="rkl-divs${steps.length === 1 ? ' one' : ''}">${divs}</div></li>`;
+  }).join('');
+  return `<h2 id="rklTitle">Ranks · ${esc(seasonLabel(r.mk))} season</h2>
+    <p class="lbl" style="margin:0">Each rank has three divisions, from <b>III</b> (lowest) to <b>I</b> (highest), then the next rank starts at III. Hours are this season’s counted focus.</p>
+    <ul class="rkl-list">${rows}</ul>
+    <p class="lbl rkl-foot">You: <b>${esc(rankName(r.idx))}</b> · ${fmtH(r.min)} this season${r.next !== null ? ` · next: <b>${esc(rankName(r.next))}</b> in ${fmtH(r.left)}` : ' · the top rank'}${r.floor > r.raw ? ` · placed at ${esc(rankName(r.floor))} from last season` : ''}. At most 14 h a day count; a new season starts on the 1st (UTC).</p>`;
+}
+function openRankLadder() {
+  if (!USER || minimal() || !S.settings.gamification) return;
+  $('#rklBody').innerHTML = rankLadderHTML();
+  const d = $('#rankLadderDlg');
+  $('#rklBoard').classList.toggle('hidden', !!USER.guest);
+  if (!d.open) d.showModal();
+  uiSound('tick');
+}
+$('#rklClose').addEventListener('click', () => $('#rankLadderDlg').close());
+$('#rklBoard').addEventListener('click', () => { $('#rankLadderDlg').close(); openMyRank(); });
+// a tap on any rank badge that isn't part of a button (rows, boards, tables, the ladder itself) opens the ladder; the
+// Rank card and the Timer's rank line open it too. Capture phase: a row under the badge must not also open.
+document.addEventListener('click', e => {
+  const t = e.target;
+  if (!(t instanceof Element)) return;
+  const b = t.closest('.rk-b[data-rk]'), area = t.closest('[data-rkladder]');
+  if (b && !b.closest('button, a, #rankLadderDlg')) { e.stopPropagation(); e.preventDefault(); openRankLadder(); return; }   // (reading only: fine in the demo)
+  if (area && !t.closest('button:not([data-rkladder]), a')) { openRankLadder(); }
+}, true);
 /* v1.19.1: my rank next to my name. Hidden in True Minimalist (like every rank badge) and before sign-in. */
 function renderRankChip() {
   const el = $('#rankChip'); if (!el) return;
@@ -11619,7 +12348,7 @@ function hdrRankGem() {
 function myRankPill(ctx) {
   if (minimal() || !USER) return '';
   const r = myRank(), nm = rankName(r.idx), inner = rankBadge(r.idx, { size: 15 }) + `<span>${esc(nm)}</span>`;
-  return ctx === 'own' ? `<button type="button" class="pc-rank" data-myrank aria-label="Your rank: ${esc(nm)} — show your progress" title="${esc(nm)} · ${fmtH(r.min)} this season">${inner}</button>`
+  return ctx === 'own' ? `<button type="button" class="pc-rank" data-myrank aria-label="Your rank: ${esc(nm)} — show every rank" title="${esc(nm)} · ${fmtH(r.min)} this season">${inner}</button>`
     : `<span class="pc-rank">${inner}</span>`;
 }
 /** The header chip opens the Ranks board (a guest, who has no boards, gets the Rank card instead). */
@@ -11679,6 +12408,7 @@ function renderRankLine() {
   el.classList.toggle('hidden', !on);
   if (!on) { el.innerHTML = ''; return; }
   const r = myRank();
+  el.dataset.rkladder = ''; el.classList.add('rk-open'); el.title = rankTip(r.idx);
   el.innerHTML = `<div class="rl-top">${rankBadge(r.idx, { size: 18 })}<b>${esc(rankName(r.idx))}</b><span class="lbl">${fmtH(r.min)} this season</span><span class="lbl rl-next">${r.next !== null ? `${esc(rankName(r.next))} in ${fmtH(r.left)}` : 'Top rank'}</span></div>
     <div class="sn-bar rl-bar" style="--rk:${RANK_MAJORS[rankMajor(r.idx)].col}"><i style="transform:translateX(${(r.pct * 100 - 100).toFixed(1)}%)"></i></div>`;
 }
@@ -11687,8 +12417,9 @@ function rankCardHTML() {
   if (!S.settings.gamification || seasonKeyNow() < RANK_FROM) return '';
   const r = myRank(), R = RANK_MAJORS[rankMajor(r.idx)], days = Math.max(1, Math.ceil((seasonEnd(r.mk) - Date.now()) / 864e5));
   const last = seasonBadges()[0], items = Object.entries(RANK_ITEMS).map(([m, ids]) => ids.map(id => ITEM_BY_ID[id] ? `<span class="rk-gift${isOwned(id) ? ' got' : ''}">${rankBadge(+m === 6 ? 16 : +m === 5 ? 15 : +m * 3 + 2, { size: 13 })}${esc(ITEM_BY_ID[id].name)}</span>` : '').join('')).join('');
-  return `<div class="card rk-card" id="rankCard" style="--rk:${R.col};--rk2:${R.col2}"><div class="row between" style="gap:8px;flex-wrap:wrap"><h2 style="margin:0">Rank · ${esc(seasonLabel(r.mk))} season</h2><span class="lbl">${days} day${days === 1 ? '' : 's'} left</span></div>
-    <div class="rk-hero">${rankBadge(r.idx, { size: 44, cls: 'big' })}<div><div class="rk-name">${esc(rankName(r.idx))}</div><div class="lbl">${fmtH(r.min)} counted this season${r.floor > r.raw ? ` · placed at ${esc(rankName(r.floor))} from last season` : ''}</div></div></div>
+  return `<div class="card rk-card" id="rankCard" style="--rk:${R.col};--rk2:${R.col2}"><div class="row between" style="gap:8px;flex-wrap:wrap"><h2 style="margin:0">Rank · ${esc(seasonLabel(r.mk))} season</h2><span class="row" style="gap:8px"><span class="lbl">${days} day${days === 1 ? '' : 's'} left</span><button type="button" class="linkbtn" data-rkladder>All ranks ›</button></span></div>
+    <div class="rk-hero rk-open" data-rkladder>${rankBadge(r.idx, { size: 44, cls: 'big' })}<div><div class="rk-name">${esc(rankName(r.idx))}</div><div class="lbl">${fmtH(r.min)} counted this season${r.floor > r.raw ? ` · placed at ${esc(rankName(r.floor))} from last season` : ''}</div></div></div>
+    ${rankHintHTML(r.idx)}
     <div class="sn-bar rl-bar"><i style="transform:translateX(${(r.pct * 100 - 100).toFixed(1)}%)"></i></div>
     <div class="lbl">${r.next !== null ? `${esc(rankName(r.next))} in ${fmtH(r.left)}` : 'Grandmaster — the top rank'} · at most 14 h a day count · a new season starts on the 1st (UTC)</div>
     ${last ? `<div class="lbl" style="margin-top:6px">Last season (${esc(seasonLabel(last.mk))}): ${esc(rankName(last.p))} · +${SEASON_COINS[rankMajor(last.p)]} coins</div>` : ''}
@@ -11769,19 +12500,20 @@ const BOSS_SEEN_KEY = 'pomodorolist-boss-seen';
 function updateQuestDot() {
   const dot = $('#questDot');
   if (!dot) return;
-  dot.classList.toggle('hidden', !USER || minimal() || isPreview() || !rewardsReady() || !(pendingBossRewards().length || questClaimable()));
+  dot.classList.toggle('hidden', !USER || minimal() || isPreview() || !rewardsReady() || !(pendingBossRewards().length || questClaimable() || passClaimableNow()));
 }
 function renderQuests() {
   const el = $('#questBody');
   if (!el || !USER) return;
-  const view = ['quest', 'board'].includes(S.ui.questView) ? S.ui.questView : 'boss', ev = currentEvent();
+  const view = ['quest', 'board', 'pass'].includes(S.ui.questView) ? S.ui.questView : 'boss', ev = currentEvent();
   const bossPend = rewardsReady() && pendingBossRewards().length, qPend = rewardsReady() && questClaimable();
   el.innerHTML = `<div class="q-switch"><div class="seg" id="questSeg">
       <button data-qview="boss" class="${view === 'boss' ? 'active' : ''}">⚔️ Weekly boss${bossPend ? '<i class="sdot" aria-label="Rewards to claim"></i>' : ''}</button>
       <button data-qview="quest" class="${view === 'quest' ? 'active' : ''}">${ev ? ev.emoji : '🗺️'} Questline${qPend ? '<i class="sdot" aria-label="Rewards to claim"></i>' : ''}</button>
+      <button data-qview="pass" class="${view === 'pass' ? 'active' : ''}">🎟️ Study Pass${rewardsReady() && passClaimableNow() ? '<i class="sdot" aria-label="Rewards to claim"></i>' : ''}</button>
       <button data-qview="board" class="${view === 'board' ? 'active' : ''}">📋 Quest board</button></div></div>
     <div id="qView"></div>`;
-  if (view === 'boss') renderBossView($('#qView')); else if (view === 'board') renderBoardView($('#qView')); else renderQuestline($('#qView'));
+  if (view === 'boss') renderBossView($('#qView')); else if (view === 'board') renderBoardView($('#qView')); else if (view === 'pass') renderPassView($('#qView')); else renderQuestline($('#qView'));
   animateIn(el);
   animateCounts(el);
   updateQuestDot();
@@ -13034,6 +13766,7 @@ function announceHatched(list) {
   for (const e of list) {
     const pet = PET_BY_ID[e.pet];
     if (!pet) continue;
+    { const pm = petMutOf(e); if (pm || pet.rarity !== 'common') makePost('pet', `${pm || 'x'}.${pet.id}.${e.id}`, pm ? 1 : 0); }   // v1.20
     inboxAdd({ type: 'event', key: 'egg:' + e.id, title: `🐣 A ${pet.name} hatched in your garden`, go: { tab: 'garden' }, read: true });
     setTimeout(() => showHatch(e), 5200);   // several hatches in one block queue behind the open dialog
   }
@@ -13821,6 +14554,7 @@ function openSpotDlg(spot) {
 }
 function harvestMoment(p, host) {
   const sp = speciesOf(p), m = p.m;
+  if (p.giant || cropStars(p) >= 5) makePost('harvest', `${p.sp}.${p.id}`, p.giant ? 100 : 5);   // v1.20
   if (host && motion() !== 'off') {
     host.classList.add('harvesting');
     burstParticles(host, m ? 16 : 8);
@@ -14743,6 +15477,7 @@ document.addEventListener('keydown', e => {
     return;
   }
   if (k === 'j') { e.preventDefault(); showTab('sessions'); return; }   // Study sessions (v1.19.1)
+  if (k === 'o') { const b = $('#postsTabBtn'); if (b && !b.classList.contains('hidden')) { e.preventDefault(); showTab('posts'); } return; }   // Posts (v1.20)
   if (k === 't') { e.preventDefault(); focusSubAdd(); return; }
   if (k === 'n') { e.preventDefault(); showTab('timer'); setTimeout(() => $('#nameInput').focus(), 30); return; }
   if (S.ui.tab !== 'timer') return;
@@ -15341,9 +16076,10 @@ addEventListener('resize', () => $$('.catrow').forEach(updateFades));
    command palette, offline banner, pull to refresh, tab swipes, haptics.
    Everything here is stored on this device (localStorage); no new cloud data.
    ========================================================================== */
-const APP_VERSION = '1.19.1';
+const APP_VERSION = '1.20';
 const VER_KEY = 'pomodorolist-seen-version';
 const CHANGELOG = [
+  { v: '1.20', t: 'Overtime, the Study Pass, Posts and the rank ladder', d: 'Overtime is on: when a focus block reaches 0 the end sound plays and the timer keeps counting up (+mm:ss) until you tap Stop or Break — the whole block, planned plus overtime, is logged once and counts everywhere (up to 240 minutes). After 10 minutes with no tap or key it asks “Were you still focusing?”, and “Turn off overtime” under the timer switches it off (Settings › Timer too). Each questline now has a free Study Pass under Quests: a Pass track of 30 tiers filled by focus minutes, your daily goal, the daily reward and quests, and a Focus track of 20 steps filled by focus hours — claim each reward when you like; anything you reach but don’t claim is added for you when the event ends. A pass that was already running when you got 1.20 is sized to the days left, and catch-up XP from lighter days helps you finish. The monthly reward track is now part of the Study Pass (everything you claimed stays). Posts, a new section next to Friends (press O), shows what you and your friends reach — a streak, a rank-up, a boss, a Giant harvest — automatically, never any text anyone writes; react with 🔥 👏 💪 ⭐. Choose what gets posted, or switch posting off, in Settings › Friends & privacy. The Rank card shows the divisions around you (Gold III → II → I → Platinum III), and tapping any rank badge opens the full rank ladder with every rank’s hours.' },
   { v: '1.19.1', t: 'Leaderboard fix and your rank next to your name', d: 'Fixed: on the Leaderboard, the Focus time button could open the Ranks board after you had visited Ranks or Streaks (even after a reload). Each board now goes back to its own last view. The Monthly focus board is gone — the Ranks board (this season = this month) replaces it. Your rank now shows next to your name in the header and on your player card: tap it in the header for the Ranks board, or on the card for your progress. Hidden in True Minimalist. Also fixed: switchers such as the achievement categories no longer wrap onto two lines with a stretched highlight — they stay on one line and scroll sideways when they don’t fit. On wide screens the cards on the Timer, Profile, Clan, Quests and Friends pages now fill two balanced columns (or one centred column when there are too few), instead of leaving a big empty space beside one column; the achievements list spreads across the page below the cards. Fixed: hosting a study session with a long preset (focus blocks over 120 min, such as 240 / 5 × 4) failed with a confusing clan message — sessions now take any preset the timer allows, and session errors talk about the session, not your clan. Study sessions now have their own section (sidebar: Friends · Study sessions · Clan · Leaderboard, or press J): live tables with who’s inside and the seats left, a step-by-step Host sheet that shows the preset it uses, upcoming sessions with reminders and your clan’s RSVPs, your history, and a dot when a friend is studying or someone asks to join. The Clan page is back to its familiar layout, with Activity and Clan session milestones that fold away. Fixed: on wide screens one card column could start lower than the other, and a clan leader could see “joined the clan — just now” again after opening the app on a new device.' },
   { v: '1.19', t: 'Ranks for this season and streak leaderboards', d: 'Ranks show how much you study right now: every month is a season, and your counted focus hours (up to 14 h a day) take you from Bronze through Silver, Gold, Platinum and Diamond (three divisions each) to Master and Grandmaster. A new season starts on the 1st with a small head start from last season’s best. The end of a season pays coins and puts a season badge on your trophy shelf, and the first time you reach a rank you get its frame, aura or room poster. Rank badges show next to names on boards, friend lists, study tables and clans. The leaderboard has Ranks and Streaks (current and best) boards for friends and everyone.' },
   { v: '1.18', t: 'Study sessions without a clan, rewards for studying together, streak milestones, a new Pomeo, a weekly quest board, a monthly track, Pomeo’s stages and a collection log', d: 'The Friends tab now has Friends · Study sessions · Challenges. Host a public, friends-only or link study session (no clan needed), let people ask to join, invite friends, hand over or end it, and see who is studying now. Studying together pays: coins for new study partners, clan-session milestones with clan-only rewards, bonus Clan Points and 39 new achievements with real rewards, on a sortable achievements page. Streak milestones at 3, 7, 14, 30, 50, 100, 200 and 365 days give titles, the Ember theme, a Flame Pomeo picture, a trophy, a Flame ring, a Blaze frame, an Eternal flame aura and a Golden Pomeo statue, celebrated once after your block. Pomeo is redrawn: minimal and cute, everywhere, and he grows with your focus hours. New: a weekly quest board, a free monthly reward track, a collection log, and your monthly recap counts who you studied with. Fixes: recently used presets keep their order and favourites, and one challenge join per week.' },
@@ -15471,6 +16207,7 @@ function ibGo(it) {
   $('#inboxDlg').close();
   if (g.action === 'login') { showTab('profile'); setTimeout(() => { if (loginOn() && !loginToday().claimed) openLoginDlg(); }, 250); return; }
   if (g.tab === 'friends' && g.view === 'sessions') { showTab('sessions'); return; }   // inbox items saved before 1.19.1
+  if (g.tab === 'friends' && g.view === 'posts') { showTab('posts'); return; }   // (Posts briefly lived under Friends while 1.20 was built)
   if (g.view) S.ui.friendsView = g.view;
   if (g.gview) S.ui.gardenView = g.gview;   // a garden view, e.g. the Harvests tab (v1.17)
   if (g.tab) showTab(g.tab);
@@ -15592,8 +16329,8 @@ function goSetting(row) {
    ========================================================================== */
 function cmdList(q) {
   const L = [], add = (ic, t, g, run, k = '') => L.push({ ic, t, g, run, k });
-  const tabs = [['timer', '⏱️', 'Timer'], ['reminders', '🔔', 'Reminders'], ['quests', '⚔️', 'Quests'], ['stats', '📊', 'Stats'], ['garden', '🌱', 'Garden'], ['board', '🏆', 'Leaderboard'], ['shop', '🛍️', 'Shop'], ['friends', '👥', 'Friends'], ['sessions', '📚', 'Study sessions'], ['profile', '👤', 'Profile'], ['settings', '⚙️', 'Settings'], ['about', 'ℹ️', 'About']];
-  for (const [id, ic, n] of tabs) if (!(['quests', 'shop', 'garden'].includes(id) && !S.settings.gamification)) add(ic, n, 'Go to', () => showTab(id), id === 'board' ? 'ranks leaderboard' : id === 'garden' ? 'plants seeds harvest' : id === 'sessions' ? 'study together live host join table' : '');
+  const tabs = [['timer', '⏱️', 'Timer'], ['reminders', '🔔', 'Reminders'], ['quests', '⚔️', 'Quests'], ['stats', '📊', 'Stats'], ['garden', '🌱', 'Garden'], ['board', '🏆', 'Leaderboard'], ['shop', '🛍️', 'Shop'], ['friends', '👥', 'Friends'], ['posts', '📣', 'Posts'], ['sessions', '📚', 'Study sessions'], ['profile', '👤', 'Profile'], ['settings', '⚙️', 'Settings'], ['about', 'ℹ️', 'About']];
+  for (const [id, ic, n] of tabs) if (!(['quests', 'shop', 'garden', 'posts'].includes(id) && !S.settings.gamification)) add(ic, n, 'Go to', () => showTab(id), id === 'board' ? 'ranks leaderboard' : id === 'garden' ? 'plants seeds harvest' : id === 'sessions' ? 'study together live host join table' : id === 'posts' ? 'feed wins reactions friends news' : '');
   add('📥', 'Inbox', 'Open', openInbox, 'notifications messages');
   const t = S.timer;
   add(t.status === 'running' ? '⏸️' : '▶️', t.status === 'running' ? 'Pause timer' : t.status === 'paused' ? 'Resume timer' : 'Start timer', 'Timer', () => { showTab('timer'); $('#mainBtn').click(); }, 'start pause resume focus');
@@ -15627,6 +16364,7 @@ function cmdList(q) {
     add('⚔️', 'Weekly boss', 'Quests', () => { S.ui.questView = 'boss'; showTab('quests'); }, 'boss battle squad solo trophy hall');
     const ev = currentEvent();
     if (ev) add(ev.emoji, `${ev.name} questline`, 'Quests', () => { S.ui.questView = 'quest'; showTab('quests'); loadEventBoard(); }, 'questline event quests');
+    if (passEvent(ev)) add('🎟️', passName(ev), 'Quests', () => { S.ui.questView = 'pass'; showTab('quests'); }, 'study pass tiers rewards focus track battle pass');
   }
   add('⌨️', 'Keyboard shortcuts', 'Help', () => $('#keysDlg').showModal(), 'keys help');
   add('🧘', minimal() ? 'Turn off True Minimalist' : 'Turn on True Minimalist', 'Settings', () => { setMinimal(!minimal()); toast(minimal() ? 'True Minimalist on' : 'True Minimalist off', 2000, true); }, 'true minimalist minimal simple plain gamification progression');
@@ -15758,10 +16496,11 @@ function quietRetry(err) {
    PHONES: pull to refresh, swipe between tabs, swipe-to-dismiss helper
    ========================================================================== */
 const coarse = matchMedia('(pointer: coarse)');
-const PTR_TABS = ['stats', 'friends', 'board'];
+const PTR_TABS = ['stats', 'friends', 'board', 'posts'];
 async function ptrRefresh(where) {
   if (where === 'inbox') { ibRefresh(); renderInbox(); return; }
   if (where === 'stats') { renderStats(); return; }
+  if (where === 'posts') { if (cloudReady() && Date.now() - POST.at > 20000) await loadPosts(true); else renderPostsPage(true); return; }
   if (!cloudReady()) { if (where === 'friends') renderFriends(); else renderBoardTab(); return; }
   if (where === 'friends') { await loadFriendsPublic(true).catch(() => {}); SOC.challengesAt = 0; await loadChallenges(true).catch(() => {}); renderFriends(); }
   if (where === 'board') { SOC.lb = {}; renderBoardTab(); }
@@ -16062,6 +16801,7 @@ for (const b of BOSSES) {
 }
 for (const b of BOSSES) NAME_GRADS['col_b_' + b.id] = { ...b.grad, squad: true, lv: rewardLevel(b.id, 'squad') };   // lv 3+: moving, 4+: shimmer, 5+: glow
 for (const ev of EVENTS) NAME_GRADS['col_ev_' + ev.id] = EV_LOOK[ev.id].grad;
+for (const ev of EVENTS) if (ev.start >= PASS_FROM) { const g = EV_LOOK[ev.id].grad; NAME_GRADS['col_pass_' + ev.id] = { l: [g.l[g.l.length - 1], g.l[0], g.l[g.l.length - 1]], d: [g.d[g.d.length - 1], g.d[0], g.d[g.d.length - 1]] }; }   // v1.20
 /** Attributes for an element showing someone's name in their name colour (class merged with `cls`). */
 function nameAttrs(colId, cls = '') {
   const g = !minimal() && NAME_GRADS[colId], c = !minimal() && NAME_COLORS[colId];
@@ -16085,6 +16825,7 @@ for (const b of BOSSES) {
     SPECIAL_AURAS[id] = { cols: lv === 1 ? [b.a] : lv < 4 ? [b.a, b.b] : [b.a, b.b, b.c], name, lv, pulse: lv === 3, spin: lv >= 4, shim: lv >= 5 || id.endsWith('_sq'), flare: lv >= 6, sq: id.endsWith('_sq') };
 }
 for (const ev of EVENTS) { const cols = EV_LOOK[ev.id].aura; SPECIAL_AURAS['au_ev_' + ev.id] = { cols, name: (EV_ITEMS.find(x => x[0] === 'au_ev_' + ev.id) || [])[2] + ' aura', spin: cols.length > 2 }; }
+for (const ev of EVENTS) if (ev.start >= PASS_FROM) { const cols = [...new Set([...EV_LOOK[ev.id].aura, ev.a, ev.b])]; SPECIAL_AURAS['au_pass_' + ev.id] = { cols, name: ITEM_BY_ID['au_pass_' + ev.id].name, spin: true }; }   // v1.20
 
 
 // ---- Clan cosmetics (v1.14): name colours and auras unlocked by the clan's level, raid auras by its raids ----
@@ -16106,6 +16847,7 @@ for (const r of RAID_BOSSES) SPECIAL_AURAS['au_cr_' + r.id] = { cols: [r.a, r.b,
 const TITLE_TEXT = Object.fromEntries(EV_ITEMS.filter(x => x[1] === 'title').map(x => [x[0], x[2]]));
 for (const it of ITEMS) if (it.cat === 'title' && /^ti_(host|table_host|study_buddy|social_scholar|campus_legend|clan_scholar|five_star|market|s_roll|s_unbreak)$/.test(it.id)) TITLE_TEXT[it.id] = it.name;   // v1.18 (group, clan, garden and streak titles)
 Object.assign(TITLE_TEXT, { ti_gardener: 'Gardener', ti_greenthumb: 'Green Thumb', ti_harvestmoon: 'Harvest Moon' });   // garden looks (v1.16)
+for (const it of ITEMS) if (/^ti_pass_/.test(it.id)) TITLE_TEXT[it.id] = it.name;   // Study Pass titles (v1.20)
 const EV_FX = Object.fromEntries(EVENTS.filter(ev => EV_LOOK[ev.id].fx).map(ev => ['fx_ev_' + ev.id, EV_LOOK[ev.id].fx]));
 
 /** One stylesheet for every reward look, built from the data above. */
@@ -16772,7 +17514,8 @@ function demoDocs() {
     recent: [{ name: 'Physics', presetId: 'p-deep', ts: Date.now() - 3600e3 }, { name: 'Maths', presetId: 'p-classic', ts: Date.now() - 7200e3 }, { name: 'Chemistry', presetId: 'p-deep', ts: Date.now() - 864e5 }],
     pinned: [{ name: 'Physics', presetId: 'p-deep' }],
     game: { purchases, equipped: { ...equipped, stamp: 'stamp_pixel', card: 'card_champion', aura: Object.keys(grants).find(id => /^au_b_.*_sq$/.test(id)) || 'au_streak', color: Object.keys(grants).find(id => id.startsWith('col_b_')) || equipped.color, frame: 'frame_cobweb', title: 'ti_s_unbreak' },
-      tierFrom: '2000-01-03', claims: { bosses, brew, quests, goalDays: claimed.goalDays, achievements: claimed.achievements, milestones: miles, login: Object.fromEntries(Array.from({ length: 9 }, (_, i) => [dayKey(addDays(startOfDay(new Date()), -(9 - i))), Date.now() - (9 - i) * 864e5])) }, trophies, grants, freezesUsed: {}, seenAt: Date.now() - 2 * 864e5 },
+      tierFrom: '2000-01-03', claims: { bosses, brew, quests, goalDays: claimed.goalDays, achievements: claimed.achievements, milestones: miles, login: Object.fromEntries(Array.from({ length: 9 }, (_, i) => [dayKey(addDays(startOfDay(new Date()), -(9 - i))), Date.now() - (9 - i) * 864e5])),
+        pass: (() => { const ev = eventAt(Date.now()), o = {}; if (ev && ev.start >= PASS_FROM) { for (let i = 1; i <= 3; i++) o[`${ev.id}:p:${i}`] = Date.now() - (5 - i) * 864e5; for (let i = 1; i <= 2; i++) o[`${ev.id}:f:${i}`] = Date.now() - (5 - i) * 864e5; } return o; })() }, trophies, grants, freezesUsed: {}, seenAt: Date.now() - 2 * 864e5 },
     cardPrefs: { banner: { v: 'bs:' + mastered, u: cardAt }, featured: { v: ['fm:' + mastered, 'fs:14', 'fe:frame_cobweb'], u: cardAt }, p_subjects: { v: true, u: cardAt } },
     loadouts: [{ id: 'demo_lo1', name: 'Exam mode', look: { theme: 'th_ocean', avatar: 'av_owl', frame: 'frame_double', color: 'col_teal', aura: 'au_streak', pomhat: 'hat_grad', pomacc: 'acc_glasses', pomskin: 'skin_none', title: 'ti_none' } },
       { id: 'demo_lo2', name: 'Spooky', look: { avatar: 'av_bat', frame: 'frame_cobweb', aura: 'au_streak', pomhat: 'hat_none', pomacc: 'acc_none', pomskin: 'skin_none' } }],
@@ -16838,6 +17581,18 @@ function demoDocs() {
   docs['studySessions/demo_sess2'] = { title: 'Mock test marathon', host: 'demo_f4', hostName: 'Princess_cupcake', pattern: { focus: 50, short: 10, rounds: 3 }, mode: 'synced', startAt: ts(Date.now() - 5 * 60000), pausedAt: 0, pauseTotal: 0, shift: 0, open: true, counted: false, vis: 'friends', lobby: 'friends', max: 4, members: ['demo_f4'], invited: ['demo'], plan: 0, code: '', hostAt: ts(Date.now() - 5 * 60000), createdAt: ts(Date.now() - 5 * 60000), endedAt: 0, updatedAt: ts(Date.now() - 60000) };
   // v1.19.1: a planned table for later today (Upcoming: Remind me)
   docs['studySessions/demo_sess3'] = { title: 'Physics problem set', host: 'demo_f3', hostName: 'Justin', pattern: { focus: 50, short: 10, rounds: 2 }, mode: 'together', startAt: ts(Date.now() - 2 * 60000), pausedAt: 0, pauseTotal: 0, shift: 0, open: true, counted: false, vis: 'friends', lobby: 'friends', max: 5, members: ['demo_f3'], invited: ['demo'], plan: Date.now() + 150 * 60000, code: '', hostAt: ts(Date.now() - 2 * 60000), createdAt: ts(Date.now() - 2 * 60000), endedAt: 0, updatedAt: ts(Date.now() - 2 * 60000), welcome: [] };
+  // v1.20: a sample Posts feed (the demo reads it; reacting shows the preview prompt)
+  { const aud = ['demo', 'demo_f1', 'demo_f2', 'demo_f3', 'demo_f4', 'demo_f5'], ev = eventAt(Date.now());
+    const P = (type, author, name, ref, n, mins, r = {}, extra = {}) => { docs[`posts/${type}_${author}_${ref}`] = { author, authorName: name, type, ref, n, aud, day: dayKey(new Date(Date.now() - mins * 6e4)), at: ts(Date.now() - mins * 6e4), r, ...extra }; };
+    P('rank', 'demo_f1', 'James', seasonKeyNow() + '-7', 7, 25, { demo: '🔥', demo_f2: '👏' });
+    P('streak', 'demo_f4', 'Princess_cupcake', 'm30', 30, 70, { demo_f1: '💪', demo_f3: '🔥', demo_f2: '🔥' });
+    P('session', 'demo_f2', 'siverieg', 'demo_sess_old', 2, 140, { demo_f1: '⭐' }, { mates: ['demo', 'demo_f1'] });
+    P('ach', 'demo_f3', 'Justin', 'g_host', 0, 200); P('ach', 'demo_f3', 'Justin', 'g_p5', 0, 203);
+    P('boss', 'demo', 'demo_scholar', dayKey(weekMonday()) + '-solo', 2, 300, { demo_f1: '🔥', demo_f4: '👏' });
+    if (ev && ev.start >= PASS_FROM) P('quest', 'demo_f1', 'James', ev.id + '-pass', 30, 600, { demo: '⭐' });
+    P('harvest', 'demo_f4', 'Princess_cupcake', 'sunflower.demo1', 100, 900);
+    P('hours', 'demo_f2', 'siverieg', 'h250', 250, 1500, { demo: '👏' });
+    P('evo', 'demo_f5', 'lenvixty', 'e3', 3, 2000); }
   docs['challenges/demo_c1'] = { preset: 'h10', weekKey: wk, creator: 'demo_f4', members: ['demo_f4', 'demo', 'demo_f1'], invited: ['demo'], names: { demo_f4: 'Princess_cupcake', demo: 'demo_scholar', demo_f1: 'James' },
     progress: { demo_f4: 410, demo: Math.round(myWeek), demo_f1: 280 }, createdAt: ts(Date.now() - 2 * 864e5) };
   Object.assign(docs, demoClanDocs(ts, wk));
@@ -16903,7 +17658,7 @@ const PV_BLOCK = ['#plSave', '[data-dnew]', '[data-ddel]', '[data-cdel]', '[data
   '[data-join]', '[data-start]', '[data-claimlogin]', '#loginClaim', '[data-sremind]', '[data-hrsvp]', '[data-sjoin]', '[data-sask]', '[data-shost]', '[data-sinvite]', '[data-sallow]', '[data-sdeny]', '[data-skick]', '[data-shand]', '[data-scode]', '[data-remadd]', '#remAdd', '[data-rdone]', '[data-rdel]', '[data-redit]', '[data-rev]', '[data-del]', '[data-delp]',
   '[data-exdel]', '[data-tdel]', '[data-tload]', '[data-remove]', '[data-tick]', '[data-energy]', '#parkBtn', '#subToggle', '#subCheckAdd', '#managePresets', '#noteSave', '#revSchedule', '#examsBtn',
   '#importBtn', '#exportBtn', '#wipeBtn', '#pomeoOutfit', '[data-sell]', '[data-sellall]', '[data-fav]', '[data-compost]', '[data-gtask]', '#replayTour', '#resetTips', '[data-news-tut]', '[data-news-min]', '#addFriendForm button', '#chips .chip', '[data-pin]', '.chip .pin',
-  '#squadBtn', '[data-squad]', '#examCard', '[data-gl]', '#tutMinimal', '#squadEdit', '[data-bclaim]', '[data-qclaim]', '[data-bequip]', '[data-bunequip]', '[data-btoggle]', '[data-petequip]', '[data-petunequip]', '#egOut',
+  '#squadBtn', '[data-squad]', '#examCard', '[data-gl]', '#tutMinimal', '#squadEdit', '[data-bclaim]', '[data-qclaim]', '[data-pclaim]', '[data-pclaimall]', '[data-preact]', '#setPosts', '[data-posttype]', '[data-bequip]', '[data-bunequip]', '[data-btoggle]', '[data-petequip]', '[data-petunequip]', '#egOut',
   '#loNew', '[data-lo-apply]', '[data-lo-del]', '#setFestive', '#todoAdd button', '#todoMore', '[data-tdone]', '[data-tdel]', '[data-tfocus]', '[data-tgrip]', '#tdSave', '#tdDelete', '[data-cdstyle]', '[data-cdbn]', '[data-cdfeat]', '[data-cdpriv]', '#shSave', '#shNative', '#shCopy', '#shLink', '#setTod', '#setTodRain', '#clanCreateBtn', '#clanJoinBtn', '#ccSave', '#cjFind', '#clanCardGo', '#ciRegen', '#ciCopy', '[data-cbuy]', '[data-cuse]', '#csdSave', '[data-cmode]', '#cstShop', '#cstSched', '#cstTransfer', '#cstDisband', '[data-rsvp]', '[data-cremind]', '[data-cedit]', '[data-ccancel]', '[data-cstart]', '[data-cjoinlive]', '#clanStudyNow', '#clanSchedBtn', '[data-react]', '[data-lvctl]', '#clanLeave', '[data-crole]', '[data-ctransfer]', '[data-cremove]', '[data-creqok]', '[data-creqno]', '#clanQuestClaim', '#clanRaidClaim', '[data-crbefore]', '#clanCancelReq', '#clanInvite'].join(',');
 const PV_WHY = [['#plSave', 'plan your week'], ['[data-dnew],[data-ddel],[data-cdel],[data-dkbulk],#dkAdd button,[data-drename],[data-cedit]', 'make your own flashcards'], ['[data-rmset-save],[data-rmset-apply],[data-rmset-del],[data-rremove]', 'decorate Pomeo’s room'], ['.gd-plot.ready,[data-gbuy],[data-gequip],[data-gplant],[data-gharvest],[data-gplace],[data-gplaceat],[data-gremove],[data-gfocus]', 'grow your own garden'], ['[data-buy],[data-equip],[data-toggle-extra]', 'buy and equip shop items'], ['#mainBtn,[data-qs],#skipBtn', 'start your own focus sessions'], ['[data-kudos],[data-accept],[data-decline],#addFriendForm button,[data-block]', 'add friends and send kudos'],
   ['[data-claimlogin],#loginClaim', 'collect daily rewards'], ['[data-sjoin],[data-sask],[data-shost],[data-sinvite],[data-sallow],[data-sdeny],[data-skick],[data-shand],[data-scode],[data-sremind]', 'study live with friends'], ['[data-hrsvp]', 'join your clan’s sessions'], ['[data-sell],[data-sellall],[data-fav],[data-compost]', 'sell your harvests for produce'], ['[data-gtask]', 'claim garden tasks'], ['[data-bclaim],[data-qclaim]', 'claim boss and questline rewards'], ['[data-bequip],[data-bunequip],[data-btoggle],#loNew,[data-lo-apply],[data-lo-del]', 'equip items and save looks'], ['[data-petequip],[data-petunequip],#egOut', 'keep garden pets'], ['#remAdd,[data-remadd],[data-rdone],[data-redit],[data-rdel]', 'plan your own reminders'], ['#todoAdd button,#todoMore,[data-tdone],[data-tdel],[data-tfocus],[data-tgrip],#tdSave,#tdDelete', 'keep your own to-do list'], ['[data-cdstyle],[data-cdbn],[data-cdfeat],[data-cdpriv],#shSave,#shNative,#shCopy,#shLink', 'make and share your own player card'], ['#clanCreateBtn,#clanJoinBtn,#ccSave,#cjFind,#clanCardGo,[data-cjoinlive],#clanStudyNow,[data-react],[data-lvctl],[data-rsvp],[data-cremind],#clanSchedBtn,[data-cbuy],[data-cuse],#clanLeave,#clanQuestClaim,#clanRaidClaim,#clanInvite', 'create or join a clan and study live together']];
@@ -17063,6 +17818,7 @@ function questClaimable() {
   const st = questState(ev);
   return st.qs.some(q => q.done && !q.claimed) || (st.finalDone && !st.finalClaimed);
 }
+const passClaimableNow = () => { const ev = currentEvent(); return !!(ev && passEvent(ev) && USER && !minimal() && passClaimable(ev).length); };   // v1.20
 let questClaiming = false;
 async function claimQuest(evId, qid) {
   const ev = EVENT_BY_ID[evId];
@@ -17085,6 +17841,7 @@ async function claimQuest(evId, qid) {
     setTimeout(() => toast('🥚 A rare pet egg joined your garden’s queue — focus to hatch it', 3600, true, { go: { tab: 'garden' } }), 3000);
   }
   save();
+  if (qid === 'final') makePost('quest', ev.id, ev.quests.length, { at });   // v1.20: finished the questline
   showRewardReveal({ kicker: qid === 'final' ? `${ev.name} · final reward` : `${ev.name} · quest ${qid.slice(1)} of ${ev.quests.length}`,
     title: qid === 'final' ? 'Questline complete! 🏆' : q.title, items, pal: [ev.a, ev.b] });
   inboxAdd({ type: 'event', key: 'quest:' + key, title: `${ev.emoji} ${items.map(i => ITEM_BY_ID[i].name).join(' + ')} added to your bag`, go: { tab: 'bag' }, read: true });
@@ -17116,7 +17873,8 @@ function renderQuestline(host) {
         <div class="ql-info"><div class="boss-kicker">${esc(ev.label)} · ${evRange(ev)}</div><div class="ql-name">${ev.emoji} ${esc(ev.name)}</div>
           <p class="ql-intro">${esc(ev.intro)}</p>
           <div class="ql-meta"><span class="pill">${left} day${left === 1 ? '' : 's'} left</span><span class="pill">${st.doneN} / ${st.qs.length} quests</span></div>
-          <div class="ql-bar"><i style="transform:scaleX(${(st.doneN / st.qs.length).toFixed(3)})"></i></div></div></div>
+          <div class="ql-bar"><i style="transform:scaleX(${(st.doneN / st.qs.length).toFixed(3)})"></i></div>
+          ${passEvent(ev) ? (() => { const ps = passState(ev); return `<div class="ql-pass"><span>🎟️ Study Pass · tier <b>${ps.tier}</b> / ${PASS_TIERS} · Focus <b>${ps.step}</b> / ${FOCUS_H.length}</span><button type="button" class="linkbtn" data-qview="pass">Open ›</button></div>`; })() : ''}</div></div>
       <div class="card"><div class="row between" style="margin-bottom:6px"><h2 style="margin:0">Quest path</h2><span class="lbl">Counts from ${parseDay(ev.start).toLocaleDateString([], { day: 'numeric', month: 'short' })}</span></div>
         <ol class="ql-path">${st.qs.map((q, i) => questNode(ev, q, i, g)).join('')}
           <li class="qn final${st.finalClaimed ? ' claimed' : st.finalDone ? ' done' : ''}"><span class="qn-dot" aria-hidden="true">${st.finalClaimed ? '✓' : '🏆'}</span>
@@ -17761,6 +18519,7 @@ function tourSteps() {
     { tab: 'board', text: 'Leaderboard: see how your focus compares with friends.' },
     on && { tab: 'shop', text: 'Shop: spend coins on themes, sounds and outfits for me.' },
     { tab: 'friends', text: 'Friends: add friends, send kudos, see who’s focusing.' },
+    on && { tab: 'posts', text: 'Posts: your friends’ wins — a streak, a rank, a boss. Cheer them on with 🔥 👏 💪 ⭐.' },
     { tab: 'sessions', text: 'Study sessions: join a friend’s table or host your own — no clan needed.' },
     { tab: 'clan', text: 'Clan: your study group — plan sessions and study live together.' },
     on && { tab: 'quests', text: 'Quests: a new boss every week — every focus minute is a hit.' },
@@ -17898,10 +18657,12 @@ $('#mainBtn').addEventListener('click', () => {
   if (performance.now() - mainBtnAt < 400) return;   // a double-click (or a bounced tap) used to start and immediately pause
   mainBtnAt = performance.now();
   if (liveButton('main')) return;
+  if (S.timer.ot && S.timer.phase === 'focus') { otStop('stop'); return; }   // overtime: Stop logs the block (v1.20)
   if (S.timer.status === 'running') pauseTimer(); else startTimer();
 });
-$('#skipBtn').addEventListener('click', () => { if (!liveButton('skip')) finishPhase(S.timer.phase === 'focus' && S.timer.status !== 'idle' ? 'early' : 'skip'); });   // during a focus block the button is "Finish early" (v1.17)
-$('#resetBtn').addEventListener('click', () => { if (!liveButton('reset')) finishPhase('reset'); });
+$('#skipBtn').addEventListener('click', () => { if (S.timer.ot && S.timer.phase === 'focus') { otStop('break'); return; } if (!liveButton('skip')) finishPhase(S.timer.phase === 'focus' && S.timer.status !== 'idle' ? 'early' : 'skip'); });   // during a focus block the button is "Finish early" (v1.17)
+$('#resetBtn').addEventListener('click', () => { if (S.timer.ot && S.timer.phase === 'focus') { if (S.timer.status === 'running') pauseTimer(); else startTimer(); return; } if (!liveButton('reset')) finishPhase('reset'); });   // overtime: Pause / Resume (v1.20)
+document.addEventListener('click', e => { if (e.target.closest('#otOff')) { S.settings.overtime = false; save(); otStop('off'); } });
 $('#muteBtn').addEventListener('click', () => {
   S.settings.sound = !S.settings.sound;
   if (S.settings.sound) { kickAudio(); playEndSound(); } else stopPreview();
@@ -17987,6 +18748,7 @@ $('#setWeek').addEventListener('change', e => { S.settings.weekStart = +e.target
 $('#setTheme').addEventListener('change', e => { S.settings.theme = e.target.value; applyTheme(); save(); });
 $('#setSound').addEventListener('change', e => { S.settings.sound = e.target.checked; if (e.target.checked) kickAudio(); else stopPreview(); save(); renderTimer(); });
 $('#setAuto').addEventListener('change', e => { S.settings.autoStart = e.target.checked; save(); });
+$('#setOvertime').addEventListener('change', e => { S.settings.overtime = e.target.checked; save(); renderTimer(); });
 $('#setAmbVol').addEventListener('input', e => setAmbientVolume(e.target.value));
 $$('.setting').forEach(row => {
   const cb = row.querySelectorAll('input[type="checkbox"]');
@@ -18085,7 +18847,7 @@ $('#blockedList').addEventListener('click', e => { const b = e.target.closest('[
 // Header shortcuts: coins open the Shop, the level badge (or avatar) opens Profile
 $('#lvChip').addEventListener('click', e => { if (e.target.closest('[data-hdr-rank]')) { uiSound('tick'); openMyRank(); return; } showTab('profile'); });   // the rank gem (phones) opens the Ranks board
 $('#rankChip').addEventListener('click', () => { uiSound('tick'); openMyRank(); });
-document.addEventListener('click', e => { if (e.target.closest('[data-myrank]')) { uiSound('tick'); showRankProgress(); } });
+document.addEventListener('click', e => { if (e.target.closest('[data-myrank]')) openRankLadder(); });   // v1.20: the ladder shows your progress and every step
 $('#avatarBtn').addEventListener('click', () => showTab('profile'));
 $('#coinPill').addEventListener('click', () => showTab('shop'));
 $('#tab-profile').addEventListener('click', e => {
@@ -18244,7 +19006,8 @@ function tick() {
   renderGreeting();
   const t = S.timer;
   if (t.live && t.live.mode !== 'together') { liveSync(); renderLiveClock(); }
-  if (t.status === 'running' && !(t.live && t.live.mode !== 'together') && Date.now() >= t.endAt) { finishPhase('complete'); return; }
+  if (t.status === 'running' && t.ot) otTick();   // counting up (v1.20)
+  else if (t.status === 'running' && !(t.live && t.live.mode !== 'together') && Date.now() >= t.endAt) { if (otEligible()) otEnter(); else finishPhase('complete'); return; }
   if (t.live && t.live.mode === 'together' && LIVE.lid) togetherTick();
   renderClock();
   renderAtmo();
@@ -18316,6 +19079,10 @@ Object.assign(STAMP_ART, {   // garden looks (v1.16)
 });
 function stampArt(id) {
   if (STAMP_ART[id]) return STAMP_ART[id];
+  const ps = /^stamp_pass(f?)_(\w+)$/.exec(id || ''), pe = ps && EVENTS.find(ev => ev.id === ps[2]);
+  if (pe) return ps[1]   // v1.20: the Study Pass seals, in the event's colours with its emoji
+    ? `<circle cx="32" cy="32" r="28.5" fill="none" stroke="${pe.b}" stroke-width="3" stroke-dasharray="4 3"/><circle cx="32" cy="32" r="23" fill="${pe.b}" opacity=".2"/><circle cx="32" cy="32" r="23" fill="none" stroke="${pe.a}" stroke-width="1.6"/><text x="32" y="38" text-anchor="middle" font-size="19">${pe.emoji}</text><text x="32" y="53" text-anchor="middle" font-size="6.5" font-weight="800" fill="${pe.b}" letter-spacing=".6">FOCUS</text>`
+    : `<circle cx="32" cy="32" r="28.5" fill="none" stroke="${pe.a}" stroke-width="3"/><circle cx="32" cy="32" r="24" fill="${pe.a}" opacity=".22"/><circle cx="32" cy="32" r="24" fill="none" stroke="${pe.b}" stroke-width="1.6"/><text x="32" y="40" text-anchor="middle" font-size="22">${pe.emoji}</text><text x="32" y="15.5" text-anchor="middle" font-size="6.5" font-weight="800" fill="${pe.a}" letter-spacing=".6">PASS</text>`;
   const b = /^stamp_b_(\w+)$/.exec(id || '');
   const bb = b && BOSS_BY_ID[b[1]], art = bb && BOSS_ART[bb.id];
   if (art) return `<circle cx="32" cy="32" r="28.5" fill="none" stroke="${bb.a}" stroke-width="3"/><circle cx="32" cy="32" r="24" fill="${bb.c}" opacity=".55"/><circle cx="32" cy="32" r="24" fill="none" stroke="${bb.b}" stroke-width="1.2" stroke-dasharray="3 2"/><g transform="translate(12.5 12.5) scale(.325)">${art.body}${art.calm}</g>`;
@@ -19991,6 +20758,7 @@ async function flushContrib() {
     clanBonusFlush((res.items || []).filter(x => x.grp));   // bonus Clan Points for studying together (v1.18)
     if (res.level > res.levelFrom) {
       clanFeed('level', res.level);
+      makePost('clan', `${CLAN.id}-L${res.level}`, res.level);   // v1.20
       inboxAdd({ type: 'clan', key: 'clanlv:' + id + ':' + res.level, title: `${CLAN.doc.name} reached level ${res.level}! 🎉`, body: 'New clan cosmetics may be unlocked in your bag', go: { tab: 'clan' } });
       toast(`🛡️ ${CLAN.doc.name} reached clan level ${res.level}!`, 3600, true);
     }
@@ -20079,6 +20847,7 @@ async function clanClaimRaid() {
   CLAN.rallied = rally;
   G = null;
   clanFeed('raid', 0);
+  makePost('clan', `${CLAN.id}-raid-${monthKey(Date.now())}`, 0);   // v1.20
   return true;
 }
 
@@ -21881,7 +22650,7 @@ function togetherTick() {
   if (t.status === 'running' && t.phase === 'focus') for (const p of livePeople()) if (p.id !== USER.uid && p.st === 'focus') { LIVE.blockMates.add(p.id); LIVE.mates.add(p.id); }
   for (const el of document.querySelectorAll('.lv-cd[data-end]')) { const end = +el.dataset.end; el.textContent = fmtClock(Math.max(0, end - liveSrvNow())); }
   const mine = $('#lvMine');
-  if (mine) mine.textContent = fmtClock(remainingMs());
+  if (mine) mine.textContent = t.ot && t.phase === 'focus' ? '+' + fmtClock(otMs()) : fmtClock(remainingMs());   // overtime counts up (v1.20)
 }
 /** A focus block started: count who focuses with me from now on. */
 function togetherBlockStart() { if (inTogether()) LIVE.blockMates = new Set(livePeople().filter(p => p.id !== USER.uid && p.st === 'focus').map(p => p.id)); }
