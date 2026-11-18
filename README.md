@@ -6,7 +6,7 @@ No ads. No tracking. Runs in your browser.
 👉 **Try it:** https://siverieg.github.io/Pomodorolist-V1.0/
 🎬 **Watch the trailer:** https://youtu.be/Ir033JoyJ5Q
 
-Current version: **v1.19.1**
+Current version: **v2.0**
 
 ---
 
@@ -19,6 +19,19 @@ You can use it on your own, or study with friends, clans and strangers in live s
 ---
 
 ## Features
+
+### ✨ New in 2.0
+- **A calmer design everywhere:** one set of sizes, spacing and controls on every screen, the app's own menus and date/time pickers, clearer contrast in every theme, bigger touch targets on phones and faster tab switches
+- **Calendar** (press C): month, week, day and agenda views of reminders, planned focus blocks, revisions, exams, to-dos and clan sessions — drag to move, export to your calendar app
+- **All-day reminders**
+- **Intention and debrief:** one line on what "done" looks like before a block, and "How far did you get?" after it
+- **"I got distracted"** (press D): a quiet count during a block, with no pop-up
+- **Pick up where you left off:** your last unfinished block comes back in one tap
+- **Streak care:** a weekly rest day, a pause of up to 7 days a month, mending one missed day a month, and a graduate mark at 100 days
+- **Break ideas:** a breathing minute, stretch cards, a 20-second eye rest and a water count — on breaks only
+- **Fuller Focus insights** without check-ins: your week against the last, one suggestion, blocks past the timer, your weekly plan's balance
+- **Invite a friend:** your own link; when a friend joins and studies on three days, you both get a gift
+- **Link previews:** a pasted link shows a proper picture and description
 
 ### ⏱️ Focus
 - Custom Pomodoro timers with named sessions and subjects
@@ -44,6 +57,7 @@ You can use it on your own, or study with friends, clans and strangers in live s
   - *Focus together*: everyone runs their own timer at a shared table
   - *Synced timer*: one shared timer for the whole group
 - Ask to join a friend's session, invite friends in the app, or share an invite link
+- Personal invite link with a gift for you and your friend once they stay
 - Friends tab with Friends, Study sessions and Challenges
 - Kudos and nudges
 - Weekly challenges with friends
@@ -52,7 +66,8 @@ You can use it on your own, or study with friends, clans and strangers in live s
 ### 🏆 Progress and rewards
 - XP and levels (Novice → Legend)
 - **Ranks:** monthly seasons from Bronze to Grandmaster, based on how much you focus this month
-- **Streak milestones** at 3, 7, 14, 30, 50, 100, 200 and 365 days
+- **Streak milestones** at 3, 7, 14, 30, 50, 100, 200 and 365 days, with rest days, pauses and mending so one bad day doesn't undo a habit
+- **Study Pass** with each seasonal questline, and **Posts** showing what you and your friends reach
 - Leaderboards for focus time, garden, ranks and streaks (Friends / Global / Clans)
 - Achievements, weekly quest board and a free monthly reward track
 - Weekly boss battles and seasonal questlines
@@ -71,7 +86,7 @@ You can use it on your own, or study with friends, clans and strangers in live s
 
 ## Built with
 
-- **HTML, CSS and plain JavaScript** in a single `index.html`
+- **HTML, CSS and plain JavaScript** in a single `index.html` (plus an `assets/` folder with the link-preview picture and icons)
 - **Firebase Authentication** for accounts
 - **Cloud Firestore** for syncing, friends, sessions and leaderboards
 - **GitHub Pages** for hosting
@@ -88,7 +103,7 @@ There's no server or backend code. Firestore security rules (`firestore.rules`) 
 4. **Publish the rules:** go to Firestore → Rules, then paste and publish the contents of `firestore.rules`.
 5. **Create the indexes:** go to Firestore → Indexes, then create every composite index listed in `firestore.indexes.json`. All of them use Collection scope. Wait until they all say *Enabled*.
 6. **Add your config:** in Project settings → Your apps, register a web app and copy its config. In `index.html`, search for `EDIT HERE` and paste your values in.
-7. **Host it:** upload `index.html` to GitHub Pages (or any static host) and open it.
+7. **Host it:** upload `index.html` and the `assets/` folder to GitHub Pages (or any static host) and open it. If you host it somewhere else, change the address in the `og:url`, `og:image`, `twitter:image` and `canonical` lines at the top of `index.html`.
 
 The setup order matters: rules first, then indexes, then the app files.
 
@@ -105,6 +120,9 @@ The setup order matters: rules first, then indexes, then the app files.
 | v1.17 | Bug fixes, finish early, harvest collection, garden tour, daily rewards |
 | v1.18 | Study sessions without clans, friends tab rework, streak milestones, new achievements, minimal Pomeo, quest board, monthly track, collection log |
 | v1.19 | Ranks (monthly seasons) and streak leaderboards |
+| v1.19.1 | Leaderboard fix and your rank next to your name |
+| v1.20 | Overtime, the Study Pass, Posts and the rank ladder |
+| v2.0 | A new calmer design, the Calendar, all-day reminders, intention and debrief, kinder streaks, break ideas, fuller insights, invite links and link previews |
 
 ---
 

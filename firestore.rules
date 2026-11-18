@@ -27,7 +27,8 @@ service cloud.firestore {
     function me() { return request.auth.uid; }
     // Usernames are the login: "<username>@pomodorolist.app". This ties every
     // public username to the account that really owns it.
-    function myName() { return request.auth.token.email.split('@')[0]; }
+    // (v2.0) Only an address of the app's own domain gives a name; any other address keeps its "@", and no username has one.
+    function myName() { return request.auth.token.email.replace('@pomodorolist[.]app$', ''); }
     function path(col, id) { return /databases/$(database)/documents/$(col)/$(id); }
 
     // Accepted friendship between me and uid (document id = smaller uid + "_" + larger uid): one read.
@@ -988,6 +989,65 @@ service cloud.firestore {
         && (uid == me() || (isOfficer(request.resource.data.clan) && exists(/databases/$(database)/documents/clans/$(request.resource.data.clan)/requests/$(uid))));
       allow delete: if signedIn() && !existsAfter(memberPath(resource.data.clan, uid))                  // only when the member row goes too
         && (uid == me() || isLeader(resource.data.clan) || (isOfficer(resource.data.clan) && get(memberPath(resource.data.clan, uid)).data.role == 'member'));
+    }
+
+    // ---------------- v2.0: invites ----------------
+    // referrals/{invitee}: written once, by a new account that arrived through someone's link. Never deleted, and an
+    // account can have only one — so nobody can be counted as "invited" twice.
+    //   { inviter, inviterName, name, at, checks, checkAt, min, state: 'joined' | 'active', activeAt? }
+    // The invitee checks in three times, at least 18 hours apart and within 14 days of joining. Each check-in needs
+    // 20 more published focus minutes than the one before (publicStats.lifeMin, which the rules only let grow with
+    // real time), and the third needs 180 in total. That third write must, in the same batch, add exactly one to the
+    // inviter's inviteStats — the only way inviteStats can change. Each invitee therefore counts once.
+    // What this proves: one account, counted once, for one inviter, after three check-ins at least 18 hours apart within
+    // 14 days. The minutes are only as good as publicStats (which an account can delete and write again), so they prove
+    // little; that is why the rewards are cosmetic and capped (see the report).
+    function refPath(uid) { return path('referrals', uid); }
+    function validReferral(d, uid) {
+      return d.keys().hasOnly(['inviter', 'inviterName', 'name', 'at', 'checks', 'checkAt', 'min', 'state'])
+        && d.inviter is string && d.inviter != uid                                  // never yourself
+        && d.inviterName is string && d.inviterName.size() <= 20
+        && get(path('usernames', d.inviterName)).data.uid == d.inviter              // the inviter exists and owns that name
+        && d.name == myName()
+        && !blockedBy(d.inviter)                                                    // not someone the inviter has blocked
+        && d.at == request.time && d.checkAt == request.time
+        && d.checks == 0 && d.min == 0 && d.state == 'joined'
+        && !exists(path('publicStats', uid));                                       // a new account: nothing published yet
+    }
+    function referralStep(n, o, uid) {
+      return n.diff(o).affectedKeys().hasOnly(['checks', 'checkAt', 'min', 'state', 'activeAt'])
+        && o.state == 'joined'
+        && n.checks == o.checks + 1 && n.checks <= 3
+        && n.checkAt == request.time
+        && request.time >= o.checkAt + duration.value(18, 'h')
+        && request.time <= o.at + duration.value(14, 'd')
+        && n.min is int && n.min == get(path('publicStats', uid)).data.lifeMin && n.min >= o.min + 20
+        && ((n.checks < 3 && n.state == 'joined' && !('activeAt' in n))
+            || (n.checks == 3 && n.state == 'active' && n.activeAt == request.time && n.min >= 180
+                && getAfter(path('inviteStats', o.inviter)).data.n == (exists(path('inviteStats', o.inviter)) ? get(path('inviteStats', o.inviter)).data.n + 1 : 1)));
+    }
+    match /referrals/{uid} {
+      allow get: if signedIn() && (me() == uid || resource.data.inviter == me());
+      allow list: if signedIn() && resource.data.inviter == me();                   // "who joined through my link": where('inviter', '==', me)
+      allow create: if signedIn() && me() == uid && validReferral(request.resource.data, uid);
+      allow update: if signedIn() && me() == uid && referralStep(request.resource.data, resource.data, uid);
+      allow delete: if false;
+    }
+    // inviteStats/{inviter}: { n, updatedAt } — how many invited friends became active. Readable by any signed-in
+    // user (it is the "Brought N friends" on a profile); written only by an invitee, in the write that makes their
+    // own referral active.
+    function activatesNow(inviter) {
+      return get(refPath(me())).data.inviter == inviter && get(refPath(me())).data.state == 'joined'
+        && getAfter(refPath(me())).data.state == 'active';
+    }
+    match /inviteStats/{inviter} {
+      allow get: if signedIn();
+      allow list: if false;
+      allow create: if signedIn() && request.resource.data.keys().hasOnly(['n', 'updatedAt'])
+        && request.resource.data.n == 1 && request.resource.data.updatedAt == request.time && activatesNow(inviter);
+      allow update: if signedIn() && request.resource.data.keys().hasOnly(['n', 'updatedAt'])
+        && request.resource.data.n == resource.data.n + 1 && request.resource.data.updatedAt == request.time && activatesNow(inviter);
+      allow delete: if false;
     }
 
     // Everything else is closed.
